@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="color_material_indigo_500">#3f51b5</color>
+    <color name="color_material_indigo_700">#303f9f</color>
+    <color name="color_material_pink_A100">#ff80ab</color>
+    <color name="color_material_pink_A200">#ff4081</color>
+    <color name="color_material_grey_200">#eeeeee</color>
+
+    <color name="color_material_blue_grey_500">#607D8B</color>
+    <color name="color_material_blue_grey_700">#455a64</color>
+</resources>

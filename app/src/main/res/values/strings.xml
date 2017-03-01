@@ -1,0 +1,51 @@
+<resources>
+    <string name="app_name">Gymm</string>
+
+    <!-- main activity -->
+    <!-- menu -->
+    <string name="main_activity_menu_add_program_title">Добавить программу тренировки</string>
+
+    <!-- program training activity -->
+    <string name="program_training_activity_title">Тренировка</string>
+    <!-- layout items -->
+    <string name="program_training_activity_name_hint">Название тренировки</string>
+    <string name="program_training_activity_weekday_label">День недели (опционально)</string>
+    <string name="program_training_activity_exercises_label">Упражнения</string>
+    <string name="program_training_activity_add_exercise">Добавить упражнение</string>
+    <string name="program_training_activity_empty_list">Вы ещё не добавили упражнения</string>
+    <!-- menu -->
+    <string name="program_training_activity_menu_done">Сохранить</string>
+
+    <!-- program exercise activity -->
+    <string name="program_exercise_activity_title">Упражнение</string>
+    <!-- layout items -->
+    <!--<string name="program_exercise_activity_list_label">Упражнение</string>-->
+    <string name="program_exercise_activity_reps_label">Повторы</string>
+    <string name="program_exercise_activity_rest_time_minutes_label">Минуты</string>
+    <string name="program_exercise_activity_rest_time_seconds_label">Секунды</string>
+    <string name="program_exercise_activity_empty_list">Вы ещё не добавили подходы</string>
+    <!-- exercise's reps and rest time input dialog -->
+    <string name="program_exercise_activity_dialog_title">Добавление подхода</string>
+    <string name="program_exercise_activity_dialog_rest_time_label">Время на отдых</string>
+    <string name="program_exercise_activity_dialog_positive_button_text">OK</string>
+    <string name="program_exercise_activity_dialog_negative_button_text">Отмена</string>
+    <!-- menu -->
+
+    <plurals name="number_of_sets">
+        <item quantity="one">%d повтор</item>
+        <item quantity="few">%d повтора</item>
+        <item quantity="other">%d повторов</item>
+    </plurals>
+
+    <plurals name="minutes">
+        <item quantity="one">%d минута</item>
+        <item quantity="few">%d минуты</item>
+        <item quantity="other">%d минут</item>
+    </plurals>
+
+    <plurals name="seconds">
+        <item quantity="one">%d секунда</item>
+        <item quantity="few">%d секунды</item>
+        <item quantity="other">%d секунд</item>
+    </plurals>
+</resources>

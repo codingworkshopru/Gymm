@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <data>
+        <import type="android.view.View"/>
+        <variable
+            name="exercise"
+            type="ru.codingworkshop.gymm.data.model.ProgramExercise"/>
+    </data>
+
+    <android.support.constraint.ConstraintLayout
+        android:id="@+id/activity_program_exercise"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+        <android.support.design.widget.AppBarLayout
+            android:id="@+id/app_bar_layout"
+            android:layout_height="wrap_content"
+            android:layout_width="0dp"
+            android:theme="?attr/actionBarTheme"
+            android:background="@drawable/tr_app_bar_color"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintLeft_toLeftOf="parent">
+
+            <android.support.v7.widget.Toolbar
+                android:id="@+id/toolbar"
+                android:layout_width="match_parent"
+                android:layout_height="?attr/actionBarSize"/>
+
+            <Spinner
+                android:id="@+id/program_exercises_dropdown"
+                android:layout_height="48dp"
+                android:layout_width="match_parent"
+                android:layout_marginTop="8dp"
+                android:layout_marginBottom="16dp"
+                android:layout_marginEnd="16dp"
+                android:layout_marginRight="16dp"
+                android:layout_marginStart="16dp"
+                android:layout_marginLeft="16dp"
+                bind:value="@={exercise.exercise}"
+                app:popupTheme="@style/ThemeOverlay.AppCompat.Light"
+                android:visibility="visible" />
+
+        </android.support.design.widget.AppBarLayout>
+
+        <android.support.design.widget.FloatingActionButton
+            android:id="@+id/program_exercise_add_set"
+            android:layout_height="0dp"
+            android:layout_width="wrap_content"
+            app:fabSize="normal"
+            android:onClick="onAddButtonClick"
+            android:layout_gravity="bottom|end"
+            app:srcCompat="@drawable/ic_add_24dp"
+            android:layout_weight="1"
+            android:layout_marginEnd="16dp"
+            app:layout_constraintRight_toRightOf="parent"
+            android:layout_marginRight="16dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            android:layout_marginBottom="16dp" />
+
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/program_exercise_sets_list"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:paddingBottom="100dp"
+            android:scrollbars="vertical"
+            android:background="@color/color_material_grey_200"
+            app:layout_behavior="@string/appbar_scrolling_view_behavior"
+            android:clipToPadding="false"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/app_bar_layout"
+            app:layout_constraintBottom_toBottomOf="parent"/>
+
+        <TextView
+            android:visibility="@{exercise.mHasChildren ? View.GONE : View.VISIBLE}"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+            android:id="@+id/textView"
+            app:layout_constraintTop_toBottomOf="@+id/app_bar_layout"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintLeft_toLeftOf="parent"
+            android:text="@string/program_exercise_activity_empty_list"
+            android:layout_gravity="center_horizontal"
+            android:drawableTop="@drawable/ic_timeline_200dp" />
+
+
+    </android.support.constraint.ConstraintLayout>
+</layout>
