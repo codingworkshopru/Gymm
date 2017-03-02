@@ -60,10 +60,6 @@ public class ProgramTrainingActivity extends AppCompatActivity
         // data binding
         mBinding = DataBindingUtil.setContentView(this, R.layout.activity_program_training);
 
-        // restore model from bundle
-        if (savedInstanceState != null && savedInstanceState.containsKey(TRAINING_MODEL_KEY))
-            mModel = savedInstanceState.getParcelable(TRAINING_MODEL_KEY);
-
         setSupportActionBar((Toolbar) findViewById(R.id.toolbar2));
         // setting "up" button
         ActionBar ab = getSupportActionBar();
@@ -98,6 +94,13 @@ public class ProgramTrainingActivity extends AppCompatActivity
         mExercisesAdapter = new ProgramAdapter<>(mModel, this, new ExerciseViewHolderFactory());
         mExercisesView.setAdapter(mExercisesAdapter);
 
+
+        // restore model from bundle
+        if (savedInstanceState != null && savedInstanceState.containsKey(TRAINING_MODEL_KEY)) {
+            mModel = savedInstanceState.getParcelable(TRAINING_MODEL_KEY);
+            onModelUpdated();
+        }
+
         Intent intent = getIntent();
         if (mModel == null) {
             if (intent != null && intent.hasExtra(TRAINING_ID_KEY)) {
@@ -112,7 +115,6 @@ public class ProgramTrainingActivity extends AppCompatActivity
         }
     }
 
-    // TODO попробовать не сохранять
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
@@ -192,7 +194,7 @@ public class ProgramTrainingActivity extends AppCompatActivity
         };
     }
 
-    void onModelUpdated() {
+    private void onModelUpdated() {
         mBinding.setTraining(mModel);
         mExercisesAdapter.setModel(mModel);
     }
