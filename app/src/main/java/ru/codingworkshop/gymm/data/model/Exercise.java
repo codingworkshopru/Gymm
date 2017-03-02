@@ -3,19 +3,19 @@ package ru.codingworkshop.gymm.data.model;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Parcel;
-import android.os.Parcelable;
 
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
 import ru.codingworkshop.gymm.data.GymContract;
+import ru.codingworkshop.gymm.data.model.base.Model;
 
 /**
  * Created by Радик on 14.02.2017.
  */
 
-public final class Exercise implements Parcelable {
+public final class Exercise implements Model {
     private long id;
     private MuscleGroup primaryMuscleGroup;
     private String name;
@@ -42,6 +42,7 @@ public final class Exercise implements Parcelable {
         secondaryMuscles.add(muscles);
     }
 
+    @Override
     public long getId() {
         return id;
     }

@@ -4,8 +4,9 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools">
     <data>
+        <import type="android.view.View" />
         <variable
-            name="program"
+            name="training"
             type="ru.codingworkshop.gymm.data.model.ProgramTraining" />
     </data>
     <android.support.design.widget.CoordinatorLayout
@@ -50,7 +51,7 @@
                             android:layout_height="wrap_content"
                             android:layout_width="match_parent"
                             android:layout_gravity="center_vertical"
-                            android:text="@={program.name}"
+                            android:text="@={training.name}"
                             android:hint="@string/program_training_activity_name_hint"
                             android:textAppearance="@style/TextAppearance.AppCompat.Large.Inverse"
                             tools:text="Бицуха"/>
@@ -68,7 +69,7 @@
                         android:id="@+id/program_training_weekday"
                         android:layout_height="48dp"
                         android:layout_gravity="bottom"
-                        bind:value="@={program.weekday}"
+                        bind:value="@={training.weekday}"
                         android:layout_width="match_parent"
                         app:popupTheme="@style/ThemeOverlay.AppCompat.Light"
                         android:layout_marginBottom="16dp" />
@@ -96,6 +97,7 @@
             app:layout_behavior="@string/appbar_scrolling_view_behavior" />
 
         <TextView
+            android:visibility="@{training.childrenCount() > 0 ? View.GONE : View.VISIBLE}"
             android:text="@string/program_training_activity_empty_list"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"

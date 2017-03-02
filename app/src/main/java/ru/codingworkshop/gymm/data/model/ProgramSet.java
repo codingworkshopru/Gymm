@@ -9,64 +9,66 @@ import android.os.Parcel;
 import java.util.LinkedList;
 import java.util.List;
 
+import ru.codingworkshop.gymm.data.model.base.MutableModel;
+import ru.codingworkshop.gymm.data.model.base.Orderable;
 import ru.codingworkshop.gymm.data.model.field.Field;
-import ru.codingworkshop.gymm.data.GymContract;
+import ru.codingworkshop.gymm.data.GymContract.*;
 
 /**
  * Created by Радик on 17.02.2017.
  */
 
-public final class ProgramSet extends Model implements Model.Orderable {
-    private static final int ID  = 0;
-    private static final int REPS = 1;
-    private static final int SECONDS_FOR_REST = 2;
-    private static final int SORT_ORDER = 3;
+public final class ProgramSet extends MutableModel implements Orderable {
+    private Field<Long> id = new Field<>(ProgramSetEntry._ID, 0L);
+    private Field<Integer> reps = new Field<>(ProgramSetEntry.COLUMN_REPS, 0);
+    private Field<Integer> secondsForRest = new Field<>(ProgramSetEntry.COLUMN_SECONDS_FOR_REST, 0);
+    private Field<Integer> sortOrder = new Field<>(ProgramSetEntry.COLUMN_SORT_ORDER, -1);
 
-    private static final String TABLE_NAME = GymContract.ProgramSetEntry.TABLE_NAME;
+    private static final String TABLE_NAME = ProgramSetEntry.TABLE_NAME;
 
     public ProgramSet() {
-        fields = new Field[4];
-        fields[ID] = new Field<Long>(GymContract.ProgramSetEntry._ID, 0L);
-        fields[REPS] = new Field<Integer>(GymContract.ProgramSetEntry.COLUMN_REPS, 0);
-        fields[SECONDS_FOR_REST] = new Field<Integer>(GymContract.ProgramSetEntry.COLUMN_SECONDS_FOR_REST, 0);
-        fields[SORT_ORDER] = new Field<Integer>(GymContract.ProgramSetEntry.COLUMN_SORT_ORDER, -1);
     }
 
     @Override
     public long getId() {
-        return (long) fields[ID].getData();
+        return id.getData();
     }
 
     public void setReps(int reps) {
-        fields[REPS].setData(reps);
+        this.reps.setData(reps);
     }
 
     public int getReps() {
-        return (int) fields[REPS].getData();
+        return reps.getData();
     }
 
     public void setSecondsForRest(int secondsForRest) {
-        fields[SECONDS_FOR_REST].setData(secondsForRest);
+        this.secondsForRest.setData(secondsForRest);
     }
 
     public int getSecondsForRest() {
-        return (int) fields[SECONDS_FOR_REST].getData();
+        return secondsForRest.getData();
     }
 
     @Override
     public void setOrder(int order) {
-        fields[SORT_ORDER].setData(order);
+        sortOrder.setData(order);
     }
 
     @Override
     public int getOrder() {
-        return (int) fields[SORT_ORDER].getData();
+        return sortOrder.getData();
     }
 
     @Override
     public ProgramSet clone() {
         try {
-            return (ProgramSet) super.clone();
+            ProgramSet cloned = (ProgramSet) super.clone();
+            cloned.id = id.clone();
+            cloned.reps = reps.clone();
+            cloned.secondsForRest = secondsForRest.clone();
+            cloned.sortOrder = sortOrder.clone();
+            return cloned;
         } catch (CloneNotSupportedException e) {
             e.printStackTrace();
             return null;
@@ -75,30 +77,38 @@ public final class ProgramSet extends Model implements Model.Orderable {
 
     @Override
     public boolean isChanged() {
-        for (Field f : fields)
-            if (f.isChanged())
-                return true;
+        return reps.isChanged() || secondsForRest.isChanged() || sortOrder.isChanged();
+    }
 
-        return false;
+    protected void addFieldsToContentValues(ContentValues cv, boolean onlyChanged) {
+        Field.addToValues(cv, reps, onlyChanged);
+        Field.addToValues(cv, secondsForRest, onlyChanged);
+        Field.addToValues(cv, sortOrder, onlyChanged);
+    }
+
+    @Override
+    protected void commit() {
+        id.commit();
+        reps.commit();
+        secondsForRest.commit();
+        sortOrder.commit();
     }
 
     @Override
     public long create(SQLiteDatabase db, long parentId) {
-        if (getId() != 0)
+        if (!isPhantom())
             return -1;
 
         ContentValues cv = new ContentValues();
-        cv.put(GymContract.ProgramSetEntry.COLUMN_PROGRAM_EXERCISE_ID, parentId);
-
-        for (int i = ID + 1; i <= SORT_ORDER; i++)
-            cv.put(fields[i].getColumnName(), (Integer) fields[i].getData());
+        cv.put(ProgramSetEntry.COLUMN_PROGRAM_EXERCISE_ID, parentId);
+        addFieldsToContentValues(cv, false);
 
         long setId = db.insert(TABLE_NAME, null, cv);
 
         if (setId == -1)
             throw new SQLiteException("Insertion error: " + cv);
 
-        fields[ID].setData(setId);
+        id.setData(setId);
         commit();
 
         return setId;
@@ -108,21 +118,21 @@ public final class ProgramSet extends Model implements Model.Orderable {
         Cursor cursor = db.query(
                 TABLE_NAME,
                 null,
-                GymContract.ProgramSetEntry.COLUMN_PROGRAM_EXERCISE_ID + "=" + parentId,
+                ProgramSetEntry.COLUMN_PROGRAM_EXERCISE_ID + "=" + parentId,
                 null,
                 null,
                 null,
-                GymContract.ProgramSetEntry.COLUMN_SORT_ORDER
+                ProgramSetEntry.COLUMN_SORT_ORDER
         );
 
         List<ProgramSet> result = new LinkedList<>();
         while (cursor.moveToNext()) {
             ProgramSet set = new ProgramSet();
-            Field[] fields = set.fields;
-            fields[ID].setInitialData(cursor.getLong(cursor.getColumnIndex(fields[ID].getColumnName())));
-            fields[REPS].setInitialData(cursor.getInt(cursor.getColumnIndex(fields[REPS].getColumnName())));
-            fields[SECONDS_FOR_REST].setInitialData(cursor.getInt(cursor.getColumnIndex(fields[SECONDS_FOR_REST].getColumnName())));
-            fields[SORT_ORDER].setInitialData(cursor.getInt(cursor.getColumnIndex(fields[SORT_ORDER].getColumnName())));
+            set.id.setInitialData(cursor.getLong(cursor.getColumnIndex(set.id.getColumnName())));
+
+            set.reps.setInitialData(cursor.getInt(cursor.getColumnIndex(set.reps.getColumnName())));
+            set.secondsForRest.setInitialData(cursor.getInt(cursor.getColumnIndex(set.secondsForRest.getColumnName())));
+            set.sortOrder.setInitialData(cursor.getInt(cursor.getColumnIndex(set.sortOrder.getColumnName())));
             result.add(set);
         }
 
@@ -133,35 +143,40 @@ public final class ProgramSet extends Model implements Model.Orderable {
 
     @Override
     public int update(SQLiteDatabase db) {
-        if (getId() == 0)
+        if (isPhantom() || !isChanged())
             return 0;
 
         ContentValues cv = new ContentValues();
-
-        for (Field f : fields)
-            if (f.isChanged())
-                cv.put(f.getColumnName(), (Integer) f.getData());
-
-        if (cv.size() == 0)
-            return 0;
+        addFieldsToContentValues(cv, true);
 
         commit();
 
-        return db.update(TABLE_NAME, cv, fields[ID].getColumnName() + "=" + getId(), null);
+        return db.update(TABLE_NAME, cv, id.getColumnName() + "=" + getId(), null);
     }
 
     @Override
     public int delete(SQLiteDatabase db) {
-        int rows = db.delete(TABLE_NAME, fields[ID].getColumnName() + "=" + getId(), null);
-        if (rows == 1) {
-            fields[ID].setData(0L);
-            fields[ID].commit();
-        }
-        return rows;
+        if (isPhantom())
+            return 0;
+
+        int rowsAffected = db.delete(TABLE_NAME, id.getColumnName() + "=" + getId(), null);
+
+        if (rowsAffected != 0)
+            id.setInitialData(0L);
+
+        return rowsAffected;
+    }
+
+    @Override
+    public String validate() {
+        return null;
     }
 
     private ProgramSet(Parcel in) {
-        super(in);
+        id = in.readParcelable(reps.getClass().getClassLoader());
+        reps = in.readParcelable(reps.getClass().getClassLoader());
+        secondsForRest = in.readParcelable(secondsForRest.getClass().getClassLoader());
+        sortOrder = in.readParcelable(sortOrder.getClass().getClassLoader());
     }
 
     public static final Creator<ProgramSet> CREATOR = new Creator<ProgramSet>() {
@@ -175,4 +190,17 @@ public final class ProgramSet extends Model implements Model.Orderable {
             return new ProgramSet[size];
         }
     };
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeParcelable(id, flags);
+        dest.writeParcelable(reps, flags);
+        dest.writeParcelable(secondsForRest, flags);
+        dest.writeParcelable(sortOrder, flags);
+    }
 }

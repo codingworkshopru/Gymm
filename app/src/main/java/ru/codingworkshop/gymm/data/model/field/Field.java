@@ -1,7 +1,10 @@
 package ru.codingworkshop.gymm.data.model.field;
 
+import android.content.ContentValues;
 import android.os.Parcel;
 import android.os.Parcelable;
+
+import ru.codingworkshop.gymm.data.model.base.Model;
 
 /**
  * Created by Радик on 17.02.2017.
@@ -21,11 +24,14 @@ public class Field<T> implements Cloneable, Parcelable {
     }
 
     public Field(String columnName, T initialData) {
-        this(columnName, (Class<T>) initialData.getClass());
+        this(columnName, (Class<T>) initialData.getClass()); // TODO проверить с getTypeParameters и заменить в ChildrenField
         data = initialData;
     }
 
     public void commit() {
+        if (changedData == null)
+            return;
+
         data = changedData;
         changedData = null;
     }
@@ -52,8 +58,8 @@ public class Field<T> implements Cloneable, Parcelable {
     }
 
     @Override
-    public Object clone() throws CloneNotSupportedException {
-        return super.clone();
+    public Field<T> clone() throws CloneNotSupportedException {
+        return (Field<T>) super.clone();
     }
 
     private Field(Parcel in) {
@@ -86,5 +92,22 @@ public class Field<T> implements Cloneable, Parcelable {
         dest.writeValue(data);
         dest.writeValue(changedData);
         dest.writeString(columnName);
+    }
+
+    public static void addToValues(ContentValues cv, Field field, boolean onlyChanged) {
+        if (onlyChanged && !field.isChanged())
+            return;
+
+        String column = field.getColumnName();
+        Object data = field.getData();
+
+        if (data instanceof Long)
+            cv.put(column, (Long) data);
+        else if (data instanceof Integer)
+            cv.put(column, (Integer) data);
+        else if (data instanceof String)
+            cv.put(column, data.toString());
+        else if (data instanceof Model)
+            cv.put(column, ((Model)data).getId());
     }
 }

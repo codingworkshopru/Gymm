@@ -71,7 +71,7 @@ public final class GymDbHelper extends SQLiteOpenHelper {
 
     @Override
     public void onOpen(SQLiteDatabase db) {
-//        db.execSQL("PRAGMA foreign_keys = ON");
+        db.execSQL("PRAGMA foreign_keys = ON");
     }
 
     private void parseXml(SQLiteDatabase db) throws XmlPullParserException, IOException {

@@ -38,7 +38,6 @@ public class ProgramExerciseActivity extends AppCompatActivity
         SetInputDialog.SetInputDialogListener,
         ProgramAdapter.ListItemActionListener
 {
-
     private static final String TAG = ProgramExerciseActivity.class.getSimpleName();
 
     // models

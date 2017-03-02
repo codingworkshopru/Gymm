@@ -193,7 +193,7 @@ public class ProgramTrainingActivity extends AppCompatActivity
     }
 
     void onModelUpdated() {
-        mBinding.setProgram(mModel);
+        mBinding.setTraining(mModel);
         mExercisesAdapter.setModel(mModel);
     }
 

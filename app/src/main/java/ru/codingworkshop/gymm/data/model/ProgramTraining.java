@@ -5,61 +5,52 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteException;
 import android.os.Parcel;
-import android.util.Log;
 
 import java.util.LinkedList;
 import java.util.List;
 
+import ru.codingworkshop.gymm.data.model.base.MutableModel;
+import ru.codingworkshop.gymm.data.model.base.Parent;
 import ru.codingworkshop.gymm.data.model.field.ChildrenField;
 import ru.codingworkshop.gymm.data.model.field.Field;
-import ru.codingworkshop.gymm.data.GymContract;
+import ru.codingworkshop.gymm.data.GymContract.*;
 
 /**
  * Created by Радик on 18.02.2017.
  */
 
-public final class ProgramTraining extends Model implements Model.Parent<ProgramExercise> {
-    private ChildrenField<ProgramExercise> children;
+public final class ProgramTraining extends MutableModel implements Parent<ProgramExercise> {
+    private Field<Long> id = new Field<>(ProgramTrainingEntry._ID, 0L);
+    private Field<String> name = new Field<>(ProgramTrainingEntry.COLUMN_NAME, String.class);
+    private Field<Integer> weekday = new Field<>(ProgramTrainingEntry.COLUMN_WEEKDAY, 0);
+    private ChildrenField<ProgramExercise> children = new ChildrenField<>(ProgramExercise.class, this);
 
-    private static final int ID = 0;
-    private static final int NAME = 1;
-    private static final int WEEKDAY = 2;
-
-    private static final String TABLE_NAME = GymContract.ProgramTrainingEntry.TABLE_NAME;
+    private static final String TABLE_NAME = ProgramTrainingEntry.TABLE_NAME;
 
     private static final String TAG = ProgramTraining.class.getSimpleName();
 
     public ProgramTraining() {
-        fields = new Field[3];
-
-        fields[ID] = new Field<Long>(GymContract.ProgramTrainingEntry._ID, 0L);
-        fields[NAME] = new Field<String>(GymContract.ProgramTrainingEntry.COLUMN_NAME, String.class);
-        fields[WEEKDAY] = new Field<Integer>(GymContract.ProgramTrainingEntry.COLUMN_WEEKDAY, 0);
-
-        children = new ChildrenField<>(ProgramExercise.class);
-
-        Log.d(TAG, "ProgramTraining object constructed");
     }
 
     @Override
     public long getId() {
-        return (long) fields[ID].getData();
+        return id.getData();
     }
 
     public String getName() {
-        return (String) fields[NAME].getData();
+        return name.getData();
     }
 
     public void setName(String name) {
-        fields[NAME].setData(name);
+        this.name.setData(name);
     }
 
     public int getWeekday() {
-        return (int) fields[WEEKDAY].getData();
+        return weekday.getData();
     }
 
     public void setWeekday(int weekday) {
-        fields[WEEKDAY].setData(weekday);
+        this.weekday.setData(weekday);
     }
 
     @Override
@@ -94,28 +85,41 @@ public final class ProgramTraining extends Model implements Model.Parent<Program
 
     @Override
     public boolean isChanged() {
-        for (Field f : fields)
-            if (f.isChanged())
-                return true;
+        return name.isChanged() || weekday.isChanged() || children.isChanged();
+    }
 
-        return children.isChanged();
+    @Override
+    public String validate() {
+        return null;
+    }
+
+    @Override
+    protected void commit() {
+        id.commit();
+        name.commit();
+        weekday.commit();
+    }
+
+    @Override
+    protected void addFieldsToContentValues(ContentValues cv, boolean onlyChanged) {
+        Field.addToValues(cv, name, onlyChanged);
+        Field.addToValues(cv, weekday, onlyChanged);
     }
 
     @Override
     public long create(SQLiteDatabase db, long parentId) {
-        if (getId() != 0)
+        if (!isPhantom())
             return -1;
 
         ContentValues cv = new ContentValues();
-        cv.put(fields[NAME].getColumnName(), (String) fields[NAME].getData());
-        cv.put(fields[WEEKDAY].getColumnName(), (int) fields[WEEKDAY].getData());
+        addFieldsToContentValues(cv, false);
 
         long trainingId = db.insert(TABLE_NAME, null, cv);
 
         if (trainingId == -1)
             throw new SQLiteException("Insertion error: " + cv);
 
-        fields[ID].setData(trainingId);
+        id.setData(trainingId);
         commit();
 
         children.save(db, getId());
@@ -127,7 +131,7 @@ public final class ProgramTraining extends Model implements Model.Parent<Program
         Cursor cursor = db.query(
                 TABLE_NAME,
                 null,
-                GymContract.ProgramTrainingEntry._ID + "= ?",
+                ProgramTrainingEntry._ID + "= ?",
                 new String[] {Long.toString(id)},
                 null,
                 null,
@@ -136,10 +140,9 @@ public final class ProgramTraining extends Model implements Model.Parent<Program
 
         ProgramTraining result = new ProgramTraining();
         if (cursor.moveToNext()) {
-            Field[] fields = result.fields;
-            fields[ID].setInitialData(cursor.getLong(cursor.getColumnIndex(fields[ID].getColumnName())));
-            fields[NAME].setInitialData(cursor.getString(cursor.getColumnIndex(fields[NAME].getColumnName())));
-            fields[WEEKDAY].setInitialData(cursor.getInt(cursor.getColumnIndex(fields[WEEKDAY].getColumnName())));
+            result.id.setInitialData(cursor.getLong(cursor.getColumnIndex(result.id.getColumnName())));
+            result.name.setInitialData(cursor.getString(cursor.getColumnIndex(result.name.getColumnName())));
+            result.weekday.setInitialData(cursor.getInt(cursor.getColumnIndex(result.weekday.getColumnName())));
             result.children.setInitialList(ProgramExercise.read(db, result.getId()));
         }
 
@@ -162,10 +165,9 @@ public final class ProgramTraining extends Model implements Model.Parent<Program
         List<ProgramTraining> result = new LinkedList<>();
         while (cursor.moveToNext()) {
             ProgramTraining training = new ProgramTraining();
-            Field[] fields = training.fields;
-            fields[ID].setInitialData(cursor.getLong(cursor.getColumnIndex(fields[ID].getColumnName())));
-            fields[NAME].setInitialData(cursor.getString(cursor.getColumnIndex(fields[NAME].getColumnName())));
-            fields[WEEKDAY].setInitialData(cursor.getInt(cursor.getColumnIndex(fields[WEEKDAY].getColumnName())));
+            training.id.setInitialData(cursor.getLong(cursor.getColumnIndex(training.id.getColumnName())));
+            training.name.setInitialData(cursor.getString(cursor.getColumnIndex(training.name.getColumnName())));
+            training.weekday.setInitialData(cursor.getInt(cursor.getColumnIndex(training.weekday.getColumnName())));
             training.children.setInitialList(ProgramExercise.read(db, training.getId()));
             result.add(training);
         }
@@ -177,46 +179,48 @@ public final class ProgramTraining extends Model implements Model.Parent<Program
 
     @Override
     public int update(SQLiteDatabase db) {
-        if (getId() == 0)
+        if (isPhantom() || !isChanged())
             return 0;
-
-        ContentValues cv = new ContentValues();
-        if (fields[NAME].isChanged())
-            cv.put(fields[NAME].getColumnName(), (String) fields[NAME].getData());
-
-        if (fields[WEEKDAY].isChanged())
-            cv.put(fields[WEEKDAY].getColumnName(), (int) fields[WEEKDAY].getData());
 
         children.save(db, getId());
 
-        if (cv.size() == 0)
+        ContentValues cv = new ContentValues();
+        addFieldsToContentValues(cv, true);
+        if (cv.size() != 0) {
+            commit();
+            return db.update(TABLE_NAME, cv, id.getColumnName() + "=" + getId(), null);
+        } else {
             return 0;
-
-        commit();
-
-        return db.update(TABLE_NAME, cv, fields[ID].getColumnName() + "=" + getId(), null);
+        }
     }
 
     @Override
     public int delete(SQLiteDatabase db) {
-        int rows = db.delete(TABLE_NAME, fields[ID].getColumnName() + "=" + getId(), null);
+        int rows = db.delete(TABLE_NAME, id.getColumnName() + "=" + getId(), null);
 
-        if (rows == 1) {
-            fields[ID].setData(0L);
-            commit();
-        }
+        if (rows == 1)
+            id.setInitialData(0L);
 
         return rows;
     }
 
     private ProgramTraining(Parcel in) {
-        super(in);
+        id = in.readParcelable(Field.class.getClassLoader());
+        name = in.readParcelable(Field.class.getClassLoader());
+        weekday = in.readParcelable(Field.class.getClassLoader());
         children = in.readParcelable(ChildrenField.class.getClassLoader());
     }
 
     @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
     public void writeToParcel(Parcel dest, int flags) {
-        super.writeToParcel(dest, flags);
+        dest.writeParcelable(id, flags);
+        dest.writeParcelable(name, flags);
+        dest.writeParcelable(weekday, flags);
         dest.writeParcelable(children, flags);
     }
 

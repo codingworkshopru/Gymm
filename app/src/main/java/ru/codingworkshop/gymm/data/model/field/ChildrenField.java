@@ -7,24 +7,25 @@ package ru.codingworkshop.gymm.data.model.field;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Parcel;
 import android.os.Parcelable;
-import android.util.Log;
 
 import java.util.LinkedList;
 import java.util.List;
 
-import ru.codingworkshop.gymm.data.model.Model;
+import ru.codingworkshop.gymm.data.model.base.MutableModel;
+import ru.codingworkshop.gymm.data.model.base.Orderable;
+import ru.codingworkshop.gymm.data.model.base.Parent;
 
-public class ChildrenField<T extends Model> implements Cloneable, Parcelable {
+public class ChildrenField<T extends MutableModel> implements Cloneable, Parcelable {
+    private Class<T> type;
     private List<T> data;
     private List<T> changedData;
-    private Class<T> type;
 
     private static final String TAG = ChildrenField.class.getSimpleName();
 
-    public ChildrenField(Class<T> type) {
+    public ChildrenField(Class<T> type, Parent parent) {
+        this.type = type;
         data = createList();
         changedData = createList();
-        this.type = type;
     }
 
     public void setInitialList(List<T> list) {
@@ -36,8 +37,8 @@ public class ChildrenField<T extends Model> implements Cloneable, Parcelable {
         if (element == null)
             throw new IllegalArgumentException("Element is null");
 
-        if (element instanceof Model.Orderable)
-            ((Model.Orderable) element).setOrder(changedData.size());
+        if (element instanceof Orderable)
+            ((Orderable) element).setOrder(changedData.size());
 
         changedData.add(element);
     }
@@ -47,7 +48,7 @@ public class ChildrenField<T extends Model> implements Cloneable, Parcelable {
             throw new IllegalArgumentException("Element is null");
 
         if (index < 0 || index >= changedData.size())
-            throw new IndexOutOfBoundsException("Index out of bounds");
+            throw new IndexOutOfBoundsException("Index out of bounds: ");
 
         changedData.set(index, element);
     }
@@ -92,8 +93,8 @@ public class ChildrenField<T extends Model> implements Cloneable, Parcelable {
     private void reorder() {
         int i = 0;
         for (T element : changedData)
-            if (element instanceof Model.Orderable)
-                ((Model.Orderable) element).setOrder(i++);
+            if (element instanceof Orderable)
+                ((Orderable) element).setOrder(i++);
     }
 
     public void save(SQLiteDatabase db, long parentId) {
@@ -153,14 +154,12 @@ public class ChildrenField<T extends Model> implements Cloneable, Parcelable {
         return new LinkedList<>();
     }
 
-    @SuppressWarnings("unchecked")
     private List<T> copyList(List<T> source) {
         List<T> copied = createList();
         try {
             for (T element : source)
                 copied.add((T) element.clone());
         } catch (CloneNotSupportedException e) {
-            Log.e(TAG, e.getMessage());
             e.printStackTrace();
         }
 
@@ -168,8 +167,8 @@ public class ChildrenField<T extends Model> implements Cloneable, Parcelable {
     }
 
     @Override
-    public Object clone() throws CloneNotSupportedException {
-        ChildrenField cloned = (ChildrenField) super.clone();
+    public ChildrenField<T> clone() throws CloneNotSupportedException {
+        ChildrenField<T> cloned = (ChildrenField<T>) super.clone();
         cloned.data = copyList(data);
         cloned.changedData = copyList(changedData);
         return cloned;

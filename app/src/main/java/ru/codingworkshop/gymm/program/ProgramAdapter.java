@@ -7,7 +7,8 @@ import android.support.v7.widget.helper.ItemTouchHelper;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
-import ru.codingworkshop.gymm.data.model.Model;
+import ru.codingworkshop.gymm.data.model.base.MutableModel;
+import ru.codingworkshop.gymm.data.model.base.Parent;
 
 /**
  * Created by Радик on 20.02.2017.
@@ -22,7 +23,7 @@ public final class ProgramAdapter<VH extends ProgramViewHolder> extends Recycler
         void onSwiped(RecyclerView.ViewHolder viewHolder);
     }
 
-    private Model.Parent mModel;
+    private Parent mModel;
     private ItemTouchHelper mItemTouchHelper;
     private ListItemActionListener mListItemActionListener;
     public final ObservableBoolean mInEditMode = new ObservableBoolean();
@@ -30,7 +31,7 @@ public final class ProgramAdapter<VH extends ProgramViewHolder> extends Recycler
 
     private static final String TAG = ProgramAdapter.class.getSimpleName();
 
-    public ProgramAdapter(Model.Parent model, ListItemActionListener clickListener, ViewHolderFactory<VH> viewHolderFactory) {
+    public ProgramAdapter(Parent model, ListItemActionListener clickListener, ViewHolderFactory<VH> viewHolderFactory) {
         mModel = model;
         mListItemActionListener = clickListener;
         mViewHolderFactory = viewHolderFactory;
@@ -52,7 +53,7 @@ public final class ProgramAdapter<VH extends ProgramViewHolder> extends Recycler
         });
     }
 
-    public void setModel(Model.Parent model) {
+    public void setModel(Parent model) {
         mModel = model;
         notifyDataSetChanged();
     }
@@ -102,7 +103,7 @@ public final class ProgramAdapter<VH extends ProgramViewHolder> extends Recycler
 
     @Override
     public void onBindViewHolder(VH holder, int position) {
-        Model child = mModel.getChild(position);
+        MutableModel child = mModel.getChild(position);
         holder.setModel(child);
     }
 

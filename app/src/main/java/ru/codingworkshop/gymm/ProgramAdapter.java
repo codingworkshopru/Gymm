@@ -8,20 +8,19 @@ import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.animation.Animation;
-import android.view.animation.AnimationUtils;
 import android.widget.ImageView;
 
 import java.lang.reflect.Constructor;
 
-import ru.codingworkshop.gymm.data.model.Model;
+import ru.codingworkshop.gymm.data.model.base.MutableModel;
+import ru.codingworkshop.gymm.data.model.base.Parent;
 
 /**
  * Created by Радик on 20.02.2017.
  */
 
 final class ProgramAdapter<VH extends ProgramAdapter.ProgramViewHolder> extends RecyclerView.Adapter<VH> {
-    private Model.Parent mModel;
+    private Parent mModel;
     private ItemTouchHelper mItemTouchHelper;
     private Class<VH> mViewHolderType;
     private View.OnClickListener mClickListener;
@@ -30,7 +29,7 @@ final class ProgramAdapter<VH extends ProgramAdapter.ProgramViewHolder> extends 
 
     private static final String TAG = ProgramAdapter.class.getSimpleName();
 
-    ProgramAdapter(Model.Parent model, Class<VH> viewHolderType) {
+    ProgramAdapter(Parent model, Class<VH> viewHolderType) {
         mModel = model;
         mViewHolderType = viewHolderType;
         mItemTouchHelper = new ItemTouchHelper(new ItemTouchHelper.SimpleCallback(ItemTouchHelper.UP | ItemTouchHelper.DOWN, ItemTouchHelper.RIGHT) {
@@ -57,12 +56,12 @@ final class ProgramAdapter<VH extends ProgramAdapter.ProgramViewHolder> extends 
         });
     }
 
-    ProgramAdapter(Model.Parent model, Class<VH> viewHolderType, View.OnClickListener clickListener) {
+    ProgramAdapter(Parent model, Class<VH> viewHolderType, View.OnClickListener clickListener) {
         this(model, viewHolderType);
         mClickListener = clickListener;
     }
 
-    ProgramAdapter(Model.Parent model, Class<VH> viewHolderType, View.OnClickListener clickListener, View.OnLongClickListener longClickListener) {
+    ProgramAdapter(Parent model, Class<VH> viewHolderType, View.OnClickListener clickListener, View.OnLongClickListener longClickListener) {
         this(model, viewHolderType, clickListener);
         mLongClickListener = longClickListener;
     }
@@ -71,7 +70,7 @@ final class ProgramAdapter<VH extends ProgramAdapter.ProgramViewHolder> extends 
         mItemTouchHelper.attachToRecyclerView(recyclerView);
     }
 
-    void setModel(Model.Parent model) {
+    void setModel(Parent model) {
         mModel = model;
         notifyDataSetChanged();
     }
@@ -121,7 +120,7 @@ final class ProgramAdapter<VH extends ProgramAdapter.ProgramViewHolder> extends 
 
     @Override
     public void onBindViewHolder(VH holder, int position) {
-        Model child = mModel.getChild(position);
+        MutableModel child = mModel.getChild(position);
         holder.setModel(child);
 
         View view = holder.itemView.findViewById(R.id.program_exercise_list_item_delete_sweep);
@@ -159,7 +158,7 @@ final class ProgramAdapter<VH extends ProgramAdapter.ProgramViewHolder> extends 
         return mModel.getChild(position).getId();
     }
 
-    public static abstract class ProgramViewHolder<T extends Model> extends RecyclerView.ViewHolder {
+    public static abstract class ProgramViewHolder<T extends MutableModel> extends RecyclerView.ViewHolder {
         T mModel;
 
         ProgramViewHolder(View itemView) {

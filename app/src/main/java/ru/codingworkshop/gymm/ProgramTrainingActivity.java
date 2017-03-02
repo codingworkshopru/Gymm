@@ -187,7 +187,7 @@ public class ProgramTrainingActivity extends AppCompatActivity implements Loader
     }
 
     void onModelUpdated() {
-        mBinding.setProgram(mModel);
+        mBinding.setTraining(mModel);
         mExercisesAdapter.setModel(mModel);
     }
 
