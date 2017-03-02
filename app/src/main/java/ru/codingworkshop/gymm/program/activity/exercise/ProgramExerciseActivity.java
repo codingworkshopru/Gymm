@@ -102,8 +102,11 @@ public class ProgramExerciseActivity extends AppCompatActivity
         mSetsView = (RecyclerView) findViewById(R.id.program_exercise_sets_list);
         mSetsView.setLayoutManager(new LinearLayoutManager(this));
         mSetsView.addItemDecoration(new DividerItemDecoration(this, DividerItemDecoration.VERTICAL));
-        mSetsAdapter = new ProgramAdapter<>(mModel, this, new SetViewHolderFactory());
+
+        mSetsAdapter = new ProgramAdapter<>(this, new SetViewHolderFactory());
         mSetsView.setAdapter(mSetsAdapter);
+        mBinding.setAdapter(mSetsAdapter);
+        mSetsAdapter.setModel(mModel);
 
         LoaderManager loaderManager = getSupportLoaderManager();
         if (loaderManager.getLoader(EXERCISES_LOADER_ID) == null)

@@ -6,6 +6,9 @@
     <data>
         <import type="android.view.View" />
         <variable
+            name="adapter"
+            type="ru.codingworkshop.gymm.program.ProgramAdapter"/>
+        <variable
             name="training"
             type="ru.codingworkshop.gymm.data.model.ProgramTraining" />
     </data>
@@ -97,7 +100,7 @@
             app:layout_behavior="@string/appbar_scrolling_view_behavior" />
 
         <TextView
-            android:visibility="@{training.childrenCount() > 0 ? View.GONE : View.VISIBLE}"
+            android:visibility="@{adapter.mIsEmpty ? View.VISIBLE : View.GONE}"
             android:text="@string/program_training_activity_empty_list"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"

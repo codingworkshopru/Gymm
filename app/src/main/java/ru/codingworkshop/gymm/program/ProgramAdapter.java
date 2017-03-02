@@ -15,24 +15,17 @@ import ru.codingworkshop.gymm.data.model.base.Parent;
  */
 
 public final class ProgramAdapter<VH extends ProgramViewHolder> extends RecyclerView.Adapter<VH> {
-
-    public interface ListItemActionListener {
-        void onListItemClick(View view);
-        boolean onListItemLongClick(View view);
-        boolean onMove(RecyclerView.ViewHolder viewHolder, RecyclerView.ViewHolder target);
-        void onSwiped(RecyclerView.ViewHolder viewHolder);
-    }
-
     private Parent mModel;
     private ItemTouchHelper mItemTouchHelper;
     private ListItemActionListener mListItemActionListener;
-    public final ObservableBoolean mInEditMode = new ObservableBoolean();
     private ViewHolderFactory<VH> mViewHolderFactory;
+
+    public final ObservableBoolean mInEditMode = new ObservableBoolean();
+    public final ObservableBoolean mIsEmpty = new ObservableBoolean(true);
 
     private static final String TAG = ProgramAdapter.class.getSimpleName();
 
-    public ProgramAdapter(Parent model, ListItemActionListener clickListener, ViewHolderFactory<VH> viewHolderFactory) {
-        mModel = model;
+    public ProgramAdapter(ListItemActionListener clickListener, ViewHolderFactory<VH> viewHolderFactory) {
         mListItemActionListener = clickListener;
         mViewHolderFactory = viewHolderFactory;
         mItemTouchHelper = new ItemTouchHelper(new ItemTouchHelper.SimpleCallback(ItemTouchHelper.UP | ItemTouchHelper.DOWN, ItemTouchHelper.RIGHT) {
@@ -51,6 +44,19 @@ public final class ProgramAdapter<VH extends ProgramViewHolder> extends Recycler
                 return false;
             }
         });
+        registerAdapterDataObserver(new RecyclerView.AdapterDataObserver() {
+            @Override
+            public void onChanged() { setEmptyState(); }
+
+            @Override
+            public void onItemRangeChanged(int positionStart, int itemCount) { setEmptyState(); }
+
+            @Override
+            public void onItemRangeRemoved(int positionStart, int itemCount) { setEmptyState(); }
+
+            @Override
+            public void onItemRangeInserted(int positionStart, int itemCount) { setEmptyState(); }
+        });
     }
 
     public void setModel(Parent model) {
@@ -60,6 +66,10 @@ public final class ProgramAdapter<VH extends ProgramViewHolder> extends Recycler
 
     public void setEditMode(boolean inEditMode) {
         mInEditMode.set(inEditMode);
+    }
+
+    private void setEmptyState() {
+        mIsEmpty.set(mModel == null || mModel.childrenCount() == 0);
     }
 
     public void attachItemTouchHelper(RecyclerView recyclerView) {
@@ -115,5 +125,12 @@ public final class ProgramAdapter<VH extends ProgramViewHolder> extends Recycler
     @Override
     public long getItemId(int position) {
         return mModel.getChild(position).getId();
+    }
+
+    public interface ListItemActionListener {
+        void onListItemClick(View view);
+        boolean onListItemLongClick(View view);
+        boolean onMove(RecyclerView.ViewHolder viewHolder, RecyclerView.ViewHolder target);
+        void onSwiped(RecyclerView.ViewHolder viewHolder);
     }
 }

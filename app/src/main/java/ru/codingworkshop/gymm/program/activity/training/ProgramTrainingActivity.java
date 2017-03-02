@@ -91,9 +91,11 @@ public class ProgramTrainingActivity extends AppCompatActivity
         mExercisesView = (RecyclerView) findViewById(R.id.program_training_exercises_list);
         mExercisesView.setLayoutManager(new LinearLayoutManager(this));
         mExercisesView.addItemDecoration(new DividerItemDecoration(this, DividerItemDecoration.VERTICAL));
-        mExercisesAdapter = new ProgramAdapter<>(mModel, this, new ExerciseViewHolderFactory());
-        mExercisesView.setAdapter(mExercisesAdapter);
 
+        mExercisesAdapter = new ProgramAdapter<>(this, new ExerciseViewHolderFactory());
+        mExercisesView.setAdapter(mExercisesAdapter);
+        mBinding.setAdapter(mExercisesAdapter);
+        mExercisesAdapter.setModel(mModel);
 
         // restore model from bundle
         if (savedInstanceState != null && savedInstanceState.containsKey(TRAINING_MODEL_KEY)) {
@@ -197,6 +199,7 @@ public class ProgramTrainingActivity extends AppCompatActivity
     private void onModelUpdated() {
         mBinding.setTraining(mModel);
         mExercisesAdapter.setModel(mModel);
+
     }
 
     @Override
