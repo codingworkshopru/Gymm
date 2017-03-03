@@ -49,7 +49,7 @@
 
             <TextView
                 android:id="@+id/program_exercise_list_item_rest_time"
-                android:text="@{@string/program_exercise_activity_dialog_rest_time_label + ' ' + @plurals/minutes(model.getSecondsForRest()/60, model.getSecondsForRest()/60) + ' ' + @plurals/seconds(model.getSecondsForRest()%60, model.getSecondsForRest()%60)}"
+                android:text="@{@string/program_exercise_activity_dialog_rest_time_label + ' ' + (model.getRestMinutes + model.getRestSeconds == 0 ? @string/program_exercise_activity_rest_time_not_set : @plurals/minutes(model.getRestMinutes(), model.getRestMinutes()) + ' ' + @plurals/seconds(model.getRestSeconds(), model.getRestSeconds()))}"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 tools:text="Very very long secondary text here. It is too long to fit here"

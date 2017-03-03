@@ -24,6 +24,7 @@
     <string name="program_exercise_activity_rest_time_minutes_label">Минуты</string>
     <string name="program_exercise_activity_rest_time_seconds_label">Секунды</string>
     <string name="program_exercise_activity_empty_list">Вы ещё не добавили подходы</string>
+    <string name="program_exercise_activity_rest_time_not_set">не задано</string>
     <!-- exercise's reps and rest time input dialog -->
     <string name="program_exercise_activity_dialog_title">Добавление подхода</string>
     <string name="program_exercise_activity_dialog_rest_time_label">Время на отдых</string>
@@ -47,5 +48,11 @@
         <item quantity="one">%d секунда</item>
         <item quantity="few">%d секунды</item>
         <item quantity="other">%d секунд</item>
+    </plurals>
+
+    <plurals name="sets">
+        <item quantity="one">%d подход</item>
+        <item quantity="few">%d подхода</item>
+        <item quantity="other">%d подходов</item>
     </plurals>
 </resources>

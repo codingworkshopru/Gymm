@@ -6,16 +6,16 @@ import android.content.res.Resources;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.databinding.BindingAdapter;
-import android.databinding.InverseBindingAdapter;
 import android.databinding.DataBindingUtil;
+import android.databinding.InverseBindingAdapter;
 import android.databinding.InverseBindingListener;
+import android.os.Bundle;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.AsyncTaskLoader;
 import android.support.v4.content.Loader;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
 import android.support.v7.view.ActionMode;
 import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
@@ -217,9 +217,7 @@ public class ProgramExerciseActivity extends AppCompatActivity
 
     private void saveDataInputToModel() {
         mCurrentSet.setReps(mRepsPicker.getValue());
-
-        int secondsForRest = mMinutesPicker.getValue() * 60 + mSecondsPicker.getValue();
-        mCurrentSet.setSecondsForRest(secondsForRest);
+        mCurrentSet.setTimeForRest(mMinutesPicker.getValue(), mSecondsPicker.getValue());
     }
 
     @Override
@@ -258,8 +256,8 @@ public class ProgramExerciseActivity extends AppCompatActivity
 
     public void onAddButtonClick(View view) {
         mRepsPicker.setValue(mCurrentSet.getReps());
-        mMinutesPicker.setValue(mCurrentSet.getSecondsForRest() / 60);
-        mSecondsPicker.setValue(mCurrentSet.getSecondsForRest() % 60);
+        mMinutesPicker.setValue(mCurrentSet.getRestMinutes());
+        mSecondsPicker.setValue(mCurrentSet.getRestSeconds());
         mInputDialog.show();
     }
 
@@ -345,9 +343,8 @@ public class ProgramExerciseActivity extends AppCompatActivity
             int reps = model.getReps();
             mReps.setText(itemView.getResources().getQuantityString(R.plurals.number_of_sets, reps, reps));
 
-            int secondsForRest = model.getSecondsForRest();
-            int minutes = secondsForRest / 60;
-            int seconds = secondsForRest % 60;
+            int minutes = model.getRestMinutes();
+            int seconds = model.getRestSeconds();
 
             Resources res = itemView.getResources();
             mRestTime.setText(res.getString(R.string.program_exercise_activity_dialog_rest_time_label) + " " +

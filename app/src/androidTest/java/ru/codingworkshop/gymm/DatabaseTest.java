@@ -8,7 +8,6 @@ import android.database.sqlite.SQLiteOpenHelper;
 import android.support.test.InstrumentationRegistry;
 import android.support.test.runner.AndroidJUnit4;
 
-import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -74,7 +73,8 @@ public class DatabaseTest {
                 ProgramSet set = new ProgramSet();
                 set.setOrder(j);
                 set.setReps(j + REPS_ADDITION);
-                set.setSecondsForRest(j * REST_MULTIPLIER);
+                int seconds = j * REST_MULTIPLIER;
+                set.setTimeForRest(seconds / 60, seconds % 60);
                 exercise.addChild(set);
             }
 
@@ -166,7 +166,9 @@ public class DatabaseTest {
 
                 assertEquals(eqOrders, j, loadedSet.getOrder());
                 assertEquals(eqReps, j + REPS_ADDITION, loadedSet.getReps());
-                assertEquals(eqRests, j * REST_MULTIPLIER, loadedSet.getSecondsForRest());
+                int seconds = j * REST_MULTIPLIER;
+                assertEquals(eqRests, seconds / 60, loadedSet.getRestMinutes());
+                assertEquals(eqRests, seconds % 60, loadedSet.getRestSeconds());
             }
         }
     }

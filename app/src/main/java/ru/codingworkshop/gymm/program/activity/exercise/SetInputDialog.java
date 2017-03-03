@@ -78,8 +78,8 @@ public final class SetInputDialog extends DialogFragment
             mModel = savedModel.getParcelable(DIALOG_MODEL_KEY);
             if (mModel != null) {
                 mRepsPicker.setValue(mModel.getReps());
-                mMinutesPicker.setValue(mModel.getSecondsForRest() / 60);
-                mSecondsPicker.setValue(mModel.getSecondsForRest() % 60);
+                mMinutesPicker.setValue(mModel.getRestMinutes());
+                mSecondsPicker.setValue(mModel.getRestSeconds());
             }
         } else {
             mModel = new ProgramSet();
@@ -105,11 +105,7 @@ public final class SetInputDialog extends DialogFragment
     @Override
     public void onClick(DialogInterface dialog, int which) {
         mModel.setReps(mRepsPicker.getValue());
-        mModel.setSecondsForRest(minutesAndSecondsToSeconds(mMinutesPicker.getValue(), mSecondsPicker.getValue()));
+        mModel.setTimeForRest(mMinutesPicker.getValue(), mSecondsPicker.getValue());
         mSetInputDialogListener.onProgramSetReturn(mModel);
-    }
-
-    static int minutesAndSecondsToSeconds(int minutes, int seconds) {
-        return minutes * 60 + seconds;
     }
 }

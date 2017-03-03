@@ -9,10 +9,10 @@ import android.os.Parcel;
 import java.util.LinkedList;
 import java.util.List;
 
+import ru.codingworkshop.gymm.data.GymContract.ProgramSetEntry;
 import ru.codingworkshop.gymm.data.model.base.MutableModel;
 import ru.codingworkshop.gymm.data.model.base.Orderable;
 import ru.codingworkshop.gymm.data.model.field.Field;
-import ru.codingworkshop.gymm.data.GymContract.*;
 
 /**
  * Created by Радик on 17.02.2017.
@@ -42,12 +42,24 @@ public final class ProgramSet extends MutableModel implements Orderable {
         return reps.getData();
     }
 
-    public void setSecondsForRest(int secondsForRest) {
+    private void setSecondsForRest(int secondsForRest) {
         this.secondsForRest.setData(secondsForRest);
     }
 
-    public int getSecondsForRest() {
+    private int getSecondsForRest() {
         return secondsForRest.getData();
+    }
+
+    public void setTimeForRest(int minutes, int seconds) {
+        setSecondsForRest(minutes * 60 + seconds);
+    }
+
+    public int getRestMinutes() {
+        return getSecondsForRest() / 60;
+    }
+
+    public int getRestSeconds() {
+        return getSecondsForRest() % 60;
     }
 
     @Override
