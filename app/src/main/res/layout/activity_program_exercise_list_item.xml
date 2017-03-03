@@ -40,7 +40,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textAppearance="@style/TextAppearance.AppCompat.Menu"
-                android:text="@{@plurals/number_of_sets(model.getReps(), model.getReps())}"
+                android:text="@{@plurals/number_of_reps(model.getReps(), model.getReps())}"
                 android:layout_marginStart="16dp"
                 android:layout_marginLeft="16dp"
                 tools:text="Main text is here ffff fffff fffffff ffffffff  ffff "

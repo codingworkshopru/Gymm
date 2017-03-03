@@ -49,7 +49,7 @@
 
             <TextView
                 android:id="@+id/program_training_list_item_rest_time"
-                android:text="@{String.valueOf(model.childrenCount())}"
+                android:text="@{@plurals/number_of_sets(model.childrenCount(), model.childrenCount())}"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 tools:text="Very very long secondary text here. It is too long to fit here"

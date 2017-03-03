@@ -32,10 +32,16 @@
     <string name="program_exercise_activity_dialog_negative_button_text">Отмена</string>
     <!-- menu -->
 
-    <plurals name="number_of_sets">
+    <plurals name="number_of_reps">
         <item quantity="one">%d повтор</item>
         <item quantity="few">%d повтора</item>
         <item quantity="other">%d повторов</item>
+    </plurals>
+
+    <plurals name="number_of_sets">
+        <item quantity="one">%d подход</item>
+        <item quantity="few">%d подхода</item>
+        <item quantity="other">%d подходов</item>
     </plurals>
 
     <plurals name="minutes">

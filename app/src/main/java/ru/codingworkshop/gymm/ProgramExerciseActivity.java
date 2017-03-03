@@ -341,7 +341,7 @@ public class ProgramExerciseActivity extends AppCompatActivity
         @Override
         public void setModel(ProgramSet model) {
             int reps = model.getReps();
-            mReps.setText(itemView.getResources().getQuantityString(R.plurals.number_of_sets, reps, reps));
+            mReps.setText(itemView.getResources().getQuantityString(R.plurals.number_of_reps, reps, reps));
 
             int minutes = model.getRestMinutes();
             int seconds = model.getRestSeconds();
