@@ -8,6 +8,7 @@ public interface Parent<T extends MutableModel> {
     void setChild(int index, T model);
     void moveChild(int fromIndex, int toIndex);
     T removeChild(int index);
+    int restoreLastRemoved();
     T getChild(int index);
     int childrenCount();
 }

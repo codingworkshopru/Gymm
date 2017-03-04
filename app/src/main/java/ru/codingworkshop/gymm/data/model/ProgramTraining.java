@@ -9,11 +9,11 @@ import android.os.Parcel;
 import java.util.LinkedList;
 import java.util.List;
 
+import ru.codingworkshop.gymm.data.GymContract.ProgramTrainingEntry;
 import ru.codingworkshop.gymm.data.model.base.MutableModel;
 import ru.codingworkshop.gymm.data.model.base.Parent;
 import ru.codingworkshop.gymm.data.model.field.ChildrenField;
 import ru.codingworkshop.gymm.data.model.field.Field;
-import ru.codingworkshop.gymm.data.GymContract.*;
 
 /**
  * Created by Радик on 18.02.2017.
@@ -23,7 +23,7 @@ public final class ProgramTraining extends MutableModel implements Parent<Progra
     private Field<Long> id = new Field<>(ProgramTrainingEntry._ID, 0L);
     private Field<String> name = new Field<>(ProgramTrainingEntry.COLUMN_NAME, String.class);
     private Field<Integer> weekday = new Field<>(ProgramTrainingEntry.COLUMN_WEEKDAY, 0);
-    private ChildrenField<ProgramExercise> children = new ChildrenField<>(ProgramExercise.class, this);
+    private ChildrenField<ProgramExercise> children = new ChildrenField<>(ProgramExercise.class);
 
     private static final String TABLE_NAME = ProgramTrainingEntry.TABLE_NAME;
 
@@ -66,6 +66,11 @@ public final class ProgramTraining extends MutableModel implements Parent<Progra
     @Override
     public ProgramExercise removeChild(int index) {
         return children.remove(index);
+    }
+
+    @Override
+    public int restoreLastRemoved() {
+        return children.restoreLastRemoved();
     }
 
     @Override

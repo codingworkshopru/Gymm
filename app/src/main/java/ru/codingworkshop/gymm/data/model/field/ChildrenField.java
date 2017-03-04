@@ -13,16 +13,16 @@ import java.util.List;
 
 import ru.codingworkshop.gymm.data.model.base.MutableModel;
 import ru.codingworkshop.gymm.data.model.base.Orderable;
-import ru.codingworkshop.gymm.data.model.base.Parent;
 
 public class ChildrenField<T extends MutableModel> implements Cloneable, Parcelable {
     private Class<T> type;
     private List<T> data;
     private List<T> changedData;
+    private T lastRemoved;
 
     private static final String TAG = ChildrenField.class.getSimpleName();
 
-    public ChildrenField(Class<T> type, Parent parent) {
+    public ChildrenField(Class<T> type) {
         this.type = type;
         data = createList();
         changedData = createList();
@@ -58,8 +58,27 @@ public class ChildrenField<T extends MutableModel> implements Cloneable, Parcela
             return null;
 
         T removed = changedData.remove(index);
+        lastRemoved = removed;
         reorder();
         return removed;
+    }
+
+    private void insert(int index, T element) {
+        changedData.add(index, element);
+        reorder();
+    }
+
+    public int restoreLastRemoved() {
+        if (lastRemoved == null) return -1;
+
+        if (lastRemoved instanceof Orderable) {
+            int order = ((Orderable) lastRemoved).getOrder();
+            insert(order, lastRemoved);
+            return order;
+        } else {
+            add(lastRemoved);
+            return size() - 1;
+        }
     }
 
     public T get(int index) {
@@ -102,7 +121,7 @@ public class ChildrenField<T extends MutableModel> implements Cloneable, Parcela
             for (T element : newElements())
                 element.create(db, parentId);
 
-            for (T element : deletedElements())
+            for (T element : removedElements())
                 element.delete(db);
 
             for (T element : changedElements())
@@ -132,7 +151,7 @@ public class ChildrenField<T extends MutableModel> implements Cloneable, Parcela
         return result;
     }
 
-    private List<T> deletedElements() {
+    private List<T> removedElements() {
         List<T> result = createList();
 
         for (T oldElement : data) {

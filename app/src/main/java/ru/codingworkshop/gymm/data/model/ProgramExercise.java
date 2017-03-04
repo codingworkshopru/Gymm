@@ -9,12 +9,12 @@ import android.os.Parcel;
 import java.util.LinkedList;
 import java.util.List;
 
+import ru.codingworkshop.gymm.data.GymContract.ProgramExerciseEntry;
 import ru.codingworkshop.gymm.data.model.base.MutableModel;
 import ru.codingworkshop.gymm.data.model.base.Orderable;
 import ru.codingworkshop.gymm.data.model.base.Parent;
 import ru.codingworkshop.gymm.data.model.field.ChildrenField;
 import ru.codingworkshop.gymm.data.model.field.Field;
-import ru.codingworkshop.gymm.data.GymContract.*;
 
 /**
  * Created by Радик on 17.02.2017.
@@ -24,7 +24,7 @@ public final class ProgramExercise extends MutableModel implements Orderable, Pa
     private Field<Long> id = new Field<>(ProgramExerciseEntry._ID, 0L);
     private Field<Exercise> exercise = new Field<>(ProgramExerciseEntry.COLUMN_EXERCISE_ID, Exercise.class);
     private Field<Integer> sortOrder = new Field<>(ProgramExerciseEntry.COLUMN_SORT_ORDER, -1);
-    private ChildrenField<ProgramSet> children = new ChildrenField<>(ProgramSet.class, this);
+    private ChildrenField<ProgramSet> children = new ChildrenField<>(ProgramSet.class);
 
     private static final String TAG = ProgramExercise.class.getSimpleName();
 
@@ -74,6 +74,11 @@ public final class ProgramExercise extends MutableModel implements Orderable, Pa
     @Override
     public ProgramSet removeChild(int index) {
         return children.remove(index);
+    }
+
+    @Override
+    public int restoreLastRemoved() {
+        return children.restoreLastRemoved();
     }
 
     @Override

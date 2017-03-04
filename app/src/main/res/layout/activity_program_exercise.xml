@@ -12,19 +12,17 @@
             type="ru.codingworkshop.gymm.data.model.ProgramExercise"/>
     </data>
 
-    <android.support.constraint.ConstraintLayout
+    <android.support.design.widget.CoordinatorLayout
         android:id="@+id/activity_program_exercise"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
+
         <android.support.design.widget.AppBarLayout
             android:id="@+id/app_bar_layout"
             android:layout_height="wrap_content"
-            android:layout_width="0dp"
+            android:layout_width="match_parent"
             android:theme="?attr/actionBarTheme"
-            android:background="@drawable/tr_app_bar_color"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintRight_toRightOf="parent"
-            app:layout_constraintLeft_toLeftOf="parent">
+            android:background="@drawable/tr_app_bar_color">
 
             <android.support.v7.widget.Toolbar
                 android:id="@+id/toolbar"
@@ -47,9 +45,31 @@
 
         </android.support.design.widget.AppBarLayout>
 
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/program_exercise_sets_list"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:paddingBottom="100dp"
+            android:scrollbars="vertical"
+            android:background="@color/color_material_grey_200"
+            app:layout_behavior="@string/appbar_scrolling_view_behavior"
+            android:clipToPadding="false"/>
+
+        <TextView
+            android:visibility="@{adapter.mIsEmpty ? View.VISIBLE : View.GONE}"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textAlignment="center"
+            android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+            android:id="@+id/textView"
+            android:text="@string/program_exercise_activity_empty_list"
+            app:layout_behavior="@string/appbar_scrolling_view_behavior"
+            android:drawableTop="@drawable/ic_timeline_200dp" />
+
+
         <android.support.design.widget.FloatingActionButton
             android:id="@+id/program_exercise_add_set"
-            android:layout_height="0dp"
+            android:layout_height="wrap_content"
             android:layout_width="wrap_content"
             app:fabSize="normal"
             android:onClick="onAddButtonClick"
@@ -57,38 +77,9 @@
             app:srcCompat="@drawable/ic_add_24dp"
             android:layout_weight="1"
             android:layout_marginEnd="16dp"
-            app:layout_constraintRight_toRightOf="parent"
             android:layout_marginRight="16dp"
-            app:layout_constraintBottom_toBottomOf="parent"
-            android:layout_marginBottom="16dp" />
+            android:layout_marginBottom="16dp"
+            app:layout_anchorGravity="bottom|end"/>
 
-        <android.support.v7.widget.RecyclerView
-            android:id="@+id/program_exercise_sets_list"
-            android:layout_width="0dp"
-            android:layout_height="0dp"
-            android:paddingBottom="100dp"
-            android:scrollbars="vertical"
-            android:background="@color/color_material_grey_200"
-            app:layout_behavior="@string/appbar_scrolling_view_behavior"
-            android:clipToPadding="false"
-            app:layout_constraintRight_toRightOf="parent"
-            app:layout_constraintLeft_toLeftOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/app_bar_layout"
-            app:layout_constraintBottom_toBottomOf="parent"/>
-
-        <TextView
-            android:visibility="@{adapter.mIsEmpty ? View.VISIBLE : View.GONE}"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textAppearance="@style/TextAppearance.AppCompat.Medium"
-            android:id="@+id/textView"
-            app:layout_constraintTop_toBottomOf="@+id/app_bar_layout"
-            app:layout_constraintRight_toRightOf="parent"
-            app:layout_constraintLeft_toLeftOf="parent"
-            android:text="@string/program_exercise_activity_empty_list"
-            android:layout_gravity="center_horizontal"
-            android:drawableTop="@drawable/ic_timeline_200dp" />
-
-
-    </android.support.constraint.ConstraintLayout>
+    </android.support.design.widget.CoordinatorLayout>
 </layout>

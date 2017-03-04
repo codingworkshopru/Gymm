@@ -134,7 +134,7 @@ public class ProgramExerciseActivity extends AppCompatActivity
                 .setTitle(getString(R.string.program_exercise_activity_dialog_title))
                 .setCancelable(true)
                 .setView(view)
-                .setNegativeButton(getString(R.string.program_exercise_activity_dialog_negative_button_text), null)
+                .setNegativeButton(getString(R.string.cancel_button_text), null)
                 .setPositiveButton(
                         getString(R.string.program_exercise_activity_dialog_positive_button_text),
                         new DialogInterface.OnClickListener() {

@@ -5,12 +5,13 @@ import android.content.Intent;
 import android.database.Cursor;
 import android.databinding.DataBindingUtil;
 import android.graphics.drawable.TransitionDrawable;
+import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.Loader;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
 import android.support.v7.view.ActionMode;
 import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
@@ -19,18 +20,19 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.SimpleCursorAdapter;
 import android.widget.Spinner;
 
-import ru.codingworkshop.gymm.databinding.ActivityProgramExerciseBinding;
-import ru.codingworkshop.gymm.program.ProgramAdapter;
 import ru.codingworkshop.gymm.R;
 import ru.codingworkshop.gymm.data.GymContract;
 import ru.codingworkshop.gymm.data.model.ProgramExercise;
 import ru.codingworkshop.gymm.data.model.ProgramSet;
+import ru.codingworkshop.gymm.databinding.ActivityProgramExerciseBinding;
+import ru.codingworkshop.gymm.program.ProgramAdapter;
 
 public class ProgramExerciseActivity extends AppCompatActivity
         implements ActionMode.Callback,
@@ -40,17 +42,12 @@ public class ProgramExerciseActivity extends AppCompatActivity
 {
     private static final String TAG = ProgramExerciseActivity.class.getSimpleName();
 
-    // models
     private ProgramExercise mModel;
-
-    // adapters
     private SimpleCursorAdapter mExercisesAdapter;
     private ProgramAdapter<SetViewHolder> mSetsAdapter;
-
     private RecyclerView mSetsView;
-
-    // bindings
     private ActivityProgramExerciseBinding mBinding;
+    private Snackbar mItemRemovedSnackbar;
 
     public static final String EXERCISE_MODEL_KEY = ProgramExercise.class.getCanonicalName();
     private static final int EXERCISES_LOADER_ID = 0;
@@ -113,6 +110,14 @@ public class ProgramExerciseActivity extends AppCompatActivity
             loaderManager.initLoader(EXERCISES_LOADER_ID, null, this);
         else
             loaderManager.restartLoader(EXERCISES_LOADER_ID, null, this);
+    }
+
+    @Override
+    public boolean dispatchTouchEvent(MotionEvent ev) {
+        boolean dispatchResult = super.dispatchTouchEvent(ev);
+        if (mItemRemovedSnackbar != null && mItemRemovedSnackbar.isShown())
+            mItemRemovedSnackbar.dismiss();
+        return dispatchResult;
     }
 
     public void onAddButtonClick(View view) {
@@ -219,6 +224,15 @@ public class ProgramExerciseActivity extends AppCompatActivity
         int viewHolderPosition = viewHolder.getAdapterPosition();
         mModel.removeChild(viewHolderPosition);
         mSetsAdapter.notifyItemRemoved(viewHolderPosition);
+
+        mItemRemovedSnackbar = Snackbar.make(mSetsView, R.string.program_exercise_activity_set_deleted_message, Snackbar.LENGTH_INDEFINITE);
+        mItemRemovedSnackbar.setAction(R.string.cancel_button_text, new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mSetsAdapter.notifyItemInserted(mModel.restoreLastRemoved());
+            }
+        });
+        mItemRemovedSnackbar.show();
     }
     //-----------------------------------------
 

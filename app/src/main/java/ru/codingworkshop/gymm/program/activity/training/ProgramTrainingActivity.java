@@ -27,12 +27,12 @@ import java.text.DateFormatSymbols;
 import java.util.Calendar;
 import java.util.Locale;
 
-import ru.codingworkshop.gymm.program.ProgramAdapter;
 import ru.codingworkshop.gymm.R;
 import ru.codingworkshop.gymm.data.GymDbHelper;
 import ru.codingworkshop.gymm.data.model.ProgramExercise;
 import ru.codingworkshop.gymm.data.model.ProgramTraining;
 import ru.codingworkshop.gymm.databinding.ActivityProgramTrainingBinding;
+import ru.codingworkshop.gymm.program.ProgramAdapter;
 import ru.codingworkshop.gymm.program.activity.exercise.ProgramExerciseActivity;
 
 public class ProgramTrainingActivity extends AppCompatActivity
@@ -68,6 +68,7 @@ public class ProgramTrainingActivity extends AppCompatActivity
         }
 
         // populating spinner with days of week
+        // TODO: 04.03.2017 вынести в модель
         DateFormatSymbols dateFormatSymbols = java.text.DateFormatSymbols.getInstance(Locale.getDefault());
         String[] dayOfWeekNamesWrongOrder = dateFormatSymbols.getWeekdays();
         String[] dayOfWeekNames = new String[dayOfWeekNamesWrongOrder.length];

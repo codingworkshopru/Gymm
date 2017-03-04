@@ -68,7 +68,7 @@ public final class SetInputDialog extends DialogFragment
                 .setCancelable(true)
                 .setView(customView)
                 .setPositiveButton(R.string.program_exercise_activity_dialog_positive_button_text, this)
-                .setNegativeButton(R.string.program_exercise_activity_dialog_negative_button_text, null);
+                .setNegativeButton(R.string.cancel_button_text, null);
 
         Bundle savedModel = getArguments();
         if (savedModel == null)

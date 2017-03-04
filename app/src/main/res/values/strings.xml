@@ -19,18 +19,20 @@
     <!-- program exercise activity -->
     <string name="program_exercise_activity_title">Упражнение</string>
     <!-- layout items -->
-    <!--<string name="program_exercise_activity_list_label">Упражнение</string>-->
     <string name="program_exercise_activity_reps_label">Повторы</string>
     <string name="program_exercise_activity_rest_time_minutes_label">Минуты</string>
     <string name="program_exercise_activity_rest_time_seconds_label">Секунды</string>
     <string name="program_exercise_activity_empty_list">Вы ещё не добавили подходы</string>
     <string name="program_exercise_activity_rest_time_not_set">не задано</string>
+    <string name="program_exercise_activity_set_deleted_message">Подход удалён</string>
     <!-- exercise's reps and rest time input dialog -->
     <string name="program_exercise_activity_dialog_title">Добавление подхода</string>
     <string name="program_exercise_activity_dialog_rest_time_label">Время на отдых</string>
     <string name="program_exercise_activity_dialog_positive_button_text">OK</string>
-    <string name="program_exercise_activity_dialog_negative_button_text">Отмена</string>
     <!-- menu -->
+
+    <!-- common -->
+    <string name="cancel_button_text">Отмена</string>
 
     <plurals name="number_of_reps">
         <item quantity="one">%d повтор</item>
@@ -54,11 +56,5 @@
         <item quantity="one">%d секунда</item>
         <item quantity="few">%d секунды</item>
         <item quantity="other">%d секунд</item>
-    </plurals>
-
-    <plurals name="sets">
-        <item quantity="one">%d подход</item>
-        <item quantity="few">%d подхода</item>
-        <item quantity="other">%d подходов</item>
     </plurals>
 </resources>
