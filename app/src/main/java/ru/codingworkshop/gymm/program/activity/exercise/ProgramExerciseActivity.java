@@ -67,7 +67,7 @@ public class ProgramExerciseActivity extends AppCompatActivity
 
         // restore model from intent or bundle
         Intent intent = getIntent();
-        if (savedInstanceState != null && savedInstanceState.containsKey(EXERCISE_MODEL_KEY)) // TODO проверить, нужно ли это вообще
+        if (savedInstanceState != null && savedInstanceState.containsKey(EXERCISE_MODEL_KEY))
             mModel = savedInstanceState.getParcelable(EXERCISE_MODEL_KEY);
         else if (intent != null && intent.hasExtra(EXERCISE_MODEL_KEY))
             mModel = intent.getParcelableExtra(EXERCISE_MODEL_KEY);
@@ -110,6 +110,12 @@ public class ProgramExerciseActivity extends AppCompatActivity
             loaderManager.initLoader(EXERCISES_LOADER_ID, null, this);
         else
             loaderManager.restartLoader(EXERCISES_LOADER_ID, null, this);
+    }
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putParcelable(EXERCISE_MODEL_KEY, mModel);
     }
 
     @Override

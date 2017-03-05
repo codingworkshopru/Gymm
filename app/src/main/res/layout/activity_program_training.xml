@@ -18,7 +18,6 @@
         android:layout_height="match_parent"
         tools:context="ru.codingworkshop.gymm.program.activity.training.ProgramTrainingActivity">
 
-        <!-- FIXME Внутри панели инструментов не может находиться ничего кроме названия активити (или фильтра содержимого) https://storage.googleapis.com/material-design/publish/material_v_10/assets/0B6Okdz75tqQsTW1zb2x5WWg5cDA/layout_structure_appbar_metrics5.png -->
         <android.support.design.widget.AppBarLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
