@@ -23,7 +23,8 @@ import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Spinner;
 
-import java.text.DateFormatSymbols;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Locale;
 
@@ -68,18 +69,17 @@ public class ProgramTrainingActivity extends AppCompatActivity
         }
 
         // populating spinner with days of week
-        // TODO: 04.03.2017 вынести в модель
-        DateFormatSymbols dateFormatSymbols = java.text.DateFormatSymbols.getInstance(Locale.getDefault());
-        String[] dayOfWeekNamesWrongOrder = dateFormatSymbols.getWeekdays();
-        String[] dayOfWeekNames = new String[dayOfWeekNamesWrongOrder.length];
-        int firstDayOfWeek = Calendar.getInstance(Locale.getDefault()).getFirstDayOfWeek();
-        for (int i = 1; i < dayOfWeekNames.length; i++) {
-            int index = (i + firstDayOfWeek - 1) % 8;
-            if (index == 0)
-                index++;
-            dayOfWeekNames[i] = dayOfWeekNamesWrongOrder[index];
-        }
-        dayOfWeekNames[0] = "Не выбрано";
+        String[] dayOfWeekNames = new String[8];
+        Calendar calendar = Calendar.getInstance();
+        calendar.set(Calendar.DAY_OF_WEEK, calendar.getFirstDayOfWeek());
+        DateFormat formatter = new SimpleDateFormat("EEEE", Locale.getDefault());
+        int i = 0;
+        do {
+            dayOfWeekNames[++i] = formatter.format(calendar.getTime());
+            calendar.add(Calendar.DAY_OF_WEEK, 1);
+        } while (calendar.get(Calendar.DAY_OF_WEEK) != calendar.getFirstDayOfWeek());
+
+        dayOfWeekNames[0] = getString(R.string.program_training_activity_not_selected);
 
 
         ArrayAdapter<CharSequence> adapter = new ArrayAdapter<CharSequence>(this, android.R.layout.simple_spinner_item, dayOfWeekNames);

@@ -13,6 +13,7 @@
     <string name="program_training_activity_exercises_label">Упражнения</string>
     <string name="program_training_activity_add_exercise">Добавить упражнение</string>
     <string name="program_training_activity_empty_list">Вы ещё не добавили упражнения</string>
+    <string name="program_training_activity_not_selected">Не выбрано</string>
     <!-- menu -->
     <string name="program_training_activity_menu_done">Сохранить</string>
 

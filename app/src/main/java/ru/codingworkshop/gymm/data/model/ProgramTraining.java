@@ -6,6 +6,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteException;
 import android.os.Parcel;
 
+import java.util.Calendar;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -24,6 +25,8 @@ public final class ProgramTraining extends MutableModel implements Parent<Progra
     private Field<String> name = new Field<>(ProgramTrainingEntry.COLUMN_NAME, String.class);
     private Field<Integer> weekday = new Field<>(ProgramTrainingEntry.COLUMN_WEEKDAY, 0);
     private ChildrenField<ProgramExercise> children = new ChildrenField<>(ProgramExercise.class);
+
+    private static final int FIRST_DAY_OF_WEEK = Calendar.getInstance().getFirstDayOfWeek();
 
     private static final String TABLE_NAME = ProgramTrainingEntry.TABLE_NAME;
 
@@ -46,10 +49,27 @@ public final class ProgramTraining extends MutableModel implements Parent<Progra
     }
 
     public int getWeekday() {
-        return weekday.getData();
+        // cast weekday accordingly to first day of week
+        int weekday = this.weekday.getData();
+        if (weekday != 0) {
+            weekday -= FIRST_DAY_OF_WEEK;
+            if (weekday >= 0)
+                weekday++;
+            else
+                weekday += 8;
+        }
+        return weekday;
     }
 
     public void setWeekday(int weekday) {
+        // cast weekday accordingly to first day of week
+        if (weekday != 0) {
+            weekday += FIRST_DAY_OF_WEEK;
+            if (weekday <= 8)
+                weekday--;
+            else
+                weekday -= 8;
+        }
         this.weekday.setData(weekday);
     }
 
