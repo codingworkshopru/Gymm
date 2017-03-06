@@ -24,7 +24,7 @@ public class Field<T> implements Cloneable, Parcelable {
     }
 
     public Field(String columnName, T initialData) {
-        this(columnName, (Class<T>) initialData.getClass()); // TODO проверить с getTypeParameters и заменить в ChildrenField
+        this(columnName, (Class<T>) initialData.getClass());
         data = initialData;
     }
 

@@ -3,7 +3,10 @@ package ru.codingworkshop.gymm.program.activity.training;
 import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.databinding.BindingAdapter;
 import android.databinding.DataBindingUtil;
+import android.databinding.InverseBindingAdapter;
+import android.databinding.InverseBindingListener;
 import android.os.Bundle;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.AsyncTaskLoader;
@@ -20,6 +23,7 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Spinner;
 
@@ -256,6 +260,30 @@ public class ProgramTrainingActivity extends AppCompatActivity
     @Override
     public void onSwiped(RecyclerView.ViewHolder viewHolder) {
 
+    }
+
+    // binding adapters
+    //-----------------------------------------
+    @BindingAdapter(value = {"bind:value", "bind:valueAttrChanged"}, requireAll = false)
+    public static void setSpinnerValue(Spinner spinner, int value, final InverseBindingListener bindingListener) {
+        spinner.setSelection(value, false);
+        spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                if (bindingListener != null) {
+                    bindingListener.onChange();
+                }
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+            }
+        });
+    }
+
+    @InverseBindingAdapter(attribute = "bind:value", event = "bind:valueAttrChanged")
+    public static int captureSpinnerValue(Spinner spinner) {
+        return (int) spinner.getSelectedItemId();
     }
 }
 
