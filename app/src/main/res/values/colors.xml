@@ -5,6 +5,7 @@
     <color name="color_material_pink_A100">#ff80ab</color>
     <color name="color_material_pink_A200">#ff4081</color>
     <color name="color_material_grey_200">#eeeeee</color>
+    <color name="color_material_gray_400">#bdbdbd</color>
 
     <color name="color_material_blue_grey_500">#607D8B</color>
     <color name="color_material_blue_grey_700">#455a64</color>
