@@ -1,15 +1,12 @@
 package ru.codingworkshop.gymm.program.activity.training;
 
 import android.content.Intent;
-import android.database.Cursor;
-import android.database.sqlite.SQLiteDatabase;
 import android.databinding.BindingAdapter;
 import android.databinding.DataBindingUtil;
 import android.databinding.InverseBindingAdapter;
 import android.databinding.InverseBindingListener;
 import android.os.Bundle;
 import android.support.v4.app.LoaderManager;
-import android.support.v4.content.AsyncTaskLoader;
 import android.support.v4.content.Loader;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
@@ -18,7 +15,6 @@ import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -32,8 +28,8 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Locale;
 
+import ru.codingworkshop.gymm.MainActivity;
 import ru.codingworkshop.gymm.R;
-import ru.codingworkshop.gymm.data.GymDbHelper;
 import ru.codingworkshop.gymm.data.model.ProgramExercise;
 import ru.codingworkshop.gymm.data.model.ProgramTraining;
 import ru.codingworkshop.gymm.databinding.ActivityProgramTrainingBinding;
@@ -42,7 +38,7 @@ import ru.codingworkshop.gymm.program.activity.exercise.ProgramExerciseActivity;
 
 public class ProgramTrainingActivity extends AppCompatActivity
         implements ActionMode.Callback,
-        LoaderManager.LoaderCallbacks<Cursor>,
+        LoaderManager.LoaderCallbacks<ProgramTraining>,
         ProgramAdapter.ListItemActionListener
 {
     private ProgramTraining mModel;
@@ -51,10 +47,6 @@ public class ProgramTrainingActivity extends AppCompatActivity
 
     private static final String TAG = ProgramTrainingActivity.class.getSimpleName();
     static final String TRAINING_MODEL_KEY = ProgramTraining.class.getCanonicalName();
-    public static final String TRAINING_ID_KEY = ProgramTraining.class.getCanonicalName() + ".id";
-
-    private static final int LOADER_TRAINING_LOAD = 0;
-    private static final int LOADER_TRAINING_SAVE = 1;
     private static final int REQUEST_CODE_EXERCISE = 0;
     private RecyclerView mExercisesView;
 
@@ -110,11 +102,11 @@ public class ProgramTrainingActivity extends AppCompatActivity
 
         Intent intent = getIntent();
         if (mModel == null) {
-            if (intent != null && intent.hasExtra(TRAINING_ID_KEY)) {
-                long id = intent.getLongExtra(TRAINING_ID_KEY, 0);
+            if (intent != null && intent.hasExtra(MainActivity.PROGRAM_TRAINING_ID_KEY)) {
+                long id = intent.getLongExtra(MainActivity.PROGRAM_TRAINING_ID_KEY, 0);
                 Bundle bundle = new Bundle();
-                bundle.putLong(TRAINING_ID_KEY, id);
-                getSupportLoaderManager().initLoader(LOADER_TRAINING_LOAD, bundle, this);
+                bundle.putLong(MainActivity.PROGRAM_TRAINING_ID_KEY, id);
+                getSupportLoaderManager().initLoader(TrainingAsyncLoader.LOADER_TRAINING_LOAD, bundle, this);
             } else {
                 mModel = new ProgramTraining();
                 onModelUpdated();
@@ -162,7 +154,7 @@ public class ProgramTrainingActivity extends AppCompatActivity
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.action_done:
-                getSupportLoaderManager().initLoader(LOADER_TRAINING_SAVE, null, ProgramTrainingActivity.this);
+                getSupportLoaderManager().initLoader(TrainingAsyncLoader.LOADER_TRAINING_SAVE, null, ProgramTrainingActivity.this);
                 finish();
                 return true;
             default:
@@ -174,31 +166,8 @@ public class ProgramTrainingActivity extends AppCompatActivity
     // loader
     //-----------------------------------------
     @Override
-    public Loader<Cursor> onCreateLoader(final int id, final Bundle args) {
-        return new AsyncTaskLoader<Cursor>(this) {
-            @Override
-            protected void onStartLoading() {
-                Log.d(TAG, "onStartLoading: " + mModel);
-                if (id != LOADER_TRAINING_LOAD || mModel == null)
-                    forceLoad();
-                else
-                    deliverResult(null);
-            }
-
-            @Override
-            public Cursor loadInBackground() {
-                GymDbHelper dbHelper = new GymDbHelper(ProgramTrainingActivity.this);
-                Log.d(TAG, "loadInBackground: " + mModel);
-                if (id == LOADER_TRAINING_SAVE) {
-                    SQLiteDatabase db = dbHelper.getWritableDatabase();
-                    mModel.create(db, 0);
-                    mModel.update(db);
-                } else if (id == LOADER_TRAINING_LOAD) {
-                    mModel = ProgramTraining.load(dbHelper.getReadableDatabase(), args.getLong(TRAINING_ID_KEY));
-                }
-                return null;
-            }
-        };
+    public Loader<ProgramTraining> onCreateLoader(final int id, final Bundle args) {
+        return new TrainingAsyncLoader(this, id, args, mModel);
     }
 
     private void onModelUpdated() {
@@ -208,13 +177,15 @@ public class ProgramTrainingActivity extends AppCompatActivity
     }
 
     @Override
-    public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
-        if (loader.getId() == LOADER_TRAINING_LOAD)
+    public void onLoadFinished(Loader<ProgramTraining> loader, ProgramTraining data) {
+        if (loader.getId() == TrainingAsyncLoader.LOADER_TRAINING_LOAD) {
+            mModel = data;
             onModelUpdated();
+        }
     }
 
     @Override
-    public void onLoaderReset(Loader<Cursor> loader) {
+    public void onLoaderReset(Loader<ProgramTraining> loader) {
 
     }
 
@@ -285,5 +256,6 @@ public class ProgramTrainingActivity extends AppCompatActivity
     public static int captureSpinnerValue(Spinner spinner) {
         return (int) spinner.getSelectedItemId();
     }
+
 }
 

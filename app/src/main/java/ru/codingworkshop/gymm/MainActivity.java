@@ -3,11 +3,11 @@ package ru.codingworkshop.gymm;
 import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.os.Bundle;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.AsyncTaskLoader;
 import android.support.v4.content.Loader;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
@@ -20,13 +20,17 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import ru.codingworkshop.gymm.data.GymContract.*;
+import ru.codingworkshop.gymm.data.GymContract.ExerciseEntry;
+import ru.codingworkshop.gymm.data.GymContract.MuscleGroupEntry;
+import ru.codingworkshop.gymm.data.GymContract.ProgramExerciseEntry;
+import ru.codingworkshop.gymm.data.GymContract.ProgramTrainingEntry;
 import ru.codingworkshop.gymm.data.GymDbHelper;
 import ru.codingworkshop.gymm.data.QueryBuilder;
-
+import ru.codingworkshop.gymm.data.model.ProgramTraining;
 import ru.codingworkshop.gymm.program.activity.training.ProgramTrainingActivity;
 
 public class MainActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<Cursor> {
+    public static final String PROGRAM_TRAINING_ID_KEY = ProgramTraining.class.getCanonicalName() + ".id";
     private static final String TAG = MainActivity.class.getSimpleName();
     private static final int TEST_LOADER = 0;
 
@@ -93,9 +97,18 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
                 itemView.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        Intent intent = new Intent(itemView.getContext(), ProgramTrainingActivity.class);
-                        intent.putExtra(ProgramTrainingActivity.TRAINING_ID_KEY, getItemId());
+                        Intent intent = new Intent(itemView.getContext(), ActualTrainingActivity.class);
+                        intent.putExtra(PROGRAM_TRAINING_ID_KEY, getItemId());
                         itemView.getContext().startActivity(intent);
+                    }
+                });
+                itemView.setOnLongClickListener(new View.OnLongClickListener() {
+                    @Override
+                    public boolean onLongClick(View v) {
+                        Intent intent = new Intent(itemView.getContext(), ProgramTrainingActivity.class);
+                        intent.putExtra(PROGRAM_TRAINING_ID_KEY, getItemId());
+                        itemView.getContext().startActivity(intent);
+                        return true;
                     }
                 });
             }

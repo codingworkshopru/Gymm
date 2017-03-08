@@ -15,7 +15,7 @@ import static ru.codingworkshop.gymm.program.activity.exercise.ProgramExerciseAc
  */
 
 final class ExercisesAsyncLoader extends AsyncTaskLoader<Cursor> {
-    Cursor mExercisesCursor;
+    private Cursor mExercisesCursor;
 
     ExercisesAsyncLoader(Context context, Cursor exercisesCursor) {
         super(context);

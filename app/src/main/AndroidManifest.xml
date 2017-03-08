@@ -8,9 +8,10 @@
         android:label="@string/app_name"
         android:supportsRtl="true"
         android:theme="@style/AppTheme.NoActionBar">
-        <activity android:name=".MainActivity"
-            android:theme="@style/AppTheme.NoActionBar.TranslucentStatusOn"
-            android:label="@string/app_name">
+        <activity
+            android:name=".MainActivity"
+            android:label="@string/app_name"
+            android:theme="@style/AppTheme.NoActionBar.TranslucentStatusOn">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -18,25 +19,28 @@
             </intent-filter>
         </activity>
         <activity
-            android:theme="@style/AppTheme.NoActionBar.SpinnerInAppBar"
-            android:launchMode="singleTop"
             android:name=".program.activity.training.ProgramTrainingActivity"
             android:label="@string/program_training_activity_title"
-            android:parentActivityName=".MainActivity">
+            android:launchMode="singleTop"
+            android:parentActivityName=".MainActivity"
+            android:theme="@style/AppTheme.NoActionBar.SpinnerInAppBar">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".MainActivity" />
         </activity>
         <activity
-            android:theme="@style/AppTheme.NoActionBar.SpinnerInAppBar"
-            android:launchMode="singleTop"
             android:name=".program.activity.exercise.ProgramExerciseActivity"
             android:label="@string/program_exercise_activity_title"
-            android:parentActivityName=".program.activity.training.ProgramTrainingActivity">
+            android:launchMode="singleTop"
+            android:parentActivityName=".program.activity.training.ProgramTrainingActivity"
+            android:theme="@style/AppTheme.NoActionBar.SpinnerInAppBar">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="program.activity.training.ProgramTrainingActivity" />
         </activity>
+        <activity
+            android:name=".ActualTrainingActivity"
+            android:label="@string/title_activity_actual_training"/>
     </application>
 
 </manifest>
