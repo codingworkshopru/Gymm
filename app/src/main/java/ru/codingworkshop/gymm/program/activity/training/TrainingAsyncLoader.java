@@ -13,12 +13,12 @@ import ru.codingworkshop.gymm.data.model.ProgramTraining;
  * Created by Радик on 08.03.2017.
  */
 
-class TrainingAsyncLoader extends AsyncTaskLoader<ProgramTraining> {
+public class TrainingAsyncLoader extends AsyncTaskLoader<ProgramTraining> {
     private final int id;
     private final Bundle args;
     private final ProgramTraining model;
 
-    static final int LOADER_TRAINING_LOAD = 0;
+    public static final int LOADER_TRAINING_LOAD = 0;
     static final int LOADER_TRAINING_SAVE = 1;
 
     public TrainingAsyncLoader(Context context, int id, Bundle args, ProgramTraining model) {

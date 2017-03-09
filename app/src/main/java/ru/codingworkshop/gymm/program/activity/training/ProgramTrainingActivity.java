@@ -15,6 +15,7 @@ import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -106,7 +107,11 @@ public class ProgramTrainingActivity extends AppCompatActivity
                 long id = intent.getLongExtra(MainActivity.PROGRAM_TRAINING_ID_KEY, 0);
                 Bundle bundle = new Bundle();
                 bundle.putLong(MainActivity.PROGRAM_TRAINING_ID_KEY, id);
-                getSupportLoaderManager().initLoader(TrainingAsyncLoader.LOADER_TRAINING_LOAD, bundle, this);
+                Loader l = getSupportLoaderManager().getLoader(TrainingAsyncLoader.LOADER_TRAINING_LOAD);
+                if (l == null)
+                    getSupportLoaderManager().initLoader(TrainingAsyncLoader.LOADER_TRAINING_LOAD, bundle, this);
+                else
+                    getSupportLoaderManager().restartLoader(TrainingAsyncLoader.LOADER_TRAINING_LOAD, bundle, this);
             } else {
                 mModel = new ProgramTraining();
                 onModelUpdated();
@@ -127,6 +132,7 @@ public class ProgramTrainingActivity extends AppCompatActivity
             ProgramExercise exercise = data.getParcelableExtra(ProgramExerciseActivity.EXERCISE_MODEL_KEY);
             int order = exercise.getOrder();
             if (order == -1) {
+                Log.d(TAG, "onActivityResult " + mModel);
                 mModel.addChild(exercise);
                 mExercisesAdapter.notifyItemInserted(mModel.childrenCount() - 1);
             } else {
@@ -173,12 +179,13 @@ public class ProgramTrainingActivity extends AppCompatActivity
     private void onModelUpdated() {
         mBinding.setTraining(mModel);
         mExercisesAdapter.setModel(mModel);
+        Log.d(TAG, "onModelUpdated " + mModel);
 
     }
 
     @Override
     public void onLoadFinished(Loader<ProgramTraining> loader, ProgramTraining data) {
-        if (loader.getId() == TrainingAsyncLoader.LOADER_TRAINING_LOAD) {
+        if (loader.getId() == TrainingAsyncLoader.LOADER_TRAINING_LOAD && data != null) {
             mModel = data;
             onModelUpdated();
         }

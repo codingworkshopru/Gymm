@@ -4,6 +4,8 @@ import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.DrawableRes;
 import android.support.annotation.StyleRes;
+import android.support.v4.app.LoaderManager;
+import android.support.v4.content.Loader;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
@@ -17,7 +19,11 @@ import android.widget.TextView;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ActualTrainingActivity extends AppCompatActivity {
+import ru.codingworkshop.gymm.data.model.ProgramTraining;
+import ru.codingworkshop.gymm.program.activity.training.TrainingAsyncLoader;
+
+public class ActualTrainingActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<ProgramTraining> {
+    private ProgramTraining mProgramTraining;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -32,7 +38,7 @@ public class ActualTrainingActivity extends AppCompatActivity {
             int activeStepPosition = 0;
             @Override
             public int getCount() {
-                return 4;
+                return mProgramTraining != null ? mProgramTraining.childrenCount() : 0;
             }
 
             @Override
@@ -55,7 +61,7 @@ public class ActualTrainingActivity extends AppCompatActivity {
 
                 vh.setIndexNumber(position + 1);
                 vh.setActiveStep(position == activeStepPosition);
-                vh.setTitle(String.valueOf(Math.random()));
+                vh.setTitle(mProgramTraining.getChild(position).getExercise().getName());
                 if (position == getCount() - 1)
                     vh.setVerticalLineVisible(false);
 
@@ -75,6 +81,24 @@ public class ActualTrainingActivity extends AppCompatActivity {
                 return null;
             }
         });
+
+        getSupportLoaderManager().initLoader(TrainingAsyncLoader.LOADER_TRAINING_LOAD, getIntent().getExtras(), this);
+}
+
+    @Override
+    public Loader<ProgramTraining> onCreateLoader(int id, Bundle args) {
+        return new TrainingAsyncLoader(this, id, args, null);
+    }
+
+    @Override
+    public void onLoadFinished(Loader<ProgramTraining> loader, ProgramTraining data) {
+        mProgramTraining = data;
+        ((BaseAdapter) ((ListView) findViewById(R.id.list_view)).getAdapter()).notifyDataSetChanged();
+    }
+
+    @Override
+    public void onLoaderReset(Loader<ProgramTraining> loader) {
+
     }
 
     static class ViewHolder {
