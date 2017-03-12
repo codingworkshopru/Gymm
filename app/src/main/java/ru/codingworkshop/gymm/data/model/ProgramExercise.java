@@ -3,7 +3,6 @@ package ru.codingworkshop.gymm.data.model;
 import android.content.ContentValues;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
-import android.database.sqlite.SQLiteException;
 import android.os.Parcel;
 
 import java.util.LinkedList;
@@ -131,22 +130,9 @@ public final class ProgramExercise extends MutableModel implements Orderable, Pa
 
     @Override
     public long create(SQLiteDatabase db, long parentId) {
-        if (!isPhantom())
-            return -1;
+        long exerciseId = create(db, TABLE_NAME, ProgramExerciseEntry.COLUMN_PROGRAM_TRAINING_ID, parentId, id);
 
-        ContentValues cv = new ContentValues();
-        cv.put(ProgramExerciseEntry.COLUMN_PROGRAM_TRAINING_ID, parentId);
-        addFieldsToContentValues(cv, false);
-
-        long exerciseId = db.insert(TABLE_NAME, null, cv);
-
-        if (exerciseId == -1)
-            throw new SQLiteException("Insertion error: " + cv);
-
-        id.setData(exerciseId);
-        commit();
-
-        children.save(db, getId());
+        children.save(db, exerciseId);
 
         return exerciseId;
     }
@@ -179,32 +165,14 @@ public final class ProgramExercise extends MutableModel implements Orderable, Pa
 
     @Override
     public int update(SQLiteDatabase db) {
-        if (isPhantom() || !isChanged())
-            return 0;
-
         children.save(db, getId());
 
-        ContentValues cv = new ContentValues();
-        addFieldsToContentValues(cv, true);
-        if (cv.size() != 0) {
-            commit();
-            return db.update(TABLE_NAME, cv, id.getColumnName() + "=" + getId(), null);
-        } else {
-            return 0;
-        }
+        return update(db, TABLE_NAME, id);
     }
 
     @Override
     public int delete(SQLiteDatabase db) {
-        if (isPhantom())
-            return 0;
-
-        int rowsAffected = db.delete(TABLE_NAME, id.getColumnName() + "=" + getId(), null);
-
-        if (rowsAffected == 1)
-            id.setInitialData(0L);
-
-        return rowsAffected;
+        return delete(db, TABLE_NAME, id);
     }
 
     private ProgramExercise(Parcel in) {

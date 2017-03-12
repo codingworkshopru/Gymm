@@ -39,6 +39,9 @@ public abstract class MutableModel implements Model, Cloneable {
         ContentValues cv = new ContentValues();
         addFieldsToContentValues(cv, true);
 
+        if (cv.size() == 0)
+            return 0;
+
         commit();
 
         return db.update(tableName, cv, idField.getColumnName() + "=?", new String[] {String.valueOf(getId())});

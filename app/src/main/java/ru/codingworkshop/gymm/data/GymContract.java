@@ -88,13 +88,13 @@ public final class GymContract {
     public static final class ActualExerciseEntry implements BaseColumns {
         public static final String TABLE_NAME = "actual_exercise";
         public static final String COLUMN_EXERCISE_ID = "exercise_id";
-        public static final String COLUMN_TRAINING_DATE = "training_date";
+        public static final String COLUMN_TRAINING_TIMESTAMP = "training_timestamp";
 
         public static final String SQL_CREATE = createTableStatement(
                 TABLE_NAME,
                 primaryKey(),
                 String.format("%s INTEGER NOT NULL", COLUMN_EXERCISE_ID),
-                String.format("%s TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP", COLUMN_TRAINING_DATE),
+                String.format("%s TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP", COLUMN_TRAINING_TIMESTAMP),
                 foreignKey(COLUMN_EXERCISE_ID, ExerciseEntry.TABLE_NAME, ExerciseEntry._ID, "CASCADE", "RESTRICT")
         );
         public static final String SQL_DROP = dropTableStatement(TABLE_NAME);
