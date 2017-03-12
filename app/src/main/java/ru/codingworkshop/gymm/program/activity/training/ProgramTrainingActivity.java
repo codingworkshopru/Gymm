@@ -180,12 +180,11 @@ public class ProgramTrainingActivity extends AppCompatActivity
         mBinding.setTraining(mModel);
         mExercisesAdapter.setModel(mModel);
         Log.d(TAG, "onModelUpdated " + mModel);
-
     }
 
     @Override
     public void onLoadFinished(Loader<ProgramTraining> loader, ProgramTraining data) {
-        if (loader.getId() == TrainingAsyncLoader.LOADER_TRAINING_LOAD && data != null) {
+        if (data != null) {
             mModel = data;
             onModelUpdated();
         }

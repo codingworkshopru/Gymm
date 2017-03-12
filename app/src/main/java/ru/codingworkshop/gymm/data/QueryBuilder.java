@@ -11,25 +11,25 @@ import java.util.regex.Pattern;
 
 public final class QueryBuilder {
 
-    public static String build(QueryPart[] parts) {
-        String sqlQuery;
+    public static String build(QueryPart... parts) {
         int partsCount = parts.length;
 
         StringBuilder selection = new StringBuilder();
         StringBuilder from = new StringBuilder();
+        StringBuilder where = new StringBuilder();
         StringBuilder group = new StringBuilder();
         StringBuilder order = new StringBuilder();
         for (int i = 0; i < partsCount; i++) {
             QueryPart part = parts[i];
             String table = part.mTable;
 
-            if (!part.mSelection.isEmpty()) {
+            if (!part.mColumns.isEmpty()) {
                 if (selection.toString().isEmpty()) {
                     selection.append("SELECT ");
                     if (part.mDistinct)
                         selection.append("DISTINCT ");
                 }
-                selection.append(part.mSelection).append(",");
+                selection.append(part.mColumns).append(",");
             }
 
             if (i == 0)
@@ -51,6 +51,12 @@ public final class QueryBuilder {
                         .append(part.mOtherJoiningColumn);
             }
 
+            if (!part.mSelection.isEmpty()) {
+                if (where.toString().isEmpty())
+                    where.append(" WHERE ");
+                where.append(part.mSelection).append(" AND ");
+            }
+
             if (!part.mGroup.isEmpty()) {
                 if (group.toString().isEmpty())
                     group.append(" GROUP BY ");
@@ -65,18 +71,21 @@ public final class QueryBuilder {
         }
 
         deleteLastComma(selection);
+        deleteLast(where, "AND");
         deleteLastComma(group);
         deleteLastComma(order);
 
-        sqlQuery = selection.toString() + from.toString() + group.toString() + order.toString();
-
-        return sqlQuery;
+        return selection.toString() + from.toString() + group.toString() + order.toString();
     }
 
     private static void deleteLastComma(StringBuilder sb) {
-        int lastCommaIndex = sb.lastIndexOf(",");
-        if (lastCommaIndex != -1)
-            sb.deleteCharAt(lastCommaIndex);
+        deleteLast(sb, ",");
+    }
+
+    private static void deleteLast(StringBuilder sb, String substring) {
+        int lastSubstringIndex = sb.lastIndexOf(substring);
+        if (lastSubstringIndex != -1)
+            sb.delete(lastSubstringIndex, sb.length() - 1);
     }
 
     private static String getColumnsWithTable(String[] selection, String table) {
@@ -85,7 +94,7 @@ public final class QueryBuilder {
 
         StringBuilder selectionWithTable = new StringBuilder();
         for (String s : selection) {
-            // if field is a standard SQL function
+            // if a standard SQL function presented
             if (s.matches("^\\w+\\(\\w*\\s?\\w+\\)$")) {
                 Pattern pattern = Pattern.compile("(\\w+)\\)$");
                 Matcher matcher = pattern.matcher(s);
@@ -107,68 +116,58 @@ public final class QueryBuilder {
         return table + "." + column;
     }
 
-    public static final class QueryPartBuilder {
-        private String[] mSelection;
-        private String[] mGroup;
-        private String[] mOrder;
-        private QueryPart mQueryPart;
+    public static final class QueryPart {
+        String mColumns;
+        String mTable;
+        String mThisJoiningColumn;
+        String mOtherJoiningColumn;
+        String mSelection;
+        String mGroup;
+        String mOrder;
+        boolean mDistinct;
 
-        public QueryPartBuilder() {
-            mQueryPart = new QueryPart();
+        public QueryPart(String tableName) {
+            mTable = tableName;
         }
 
-        public QueryPartBuilder setSelection(String[] selection) {
+        public QueryPart setColumns(String... columns) {
+            mColumns = getColumnsWithTable(columns, mTable);
+            return this;
+        }
+
+        public QueryPart setTable(String table) {
+            mTable = table;
+            return this;
+        }
+
+        public QueryPart setThisJoinColumn(String joinColumn) {
+            mThisJoiningColumn = joinColumn;
+            return this;
+        }
+
+        public QueryPart setOtherJoinColumn(String joinColumn) {
+            mOtherJoiningColumn = joinColumn;
+            return this;
+        }
+
+        public QueryPart setSelection(String selection) {
             mSelection = selection;
             return this;
         }
 
-        public QueryPartBuilder setTable(String table) {
-            mQueryPart.mTable = table;
+        public QueryPart setGroup(String... group) {
+            mGroup = getColumnsWithTable(group, mTable);
             return this;
         }
 
-        public QueryPartBuilder setThisJoinColumn(String joinColumn) {
-            mQueryPart.mThisJoiningColumn = joinColumn;
+        public QueryPart setOrder(String... order) {
+            mOrder = getColumnsWithTable(order, mTable);
             return this;
         }
 
-        public QueryPartBuilder setOtherJoinColumn(String joinColumn) {
-            mQueryPart.mOtherJoiningColumn = joinColumn;
+        public QueryPart setDistinct(boolean distinct) {
+            mDistinct = distinct;
             return this;
         }
-
-        public QueryPartBuilder setGroup(String[] group) {
-            mGroup = group;
-            return this;
-        }
-
-        public QueryPartBuilder setOrder(String[] order) {
-            mOrder = order;
-            return this;
-        }
-
-        public QueryPartBuilder setDistinct(boolean distinct) {
-            mQueryPart.mDistinct = distinct;
-            return this;
-        }
-
-        public QueryPart build() {
-            String table = mQueryPart.mTable;
-            mQueryPart.mSelection = getColumnsWithTable(mSelection, table);
-            mQueryPart.mGroup = getColumnsWithTable(mGroup, table);
-            mQueryPart.mOrder = getColumnsWithTable(mOrder, table);
-
-            return mQueryPart;
-        }
-    }
-
-    public static final class QueryPart {
-        String mSelection;
-        String mTable;
-        String mThisJoiningColumn;
-        String mOtherJoiningColumn;
-        String mGroup;
-        String mOrder;
-        boolean mDistinct;
     }
 }

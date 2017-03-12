@@ -3,13 +3,13 @@ package ru.codingworkshop.gymm.data.model;
 import android.content.ContentValues;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
-import android.database.sqlite.SQLiteException;
 import android.os.Parcel;
 
 import java.util.LinkedList;
 import java.util.List;
 
 import ru.codingworkshop.gymm.data.GymContract.ProgramSetEntry;
+import ru.codingworkshop.gymm.data.QueryBuilder;
 import ru.codingworkshop.gymm.data.model.base.MutableModel;
 import ru.codingworkshop.gymm.data.model.base.Orderable;
 import ru.codingworkshop.gymm.data.model.field.Field;
@@ -108,34 +108,15 @@ public final class ProgramSet extends MutableModel implements Orderable {
 
     @Override
     public long create(SQLiteDatabase db, long parentId) {
-        if (!isPhantom())
-            return -1;
-
-        ContentValues cv = new ContentValues();
-        cv.put(ProgramSetEntry.COLUMN_PROGRAM_EXERCISE_ID, parentId);
-        addFieldsToContentValues(cv, false);
-
-        long setId = db.insert(TABLE_NAME, null, cv);
-
-        if (setId == -1)
-            throw new SQLiteException("Insertion error: " + cv);
-
-        id.setData(setId);
-        commit();
-
-        return setId;
+        return create(db, TABLE_NAME, ProgramSetEntry.COLUMN_PROGRAM_EXERCISE_ID, parentId, id);
     }
 
     public static List<ProgramSet> read(SQLiteDatabase db, long parentId) {
-        Cursor cursor = db.query(
-                TABLE_NAME,
-                null,
-                ProgramSetEntry.COLUMN_PROGRAM_EXERCISE_ID + "=" + parentId,
-                null,
-                null,
-                null,
-                ProgramSetEntry.COLUMN_SORT_ORDER
-        );
+        QueryBuilder.QueryPart part = new QueryBuilder.QueryPart(TABLE_NAME);
+        part.setSelection(ProgramSetEntry.COLUMN_PROGRAM_EXERCISE_ID + "=?")
+                .setOrder(ProgramSetEntry.COLUMN_SORT_ORDER);
+
+        Cursor cursor = db.rawQuery(QueryBuilder.build(part), new String[] {String.valueOf(parentId)});
 
         List<ProgramSet> result = new LinkedList<>();
         while (cursor.moveToNext()) {
@@ -155,28 +136,12 @@ public final class ProgramSet extends MutableModel implements Orderable {
 
     @Override
     public int update(SQLiteDatabase db) {
-        if (isPhantom() || !isChanged())
-            return 0;
-
-        ContentValues cv = new ContentValues();
-        addFieldsToContentValues(cv, true);
-
-        commit();
-
-        return db.update(TABLE_NAME, cv, id.getColumnName() + "=" + getId(), null);
+        return update(db, TABLE_NAME, id);
     }
 
     @Override
     public int delete(SQLiteDatabase db) {
-        if (isPhantom())
-            return 0;
-
-        int rowsAffected = db.delete(TABLE_NAME, id.getColumnName() + "=" + getId(), null);
-
-        if (rowsAffected != 0)
-            id.setInitialData(0L);
-
-        return rowsAffected;
+        return delete(db, TABLE_NAME, id);
     }
 
     @Override
@@ -185,10 +150,11 @@ public final class ProgramSet extends MutableModel implements Orderable {
     }
 
     private ProgramSet(Parcel in) {
-        id = in.readParcelable(reps.getClass().getClassLoader());
-        reps = in.readParcelable(reps.getClass().getClassLoader());
-        secondsForRest = in.readParcelable(secondsForRest.getClass().getClassLoader());
-        sortOrder = in.readParcelable(sortOrder.getClass().getClassLoader());
+        ClassLoader cl = Field.class.getClassLoader();
+        id = in.readParcelable(cl);
+        reps = in.readParcelable(cl);
+        secondsForRest = in.readParcelable(cl);
+        sortOrder = in.readParcelable(cl);
     }
 
     public static final Creator<ProgramSet> CREATOR = new Creator<ProgramSet>() {

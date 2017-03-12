@@ -131,7 +131,7 @@ public final class GymContract {
         public static final String SQL_DROP = dropTableStatement(TABLE_NAME);
     }
 
-    public static final class ProgramExerciseEntry implements  BaseColumns {
+    public static final class ProgramExerciseEntry implements BaseColumns {
         public static final String TABLE_NAME = "program_exercise";
         public static final String COLUMN_PROGRAM_TRAINING_ID = "program_training_id";
         public static final String COLUMN_EXERCISE_ID = "exercise_id";
