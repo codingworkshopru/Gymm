@@ -82,7 +82,15 @@ public class ChildrenField<T extends MutableModel> implements Cloneable, Parcela
     }
 
     public T get(int index) {
-        return index < size() && index >= 0 ? changedData.get(index) : null;
+        if (index < 0 || index >= changedData.size())
+            throw new IndexOutOfBoundsException("Index out of bounds: ");
+
+        T result = changedData.get(index);
+
+        if (result instanceof Orderable && ((Orderable) result).getOrder() == -1)
+            throw new RuntimeException("Invalid order");
+
+        return result;
     }
 
     public void move(int fromIndex, int toIndex) {
