@@ -1,6 +1,7 @@
 package ru.codingworkshop.gymm.data;
 
 import android.provider.BaseColumns;
+import android.util.Log;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -10,11 +11,12 @@ import java.util.regex.Pattern;
  */
 
 public final class QueryBuilder {
+    private static final String TAG = QueryBuilder.class.getSimpleName();
 
     public static String build(QueryPart... parts) {
         int partsCount = parts.length;
 
-        StringBuilder selection = new StringBuilder();
+        StringBuilder columns = new StringBuilder();
         StringBuilder from = new StringBuilder();
         StringBuilder where = new StringBuilder();
         StringBuilder group = new StringBuilder();
@@ -23,13 +25,13 @@ public final class QueryBuilder {
             QueryPart part = parts[i];
             String table = part.mTable;
 
-            if (!part.mColumns.isEmpty()) {
-                if (selection.toString().isEmpty()) {
-                    selection.append("SELECT ");
+            if (part.mColumns != null && !part.mColumns.isEmpty()) {
+                if (columns.toString().isEmpty()) {
+                    columns.append("SELECT ");
                     if (part.mDistinct)
-                        selection.append("DISTINCT ");
+                        columns.append("DISTINCT ");
                 }
-                selection.append(part.mColumns).append(",");
+                columns.append(part.mColumns).append(",");
             }
 
             if (i == 0)
@@ -51,31 +53,35 @@ public final class QueryBuilder {
                         .append(part.mOtherJoiningColumn);
             }
 
-            if (!part.mSelection.isEmpty()) {
+            if (part.mSelection != null && !part.mSelection.isEmpty()) {
                 if (where.toString().isEmpty())
                     where.append(" WHERE ");
                 where.append(part.mSelection).append(" AND ");
             }
 
-            if (!part.mGroup.isEmpty()) {
+            if (part.mGroup != null && !part.mGroup.isEmpty()) {
                 if (group.toString().isEmpty())
                     group.append(" GROUP BY ");
                 group.append(part.mGroup).append(",");
             }
 
-            if (!part.mOrder.isEmpty()) {
+            if (part.mOrder != null && !part.mOrder.isEmpty()) {
                 if (order.toString().isEmpty())
                     order.append(" ORDER BY ");
                 order.append(part.mOrder).append(",");
             }
         }
 
-        deleteLastComma(selection);
+        deleteLastComma(columns);
         deleteLast(where, "AND");
         deleteLastComma(group);
         deleteLastComma(order);
 
-        return selection.toString() + from.toString() + group.toString() + order.toString();
+        String query = columns.toString() + from.toString() + where.toString() + group.toString() + order.toString();
+
+        Log.d(TAG, query);
+
+        return query;
     }
 
     private static void deleteLastComma(StringBuilder sb) {
@@ -85,7 +91,7 @@ public final class QueryBuilder {
     private static void deleteLast(StringBuilder sb, String substring) {
         int lastSubstringIndex = sb.lastIndexOf(substring);
         if (lastSubstringIndex != -1)
-            sb.delete(lastSubstringIndex, sb.length() - 1);
+            sb.delete(lastSubstringIndex, sb.length());
     }
 
     private static String getColumnsWithTable(String[] selection, String table) {
@@ -132,11 +138,6 @@ public final class QueryBuilder {
 
         public QueryPart setColumns(String... columns) {
             mColumns = getColumnsWithTable(columns, mTable);
-            return this;
-        }
-
-        public QueryPart setTable(String table) {
-            mTable = table;
             return this;
         }
 

@@ -161,31 +161,23 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
             public Cursor loadInBackground() {
                 GymDbHelper dbHelper = new GymDbHelper(MainActivity.this);
                 SQLiteDatabase db = dbHelper.getReadableDatabase();
-                QueryBuilder.QueryPart training = new QueryBuilder.QueryPartBuilder()
-                        .setSelection(new String[] {ProgramTrainingEntry._ID, ProgramTrainingEntry.COLUMN_NAME, ProgramTrainingEntry.COLUMN_WEEKDAY})
-                        .setTable(ProgramTrainingEntry.TABLE_NAME)
-                        .setGroup(new String[] {ProgramTrainingEntry._ID})
-                        .build();
+                QueryBuilder.QueryPart training = new QueryBuilder.QueryPart(ProgramTrainingEntry.TABLE_NAME)
+                        .setColumns(ProgramTrainingEntry._ID, ProgramTrainingEntry.COLUMN_NAME, ProgramTrainingEntry.COLUMN_WEEKDAY)
+                        .setGroup(ProgramTrainingEntry._ID);
 
-                QueryBuilder.QueryPart programExercise = new QueryBuilder.QueryPartBuilder()
-                        .setTable(ProgramExerciseEntry.TABLE_NAME)
-                        .setThisJoinColumn(ProgramExerciseEntry.COLUMN_PROGRAM_TRAINING_ID)
-                        .build();
+                QueryBuilder.QueryPart programExercise = new QueryBuilder.QueryPart(ProgramExerciseEntry.TABLE_NAME)
+                        .setThisJoinColumn(ProgramExerciseEntry.COLUMN_PROGRAM_TRAINING_ID);
 
-                QueryBuilder.QueryPart exercise = new QueryBuilder.QueryPartBuilder()
-                        .setTable(ExerciseEntry.TABLE_NAME)
+                QueryBuilder.QueryPart exercise = new QueryBuilder.QueryPart(ExerciseEntry.TABLE_NAME)
                         .setThisJoinColumn(ExerciseEntry._ID)
-                        .setOtherJoinColumn(ProgramExerciseEntry.COLUMN_EXERCISE_ID)
-                        .build();
+                        .setOtherJoinColumn(ProgramExerciseEntry.COLUMN_EXERCISE_ID);
 
-                QueryBuilder.QueryPart muscleGroup = new QueryBuilder.QueryPartBuilder()
-                        .setSelection(new String[] {"group_concat(DISTINCT "+ MuscleGroupEntry.COLUMN_NAME + ")"})
-                        .setTable(MuscleGroupEntry.TABLE_NAME)
+                QueryBuilder.QueryPart muscleGroup = new QueryBuilder.QueryPart(MuscleGroupEntry.TABLE_NAME)
+                        .setColumns("group_concat(DISTINCT "+ MuscleGroupEntry.COLUMN_NAME + ")")
                         .setThisJoinColumn(MuscleGroupEntry._ID)
-                        .setOtherJoinColumn(ExerciseEntry.COLUMN_PRIMARY_MUSCLE_GROUP_ID)
-                        .build();
+                        .setOtherJoinColumn(ExerciseEntry.COLUMN_PRIMARY_MUSCLE_GROUP_ID);
 
-                String query = QueryBuilder.build(new QueryBuilder.QueryPart[] {training, programExercise, exercise, muscleGroup});
+                String query = QueryBuilder.build(training, programExercise, exercise, muscleGroup);
                 Log.d(TAG, query);
                 Cursor cursor = db.rawQuery(query, null);
                 while (cursor.moveToNext()) {

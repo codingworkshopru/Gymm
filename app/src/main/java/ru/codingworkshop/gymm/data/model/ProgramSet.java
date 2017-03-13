@@ -112,8 +112,9 @@ public final class ProgramSet extends MutableModel implements Orderable {
     }
 
     public static List<ProgramSet> read(SQLiteDatabase db, long parentId) {
-        QueryBuilder.QueryPart part = new QueryBuilder.QueryPart(TABLE_NAME);
-        part.setSelection(ProgramSetEntry.COLUMN_PROGRAM_EXERCISE_ID + "=?")
+        QueryBuilder.QueryPart part = new QueryBuilder.QueryPart(TABLE_NAME)
+                .setColumns("*")
+                .setSelection(ProgramSetEntry.COLUMN_PROGRAM_EXERCISE_ID + "=?")
                 .setOrder(ProgramSetEntry.COLUMN_SORT_ORDER);
 
         Cursor cursor = db.rawQuery(QueryBuilder.build(part), new String[] {String.valueOf(parentId)});
