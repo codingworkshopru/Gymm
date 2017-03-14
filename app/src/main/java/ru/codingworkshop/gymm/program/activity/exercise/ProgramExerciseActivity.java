@@ -7,7 +7,6 @@ import android.databinding.BindingAdapter;
 import android.databinding.DataBindingUtil;
 import android.databinding.InverseBindingAdapter;
 import android.databinding.InverseBindingListener;
-import android.graphics.drawable.TransitionDrawable;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
@@ -79,7 +78,7 @@ public class ProgramExerciseActivity extends AppCompatActivity
         else
             mModel = new ProgramExercise();
 
-        setSupportActionBar((Toolbar) findViewById(R.id.toolbar));
+        setSupportActionBar((Toolbar) findViewById(R.id.program_exercise_toolbar));
         // setting "up" button
         ActionBar ab = getSupportActionBar();
         if (ab != null) {
@@ -97,7 +96,7 @@ public class ProgramExerciseActivity extends AppCompatActivity
                 0
         );
         mExercisesAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        Spinner spinner = (Spinner) findViewById(R.id.program_exercises_dropdown);
+        Spinner spinner = (Spinner) findViewById(R.id.program_exercise_exercises_dropdown);
         spinner.setAdapter(mExercisesAdapter);
 
         // recycler view
@@ -153,15 +152,12 @@ public class ProgramExerciseActivity extends AppCompatActivity
         int animationDuration = getResources().getInteger(android.R.integer.config_shortAnimTime);
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.program_exercise_add_set);
-        TransitionDrawable transitionDrawable = (TransitionDrawable) findViewById(R.id.app_bar_layout).getBackground();
         Animation iconsAnimation;
         if (actionModeOn) {
             fab.hide();
-            transitionDrawable.startTransition(animationDuration);
             iconsAnimation = AnimationUtils.makeInAnimation(this, false);
         } else {
             fab.show();
-            transitionDrawable.reverseTransition(animationDuration);
             iconsAnimation = AnimationUtils.makeOutAnimation(this, true);
         }
 
@@ -178,6 +174,7 @@ public class ProgramExerciseActivity extends AppCompatActivity
     //-----------------------------------------
     @Override
     public boolean onCreateActionMode(ActionMode mode, Menu menu) {
+        findViewById(R.id.program_exercise_exercises_dropdown).setVisibility(View.GONE);
         doActionModeChangeAnimation(true);
         mSetsAdapter.attachItemTouchHelper(mSetsView);
         mSetsAdapter.setEditMode(true);
@@ -199,6 +196,7 @@ public class ProgramExerciseActivity extends AppCompatActivity
         mSetsAdapter.attachItemTouchHelper(null);
         doActionModeChangeAnimation(false);
         mSetsAdapter.setEditMode(false);
+        findViewById(R.id.program_exercise_exercises_dropdown).setVisibility(View.VISIBLE);
     }
     //-----------------------------------------
 
@@ -222,20 +220,11 @@ public class ProgramExerciseActivity extends AppCompatActivity
     }
 
     @Override
-    public boolean onMove(RecyclerView.ViewHolder viewHolder, RecyclerView.ViewHolder target) {
-        int insertionIndex = target.getAdapterPosition();
-        int sourceIndex = viewHolder.getAdapterPosition();
-        mModel.moveChild(sourceIndex, insertionIndex);
-        mSetsAdapter.notifyItemMoved(sourceIndex, insertionIndex);
-        return true;
+    public void onMove(RecyclerView.ViewHolder viewHolder, RecyclerView.ViewHolder target) {
     }
 
     @Override
     public void onSwiped(RecyclerView.ViewHolder viewHolder) {
-        int viewHolderPosition = viewHolder.getAdapterPosition();
-        mModel.removeChild(viewHolderPosition);
-        mSetsAdapter.notifyItemRemoved(viewHolderPosition);
-
         mItemRemovedSnackbar = Snackbar.make(mSetsView, R.string.program_exercise_activity_set_deleted_message, Snackbar.LENGTH_INDEFINITE);
         mItemRemovedSnackbar.setAction(R.string.cancel_button_text, new View.OnClickListener() {
             @Override

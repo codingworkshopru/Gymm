@@ -13,12 +13,12 @@
             type="ru.codingworkshop.gymm.data.model.ProgramTraining" />
     </data>
     <android.support.design.widget.CoordinatorLayout
-        android:id="@+id/activity_program_training"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         tools:context="ru.codingworkshop.gymm.program.activity.training.ProgramTrainingActivity">
 
         <android.support.design.widget.AppBarLayout
+            android:id="@+id/program_training_app_bar_layout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:theme="?attr/actionBarTheme">

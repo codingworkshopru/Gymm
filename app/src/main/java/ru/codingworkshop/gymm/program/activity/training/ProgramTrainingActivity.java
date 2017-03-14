@@ -93,16 +93,12 @@ public class ProgramTrainingActivity extends AppCompatActivity
         mExercisesAdapter = new ProgramAdapter<>(this, new ExerciseViewHolderFactory());
         mExercisesView.setAdapter(mExercisesAdapter);
         mBinding.setAdapter(mExercisesAdapter);
-        mExercisesAdapter.setModel(mModel);
 
         // restore model from bundle
-        if (savedInstanceState != null && savedInstanceState.containsKey(TRAINING_MODEL_KEY)) {
-            mModel = savedInstanceState.getParcelable(TRAINING_MODEL_KEY);
-            onModelUpdated();
-        }
-
-        Intent intent = getIntent();
-        if (mModel == null) {
+        if (savedInstanceState != null) {
+            setModel((ProgramTraining) savedInstanceState.getParcelable(TRAINING_MODEL_KEY));
+        } else {
+            Intent intent = getIntent();
             if (intent != null && intent.hasExtra(MainActivity.PROGRAM_TRAINING_ID_KEY)) {
                 long id = intent.getLongExtra(MainActivity.PROGRAM_TRAINING_ID_KEY, 0);
                 Bundle bundle = new Bundle();
@@ -112,11 +108,13 @@ public class ProgramTrainingActivity extends AppCompatActivity
                     getSupportLoaderManager().initLoader(TrainingAsyncLoader.LOADER_TRAINING_LOAD, bundle, this);
                 else
                     getSupportLoaderManager().restartLoader(TrainingAsyncLoader.LOADER_TRAINING_LOAD, bundle, this);
-            } else {
-                mModel = new ProgramTraining();
-                onModelUpdated();
             }
         }
+    }
+
+    @Override
+    protected void onRestart() {
+        super.onRestart();
     }
 
     @Override
@@ -173,31 +171,38 @@ public class ProgramTrainingActivity extends AppCompatActivity
     //-----------------------------------------
     @Override
     public Loader<ProgramTraining> onCreateLoader(final int id, final Bundle args) {
-        return new TrainingAsyncLoader(this, id, args, mModel);
+        return new TrainingAsyncLoader(this, id, args);
     }
 
-    private void onModelUpdated() {
+    private void setModel(ProgramTraining model) {
+        if (model == null || model == mModel)
+            return;
+
+        mModel = model;
         mBinding.setTraining(mModel);
         mExercisesAdapter.setModel(mModel);
-        Log.d(TAG, "onModelUpdated " + mModel);
+        Log.d(TAG, "setModel " + mModel);
     }
 
     @Override
     public void onLoadFinished(Loader<ProgramTraining> loader, ProgramTraining data) {
-        if (data != null) {
-            mModel = data;
-            onModelUpdated();
-        }
+        setModel(data);
     }
 
     @Override
     public void onLoaderReset(Loader<ProgramTraining> loader) {
 
     }
+    //-----------------------------------------
 
+    // action mode (in fact edit mode)
+    //-----------------------------------------
     @Override
     public boolean onCreateActionMode(ActionMode mode, Menu menu) {
-        return false;
+        findViewById(R.id.program_training_app_bar_content).setVisibility(View.GONE);
+        mExercisesAdapter.attachItemTouchHelper(mExercisesView);
+        mExercisesAdapter.setEditMode(true);
+        return true;
     }
 
     @Override
@@ -212,8 +217,11 @@ public class ProgramTrainingActivity extends AppCompatActivity
 
     @Override
     public void onDestroyActionMode(ActionMode mode) {
-
+        mExercisesAdapter.attachItemTouchHelper(null);
+        findViewById(R.id.program_training_app_bar_content).setVisibility(View.VISIBLE);
+        mExercisesAdapter.setEditMode(false);
     }
+    //-----------------------------------------
 
     @Override
     public void onListItemClick(View view) {
@@ -226,12 +234,12 @@ public class ProgramTrainingActivity extends AppCompatActivity
 
     @Override
     public boolean onListItemLongClick(View view) {
-        return false;
+        startSupportActionMode(this);
+        return true;
     }
 
     @Override
-    public boolean onMove(RecyclerView.ViewHolder viewHolder, RecyclerView.ViewHolder target) {
-        return false;
+    public void onMove(RecyclerView.ViewHolder viewHolder, RecyclerView.ViewHolder target) {
     }
 
     @Override

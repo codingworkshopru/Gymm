@@ -16,17 +16,16 @@ import ru.codingworkshop.gymm.data.model.ProgramTraining;
 public class TrainingAsyncLoader extends AsyncTaskLoader<ProgramTraining> {
     private final int id;
     private final Bundle args;
-    private final ProgramTraining model;
+    private ProgramTraining model;
 
     public static final int LOADER_TRAINING_LOAD = 0;
     static final int LOADER_TRAINING_SAVE = 1;
 
-    public TrainingAsyncLoader(Context context, int id, Bundle args, ProgramTraining model) {
+    public TrainingAsyncLoader(Context context, int id, Bundle args) {
         super(context);
 
         this.id = id;
         this.args = args;
-        this.model = model;
     }
 
     @Override
@@ -45,7 +44,8 @@ public class TrainingAsyncLoader extends AsyncTaskLoader<ProgramTraining> {
             model.create(db, 0);
             model.update(db);
         } else if (id == LOADER_TRAINING_LOAD) {
-            return ProgramTraining.load(dbHelper.getReadableDatabase(), args.getLong(MainActivity.PROGRAM_TRAINING_ID_KEY));
+            model = ProgramTraining.load(dbHelper.getReadableDatabase(), args.getLong(MainActivity.PROGRAM_TRAINING_ID_KEY));
+            return model;
         }
         return null;
     }

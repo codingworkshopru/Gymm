@@ -87,7 +87,7 @@ public class ActualTrainingActivity extends AppCompatActivity implements LoaderM
 
     @Override
     public Loader<ProgramTraining> onCreateLoader(int id, Bundle args) {
-        return new TrainingAsyncLoader(this, id, args, null);
+        return new TrainingAsyncLoader(this, id, args);
     }
 
     @Override

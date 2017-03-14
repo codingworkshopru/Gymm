@@ -7,6 +7,7 @@ import android.support.v7.widget.helper.ItemTouchHelper;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+
 import ru.codingworkshop.gymm.data.model.base.MutableModel;
 import ru.codingworkshop.gymm.data.model.base.Parent;
 
@@ -31,11 +32,22 @@ public final class ProgramAdapter<VH extends ProgramViewHolder> extends Recycler
         mItemTouchHelper = new ItemTouchHelper(new ItemTouchHelper.SimpleCallback(ItemTouchHelper.UP | ItemTouchHelper.DOWN, ItemTouchHelper.RIGHT) {
             @Override
             public boolean onMove(RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder, RecyclerView.ViewHolder target) {
-                return mListItemActionListener.onMove(viewHolder, target);
+                int insertionIndex = target.getAdapterPosition();
+                int sourceIndex = viewHolder.getAdapterPosition();
+                mModel.moveChild(sourceIndex, insertionIndex);
+                notifyItemMoved(sourceIndex, insertionIndex);
+
+                mListItemActionListener.onMove(viewHolder, target);
+
+                return true;
             }
 
             @Override
             public void onSwiped(RecyclerView.ViewHolder viewHolder, int direction) {
+                int viewHolderPosition = viewHolder.getAdapterPosition();
+                mModel.removeChild(viewHolderPosition);
+                notifyItemRemoved(viewHolderPosition);
+
                 mListItemActionListener.onSwiped(viewHolder);
             }
 
@@ -130,7 +142,7 @@ public final class ProgramAdapter<VH extends ProgramViewHolder> extends Recycler
     public interface ListItemActionListener {
         void onListItemClick(View view);
         boolean onListItemLongClick(View view);
-        boolean onMove(RecyclerView.ViewHolder viewHolder, RecyclerView.ViewHolder target);
+        void onMove(RecyclerView.ViewHolder viewHolder, RecyclerView.ViewHolder target);
         void onSwiped(RecyclerView.ViewHolder viewHolder);
     }
 }
