@@ -28,6 +28,12 @@ public class TrainingAsyncLoader extends AsyncTaskLoader<ProgramTraining> {
         this.args = args;
     }
 
+    public TrainingAsyncLoader(Context context, int id, Bundle args, ProgramTraining model) {
+        this(context, id, args);
+
+        this.model = model;
+    }
+
     @Override
     protected void onStartLoading() {
         if (id != LOADER_TRAINING_LOAD || model == null)

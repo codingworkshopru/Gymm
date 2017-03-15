@@ -94,27 +94,22 @@ public class ProgramTrainingActivity extends AppCompatActivity
         mExercisesView.setAdapter(mExercisesAdapter);
         mBinding.setAdapter(mExercisesAdapter);
 
-        // restore model from bundle
+        // get or create model
+        Intent intent = getIntent();
         if (savedInstanceState != null) {
             setModel((ProgramTraining) savedInstanceState.getParcelable(TRAINING_MODEL_KEY));
+        } else if (intent != null && intent.hasExtra(MainActivity.PROGRAM_TRAINING_ID_KEY)) {
+            long id = intent.getLongExtra(MainActivity.PROGRAM_TRAINING_ID_KEY, 0);
+            Bundle bundle = new Bundle();
+            bundle.putLong(MainActivity.PROGRAM_TRAINING_ID_KEY, id);
+            Loader l = getSupportLoaderManager().getLoader(TrainingAsyncLoader.LOADER_TRAINING_LOAD);
+            if (l == null)
+                getSupportLoaderManager().initLoader(TrainingAsyncLoader.LOADER_TRAINING_LOAD, bundle, this);
+            else
+                getSupportLoaderManager().restartLoader(TrainingAsyncLoader.LOADER_TRAINING_LOAD, bundle, this);
         } else {
-            Intent intent = getIntent();
-            if (intent != null && intent.hasExtra(MainActivity.PROGRAM_TRAINING_ID_KEY)) {
-                long id = intent.getLongExtra(MainActivity.PROGRAM_TRAINING_ID_KEY, 0);
-                Bundle bundle = new Bundle();
-                bundle.putLong(MainActivity.PROGRAM_TRAINING_ID_KEY, id);
-                Loader l = getSupportLoaderManager().getLoader(TrainingAsyncLoader.LOADER_TRAINING_LOAD);
-                if (l == null)
-                    getSupportLoaderManager().initLoader(TrainingAsyncLoader.LOADER_TRAINING_LOAD, bundle, this);
-                else
-                    getSupportLoaderManager().restartLoader(TrainingAsyncLoader.LOADER_TRAINING_LOAD, bundle, this);
-            }
+            setModel(new ProgramTraining());
         }
-    }
-
-    @Override
-    protected void onRestart() {
-        super.onRestart();
     }
 
     @Override
@@ -171,7 +166,7 @@ public class ProgramTrainingActivity extends AppCompatActivity
     //-----------------------------------------
     @Override
     public Loader<ProgramTraining> onCreateLoader(final int id, final Bundle args) {
-        return new TrainingAsyncLoader(this, id, args);
+        return new TrainingAsyncLoader(this, id, args, mModel);
     }
 
     private void setModel(ProgramTraining model) {
