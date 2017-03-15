@@ -99,7 +99,7 @@ public class DatabaseTest {
         );
         trainingCursor.moveToNext();
         assertEquals(eqNames, TRAINING_NAME, trainingCursor.getString(trainingCursor.getColumnIndex(GymContract.ProgramTrainingEntry.COLUMN_NAME)));
-        assertEquals(eqNames, WEEKDAY, trainingCursor.getInt(trainingCursor.getColumnIndex(GymContract.ProgramTrainingEntry.COLUMN_WEEKDAY)));
+        assertEquals(eqWeekdays, WEEKDAY + 1, trainingCursor.getInt(trainingCursor.getColumnIndex(GymContract.ProgramTrainingEntry.COLUMN_WEEKDAY)));
 
         Cursor exercisesCursor = db.query(
                 GymContract.ProgramExerciseEntry.TABLE_NAME,

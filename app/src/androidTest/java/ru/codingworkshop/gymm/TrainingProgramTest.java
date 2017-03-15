@@ -11,9 +11,7 @@ import android.support.test.espresso.contrib.RecyclerViewActions;
 import android.support.test.filters.LargeTest;
 import android.support.test.rule.ActivityTestRule;
 import android.support.test.runner.AndroidJUnit4;
-import android.support.v7.app.AlertDialog;
 
-import org.hamcrest.Matchers;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -28,21 +26,12 @@ import static android.support.test.espresso.Espresso.pressBack;
 import static android.support.test.espresso.action.ViewActions.actionWithAssertions;
 import static android.support.test.espresso.action.ViewActions.click;
 import static android.support.test.espresso.action.ViewActions.longClick;
-import static android.support.test.espresso.action.ViewActions.swipeLeft;
-import static android.support.test.espresso.action.ViewActions.swipeRight;
 import static android.support.test.espresso.action.ViewActions.typeText;
 import static android.support.test.espresso.assertion.ViewAssertions.matches;
-import static android.support.test.espresso.matcher.ViewMatchers.hasSibling;
 import static android.support.test.espresso.matcher.ViewMatchers.isDisplayed;
-import static android.support.test.espresso.matcher.ViewMatchers.isEnabled;
 import static android.support.test.espresso.matcher.ViewMatchers.withChild;
-import static android.support.test.espresso.matcher.ViewMatchers.withClassName;
 import static android.support.test.espresso.matcher.ViewMatchers.withId;
-import static android.support.test.espresso.matcher.ViewMatchers.withParent;
 import static android.support.test.espresso.matcher.ViewMatchers.withText;
-import static org.hamcrest.Matchers.allOf;
-import static org.hamcrest.Matchers.containsString;
-import static org.hamcrest.Matchers.instanceOf;
 
 /**
  * Created by Радик on 24.02.2017.
@@ -77,7 +66,7 @@ public class TrainingProgramTest {
 
         // add new set in created training
         onView(withId(R.id.rv_test_main)).perform(RecyclerViewActions.scrollTo(withChild(withText(TRAINING_NAME_TEXT))));
-        onView(withId(R.id.rv_test_main)).perform(RecyclerViewActions.actionOnItem(withChild(withText(TRAINING_NAME_TEXT)), click()));
+        onView(withId(R.id.rv_test_main)).perform(RecyclerViewActions.actionOnItem(withChild(withText(TRAINING_NAME_TEXT)), longClick()));
         onView(withId(R.id.program_training_exercises_list)).perform(RecyclerViewActions.actionOnItemAtPosition(0, click()));
         onView(withId(R.id.program_exercise_add_set)).perform(click());
         onView(withId(android.R.id.button1)).perform(click());
@@ -86,9 +75,9 @@ public class TrainingProgramTest {
 
         // check if set has been added
         onView(withId(R.id.rv_test_main)).perform(RecyclerViewActions.scrollTo(withChild(withText(TRAINING_NAME_TEXT))));
-        onView(withId(R.id.rv_test_main)).perform(RecyclerViewActions.actionOnItem(withChild(withText(TRAINING_NAME_TEXT)), click()));
+        onView(withId(R.id.rv_test_main)).perform(RecyclerViewActions.actionOnItem(withChild(withText(TRAINING_NAME_TEXT)), longClick()));
         closeSoftKeyboard();
-        onView(withText("2")).check(matches(isDisplayed()));
+        onView(withText(mActivityRule.getActivity().getResources().getQuantityString(R.plurals.number_of_sets, 2, 2))).check(matches(isDisplayed()));
     }
 
     @Test
@@ -98,7 +87,9 @@ public class TrainingProgramTest {
         onView(withId(R.id.action_add_program)).perform(click());
         onView(withId(R.id.program_training_name)).perform(typeText(TRAINING_NAME_TEXT));
         onView(withId(R.id.program_training_add_exercise_button)).perform(click());
-        for (int i = 0; i < 2; i++) {
+
+        final int SETS_COUNT = 2;
+        for (int i = 0; i < SETS_COUNT; i++) {
             onView(withId(R.id.program_exercise_add_set)).perform(click());
             onView(withId(android.R.id.button1)).perform(click());
         }
@@ -106,7 +97,7 @@ public class TrainingProgramTest {
         onView(withId(R.id.action_done)).perform(click());
 
         onView(withId(R.id.rv_test_main)).perform(RecyclerViewActions.scrollTo(withChild(withText(TRAINING_NAME_TEXT))));
-        onView(withId(R.id.rv_test_main)).perform(RecyclerViewActions.actionOnItem(withChild(withText(TRAINING_NAME_TEXT)), click()));
+        onView(withId(R.id.rv_test_main)).perform(RecyclerViewActions.actionOnItem(withChild(withText(TRAINING_NAME_TEXT)), longClick()));
         onView(withId(R.id.program_training_exercises_list)).perform(RecyclerViewActions.actionOnItemAtPosition(0, click()));
         onView(withId(R.id.program_exercise_sets_list)).perform(RecyclerViewActions.actionOnItemAtPosition(0, longClick()));
         onView(withId(R.id.program_exercise_sets_list)).perform(RecyclerViewActions.actionOnItemAtPosition(0, actionWithAssertions(
@@ -122,9 +113,9 @@ public class TrainingProgramTest {
         onView(withId(R.id.action_done)).perform(click());
 
         onView(withId(R.id.rv_test_main)).perform(RecyclerViewActions.scrollTo(withChild(withText(TRAINING_NAME_TEXT))));
-        onView(withId(R.id.rv_test_main)).perform(RecyclerViewActions.actionOnItem(withChild(withText(TRAINING_NAME_TEXT)), click()));
+        onView(withId(R.id.rv_test_main)).perform(RecyclerViewActions.actionOnItem(withChild(withText(TRAINING_NAME_TEXT)), longClick()));
 
         closeSoftKeyboard();
-        onView(withText("1")).check(matches(isDisplayed()));
+        onView(withText(mActivityRule.getActivity().getResources().getQuantityString(R.plurals.number_of_sets, SETS_COUNT - 1, SETS_COUNT - 1))).check(matches(isDisplayed()));
     }
 }
