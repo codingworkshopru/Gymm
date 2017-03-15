@@ -45,27 +45,25 @@
                         android:id="@+id/program_training_name_layout"
                         android:layout_width="match_parent"
                         android:layout_height="80dp"
-                        android:layout_marginBottom="8dp"
-                        android:gravity="center_vertical">
+                        android:layout_marginBottom="8dp">
 
                         <android.support.design.widget.TextInputEditText
                             android:id="@+id/program_training_name"
-                            android:layout_height="wrap_content"
                             android:layout_width="match_parent"
-                            android:layout_gravity="center_vertical"
-                            android:text="@={training.name}"
+                            android:layout_height="wrap_content"
                             android:hint="@string/program_training_activity_name_hint"
+                            android:text="@={training.name}"
                             android:textAppearance="@style/TextAppearance.AppCompat.Large.Inverse"
-                            tools:text="Бицуха"/>
+                            tools:text="Бицуха" />
                     </android.support.design.widget.TextInputLayout>
 
                     <TextView
                         android:id="@+id/program_training_weekday_label"
-                        android:text="@string/program_training_activity_weekday_label"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:textAppearance="@style/TextAppearance.AppCompat.Caption"
-                        android:textColor="?attr/colorAccent"/>
+                        android:text="@string/program_training_activity_weekday_label"
+                        android:textAppearance="@style/TextAppearance.Design.Hint"
+                        android:textColor="?android:attr/textColorHint" />
 
                     <Spinner
                         android:id="@+id/program_training_weekday"
