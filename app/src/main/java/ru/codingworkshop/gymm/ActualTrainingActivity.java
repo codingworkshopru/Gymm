@@ -62,8 +62,10 @@ public class ActualTrainingActivity extends AppCompatActivity implements LoaderM
                 vh.setIndexNumber(position + 1);
                 vh.setActiveStep(position == activeStepPosition);
                 vh.setTitle(mProgramTraining.getChild(position).getExercise().getName());
+                if (position == 0)
+                    vh.setTopLineVisibility(false);
                 if (position == getCount() - 1)
-                    vh.setVerticalLineVisible(false);
+                    vh.setBottomLineVisibility(false);
 
 
                 return vh.itemView;
@@ -104,24 +106,32 @@ public class ActualTrainingActivity extends AppCompatActivity implements LoaderM
     static class ViewHolder {
         TextView indexNumber;
         TextView title;
+        TextView summary;
         View itemView;
-        ImageView verticalLine;
+        ImageView topVerticalLine;
+        ImageView bottomVerticalLine;
         ImageView stepperCircle;
 
         public ViewHolder(View view) {
             itemView = view;
             indexNumber = (TextView) view.findViewById(R.id.textView4);
-            verticalLine = (ImageView) view.findViewById(R.id.imageView3);
+            topVerticalLine = (ImageView) view.findViewById(R.id.imageView4);
+            bottomVerticalLine = (ImageView) view.findViewById(R.id.imageView3);
             stepperCircle = (ImageView) view.findViewById(R.id.imageView2);
             title = (TextView) view.findViewById(R.id.textView3);
+            summary = (TextView) view.findViewById(R.id.textView5);
         }
 
         public void setIndexNumber(int number) {
             indexNumber.setText(String.valueOf(number));
         }
 
-        public void setVerticalLineVisible(boolean visible) {
-            verticalLine.setVisibility(visible ? View.VISIBLE : View.GONE);
+        public void setTopLineVisibility(boolean visible) {
+            topVerticalLine.setVisibility(visible ? View.VISIBLE : View.GONE);
+        }
+
+        public void setBottomLineVisibility(boolean visible) {
+            bottomVerticalLine.setVisibility(visible ? View.VISIBLE : View.GONE);
         }
 
         public void setActiveStep(boolean active) {
@@ -145,6 +155,11 @@ public class ActualTrainingActivity extends AppCompatActivity implements LoaderM
 
         public void setTitle(String text) {
             title.setText(text);
+        }
+
+        public void setSummaryText(String text) {
+            summary.setText(text);
+            summary.setVisibility(View.VISIBLE);
         }
     }
 }
