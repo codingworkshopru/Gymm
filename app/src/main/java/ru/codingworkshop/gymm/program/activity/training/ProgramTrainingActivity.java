@@ -1,5 +1,6 @@
 package ru.codingworkshop.gymm.program.activity.training;
 
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.databinding.BindingAdapter;
 import android.databinding.DataBindingUtil;
@@ -35,6 +36,7 @@ import ru.codingworkshop.gymm.data.model.ProgramExercise;
 import ru.codingworkshop.gymm.data.model.ProgramTraining;
 import ru.codingworkshop.gymm.databinding.ActivityProgramTrainingBinding;
 import ru.codingworkshop.gymm.program.ProgramAdapter;
+import ru.codingworkshop.gymm.program.ProgramUtils;
 import ru.codingworkshop.gymm.program.activity.exercise.ProgramExerciseActivity;
 
 public class ProgramTrainingActivity extends AppCompatActivity
@@ -48,7 +50,7 @@ public class ProgramTrainingActivity extends AppCompatActivity
 
     private static final String TAG = ProgramTrainingActivity.class.getSimpleName();
     static final String TRAINING_MODEL_KEY = ProgramTraining.class.getCanonicalName();
-    private static final int REQUEST_CODE_EXERCISE = 0;
+    public static final int REQUEST_CODE_EXERCISE = 0;
     private RecyclerView mExercisesView;
 
     @Override
@@ -140,6 +142,27 @@ public class ProgramTrainingActivity extends AppCompatActivity
         startActivityForResult(intent, REQUEST_CODE_EXERCISE);
     }
 
+    @Override
+    public void onBackPressed() {
+        if (mModel.isChanged()) {
+            DialogInterface.OnClickListener listener = new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    finishActivity(which == DialogInterface.BUTTON_POSITIVE);
+                }
+            };
+            ProgramUtils.showAlert(this, listener, listener);
+        } else {
+            super.onBackPressed();
+        }
+    }
+
+    private void finishActivity(boolean save) {
+        if (save)
+            getSupportLoaderManager().initLoader(TrainingAsyncLoader.LOADER_TRAINING_SAVE, null, ProgramTrainingActivity.this);
+        finish();
+    }
+
     // menu
     //-----------------------------------------
     @Override
@@ -153,8 +176,10 @@ public class ProgramTrainingActivity extends AppCompatActivity
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.action_done:
-                getSupportLoaderManager().initLoader(TrainingAsyncLoader.LOADER_TRAINING_SAVE, null, ProgramTrainingActivity.this);
-                finish();
+                finishActivity(true);
+                return true;
+            case android.R.id.home:
+                onBackPressed();
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
@@ -239,7 +264,12 @@ public class ProgramTrainingActivity extends AppCompatActivity
 
     @Override
     public void onSwiped(RecyclerView.ViewHolder viewHolder) {
-
+        ProgramUtils.showSnackbar(mExercisesView, R.string.program_exercise_activity_set_deleted_message, R.string.cancel_button_text, new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mExercisesAdapter.notifyItemInserted(mModel.restoreLastRemoved());
+            }
+        });
     }
 
     // binding adapters

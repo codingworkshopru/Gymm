@@ -1,6 +1,7 @@
 package ru.codingworkshop.gymm.program.activity.exercise;
 
 import android.app.DialogFragment;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
 import android.databinding.BindingAdapter;
@@ -9,7 +10,6 @@ import android.databinding.InverseBindingAdapter;
 import android.databinding.InverseBindingListener;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.Loader;
 import android.support.v7.app.ActionBar;
@@ -22,7 +22,6 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
@@ -37,6 +36,8 @@ import ru.codingworkshop.gymm.data.model.ProgramExercise;
 import ru.codingworkshop.gymm.data.model.ProgramSet;
 import ru.codingworkshop.gymm.databinding.ActivityProgramExerciseBinding;
 import ru.codingworkshop.gymm.program.ProgramAdapter;
+import ru.codingworkshop.gymm.program.ProgramUtils;
+import ru.codingworkshop.gymm.program.activity.training.ProgramTrainingActivity;
 
 public class ProgramExerciseActivity extends AppCompatActivity
         implements ActionMode.Callback,
@@ -51,7 +52,6 @@ public class ProgramExerciseActivity extends AppCompatActivity
     private ProgramAdapter<SetViewHolder> mSetsAdapter;
     private RecyclerView mSetsView;
     private ActivityProgramExerciseBinding mBinding;
-    private Snackbar mItemRemovedSnackbar;
 
     public static final String EXERCISE_MODEL_KEY = ProgramExercise.class.getCanonicalName();
     private static final int EXERCISES_LOADER_ID = 0;
@@ -122,14 +122,6 @@ public class ProgramExerciseActivity extends AppCompatActivity
         outState.putParcelable(EXERCISE_MODEL_KEY, mModel);
     }
 
-    @Override
-    public boolean dispatchTouchEvent(MotionEvent ev) {
-        boolean dispatchResult = super.dispatchTouchEvent(ev);
-        if (mItemRemovedSnackbar != null && mItemRemovedSnackbar.isShown())
-            mItemRemovedSnackbar.dismiss();
-        return dispatchResult;
-    }
-
     public void onAddButtonClick(View view) {
         // TODO анимация FAB -> Dialog
         DialogFragment setInputDialog = new SetInputDialog();
@@ -146,6 +138,31 @@ public class ProgramExerciseActivity extends AppCompatActivity
             mModel.setChild(modelPosition, model);
             mSetsAdapter.notifyItemChanged(modelPosition);
         }
+    }
+
+    @Override
+    public void onBackPressed() {
+        if (mModel.isChanged()) {
+            DialogInterface.OnClickListener listener = new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    finishActivity(which == DialogInterface.BUTTON_POSITIVE);
+                }
+            };
+            ProgramUtils.showAlert(this, listener, listener);
+        } else {
+            super.onBackPressed();
+        }
+    }
+
+    private void finishActivity(boolean save) {
+        if (save) {
+            Intent resultIntent = new Intent();
+            resultIntent.putExtra(EXERCISE_MODEL_KEY, mModel);
+            setResult(RESULT_OK, resultIntent);
+            finishActivity(ProgramTrainingActivity.REQUEST_CODE_EXERCISE);
+        }
+        finish();
     }
 
     private void doActionModeChangeAnimation(final boolean actionModeOn) {
@@ -225,14 +242,16 @@ public class ProgramExerciseActivity extends AppCompatActivity
 
     @Override
     public void onSwiped(RecyclerView.ViewHolder viewHolder) {
-        mItemRemovedSnackbar = Snackbar.make(mSetsView, R.string.program_exercise_activity_set_deleted_message, Snackbar.LENGTH_INDEFINITE);
-        mItemRemovedSnackbar.setAction(R.string.cancel_button_text, new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                mSetsAdapter.notifyItemInserted(mModel.restoreLastRemoved());
-            }
-        });
-        mItemRemovedSnackbar.show();
+        ProgramUtils.showSnackbar(
+                mSetsView,
+                R.string.program_exercise_activity_set_deleted_message,
+                R.string.cancel_button_text,
+                new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        mSetsAdapter.notifyItemInserted(mModel.restoreLastRemoved());
+                    }
+                });
     }
     //-----------------------------------------
 
@@ -249,12 +268,11 @@ public class ProgramExerciseActivity extends AppCompatActivity
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.action_done:
-                Intent resultIntent = new Intent();
-                resultIntent.putExtra(EXERCISE_MODEL_KEY, mModel);
-                setResult(RESULT_OK, resultIntent);
+                finishActivity(true);
+                return true;
 
-                finish();
-
+            case android.R.id.home:
+                onBackPressed();
                 return true;
             default:
                 return super.onOptionsItemSelected(item);

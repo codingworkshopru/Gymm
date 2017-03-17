@@ -83,6 +83,11 @@ public final class Exercise implements Model {
         this.video = video;
     }
 
+    @Override
+    public boolean equals(Object obj) {
+        return this == obj || obj instanceof Exercise && getId() == ((Exercise)obj).getId();
+    }
+
     // Parcelable implementation
     //-----------------------------------------
     private Exercise(Parcel in) {

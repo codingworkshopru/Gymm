@@ -103,7 +103,7 @@ public class TrainingProgramTest {
         onView(withId(R.id.program_exercise_sets_list)).perform(RecyclerViewActions.actionOnItemAtPosition(0, actionWithAssertions(
                 new GeneralSwipeAction(
                         Swipe.FAST,
-                        GeneralLocation.CENTER,
+                        GeneralLocation.CENTER_LEFT,
                         GeneralLocation.CENTER_RIGHT,
                         Press.FINGER
                 )

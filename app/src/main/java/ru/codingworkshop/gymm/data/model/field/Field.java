@@ -41,8 +41,7 @@ public class Field<T> implements Cloneable, Parcelable {
     }
 
     public void setData(T newData) {
-        if (data == null || !data.equals(newData))
-            changedData = newData;
+        changedData = data != null && data.equals(newData) ? null : newData;
     }
 
     public T getData() {

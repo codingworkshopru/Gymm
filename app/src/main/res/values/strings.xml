@@ -14,6 +14,7 @@
     <string name="program_training_activity_add_exercise">Добавить упражнение</string>
     <string name="program_training_activity_empty_list">Вы ещё не добавили упражнения</string>
     <string name="program_training_activity_not_selected">Не выбрано</string>
+    <string name="program_training_activity_exercise_deleted_message">Упражнение удалено</string>
     <!-- menu -->
     <string name="program_training_activity_menu_done">Сохранить</string>
 
@@ -34,6 +35,9 @@
 
     <!-- common -->
     <string name="cancel_button_text">Отмена</string>
+    <string name="no_button_text">Нет</string>
+    <string name="save_button_text">Сохранить</string>
+    <string name="save_changes_question">Сохранить изменения?</string>
 
     <plurals name="number_of_reps">
         <item quantity="one">%d повтор</item>
