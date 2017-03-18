@@ -9,6 +9,7 @@
     <string name="program_training_activity_title">Тренировка</string>
     <!-- layout items -->
     <string name="program_training_activity_name_hint">Название тренировки</string>
+    <string name="program_training_activity_name_empty_error">У тренировки должно быть название</string>
     <string name="program_training_activity_weekday_label">День недели (опционально)</string>
     <string name="program_training_activity_exercises_label">Упражнения</string>
     <string name="program_training_activity_add_exercise">Добавить упражнение</string>
