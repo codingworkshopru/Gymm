@@ -1,29 +1,26 @@
 package ru.codingworkshop.gymm;
 
-import android.os.Build;
+import android.net.Uri;
 import android.os.Bundle;
-import android.support.annotation.DrawableRes;
-import android.support.annotation.StyleRes;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.Loader;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
-import android.widget.BaseAdapter;
-import android.widget.ImageView;
+import android.widget.AdapterView;
 import android.widget.ListView;
-import android.widget.TextView;
-
-import java.util.ArrayList;
-import java.util.List;
 
 import ru.codingworkshop.gymm.data.model.ProgramTraining;
+import ru.codingworkshop.gymm.program.ActualTrainingAdapter;
 import ru.codingworkshop.gymm.program.activity.training.TrainingAsyncLoader;
 
-public class ActualTrainingActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<ProgramTraining> {
-    private ProgramTraining mProgramTraining;
+public class ActualTrainingActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<ProgramTraining>,
+        ActualTrainingAdapter.OnActiveStepChangeListener,
+        BlankFragment.OnFragmentInteractionListener
+{
+
+    private ActualTrainingAdapter mAdapter;
+    private BlankFragment mFragment;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -33,56 +30,16 @@ public class ActualTrainingActivity extends AppCompatActivity implements LoaderM
         setSupportActionBar(toolbar);
 
         ListView listView = (ListView) findViewById(R.id.list_view);
-        listView.setAdapter(new BaseAdapter() {
-            List<ViewHolder> viewHolders = new ArrayList<>();
-            int activeStepPosition = 0;
+        mAdapter = new ActualTrainingAdapter(this);
+        listView.setAdapter(mAdapter);
+        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
-            public int getCount() {
-                return mProgramTraining != null ? mProgramTraining.childrenCount() : 0;
-            }
-
-            @Override
-            public Object getItem(int position) {
-                return null;
-            }
-
-            @Override
-            public long getItemId(int position) {
-                return 0;
-            }
-
-            @Override
-            public View getView(int position, View convertView, ViewGroup parent) {
-                LayoutInflater inflater = LayoutInflater.from(parent.getContext());
-                ViewHolder vh = findViewHolder(convertView);
-
-                if (vh == null)
-                    vh = new ViewHolder(inflater.inflate(R.layout.activity_actual_training_stepper_item, parent, false));
-
-                vh.setIndexNumber(position + 1);
-                vh.setActiveStep(position == activeStepPosition);
-                vh.setTitle(mProgramTraining.getChild(position).getExercise().getName());
-                if (position == 0)
-                    vh.setTopLineVisibility(false);
-                if (position == getCount() - 1)
-                    vh.setBottomLineVisibility(false);
-
-
-                return vh.itemView;
-            }
-
-            private ViewHolder findViewHolder(View view) {
-                if (view == null)
-                    return null;
-
-                for (ViewHolder vh : viewHolders) {
-                    if (vh.itemView == view)
-                        return vh;
-                }
-
-                return null;
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                mAdapter.setActiveViewHolder(mAdapter.findViewHolder(view));
             }
         });
+
+        mFragment = new BlankFragment();
 
         getSupportLoaderManager().initLoader(TrainingAsyncLoader.LOADER_TRAINING_LOAD, getIntent().getExtras(), this);
 }
@@ -94,8 +51,7 @@ public class ActualTrainingActivity extends AppCompatActivity implements LoaderM
 
     @Override
     public void onLoadFinished(Loader<ProgramTraining> loader, ProgramTraining data) {
-        mProgramTraining = data;
-        ((BaseAdapter) ((ListView) findViewById(R.id.list_view)).getAdapter()).notifyDataSetChanged();
+        mAdapter.setModel(data);
     }
 
     @Override
@@ -103,63 +59,13 @@ public class ActualTrainingActivity extends AppCompatActivity implements LoaderM
 
     }
 
-    static class ViewHolder {
-        TextView indexNumber;
-        TextView title;
-        TextView summary;
-        View itemView;
-        ImageView topVerticalLine;
-        ImageView bottomVerticalLine;
-        ImageView stepperCircle;
+    @Override
+    public void onActiveStepChange(View view) {
+        getSupportFragmentManager().beginTransaction().add(R.id.frameLayout, mFragment, null).commit();
+    }
 
-        public ViewHolder(View view) {
-            itemView = view;
-            indexNumber = (TextView) view.findViewById(R.id.textView4);
-            topVerticalLine = (ImageView) view.findViewById(R.id.imageView4);
-            bottomVerticalLine = (ImageView) view.findViewById(R.id.imageView3);
-            stepperCircle = (ImageView) view.findViewById(R.id.imageView2);
-            title = (TextView) view.findViewById(R.id.textView3);
-            summary = (TextView) view.findViewById(R.id.textView5);
-        }
+    @Override
+    public void onFragmentInteraction(Uri uri) {
 
-        public void setIndexNumber(int number) {
-            indexNumber.setText(String.valueOf(number));
-        }
-
-        public void setTopLineVisibility(boolean visible) {
-            topVerticalLine.setVisibility(visible ? View.VISIBLE : View.GONE);
-        }
-
-        public void setBottomLineVisibility(boolean visible) {
-            bottomVerticalLine.setVisibility(visible ? View.VISIBLE : View.GONE);
-        }
-
-        public void setActiveStep(boolean active) {
-            @DrawableRes int imageId;
-            @StyleRes int mainTextStyle;
-
-            if (active) {
-                imageId = R.drawable.ic_circle_primary_24dp;
-                mainTextStyle = R.style.TextAppearance_AppCompat_Body2;
-            } else {
-                imageId = R.drawable.ic_circle_grey_24dp;
-                mainTextStyle = R.style.TextAppearance_AppCompat_Small;
-            }
-
-            stepperCircle.setImageResource(imageId);
-            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M)
-                title.setTextAppearance(itemView.getContext(), mainTextStyle);
-            else
-                title.setTextAppearance(mainTextStyle);
-        }
-
-        public void setTitle(String text) {
-            title.setText(text);
-        }
-
-        public void setSummaryText(String text) {
-            summary.setText(text);
-            summary.setVisibility(View.VISIBLE);
-        }
     }
 }

@@ -40,7 +40,8 @@
         </activity>
         <activity
             android:name=".ActualTrainingActivity"
-            android:label="@string/title_activity_actual_training"/>
+            android:label="@string/title_activity_actual_training"
+            android:windowSoftInputMode="adjustPan"/>
     </application>
 
 </manifest>
