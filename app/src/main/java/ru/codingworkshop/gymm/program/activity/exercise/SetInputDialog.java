@@ -86,14 +86,9 @@ public final class SetInputDialog extends DialogFragment
             mModel.setReps(REPS_MIN);
         }
 
-        return builder.create();
-    }
-
-    @Override
-    public void onAttach(Context context) {
-        super.onAttach(context);
-
         mSetInputDialogListener = (SetInputDialogListener) getActivity();
+
+        return builder.create();
     }
 
     @Override

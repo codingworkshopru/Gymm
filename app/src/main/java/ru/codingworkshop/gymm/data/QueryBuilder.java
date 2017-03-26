@@ -1,7 +1,6 @@
 package ru.codingworkshop.gymm.data;
 
 import android.provider.BaseColumns;
-import android.util.Log;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -16,8 +15,8 @@ public final class QueryBuilder {
     public static String build(QueryPart... parts) {
         int partsCount = parts.length;
 
-        StringBuilder columns = new StringBuilder();
-        StringBuilder from = new StringBuilder();
+        StringBuilder columns = new StringBuilder("SELECT ");
+        StringBuilder from = new StringBuilder(" FROM ");
         StringBuilder where = new StringBuilder();
         StringBuilder group = new StringBuilder();
         StringBuilder order = new StringBuilder();
@@ -26,17 +25,14 @@ public final class QueryBuilder {
             String table = part.mTable;
 
             if (part.mColumns != null && !part.mColumns.isEmpty()) {
-                if (columns.toString().isEmpty()) {
-                    columns.append("SELECT ");
-                    if (part.mDistinct)
-                        columns.append("DISTINCT ");
-                }
+                if (i == 0 && part.mDistinct)
+                    columns.append("DISTINCT ");
                 columns.append(part.mColumns).append(",");
             }
 
-            if (i == 0)
-                from.append(" FROM ").append(table);
-            else {
+            if (i == 0) {
+                from.append(table);
+            } else {
                 if (part.mThisJoiningColumn == null)
                     throw new IllegalArgumentException("joining column not presented");
                 else
@@ -72,6 +68,9 @@ public final class QueryBuilder {
             }
         }
 
+        if (columns.length() == 7)
+            columns.append("*");
+
         deleteLastComma(columns);
         deleteLast(where, "AND");
         deleteLastComma(group);
@@ -79,7 +78,7 @@ public final class QueryBuilder {
 
         String query = columns.toString() + from.toString() + where.toString() + group.toString() + order.toString();
 
-        Log.d(TAG, query);
+        System.out.println(TAG + " " + query);
 
         return query;
     }

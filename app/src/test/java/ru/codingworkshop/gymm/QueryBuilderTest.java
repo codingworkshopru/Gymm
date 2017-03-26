@@ -12,7 +12,7 @@ import static org.junit.Assert.assertEquals;
 
 public class QueryBuilderTest {
     @Test
-    public void testQueryBuilder() {
+    public void testComplexQuery() {
         QueryBuilder.QueryPart personPart = new QueryBuilder.QueryPart("person")
                 .setColumns("id", "group_concat(DISTINCT name)", "surname")
                 .setDistinct(true)
@@ -31,6 +31,17 @@ public class QueryBuilderTest {
         String resultQuery = QueryBuilder.build(personPart, orderPart, itemPart);
 
         String expectedQuery = "SELECT DISTINCT person.id,group_concat(DISTINCT person.name),person.surname,item.name,item.count,item.shift FROM person JOIN order ON order.person_id=person._id JOIN item ON item.order_id=order._id GROUP BY person.surname ORDER BY order.price,item.shift,item.count";
+
+        assertEquals("Query builder error", expectedQuery, resultQuery);
+    }
+
+    @Test
+    public void testSimpleQuery() {
+        QueryBuilder.QueryPart part = new QueryBuilder.QueryPart("employee");
+
+        String resultQuery = QueryBuilder.build(part);
+
+        String expectedQuery = "SELECT * FROM employee";
 
         assertEquals("Query builder error", expectedQuery, resultQuery);
     }

@@ -215,6 +215,7 @@ public class DatabaseTest {
             SQLiteOpenHelper dbHelper = (SQLiteOpenHelper) mDbHelperClass.getConstructor(Context.class).newInstance(mContext);
             return writable ? dbHelper.getWritableDatabase() : dbHelper.getReadableDatabase();
         } catch (Exception e) {
+            e.printStackTrace();
             fail(e.getMessage());
         }
         return null;

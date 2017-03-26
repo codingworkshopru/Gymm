@@ -41,7 +41,16 @@
         <activity
             android:name=".ActualTrainingActivity"
             android:label="@string/title_activity_actual_training"
-            android:windowSoftInputMode="adjustPan"/>
+            android:windowSoftInputMode="adjustPan" />
+        <activity
+            android:name=".program.activity.exercise.picker.MusclesActivity"
+            android:label="@string/title_activity_muscles"
+            android:parentActivityName=".program.activity.exercise.ProgramExerciseActivity"
+            android:theme="@style/AppTheme.NoActionBar">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="ru.codingworkshop.gymm.program.activity.exercise.ProgramExerciseActivity" />
+        </activity>
     </application>
 
 </manifest>

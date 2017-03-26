@@ -28,19 +28,35 @@
                 android:layout_width="match_parent"
                 android:layout_height="?attr/actionBarSize"/>
 
-            <Spinner
-                android:id="@+id/program_exercise_exercises_dropdown"
-                android:layout_height="48dp"
+            <TextView
                 android:layout_width="match_parent"
-                android:layout_marginTop="8dp"
-                android:layout_marginBottom="16dp"
+                android:layout_height="wrap_content"
                 android:layout_marginEnd="16dp"
+                android:layout_marginLeft="16dp"
                 android:layout_marginRight="16dp"
                 android:layout_marginStart="16dp"
-                android:layout_marginLeft="16dp"
-                bind:value="@={exercise.exercise}"
-                app:popupTheme="@style/ThemeOverlay.AppCompat.Light"
-                android:visibility="visible" />
+                android:clickable="true"
+                android:focusable="true"
+                android:onClick="onExercisePick"
+                android:paddingBottom="16dp"
+                android:paddingTop="16dp"
+                android:text="Some text"
+                android:textAppearance="@style/TextAppearance.AppCompat.Widget.ActionBar.Title" />
+
+
+            <!--<Spinner-->
+                <!--android:id="@+id/program_exercise_exercises_dropdown"-->
+                <!--bind:value="@={exercise.exercise}"-->
+                <!--android:layout_width="match_parent"-->
+                <!--android:layout_height="wrap_content"-->
+                <!--android:layout_marginBottom="16dp"-->
+                <!--android:layout_marginEnd="16dp"-->
+                <!--android:layout_marginLeft="16dp"-->
+                <!--android:layout_marginRight="16dp"-->
+                <!--android:layout_marginStart="16dp"-->
+                <!--android:layout_marginTop="8dp"-->
+                <!--android:visibility="visible"-->
+                <!--app:popupTheme="@style/ThemeOverlay.AppCompat.Light" />-->
 
         </android.support.design.widget.AppBarLayout>
 

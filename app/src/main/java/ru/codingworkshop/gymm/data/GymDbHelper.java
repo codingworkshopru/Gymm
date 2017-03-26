@@ -1,7 +1,7 @@
 package ru.codingworkshop.gymm.data;
 
-import android.content.ContentValues;
 import android.content.Context;
+import android.content.res.Resources;
 import android.content.res.XmlResourceParser;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
@@ -11,7 +11,6 @@ import org.xmlpull.v1.XmlPullParserException;
 
 import java.io.IOException;
 import java.util.HashMap;
-import java.util.List;
 
 import ru.codingworkshop.gymm.R;
 import ru.codingworkshop.gymm.data.model.Exercise;
@@ -25,7 +24,7 @@ public final class GymDbHelper extends SQLiteOpenHelper {
     private static final String DATABASE_NAME = "Gym.db";
     private static final int DATABASE_VERSION = 1;
 
-    Context mContext;
+    private Context mContext;
 
     public GymDbHelper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
@@ -74,65 +73,109 @@ public final class GymDbHelper extends SQLiteOpenHelper {
         db.execSQL("PRAGMA foreign_keys = ON");
     }
 
+    private HashMap<String, MuscleGroup> parseMuscleGroupsXml(SQLiteDatabase db) throws XmlPullParserException, IOException {
+        XmlResourceParser parser = mContext.getResources().getXml(R.xml.muscle_groups);
+        int eventType = parser.getEventType();
+
+        HashMap<String, MuscleGroup> muscleGroupIds = new HashMap<>();
+
+        MuscleGroup muscleGroup = null;
+        String tag = "";
+
+        while (eventType != XmlPullParser.END_DOCUMENT) {
+            switch (eventType) {
+
+                case XmlPullParser.START_TAG:
+                    tag = parser.getName();
+
+                    if (tag.equals("muscle_group"))
+                        muscleGroup = new MuscleGroup();
+
+                    break;
+
+                case XmlPullParser.TEXT:
+                    String text = parser.getText();
+
+                    switch (tag) {
+
+                        case "name":
+                            muscleGroup.setName(text);
+                            break;
+
+                        case "map_color_rgb":
+                            muscleGroup.setMapColorRgb(text);
+                            break;
+
+                        case "is_anterior":
+                            muscleGroup.setAnterior(text.equals("1"));
+                    }
+
+                    break;
+
+                case XmlPullParser.END_TAG:
+                    if (parser.getName().equals("muscle_group")) {
+                        muscleGroup.create(db, 0);
+                        muscleGroupIds.put(muscleGroup.getName(), muscleGroup);
+                    }
+            }
+
+            eventType = parser.next();
+        }
+
+        return muscleGroupIds;
+    }
+
     private void parseXml(SQLiteDatabase db) throws XmlPullParserException, IOException {
-        XmlResourceParser parser = mContext.getResources().getXml(R.xml.all_exercises);
-        HashMap<String, Long> muscleGroups = new HashMap<>();
+        XmlResourceParser parser = mContext.getResources().getXml(R.xml.exercises);
+        HashMap<String, MuscleGroup> muscleGroups = parseMuscleGroupsXml(db);
         String tag = "";
         Exercise exercise = null;
         int eventType = parser.getEventType();
 
         while (eventType != XmlPullParser.END_DOCUMENT) {
             switch (eventType) {
+
                 case XmlPullParser.START_TAG:
                     tag = parser.getName();
 
                     if (tag.equals("exercise"))
                         exercise = new Exercise();
                     break;
+
                 case XmlPullParser.TEXT:
                     String text = parser.getText();
 
-                    if (tag.equals("name")) {
-                        exercise.setName(text);
-                    } else if (tag.equals("video")) {
-                        exercise.setVideo(text);
-                    }  else if (tag.equals("primary_muscle") || tag.equals("muscle")) {
-                        Long id = muscleGroups.get(text);
-                        if (id == null) {
-                            ContentValues cv = new ContentValues();
-                            cv.put(GymContract.MuscleGroupEntry.COLUMN_NAME, text);
-                            id = db.insert(GymContract.MuscleGroupEntry.TABLE_NAME, null, cv);
-                            muscleGroups.put(text, id);
-                        }
-                        MuscleGroup createdGroup = new MuscleGroup(id, "");
-                        if (tag.equals("primary_muscle"))
-                            exercise.setPrimaryMuscleGroup(createdGroup);
-                        else
-                            exercise.addSecondaryMuscles(createdGroup);
+                    switch (tag) {
+
+                        case "name":
+                            exercise.setName(text);
+                            break;
+
+                        case "video":
+                            exercise.setVideo(text);
+                            break;
+
+                        case "primary_muscle":
+                            if (!muscleGroups.containsKey(text))
+                                throw new Resources.NotFoundException("Muscle group not found " + text);
+
+                            exercise.setPrimaryMuscleGroup(muscleGroups.get(text));
+                            break;
+
+                        case "muscle":
+                            if (!muscleGroups.containsKey(text))
+                                throw new Resources.NotFoundException("Muscle group not found " + text);
+
+                            exercise.addSecondaryMuscles(muscleGroups.get(text));
                     }
+
                     break;
+
                 case XmlPullParser.END_TAG:
-                    if (parser.getName().equals("exercise")) {
-                        ContentValues cv = new ContentValues();
-
-                        cv.put(GymContract.ExerciseEntry.COLUMN_NAME, exercise.getName());
-                        cv.put(GymContract.ExerciseEntry.COLUMN_YOUTUBE_VIDEO, exercise.getVideo());
-                        cv.put(GymContract.ExerciseEntry.COLUMN_PRIMARY_MUSCLE_GROUP_ID, exercise.getPrimaryMuscleGroup().getId());
-
-                        long exerciseId = db.insert(GymContract.ExerciseEntry.TABLE_NAME, null, cv);
-
-                        List<MuscleGroup> secondaryMuscles = exercise.getSecondaryMuscles();
-                        if (secondaryMuscles != null) {
-                            for (MuscleGroup secondaryMuscleGroup : secondaryMuscles) {
-                                cv = new ContentValues();
-                                cv.put(GymContract.SecondaryMuscleGroupLinkEntry.COLUMN_EXERCISE_ID, exerciseId);
-                                cv.put(GymContract.SecondaryMuscleGroupLinkEntry.COLUMN_MUSCLE_GROUP_ID, secondaryMuscleGroup.getId());
-                                db.insert(GymContract.SecondaryMuscleGroupLinkEntry.TABLE_NAME, null, cv);
-                            }
-                        }
-                    }
-                    break;
+                    if (parser.getName().equals("exercise"))
+                        exercise.create(db, 0);
             }
+
             eventType = parser.next();
         }
     }

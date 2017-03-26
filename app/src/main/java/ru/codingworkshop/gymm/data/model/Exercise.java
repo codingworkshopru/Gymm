@@ -1,5 +1,6 @@
 package ru.codingworkshop.gymm.data.model;
 
+import android.content.ContentValues;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Parcel;
@@ -8,20 +9,23 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
-import ru.codingworkshop.gymm.data.GymContract;
-import ru.codingworkshop.gymm.data.model.base.Model;
+import ru.codingworkshop.gymm.data.GymContract.ExerciseEntry;
+import ru.codingworkshop.gymm.data.GymContract.SecondaryMuscleGroupLinkEntry;
+import ru.codingworkshop.gymm.data.model.base.MutableModel;
 
 /**
  * Created by Радик on 14.02.2017.
  */
 
-public final class Exercise implements Model {
+public final class Exercise extends MutableModel {
     private long id;
     private MuscleGroup primaryMuscleGroup;
     private String name;
     private boolean isWithWeight;
     private String video;
     private List<MuscleGroup> secondaryMuscles;
+
+    private static final String TABLE_NAME = ExerciseEntry.TABLE_NAME;
 
     public Exercise() {
 
@@ -88,6 +92,100 @@ public final class Exercise implements Model {
         return this == obj || obj instanceof Exercise && getId() == ((Exercise)obj).getId();
     }
 
+    public static Exercise newInstance(Cursor c) {
+        Exercise exercise = new Exercise();
+        exercise.setId(c.getLong(c.getColumnIndex(ExerciseEntry._ID)));
+        exercise.setName(c.getString(c.getColumnIndex(ExerciseEntry.COLUMN_NAME)));
+        return exercise;
+    }
+
+    public static Exercise read(SQLiteDatabase db, long exerciseId) {
+        Cursor cursor = db.query(
+                ExerciseEntry.TABLE_NAME,
+                new String[] {ExerciseEntry._ID, ExerciseEntry.COLUMN_NAME},
+                ExerciseEntry._ID + "=" + exerciseId,
+                null,
+                null,
+                null,
+                null
+        );
+        cursor.moveToNext();
+
+        Exercise exercise = newInstance(cursor);
+
+        cursor.close();
+        return exercise;
+    }
+
+    public static List<Exercise> read(SQLiteDatabase db) {
+        Cursor cursor = db.query(
+                ExerciseEntry.TABLE_NAME,
+                new String[] {ExerciseEntry._ID, ExerciseEntry.COLUMN_NAME},
+                null,
+                null,
+                null,
+                null,
+                null
+        );
+
+        List<Exercise> result = new LinkedList<>();
+        while (cursor.moveToNext())
+            result.add(newInstance(cursor));
+
+        cursor.close();
+
+        return result;
+    }
+
+    @Override
+    public long create(SQLiteDatabase db, long parentId) {
+        id = super.create(db, TABLE_NAME, null, 0, null);
+
+        if (secondaryMuscles != null) {
+            ContentValues cv;
+            for (MuscleGroup mg : secondaryMuscles) {
+                cv = new ContentValues();
+                cv.put(SecondaryMuscleGroupLinkEntry.COLUMN_EXERCISE_ID, id);
+                cv.put(SecondaryMuscleGroupLinkEntry.COLUMN_MUSCLE_GROUP_ID, mg.getId());
+                db.insert(SecondaryMuscleGroupLinkEntry.TABLE_NAME, null, cv);
+            }
+        }
+
+        return id;
+    }
+
+    @Override
+    public int update(SQLiteDatabase db) {
+        return 0;
+    }
+
+    @Override
+    public int delete(SQLiteDatabase db) {
+        return 0;
+    }
+
+    @Override
+    public boolean isChanged() {
+        return false;
+    }
+
+    @Override
+    protected void commit() {
+
+    }
+
+    @Override
+    public String validate() {
+        return null;
+    }
+
+    @Override
+    protected void addFieldsToContentValues(ContentValues cv, boolean onlyChanged) {
+        cv.put(ExerciseEntry.COLUMN_PRIMARY_MUSCLE_GROUP_ID, getPrimaryMuscleGroup().getId());
+        cv.put(ExerciseEntry.COLUMN_NAME, getName());
+        cv.put(ExerciseEntry.COLUMN_YOUTUBE_VIDEO, getVideo());
+    }
+
     // Parcelable implementation
     //-----------------------------------------
     private Exercise(Parcel in) {
@@ -128,49 +226,4 @@ public final class Exercise implements Model {
         }
     };
     //-----------------------------------------
-
-    public static Exercise createFromCursor(Cursor c) {
-        Exercise exercise = new Exercise();
-        exercise.setId(c.getLong(c.getColumnIndex(GymContract.ExerciseEntry._ID)));
-        exercise.setName(c.getString(c.getColumnIndex(GymContract.ExerciseEntry.COLUMN_NAME)));
-        return exercise;
-    }
-
-    public static Exercise read(SQLiteDatabase db, long exerciseId) {
-        Cursor cursor = db.query(
-                GymContract.ExerciseEntry.TABLE_NAME,
-                new String[] {GymContract.ExerciseEntry._ID, GymContract.ExerciseEntry.COLUMN_NAME},
-                GymContract.ExerciseEntry._ID + "=" + exerciseId,
-                null,
-                null,
-                null,
-                null
-        );
-        cursor.moveToNext();
-
-        Exercise exercise = createFromCursor(cursor);
-
-        cursor.close();
-        return exercise;
-    }
-
-    public static List<Exercise> read(SQLiteDatabase db) {
-        Cursor cursor = db.query(
-                GymContract.ExerciseEntry.TABLE_NAME,
-                new String[] {GymContract.ExerciseEntry._ID, GymContract.ExerciseEntry.COLUMN_NAME},
-                null,
-                null,
-                null,
-                null,
-                null
-        );
-
-        List<Exercise> result = new LinkedList<>();
-        while (cursor.moveToNext())
-            result.add(createFromCursor(cursor));
-
-        cursor.close();
-
-        return result;
-    }
 }

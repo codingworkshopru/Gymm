@@ -37,6 +37,7 @@ import ru.codingworkshop.gymm.data.model.ProgramSet;
 import ru.codingworkshop.gymm.databinding.ActivityProgramExerciseBinding;
 import ru.codingworkshop.gymm.program.ProgramAdapter;
 import ru.codingworkshop.gymm.program.ProgramUtils;
+import ru.codingworkshop.gymm.program.activity.exercise.picker.MusclesActivity;
 import ru.codingworkshop.gymm.program.activity.training.ProgramTrainingActivity;
 
 public class ProgramExerciseActivity extends AppCompatActivity
@@ -96,8 +97,8 @@ public class ProgramExerciseActivity extends AppCompatActivity
                 0
         );
         mExercisesAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        Spinner spinner = (Spinner) findViewById(R.id.program_exercise_exercises_dropdown);
-        spinner.setAdapter(mExercisesAdapter);
+//        Spinner spinner = (Spinner) findViewById(R.id.program_exercise_exercises_dropdown);
+//        spinner.setAdapter(mExercisesAdapter);
 
         // recycler view
         mSetsView = (RecyclerView) findViewById(R.id.program_exercise_sets_list);
@@ -155,6 +156,11 @@ public class ProgramExerciseActivity extends AppCompatActivity
         }
     }
 
+    public void onExercisePick(View v) {
+        Intent intent = new Intent(this, MusclesActivity.class);
+        startActivity(intent);
+    }
+
     private void finishActivity(boolean save) {
         if (save) {
             Intent resultIntent = new Intent();
@@ -191,7 +197,7 @@ public class ProgramExerciseActivity extends AppCompatActivity
     //-----------------------------------------
     @Override
     public boolean onCreateActionMode(ActionMode mode, Menu menu) {
-        findViewById(R.id.program_exercise_exercises_dropdown).setVisibility(View.GONE);
+//        findViewById(R.id.program_exercise_exercises_dropdown).setVisibility(View.GONE);
         doActionModeChangeAnimation(true);
         mSetsAdapter.attachItemTouchHelper(mSetsView);
         mSetsAdapter.setEditMode(true);
@@ -213,7 +219,7 @@ public class ProgramExerciseActivity extends AppCompatActivity
         mSetsAdapter.attachItemTouchHelper(null);
         doActionModeChangeAnimation(false);
         mSetsAdapter.setEditMode(false);
-        findViewById(R.id.program_exercise_exercises_dropdown).setVisibility(View.VISIBLE);
+//        findViewById(R.id.program_exercise_exercises_dropdown).setVisibility(View.VISIBLE);
     }
     //-----------------------------------------
 

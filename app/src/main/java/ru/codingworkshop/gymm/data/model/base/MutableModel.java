@@ -17,7 +17,7 @@ public abstract class MutableModel implements Model, Cloneable {
             return -1;
 
         ContentValues cv = new ContentValues();
-        if (!parentColumnName.isEmpty())
+        if (parentColumnName != null && !parentColumnName.isEmpty())
             cv.put(parentColumnName, parentId);
         addFieldsToContentValues(cv, false);
 
@@ -26,7 +26,9 @@ public abstract class MutableModel implements Model, Cloneable {
         if (id == -1)
             throw new SQLiteException("Insertion error: " + cv);
 
-        idField.setData(id);
+        if (idField != null)
+            idField.setData(id);
+
         commit();
 
         return id;

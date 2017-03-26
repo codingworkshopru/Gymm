@@ -37,11 +37,15 @@ public final class GymContract {
     public static final class MuscleGroupEntry implements BaseColumns {
         public static final String TABLE_NAME = "muscle_group";
         public static final String COLUMN_NAME = "name";
+        public static final String COLUMN_MAP_COLOR_RGB = "map_color_rgb";
+        public static final String COLUMN_IS_ANTERIOR = "is_anterior";
 
         public static final String SQL_CREATE = createTableStatement(
                 TABLE_NAME,
                 primaryKey(),
-                String.format("%s TEXT NOT NULL", COLUMN_NAME)
+                String.format("%s TEXT NOT NULL", COLUMN_NAME),
+                String.format("%s TEXT NOT NULL", COLUMN_MAP_COLOR_RGB),
+                String.format("%s INTEGER NOT NULL", COLUMN_IS_ANTERIOR)
         );
         public static final String SQL_DROP = dropTableStatement(TABLE_NAME);
     }
@@ -61,13 +65,6 @@ public final class GymContract {
                 foreignKey(COLUMN_PRIMARY_MUSCLE_GROUP_ID, MuscleGroupEntry.TABLE_NAME, MuscleGroupEntry._ID, "CASCADE", "RESTRICT")
         );
         public static final String SQL_DROP = dropTableStatement(TABLE_NAME);
-        public static final String SQL_SELECT_ALL = "SELECT t1._id AS _id, t1.name AS exercise_name, t1.youtube_video, group_concat(t4.name) AS secondary_muscles_name" +
-                " FROM exercise AS t1" +
-                "   JOIN secondary_muscle_group_link AS t2 ON t2.exercise_id = t1._id" +
-                "   JOIN muscle_group AS t3 ON t3._id = t2.muscle_group_id" +
-                " WHERE t1.primary_muscle_group = %s" +
-                " GROUP BY t1._id, t1.name, t1.youtube_video" +
-                " ORDER BY t1.name";
     }
 
     public static final class SecondaryMuscleGroupLinkEntry {
