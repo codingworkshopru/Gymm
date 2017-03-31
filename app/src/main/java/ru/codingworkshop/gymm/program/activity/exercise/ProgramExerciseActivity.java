@@ -220,7 +220,9 @@ public class ProgramExerciseActivity extends AppCompatActivity
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == RESULT_CANCELED)
+            return;
+
         long exerciseId = data.getLongExtra(EXERCISE_ARG, 0);
         Cursor c = mExercisesAdapter.getCursor();
         c.moveToFirst();

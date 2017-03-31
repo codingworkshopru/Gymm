@@ -57,7 +57,7 @@ public class DatabaseTest {
 
         SQLiteDatabase db = getTheDatabase(false);
 
-        mExercises = Exercise.read(db);
+        mExercises = Exercise.readAll(db);
 
         // creation
         mTraining = new ProgramTraining();

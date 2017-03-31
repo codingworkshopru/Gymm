@@ -37,7 +37,7 @@ public class SectionsPagerAdapter extends FragmentPagerAdapter {
     public CharSequence getPageTitle(int position) {
         switch (position) {
             case 0:
-                return "СПЕРЕДИ";
+                return "СПЕРЕДИ"; // FIXME перенести в ресурсы
             case 1:
                 return "СЗАДИ";
         }

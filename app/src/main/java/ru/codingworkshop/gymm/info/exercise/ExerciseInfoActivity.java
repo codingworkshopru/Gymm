@@ -148,7 +148,7 @@ public class ExerciseInfoActivity extends AppCompatActivity implements LoaderMan
 
                 long exerciseId = args.getLong(EXERCISE_KEY);
 
-                return Exercise.read(db, exerciseId);
+                return Exercise.readOne(db, exerciseId);
             }
         };
     }

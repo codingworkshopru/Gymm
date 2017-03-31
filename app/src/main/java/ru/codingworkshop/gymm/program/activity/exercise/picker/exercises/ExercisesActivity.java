@@ -4,12 +4,14 @@ import android.content.Intent;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.support.v4.app.LoaderManager;
+import android.support.v4.app.NavUtils;
 import android.support.v4.content.Loader;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.MenuItem;
 import android.view.View;
 
 import ru.codingworkshop.gymm.R;
@@ -74,6 +76,19 @@ public class ExercisesActivity extends AppCompatActivity implements LoaderManage
     }
 
     @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int itemId = item.getItemId();
+
+        switch (itemId) {
+            case android.R.id.home:
+                NavUtils.navigateUpFromSameTask(this);
+                return true;
+
+            default:
+                return super.onOptionsItemSelected(item);
+        }
+    }
+    @Override
     public void onInfoButtonClick(View view) {
         long clickedItemId = mPickerExercises.getChildItemId(view);
 
@@ -90,7 +105,6 @@ public class ExercisesActivity extends AppCompatActivity implements LoaderManage
         Intent intent = new Intent();
         intent.putExtra(ExerciseInfoActivity.EXERCISE_ARG, clickedItemId);
         setResult(RESULT_OK, intent);
-
         finish();
     }
 }

@@ -108,10 +108,10 @@ public final class Exercise extends MutableModel {
     /**
      * Reads data from the database and makes a list with models.
      * @param db opened database object.
-     * @param exerciseId id of the exercise to read from DB. If 0 all records will be loaded.
+     * @param exerciseId id of the exercise to readAll from DB. If 0 all records will be loaded.
      * @return list of exercises including empty list.
      */
-    private static List<Exercise> readAll(SQLiteDatabase db, long exerciseId) {
+    private static List<Exercise> read(SQLiteDatabase db, long exerciseId) {
         List<Exercise> result = new ArrayList<>();
         String selection = null;
         String[] selectionArgs = null;
@@ -143,13 +143,13 @@ public final class Exercise extends MutableModel {
         return result;
     }
 
-    public static Exercise read(SQLiteDatabase db, long exerciseId) {
-        List<Exercise> exerciseInList = readAll(db, exerciseId);
+    public static Exercise readOne(SQLiteDatabase db, long exerciseId) {
+        List<Exercise> exerciseInList = read(db, exerciseId);
         return exerciseInList.get(0);
     }
 
-    public static List<Exercise> read(SQLiteDatabase db) {
-        return readAll(db, 0);
+    public static List<Exercise> readAll(SQLiteDatabase db) {
+        return read(db, 0);
     }
 
     @Override

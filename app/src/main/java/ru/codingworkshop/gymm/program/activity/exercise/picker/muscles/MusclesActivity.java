@@ -87,8 +87,7 @@ public class MusclesActivity extends AppCompatActivity implements LoaderManager.
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        setResult(RESULT_OK, data);
+        setResult(resultCode, data);
         finish();
     }
 }

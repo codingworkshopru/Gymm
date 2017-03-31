@@ -16,7 +16,7 @@ import ru.codingworkshop.gymm.R;
 class ExercisesAdapter extends RecyclerView.Adapter<ExercisesAdapter.ViewHolder> {
     private Cursor cursor;
     private static final int FIRST_DIVIDER_POSITION = 0;
-    private int secondDividerPosition;
+    private int secondDividerPosition = -1;
     private OnItemClickListener itemClickListener;
 
     private static final String TAG = ExercisesAdapter.class.getSimpleName();
@@ -43,7 +43,7 @@ class ExercisesAdapter extends RecyclerView.Adapter<ExercisesAdapter.ViewHolder>
         cursor.moveToPrevious();
 
         while (cursor.moveToNext()) {
-            if (cursor.getLong(0) == 0 && cursor.getPosition() > 0) {
+            if (cursor.getLong(0) == 0 && cursor.getPosition() > 0 && !cursor.isLast()) {
                 secondDividerPosition = cursor.getPosition();
                 break;
             }
@@ -103,7 +103,7 @@ class ExercisesAdapter extends RecyclerView.Adapter<ExercisesAdapter.ViewHolder>
         cursor.moveToPosition(position);
 
         if (getItemViewType(position) == TOP_DIVIDER_VIEW_TYPE) {
-            holder.setSubheader("Основные упражнения");
+            holder.setSubheader("Основные упражнения"); // FIXME перенести в ресурс
         } else if (getItemViewType(position) == DIVIDER_VIEW_TYPE) {
             holder.setSubheader("В которых задействована");
         } else {
@@ -113,7 +113,15 @@ class ExercisesAdapter extends RecyclerView.Adapter<ExercisesAdapter.ViewHolder>
 
     @Override
     public int getItemCount() {
-        return cursor == null ? 0 : cursor.getCount();
+        int count = 0;
+
+        if (cursor != null && cursor.getCount() > 0) {
+            count = cursor.getCount();
+            if (secondDividerPosition == -1)
+                count--;
+        }
+
+        return count;
     }
 
     static final class ViewHolder extends RecyclerView.ViewHolder {

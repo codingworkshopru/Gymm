@@ -152,7 +152,7 @@ public final class ProgramExercise extends MutableModel implements Orderable, Pa
         while (cursor.moveToNext()) {
             ProgramExercise exercise = new ProgramExercise();
             exercise.id.setInitialData(cursor.getLong(cursor.getColumnIndex(exercise.id.getColumnName())));
-            exercise.exercise.setInitialData(Exercise.read(db, cursor.getLong(cursor.getColumnIndex(ProgramExerciseEntry.COLUMN_EXERCISE_ID))));
+            exercise.exercise.setInitialData(Exercise.readOne(db, cursor.getLong(cursor.getColumnIndex(ProgramExerciseEntry.COLUMN_EXERCISE_ID))));
             exercise.sortOrder.setInitialData(cursor.getInt(cursor.getColumnIndex(exercise.sortOrder.getColumnName())));
             exercise.children.setInitialList(ProgramSet.read(db, exercise.getId()));
             result.add(exercise);
