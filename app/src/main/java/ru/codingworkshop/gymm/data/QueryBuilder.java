@@ -93,23 +93,30 @@ public final class QueryBuilder {
             sb.delete(lastSubstringIndex, sb.length());
     }
 
-    private static String getColumnsWithTable(String[] selection, String table) {
-        if (selection == null || selection.length == 0)
+    private static String getColumnsWithTable(String[] columns, String table) {
+        if (columns == null || columns.length == 0)
             return "";
 
         StringBuilder selectionWithTable = new StringBuilder();
-        for (String s : selection) {
-            // if a standard SQL function presented
-            if (s.matches("^\\w+\\(\\w*\\s?\\w+\\)$")) {
+        for (String c : columns) {
+            if (c.matches("^\\w+\\(\\w*\\s?\\w+\\)$")) {
+                // if a standard SQL function presented
                 Pattern pattern = Pattern.compile("(\\w+)\\)$");
-                Matcher matcher = pattern.matcher(s);
+                Matcher matcher = pattern.matcher(c);
                 if (matcher.find()) {
                     String column = getColumnWithTable(matcher.group(), table);
                     System.out.println(column);
                     selectionWithTable.append(matcher.replaceFirst(column));
                 }
             } else {
-                selectionWithTable.append(getColumnWithTable(s, table));
+                // if column name specified
+                Pattern pattern = Pattern.compile("\\s+as\\s+", Pattern.CASE_INSENSITIVE | Pattern.UNICODE_CASE);
+                Matcher matcher = pattern.matcher(c);
+                if (matcher.find()) {
+                    selectionWithTable.append(c);
+                } else {
+                    selectionWithTable.append(getColumnWithTable(c, table));
+                }
             }
             selectionWithTable.append(",");
         }
@@ -117,11 +124,11 @@ public final class QueryBuilder {
         return selectionWithTable.toString();
     }
 
-    private static String getColumnWithTable(String column, String table) {
+    public static String getColumnWithTable(String column, String table) {
         return table + "." + column;
     }
 
-    public static final class QueryPart {
+    public static final class QueryPart implements Cloneable {
         String mColumns;
         String mTable;
         String mThisJoiningColumn;
@@ -168,6 +175,27 @@ public final class QueryBuilder {
         public QueryPart setDistinct(boolean distinct) {
             mDistinct = distinct;
             return this;
+        }
+
+        @Override
+        public QueryPart clone() {
+            QueryPart cloned = null;
+            try {
+                cloned = (QueryPart) super.clone();
+                cloned.mTable = mTable;
+                cloned.mColumns = mColumns;
+                cloned.mThisJoiningColumn = mThisJoiningColumn;
+                cloned.mOtherJoiningColumn = mOtherJoiningColumn;
+                cloned.mSelection = mSelection;
+                cloned.mGroup = mGroup;
+                cloned.mOrder = mOrder;
+                cloned.mDistinct = mDistinct;
+            }
+            catch (CloneNotSupportedException e) {
+                e.printStackTrace();
+            }
+
+            return cloned;
         }
     }
 }

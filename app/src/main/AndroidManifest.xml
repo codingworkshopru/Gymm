@@ -1,6 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="ru.codingworkshop.gymm">
+    
+    <uses-permission android:name="android.permission.INTERNET"/>
 
     <application
         android:allowBackup="true"
@@ -43,7 +45,7 @@
             android:label="@string/title_activity_actual_training"
             android:windowSoftInputMode="adjustPan" />
         <activity
-            android:name=".program.activity.exercise.picker.MusclesActivity"
+            android:name=".program.activity.exercise.picker.muscles.MusclesActivity"
             android:label="@string/title_activity_muscles"
             android:parentActivityName=".program.activity.exercise.ProgramExerciseActivity"
             android:theme="@style/AppTheme.NoActionBar">
@@ -51,6 +53,17 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="ru.codingworkshop.gymm.program.activity.exercise.ProgramExerciseActivity" />
         </activity>
+        <activity
+            android:name=".program.activity.exercise.picker.exercises.ExercisesActivity"
+            android:parentActivityName=".program.activity.exercise.picker.muscles.MusclesActivity">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:theme="@style/AppTheme.NoActionBar"
+                android:value="ru.codingworkshop.gymm.program.activity.exercise.picker.muscles.MusclesActivity" />
+        </activity>
+        <activity
+            android:name=".info.exercise.ExerciseInfoActivity"
+            android:theme="@style/AppTheme.NoActionBar.TranslucentStatusOn"/>
     </application>
 
 </manifest>

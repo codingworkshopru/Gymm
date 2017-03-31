@@ -87,6 +87,10 @@ public final class Exercise extends MutableModel {
         this.video = video;
     }
 
+    public boolean hasVideo() {
+        return video != null && !video.isEmpty();
+    }
+
     @Override
     public boolean equals(Object obj) {
         return this == obj || obj instanceof Exercise && getId() == ((Exercise)obj).getId();
@@ -96,15 +100,19 @@ public final class Exercise extends MutableModel {
         Exercise exercise = new Exercise();
         exercise.setId(c.getLong(c.getColumnIndex(ExerciseEntry._ID)));
         exercise.setName(c.getString(c.getColumnIndex(ExerciseEntry.COLUMN_NAME)));
+        exercise.setVideo(c.getString(c.getColumnIndex(ExerciseEntry.COLUMN_YOUTUBE_VIDEO)));
         return exercise;
     }
 
     public static Exercise read(SQLiteDatabase db, long exerciseId) {
+        String columns[] = {ExerciseEntry._ID, ExerciseEntry.COLUMN_NAME, ExerciseEntry.COLUMN_YOUTUBE_VIDEO};
+        String selectionArgs[] = {String.valueOf(exerciseId)};
+
         Cursor cursor = db.query(
                 ExerciseEntry.TABLE_NAME,
-                new String[] {ExerciseEntry._ID, ExerciseEntry.COLUMN_NAME},
-                ExerciseEntry._ID + "=" + exerciseId,
-                null,
+                columns,
+                ExerciseEntry._ID + "=?",
+                selectionArgs,
                 null,
                 null,
                 null
@@ -120,7 +128,7 @@ public final class Exercise extends MutableModel {
     public static List<Exercise> read(SQLiteDatabase db) {
         Cursor cursor = db.query(
                 ExerciseEntry.TABLE_NAME,
-                new String[] {ExerciseEntry._ID, ExerciseEntry.COLUMN_NAME},
+                new String[] {ExerciseEntry._ID, ExerciseEntry.COLUMN_NAME, ExerciseEntry.COLUMN_YOUTUBE_VIDEO},
                 null,
                 null,
                 null,

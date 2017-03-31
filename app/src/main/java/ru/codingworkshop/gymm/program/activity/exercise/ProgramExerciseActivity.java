@@ -28,6 +28,7 @@ import android.view.animation.AnimationUtils;
 import android.widget.AdapterView;
 import android.widget.SimpleCursorAdapter;
 import android.widget.Spinner;
+import android.widget.TextView;
 
 import ru.codingworkshop.gymm.R;
 import ru.codingworkshop.gymm.data.GymContract;
@@ -37,8 +38,10 @@ import ru.codingworkshop.gymm.data.model.ProgramSet;
 import ru.codingworkshop.gymm.databinding.ActivityProgramExerciseBinding;
 import ru.codingworkshop.gymm.program.ProgramAdapter;
 import ru.codingworkshop.gymm.program.ProgramUtils;
-import ru.codingworkshop.gymm.program.activity.exercise.picker.MusclesActivity;
+import ru.codingworkshop.gymm.program.activity.exercise.picker.muscles.MusclesActivity;
 import ru.codingworkshop.gymm.program.activity.training.ProgramTrainingActivity;
+
+import static ru.codingworkshop.gymm.info.exercise.ExerciseInfoActivity.EXERCISE_ARG;
 
 public class ProgramExerciseActivity extends AppCompatActivity
         implements ActionMode.Callback,
@@ -158,7 +161,7 @@ public class ProgramExerciseActivity extends AppCompatActivity
 
     public void onExercisePick(View v) {
         Intent intent = new Intent(this, MusclesActivity.class);
-        startActivity(intent);
+        startActivityForResult(intent, 0);
     }
 
     private void finishActivity(boolean save) {
@@ -212,6 +215,21 @@ public class ProgramExerciseActivity extends AppCompatActivity
     @Override
     public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
         return false;
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        long exerciseId = data.getLongExtra(EXERCISE_ARG, 0);
+        Cursor c = mExercisesAdapter.getCursor();
+        c.moveToFirst();
+        c.moveToPrevious();
+        while (c.moveToNext()) {
+            if (c.getLong(0) == exerciseId) {
+                ((TextView) findViewById(R.id.program_exercise_name)).setText(c.getString(c.getColumnIndex(GymContract.ExerciseEntry.COLUMN_NAME)));
+                break;
+            }
+        }
     }
 
     @Override
@@ -290,7 +308,7 @@ public class ProgramExerciseActivity extends AppCompatActivity
     //-----------------------------------------
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
-        return new ExercisesAsyncLoader(this, mExercisesAdapter.getCursor());
+        return new ProgramExercisesAsyncLoader(this, mExercisesAdapter.getCursor());
     }
 
     @Override
