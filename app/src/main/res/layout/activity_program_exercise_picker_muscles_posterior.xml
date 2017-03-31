@@ -7,12 +7,14 @@
         android:id="@+id/imageView7"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_gravity="center"
         app:srcCompat="@drawable/human_muscles_posterior" />
 
     <ImageView
         android:id="@+id/imageView8"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_gravity="center"
         android:visibility="invisible"
         app:srcCompat="@drawable/muscle_labels_map_posterior" />
 </FrameLayout>

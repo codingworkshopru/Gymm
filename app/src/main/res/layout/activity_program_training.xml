@@ -96,17 +96,27 @@
             android:scrollbars="vertical"
             app:layout_behavior="@string/appbar_scrolling_view_behavior" />
 
-        <TextView
+        <LinearLayout
+            android:id="@+id/program_training_empty_state"
             android:visibility="@{adapter.mIsEmpty ? View.VISIBLE : View.GONE}"
-            android:text="@string/program_training_activity_empty_list"
+            android:orientation="vertical"
+            android:layout_gravity="top"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:id="@+id/textView2"
-            app:layout_behavior="@string/appbar_scrolling_view_behavior"
-            android:drawableTop="@drawable/ic_fitness_200dp"
-            android:layout_gravity="top"
-            android:textAppearance="@style/TextAppearance.AppCompat.Medium"
-            android:textAlignment="center" />
+            app:layout_behavior="@string/appbar_scrolling_view_behavior" >
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:layout_marginBottom="16dp"
+                app:srcCompat="@drawable/ic_fitness_200dp"/>
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/program_training_activity_empty_list"
+                android:textAlignment="center"
+                android:textAppearance="@style/TextAppearance.AppCompat.Medium"/>
+        </LinearLayout>
 
         <android.support.design.widget.FloatingActionButton
             android:id="@+id/program_training_add_exercise_button"

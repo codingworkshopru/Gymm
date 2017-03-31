@@ -30,7 +30,6 @@
 
             <TextView
                 android:id="@+id/program_exercise_name"
-                android:text="@{exercise.getExercise.getName()}"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginEnd="16dp"
@@ -38,12 +37,16 @@
                 android:layout_marginRight="16dp"
                 android:layout_marginStart="16dp"
                 android:clickable="true"
+                android:ellipsize="end"
                 android:focusable="true"
+                android:maxLines="1"
                 android:onClick="onExercisePick"
                 android:paddingBottom="16dp"
                 android:paddingTop="16dp"
-                tools:text="Some text"
-                android:textAppearance="@style/TextAppearance.AppCompat.Widget.ActionBar.Title" />
+                android:text="@{exercise.getExercise.getName()}"
+                android:textAppearance="@style/TextAppearance.AppCompat.Widget.ActionBar.Title"
+                app:theme="@style/Widget.AppCompat.Button.Borderless"
+                tools:text="Some text" />
 
 
             <!--<Spinner-->
@@ -72,16 +75,25 @@
             app:layout_behavior="@string/appbar_scrolling_view_behavior"
             android:clipToPadding="false"/>
 
-        <TextView
-            android:visibility="@{adapter.mIsEmpty ? View.VISIBLE : View.GONE}"
-            android:layout_width="match_parent"
+        <LinearLayout
+            android:id="@+id/program_exercise_empty_state"
+            android:orientation="vertical"
+            android:layout_gravity="center_horizontal|top"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textAlignment="center"
-            android:textAppearance="@style/TextAppearance.AppCompat.Medium"
-            android:id="@+id/textView"
-            android:text="@string/program_exercise_activity_empty_list"
-            app:layout_behavior="@string/appbar_scrolling_view_behavior"
-            android:drawableTop="@drawable/ic_timeline_200dp" />
+            android:visibility="@{adapter.mIsEmpty ? View.VISIBLE : View.GONE}"
+            app:layout_behavior="@string/appbar_scrolling_view_behavior" >
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                app:srcCompat="@drawable/ic_timeline_200dp"/>
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+                android:text="@string/program_exercise_activity_empty_list" />
+        </LinearLayout>
 
 
         <android.support.design.widget.FloatingActionButton

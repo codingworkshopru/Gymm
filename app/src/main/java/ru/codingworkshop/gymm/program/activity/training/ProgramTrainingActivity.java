@@ -10,6 +10,7 @@ import android.os.Bundle;
 import android.support.design.widget.TextInputEditText;
 import android.support.design.widget.TextInputLayout;
 import android.support.v4.app.LoaderManager;
+import android.support.v4.app.NavUtils;
 import android.support.v4.content.Loader;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
@@ -161,14 +162,14 @@ public class ProgramTrainingActivity extends AppCompatActivity
 
     private void finishActivity(boolean save) {
         if (!save) {
-            finish();
+            NavUtils.navigateUpFromSameTask(this);
         } else {
             TextInputEditText training = (TextInputEditText) findViewById(R.id.program_training_name);
             if (training.length() == 0) {
                 ((TextInputLayout)findViewById(R.id.program_training_name_layout)).setError(getString(R.string.program_training_activity_name_empty_error));
             } else {
                 getSupportLoaderManager().initLoader(TrainingAsyncLoader.LOADER_TRAINING_SAVE, null, ProgramTrainingActivity.this);
-                finish();
+                NavUtils.navigateUpFromSameTask(this);
             }
         }
     }

@@ -11,6 +11,7 @@ import android.databinding.InverseBindingListener;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.LoaderManager;
+import android.support.v4.app.NavUtils;
 import android.support.v4.content.Loader;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
@@ -171,7 +172,7 @@ public class ProgramExerciseActivity extends AppCompatActivity
             setResult(RESULT_OK, resultIntent);
             finishActivity(ProgramTrainingActivity.REQUEST_CODE_EXERCISE);
         }
-        finish();
+        NavUtils.navigateUpFromSameTask(this);
     }
 
     private void doActionModeChangeAnimation(final boolean actionModeOn) {

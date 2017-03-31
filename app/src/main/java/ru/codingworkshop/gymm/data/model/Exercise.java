@@ -11,6 +11,7 @@ import java.util.List;
 
 import ru.codingworkshop.gymm.data.GymContract.ExerciseEntry;
 import ru.codingworkshop.gymm.data.GymContract.SecondaryMuscleGroupLinkEntry;
+import ru.codingworkshop.gymm.data.QueryBuilder;
 import ru.codingworkshop.gymm.data.model.base.MutableModel;
 
 /**
@@ -104,45 +105,51 @@ public final class Exercise extends MutableModel {
         return exercise;
     }
 
+    /**
+     * Reads data from the database and makes a list with models.
+     * @param db opened database object.
+     * @param exerciseId id of the exercise to read from DB. If 0 all records will be loaded.
+     * @return list of exercises including empty list.
+     */
+    private static List<Exercise> readAll(SQLiteDatabase db, long exerciseId) {
+        List<Exercise> result = new ArrayList<>();
+        String selection = null;
+        String[] selectionArgs = null;
+
+        if (exerciseId != 0) {
+            selection = ExerciseEntry._ID + "=?";
+            selectionArgs = new String[] {String.valueOf(exerciseId)};
+        }
+
+        QueryBuilder.QueryPart exercisesPart = new QueryBuilder.QueryPart(ExerciseEntry.TABLE_NAME)
+                .setSelection(selection)
+                .setOrder(ExerciseEntry.COLUMN_NAME);
+
+        Cursor c = db.rawQuery(QueryBuilder.build(exercisesPart), selectionArgs);
+
+        while (c.moveToNext()) {
+            Exercise exercise = newInstance(c);
+
+            long primaryMuscleId = c.getLong(c.getColumnIndex(ExerciseEntry.COLUMN_PRIMARY_MUSCLE_GROUP_ID));
+            exercise.primaryMuscleGroup = MuscleGroup.read(db, primaryMuscleId);
+
+            exercise.setSecondaryMuscles(MuscleGroup.readByExerciseId(db, exercise.getId()));
+
+            result.add(exercise);
+        }
+
+        c.close();
+
+        return result;
+    }
+
     public static Exercise read(SQLiteDatabase db, long exerciseId) {
-        String columns[] = {ExerciseEntry._ID, ExerciseEntry.COLUMN_NAME, ExerciseEntry.COLUMN_YOUTUBE_VIDEO};
-        String selectionArgs[] = {String.valueOf(exerciseId)};
-
-        Cursor cursor = db.query(
-                ExerciseEntry.TABLE_NAME,
-                columns,
-                ExerciseEntry._ID + "=?",
-                selectionArgs,
-                null,
-                null,
-                null
-        );
-        cursor.moveToNext();
-
-        Exercise exercise = newInstance(cursor);
-
-        cursor.close();
-        return exercise;
+        List<Exercise> exerciseInList = readAll(db, exerciseId);
+        return exerciseInList.get(0);
     }
 
     public static List<Exercise> read(SQLiteDatabase db) {
-        Cursor cursor = db.query(
-                ExerciseEntry.TABLE_NAME,
-                new String[] {ExerciseEntry._ID, ExerciseEntry.COLUMN_NAME, ExerciseEntry.COLUMN_YOUTUBE_VIDEO},
-                null,
-                null,
-                null,
-                null,
-                null
-        );
-
-        List<Exercise> result = new LinkedList<>();
-        while (cursor.moveToNext())
-            result.add(newInstance(cursor));
-
-        cursor.close();
-
-        return result;
+        return readAll(db, 0);
     }
 
     @Override

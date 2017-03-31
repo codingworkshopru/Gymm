@@ -4,13 +4,16 @@ import android.content.ContentValues;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Parcel;
+import android.support.v4.util.LongSparseArray;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import ru.codingworkshop.gymm.data.GymContract.MuscleGroupEntry;
+import ru.codingworkshop.gymm.data.GymContract.SecondaryMuscleGroupLinkEntry;
 import ru.codingworkshop.gymm.data.QueryBuilder;
 import ru.codingworkshop.gymm.data.model.base.MutableModel;
+
 
 /**
  * Created by Радик on 14.02.2017.
@@ -23,6 +26,9 @@ public final class MuscleGroup extends MutableModel {
     private boolean isAnterior;
 
     private static final String TABLE_NAME = MuscleGroupEntry.TABLE_NAME;
+    private static final String TAG = MuscleGroup.class.getSimpleName();
+
+    private static final LongSparseArray<List<MuscleGroup>> cache = new LongSparseArray<>();
 
     public MuscleGroup() {
     }
@@ -65,23 +71,85 @@ public final class MuscleGroup extends MutableModel {
         return id;
     }
 
-    public static List<MuscleGroup> read(SQLiteDatabase db) {
+    private static MuscleGroup newInstance(Cursor c) {
+        MuscleGroup muscleGroup = new MuscleGroup();
+
+        muscleGroup.id = c.getLong(c.getColumnIndex(MuscleGroupEntry._ID));
+        muscleGroup.name = c.getString(c.getColumnIndex(MuscleGroupEntry.COLUMN_NAME));
+
+        int columnIndex = c.getColumnIndex(MuscleGroupEntry.COLUMN_MAP_COLOR_RGB);
+        if (columnIndex != -1)
+            muscleGroup.mapColorRgb = c.getString(columnIndex);
+
+        columnIndex = c.getColumnIndex(MuscleGroupEntry.COLUMN_IS_ANTERIOR);
+        if (columnIndex != -1)
+            muscleGroup.isAnterior = 1 == c.getInt(columnIndex);
+
+        return muscleGroup;
+    }
+
+    private static List<MuscleGroup> readAll(SQLiteDatabase db, long muscleGroupId) {
         List<MuscleGroup> result = new ArrayList<>();
+        String selection = muscleGroupId != 0 ? MuscleGroupEntry._ID + "=" + muscleGroupId : null;
 
-        QueryBuilder.QueryPart part = new QueryBuilder.QueryPart(TABLE_NAME);
+        QueryBuilder.QueryPart part = new QueryBuilder.QueryPart(TABLE_NAME)
+                .setSelection(selection)
+                .setOrder(MuscleGroupEntry.COLUMN_NAME);
 
-        Cursor cursor = db.rawQuery(QueryBuilder.build(part), null);
+        String sql = QueryBuilder.build(part);
+        int sqlHashCode = sql.hashCode();
 
-        while (cursor.moveToNext()) {
-            MuscleGroup muscleGroup = new MuscleGroup();
-            muscleGroup.id = cursor.getLong(cursor.getColumnIndex(MuscleGroupEntry._ID));
-            muscleGroup.name = cursor.getString(cursor.getColumnIndex(MuscleGroupEntry.COLUMN_NAME));
-            muscleGroup.mapColorRgb = cursor.getString(cursor.getColumnIndex(MuscleGroupEntry.COLUMN_MAP_COLOR_RGB));
-            muscleGroup.isAnterior = 1 == cursor.getInt(cursor.getColumnIndex(MuscleGroupEntry.COLUMN_IS_ANTERIOR));
-            result.add(muscleGroup);
+        if (cache.indexOfKey(sqlHashCode) < 0) {
+
+            Cursor cursor = db.rawQuery(sql, null);
+            while (cursor.moveToNext())
+                result.add(newInstance(cursor));
+            cursor.close();
+
+            cache.append(sqlHashCode, result);
+        } else {
+            result = cache.get(sqlHashCode);
+//            Log.d(TAG, "readAll: cache used");
         }
 
-        cursor.close();
+        return result;
+    }
+
+    public static List<MuscleGroup> read(SQLiteDatabase db) {
+        return readAll(db, 0);
+    }
+
+    public static MuscleGroup read(SQLiteDatabase db, long muscleGroupId) {
+        return readAll(db, muscleGroupId).get(0);
+    }
+
+    static List<MuscleGroup> readByExerciseId(SQLiteDatabase db, long exerciseId) {
+        List<MuscleGroup> result = new ArrayList<>();
+
+        QueryBuilder.QueryPart musclesPart = new QueryBuilder.QueryPart(MuscleGroup.TABLE_NAME)
+                .setColumns(MuscleGroupEntry._ID, MuscleGroupEntry.COLUMN_NAME)
+                .setOrder(MuscleGroupEntry.COLUMN_NAME);
+
+        QueryBuilder.QueryPart linkPart = new QueryBuilder.QueryPart(SecondaryMuscleGroupLinkEntry.TABLE_NAME)
+                .setThisJoinColumn(SecondaryMuscleGroupLinkEntry.COLUMN_MUSCLE_GROUP_ID)
+                .setOtherJoinColumn(MuscleGroupEntry._ID)
+                .setSelection(SecondaryMuscleGroupLinkEntry.COLUMN_EXERCISE_ID + "=" + exerciseId);
+
+        String sql = QueryBuilder.build(musclesPart, linkPart);
+        int sqlHashCode = sql.hashCode();
+
+        if (cache.indexOfKey(sqlHashCode) < 0) {
+            Cursor c = db.rawQuery(sql, null);
+            while (c.moveToNext())
+                result.add(newInstance(c));
+            c.close();
+
+            cache.append(sqlHashCode, result);
+        } else {
+            result = cache.get(sqlHashCode);
+//            Log.d(TAG, "readByExerciseId: cache used");
+        }
+
 
         return result;
     }
