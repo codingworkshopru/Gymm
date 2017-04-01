@@ -1,7 +1,6 @@
 package ru.codingworkshop.gymm.program.activity.exercise.picker.exercises;
 
 import android.content.Intent;
-import android.database.Cursor;
 import android.os.Bundle;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.app.NavUtils;
@@ -10,15 +9,17 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 
+import java.util.List;
+
 import ru.codingworkshop.gymm.R;
+import ru.codingworkshop.gymm.data.model.Exercise;
 import ru.codingworkshop.gymm.data.model.MuscleGroup;
 import ru.codingworkshop.gymm.info.exercise.ExerciseInfoActivity;
 
-public class ExercisesActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<Cursor>, ExercisesAdapter.OnItemClickListener {
+public class ExercisesActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<List<Exercise>>, ExercisesAdapter.OnItemClickListener {
 
     private RecyclerView mPickerExercises;
     private ExercisesAdapter mExercisesAdapter;
@@ -36,7 +37,7 @@ public class ExercisesActivity extends AppCompatActivity implements LoaderManage
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
-        mExercisesAdapter = new ExercisesAdapter(this);
+        mExercisesAdapter = new ExercisesAdapter(this, this);
         mPickerExercises = (RecyclerView) findViewById(R.id.picker_exercises_list);
         mPickerExercises.setAdapter(mExercisesAdapter);
         mPickerExercises.setLayoutManager(new LinearLayoutManager(this));
@@ -58,20 +59,17 @@ public class ExercisesActivity extends AppCompatActivity implements LoaderManage
     }
 
     @Override
-    public Loader<Cursor> onCreateLoader(int id, final Bundle args) {
+    public Loader<List<Exercise>> onCreateLoader(int id, final Bundle args) {
         return new ExercisesAsyncLoader(this, args);
     }
 
     @Override
-    public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
-        while (data.moveToNext()) {
-            Log.d(TAG, "id=" + data.getLong(0) + " " + data.getString(1));
-        }
-        mExercisesAdapter.setCursor(data);
+    public void onLoadFinished(Loader<List<Exercise>> loader, List<Exercise> data) {
+        mExercisesAdapter.setExercises(data);
     }
 
     @Override
-    public void onLoaderReset(Loader<Cursor> loader) {
+    public void onLoaderReset(Loader<List<Exercise>> loader) {
 
     }
 
@@ -90,20 +88,20 @@ public class ExercisesActivity extends AppCompatActivity implements LoaderManage
     }
     @Override
     public void onInfoButtonClick(View view) {
-        long clickedItemId = mPickerExercises.getChildItemId(view);
+        int clickedItemPosition = mPickerExercises.getChildAdapterPosition(view);
 
         Intent intent = new Intent(this, ExerciseInfoActivity.class);
-        intent.putExtra(ExerciseInfoActivity.EXERCISE_ARG, clickedItemId);
+        intent.putExtra(ExerciseInfoActivity.EXERCISE_ARG, mExercisesAdapter.getItem(clickedItemPosition));
 
         startActivity(intent);
     }
 
     @Override
     public void onItemClick(View view) {
-        long clickedItemId = mPickerExercises.getChildItemId(view);
+        int clickedItemPosition = mPickerExercises.getChildAdapterPosition(view);
 
         Intent intent = new Intent();
-        intent.putExtra(ExerciseInfoActivity.EXERCISE_ARG, clickedItemId);
+        intent.putExtra(ExerciseInfoActivity.EXERCISE_ARG, mExercisesAdapter.getItem(clickedItemPosition));
         setResult(RESULT_OK, intent);
         finish();
     }

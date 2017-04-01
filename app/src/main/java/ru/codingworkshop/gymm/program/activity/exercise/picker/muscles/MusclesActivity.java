@@ -62,7 +62,7 @@ public class MusclesActivity extends AppCompatActivity implements LoaderManager.
         if (mSectionsPagerAdapter == null) {
             // Create the adapter that will return a fragment for each of the three
             // primary sections of the activity.
-            mSectionsPagerAdapter = new SectionsPagerAdapter(getSupportFragmentManager(), data);
+            mSectionsPagerAdapter = new SectionsPagerAdapter(getSupportFragmentManager(), data, this);
 
             // Set up the ViewPager with the sections adapter.
             mViewPager = (ViewPager) findViewById(R.id.container);
@@ -87,7 +87,9 @@ public class MusclesActivity extends AppCompatActivity implements LoaderManager.
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        setResult(resultCode, data);
-        finish();
+        if (resultCode == RESULT_OK) {
+            setResult(resultCode, data);
+            finish();
+        }
     }
 }

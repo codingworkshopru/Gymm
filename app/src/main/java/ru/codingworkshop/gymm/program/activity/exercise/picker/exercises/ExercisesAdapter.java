@@ -1,26 +1,28 @@
 package ru.codingworkshop.gymm.program.activity.exercise.picker.exercises;
 
-import android.database.Cursor;
+import android.content.Context;
 import android.support.annotation.LayoutRes;
+import android.support.annotation.StringRes;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import java.util.List;
+
 import ru.codingworkshop.gymm.R;
+import ru.codingworkshop.gymm.data.model.Exercise;
 
 /**
  * Created by Радик on 30.03.2017.
  */
 class ExercisesAdapter extends RecyclerView.Adapter<ExercisesAdapter.ViewHolder> {
-    private Cursor cursor;
-    private static final int FIRST_DIVIDER_POSITION = 0;
-    private int secondDividerPosition = -1;
+    private List<Exercise> exercises;
     private OnItemClickListener itemClickListener;
+    private Context context;
 
     private static final String TAG = ExercisesAdapter.class.getSimpleName();
-    private static final int TOP_DIVIDER_VIEW_TYPE = 1;
     private static final int DIVIDER_VIEW_TYPE = 2;
 
     interface OnItemClickListener {
@@ -28,34 +30,18 @@ class ExercisesAdapter extends RecyclerView.Adapter<ExercisesAdapter.ViewHolder>
         void onInfoButtonClick(View view);
     }
 
-    ExercisesAdapter(OnItemClickListener listener) {
+    ExercisesAdapter(OnItemClickListener listener, Context context) {
         itemClickListener = listener;
-        setHasStableIds(true);
+        this.context = context;
     }
 
-    public void setCursor(Cursor newCursor) {
-        if (cursor != null)
-            cursor.close();
-
-        cursor = newCursor;
-
-        cursor.moveToFirst();
-        cursor.moveToPrevious();
-
-        while (cursor.moveToNext()) {
-            if (cursor.getLong(0) == 0 && cursor.getPosition() > 0 && !cursor.isLast()) {
-                secondDividerPosition = cursor.getPosition();
-                break;
-            }
-        }
-
+    public void setExercises(List<Exercise> exercises) {
+        this.exercises = exercises;
         notifyDataSetChanged();
     }
 
-    @Override
-    public long getItemId(int position) {
-        cursor.moveToPosition(position);
-        return cursor.getLong(0);
+    public Exercise getItem(int position) {
+        return exercises.get(position);
     }
 
     @Override
@@ -63,7 +49,7 @@ class ExercisesAdapter extends RecyclerView.Adapter<ExercisesAdapter.ViewHolder>
         LayoutInflater inflater = LayoutInflater.from(parent.getContext());
         @LayoutRes int layoutId = R.layout.activity_exercises_list_item;
 
-        if (viewType == DIVIDER_VIEW_TYPE || viewType == TOP_DIVIDER_VIEW_TYPE)
+        if (viewType == DIVIDER_VIEW_TYPE)
             layoutId = R.layout.list_subheader_item;
 
         final View itemView = inflater.inflate(layoutId, parent, false);
@@ -89,39 +75,23 @@ class ExercisesAdapter extends RecyclerView.Adapter<ExercisesAdapter.ViewHolder>
 
     @Override
     public int getItemViewType(int position) {
-        if (position == FIRST_DIVIDER_POSITION)
-            return TOP_DIVIDER_VIEW_TYPE;
-        if (position == secondDividerPosition)
-            return DIVIDER_VIEW_TYPE;
-
-        return super.getItemViewType(position);
+        return exercises.get(position).isPhantom() ? DIVIDER_VIEW_TYPE : super.getItemViewType(position);
     }
 
 
     @Override
     public void onBindViewHolder(ViewHolder holder, int position) {
-        cursor.moveToPosition(position);
-
-        if (getItemViewType(position) == TOP_DIVIDER_VIEW_TYPE) {
-            holder.setSubheader("Основные упражнения"); // FIXME перенести в ресурс
-        } else if (getItemViewType(position) == DIVIDER_VIEW_TYPE) {
-            holder.setSubheader("В которых задействована");
+        @StringRes int stringRes = position == 0 ? R.string.exercises_picker_activity_primary : R.string.exercises_picker_activity_secondary;
+        if (getItemViewType(position) == DIVIDER_VIEW_TYPE) {
+            holder.setSubheader(context.getString(stringRes));
         } else {
-            holder.setText(cursor.getString(1));
+            holder.setText(exercises.get(position).getName());
         }
     }
 
     @Override
     public int getItemCount() {
-        int count = 0;
-
-        if (cursor != null && cursor.getCount() > 0) {
-            count = cursor.getCount();
-            if (secondDividerPosition == -1)
-                count--;
-        }
-
-        return count;
+        return exercises == null ? 0 : exercises.size();
     }
 
     static final class ViewHolder extends RecyclerView.ViewHolder {

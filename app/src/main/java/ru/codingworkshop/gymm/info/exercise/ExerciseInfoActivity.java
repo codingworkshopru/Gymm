@@ -1,13 +1,8 @@
 package ru.codingworkshop.gymm.info.exercise;
 
 import android.content.Intent;
-import android.database.sqlite.SQLiteDatabase;
-import android.database.sqlite.SQLiteOpenHelper;
 import android.net.Uri;
 import android.os.Bundle;
-import android.support.v4.app.LoaderManager;
-import android.support.v4.content.AsyncTaskLoader;
-import android.support.v4.content.Loader;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
@@ -20,10 +15,9 @@ import com.google.android.youtube.player.YouTubeThumbnailLoader;
 import com.google.android.youtube.player.YouTubeThumbnailView;
 
 import ru.codingworkshop.gymm.R;
-import ru.codingworkshop.gymm.data.GymDbHelper;
 import ru.codingworkshop.gymm.data.model.Exercise;
 
-public class ExerciseInfoActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<Exercise>, YouTubeThumbnailView.OnInitializedListener {
+public class ExerciseInfoActivity extends AppCompatActivity implements YouTubeThumbnailView.OnInitializedListener {
     YouTubeThumbnailView thumbnailView;
     YouTubeThumbnailLoader thumbnailLoader;
 
@@ -32,7 +26,6 @@ public class ExerciseInfoActivity extends AppCompatActivity implements LoaderMan
     private static final String YOUTUBE_DEVELOPER_KEY = "AIzaSyCnjhekaG5JdIEtdbeMH4iE0pZiprQZYp4";
     private static final String YOUTUBE_EMBED_URI = "https://www.youtube.com/embed/";
     public static final String EXERCISE_ARG = Exercise.class.getCanonicalName();
-    private static final String EXERCISE_KEY = EXERCISE_ARG + "_KEY";
     private static final String TAG = ExerciseInfoActivity.class.getSimpleName();
 
     private Exercise mModel;
@@ -49,19 +42,19 @@ public class ExerciseInfoActivity extends AppCompatActivity implements LoaderMan
 
         thumbnailView = (YouTubeThumbnailView) findViewById(R.id.youtube_thumbnail_view);
 
-        Bundle args = new Bundle(1);
         Intent intent = getIntent();
         if (intent != null && intent.hasExtra(EXERCISE_ARG)) {
-            args.putLong(EXERCISE_KEY, intent.getLongExtra(EXERCISE_ARG, 0));
+            mModel = intent.getParcelableExtra(EXERCISE_ARG);
         } else {
             throw new IllegalArgumentException("No argument for " + this.getClass().getName());
         }
 
-        Loader loader = getSupportLoaderManager().getLoader(0);
-        if (loader == null)
-            getSupportLoaderManager().initLoader(0, args, this);
-        else
-            getSupportLoaderManager().restartLoader(0, args, this);
+        if (mModel.hasVideo()) {
+            if (IS_YOUTUBE_SERVICE_SUPPORTED)
+                thumbnailView.initialize(YOUTUBE_DEVELOPER_KEY, this);
+
+            findViewById(R.id.imageButton3).setVisibility(View.VISIBLE);
+        }
     }
 
     @Override
@@ -133,26 +126,6 @@ public class ExerciseInfoActivity extends AppCompatActivity implements LoaderMan
         Log.e(TAG, error);
     }
 
-    @Override
-    public Loader<Exercise> onCreateLoader(int id, final Bundle args) {
-        return new AsyncTaskLoader<Exercise>(this) {
-            @Override
-            protected void onStartLoading() {
-                forceLoad();
-            }
-
-            @Override
-            public Exercise loadInBackground() {
-                SQLiteOpenHelper dbHelper = new GymDbHelper(getContext());
-                SQLiteDatabase db = dbHelper.getReadableDatabase();
-
-                long exerciseId = args.getLong(EXERCISE_KEY);
-
-                return Exercise.readOne(db, exerciseId);
-            }
-        };
-    }
-
     public void onVideoClick(View v) {
         String videoId = mModel.getVideo();
 
@@ -167,21 +140,5 @@ public class ExerciseInfoActivity extends AppCompatActivity implements LoaderMan
         }
 
         startActivity(intent);
-    }
-
-    @Override
-    public void onLoadFinished(Loader<Exercise> loader, Exercise data) {
-        mModel = data;
-
-        if (mModel.hasVideo()) {
-            if (IS_YOUTUBE_SERVICE_SUPPORTED)
-                thumbnailView.initialize(YOUTUBE_DEVELOPER_KEY, this);
-
-            findViewById(R.id.imageButton3).setVisibility(View.VISIBLE);
-        }
-    }
-
-    @Override
-    public void onLoaderReset(Loader<Exercise> loader) {
     }
 }

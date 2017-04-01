@@ -97,35 +97,23 @@ public final class Exercise extends MutableModel {
         return this == obj || obj instanceof Exercise && getId() == ((Exercise)obj).getId();
     }
 
-    public static Exercise newInstance(Cursor c) {
+    private static Exercise newInstance(Cursor c) {
         Exercise exercise = new Exercise();
         exercise.setId(c.getLong(c.getColumnIndex(ExerciseEntry._ID)));
         exercise.setName(c.getString(c.getColumnIndex(ExerciseEntry.COLUMN_NAME)));
-        exercise.setVideo(c.getString(c.getColumnIndex(ExerciseEntry.COLUMN_YOUTUBE_VIDEO)));
+
+        int columnIndex = c.getColumnIndex(ExerciseEntry.COLUMN_YOUTUBE_VIDEO);
+        if (columnIndex != -1)
+            exercise.setVideo(c.getString(columnIndex));
+
         return exercise;
     }
 
-    /**
-     * Reads data from the database and makes a list with models.
-     * @param db opened database object.
-     * @param exerciseId id of the exercise to readAll from DB. If 0 all records will be loaded.
-     * @return list of exercises including empty list.
-     */
-    private static List<Exercise> read(SQLiteDatabase db, long exerciseId) {
+    private static List<Exercise> newListOfInstances(Cursor c, SQLiteDatabase db) {
         List<Exercise> result = new ArrayList<>();
-        String selection = null;
-        String[] selectionArgs = null;
 
-        if (exerciseId != 0) {
-            selection = ExerciseEntry._ID + "=?";
-            selectionArgs = new String[] {String.valueOf(exerciseId)};
-        }
-
-        QueryBuilder.QueryPart exercisesPart = new QueryBuilder.QueryPart(ExerciseEntry.TABLE_NAME)
-                .setSelection(selection)
-                .setOrder(ExerciseEntry.COLUMN_NAME);
-
-        Cursor c = db.rawQuery(QueryBuilder.build(exercisesPart), selectionArgs);
+        if (c == null)
+            return result;
 
         while (c.moveToNext()) {
             Exercise exercise = newInstance(c);
@@ -138,18 +126,68 @@ public final class Exercise extends MutableModel {
             result.add(exercise);
         }
 
+        return result;
+    }
+
+    /**
+     * Reads data from the database and makes a list with models.
+     * @param db opened database object.
+     * @param id id of the exercise to readAll from DB. If 0 all records will be loaded.
+     * @return list of exercises including empty list.
+     */
+    private static List<Exercise> read(SQLiteDatabase db, String column, long id) {
+        List<Exercise> result = new ArrayList<>();
+        String selection = null;
+        String[] selectionArgs = null;
+
+        if (column != null && id != 0) {
+            selection = column + "=?";
+            selectionArgs = new String[] {String.valueOf(id)};
+        }
+
+        QueryBuilder.QueryPart exercisesPart = new QueryBuilder.QueryPart(ExerciseEntry.TABLE_NAME)
+                .setSelection(selection)
+                .setOrder(ExerciseEntry.COLUMN_NAME);
+
+        Cursor c = db.rawQuery(QueryBuilder.build(exercisesPart), selectionArgs);
+
+        result = newListOfInstances(c, db);
+
         c.close();
 
         return result;
     }
 
     public static Exercise readOne(SQLiteDatabase db, long exerciseId) {
-        List<Exercise> exerciseInList = read(db, exerciseId);
-        return exerciseInList.get(0);
+        return read(db, ExerciseEntry._ID, exerciseId).get(0);
     }
 
     public static List<Exercise> readAll(SQLiteDatabase db) {
-        return read(db, 0);
+        return read(db, null, 0);
+    }
+
+    public static List<Exercise> readByPrimaryMuscles(SQLiteDatabase db, long muscleGroupId) {
+        return read(db, ExerciseEntry.COLUMN_PRIMARY_MUSCLE_GROUP_ID, muscleGroupId);
+    }
+
+    public static List<Exercise> readBySecondaryMuscles(SQLiteDatabase db, long muscleGroupId) {
+        List<Exercise> result;
+
+        String[] selectionArgs = {String.valueOf(muscleGroupId)};
+
+        QueryBuilder.QueryPart exercisesWithSecondaryMuscles = new QueryBuilder.QueryPart(ExerciseEntry.TABLE_NAME)
+                .setOrder(ExerciseEntry.COLUMN_NAME);
+
+        QueryBuilder.QueryPart exercisesMusclesLink = new QueryBuilder.QueryPart(SecondaryMuscleGroupLinkEntry.TABLE_NAME)
+                .setThisJoinColumn(SecondaryMuscleGroupLinkEntry.COLUMN_EXERCISE_ID)
+                .setOtherJoinColumn(ExerciseEntry._ID)
+                .setSelection(SecondaryMuscleGroupLinkEntry.COLUMN_MUSCLE_GROUP_ID + "=?");
+
+        Cursor c = db.rawQuery(QueryBuilder.build(exercisesWithSecondaryMuscles, exercisesMusclesLink), selectionArgs);
+
+        result = newListOfInstances(c, db);
+
+        return result;
     }
 
     @Override
@@ -195,6 +233,7 @@ public final class Exercise extends MutableModel {
     }
 
     @Override
+
     protected void addFieldsToContentValues(ContentValues cv, boolean onlyChanged) {
         cv.put(ExerciseEntry.COLUMN_PRIMARY_MUSCLE_GROUP_ID, getPrimaryMuscleGroup().getId());
         cv.put(ExerciseEntry.COLUMN_NAME, getName());

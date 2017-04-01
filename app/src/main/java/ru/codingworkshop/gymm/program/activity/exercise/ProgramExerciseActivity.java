@@ -29,7 +29,6 @@ import android.view.animation.AnimationUtils;
 import android.widget.AdapterView;
 import android.widget.SimpleCursorAdapter;
 import android.widget.Spinner;
-import android.widget.TextView;
 
 import ru.codingworkshop.gymm.R;
 import ru.codingworkshop.gymm.data.GymContract;
@@ -160,6 +159,15 @@ public class ProgramExerciseActivity extends AppCompatActivity
         }
     }
 
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (resultCode == RESULT_CANCELED)
+            return;
+
+        Exercise returnedExercise = data.getParcelableExtra(EXERCISE_ARG);
+        mModel.setExercise(returnedExercise);
+    }
+
     public void onExercisePick(View v) {
         Intent intent = new Intent(this, MusclesActivity.class);
         startActivityForResult(intent, 0);
@@ -216,23 +224,6 @@ public class ProgramExerciseActivity extends AppCompatActivity
     @Override
     public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
         return false;
-    }
-
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (requestCode == RESULT_CANCELED)
-            return;
-
-        long exerciseId = data.getLongExtra(EXERCISE_ARG, 0);
-        Cursor c = mExercisesAdapter.getCursor();
-        c.moveToFirst();
-        c.moveToPrevious();
-        while (c.moveToNext()) {
-            if (c.getLong(0) == exerciseId) {
-                ((TextView) findViewById(R.id.program_exercise_name)).setText(c.getString(c.getColumnIndex(GymContract.ExerciseEntry.COLUMN_NAME)));
-                break;
-            }
-        }
     }
 
     @Override
