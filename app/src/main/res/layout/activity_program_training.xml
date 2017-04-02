@@ -52,6 +52,8 @@
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:hint="@string/program_training_activity_name_hint"
+                            android:inputType="text|textAutoCorrect|textAutoComplete"
+                            android:maxLines="1"
                             android:text="@={training.name}"
                             android:textAppearance="@style/TextAppearance.AppCompat.Large.Inverse"
                             tools:text="Бицуха" />

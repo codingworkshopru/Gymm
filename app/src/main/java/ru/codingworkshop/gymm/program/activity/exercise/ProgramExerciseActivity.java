@@ -213,6 +213,7 @@ public class ProgramExerciseActivity extends AppCompatActivity
         doActionModeChangeAnimation(true);
         mSetsAdapter.attachItemTouchHelper(mSetsView);
         mSetsAdapter.setEditMode(true);
+        findViewById(R.id.program_exercise_name).setVisibility(View.GONE);
         return true;
     }
 
@@ -231,6 +232,7 @@ public class ProgramExerciseActivity extends AppCompatActivity
         mSetsAdapter.attachItemTouchHelper(null);
         doActionModeChangeAnimation(false);
         mSetsAdapter.setEditMode(false);
+        findViewById(R.id.program_exercise_name).setVisibility(View.VISIBLE);
 //        findViewById(R.id.program_exercise_exercises_dropdown).setVisibility(View.VISIBLE);
     }
     //-----------------------------------------

@@ -41,7 +41,7 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        setSupportActionBar((Toolbar) findViewById(R.id.toolbar3));
+        setSupportActionBar((Toolbar) findViewById(R.id.main_activity_toolbar));
 
         LoaderManager loaderManager = getSupportLoaderManager();
         loaderManager.initLoader(TEST_LOADER, null, this);

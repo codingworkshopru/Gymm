@@ -10,11 +10,11 @@
     <!-- layout items -->
     <string name="program_training_activity_name_hint">Название тренировки</string>
     <string name="program_training_activity_name_empty_error">У тренировки должно быть название</string>
-    <string name="program_training_activity_weekday_label">День недели (опционально)</string>
+    <string name="program_training_activity_weekday_label">День недели (необязательно)</string>
     <string name="program_training_activity_exercises_label">Упражнения</string>
     <string name="program_training_activity_add_exercise">Добавить упражнение</string>
     <string name="program_training_activity_empty_list">Вы ещё не добавили упражнения</string>
-    <string name="program_training_activity_not_selected">Не выбрано</string>
+    <string name="program_training_activity_not_selected">не выбрано</string>
     <string name="program_training_activity_exercise_deleted_message">Упражнение удалено</string>
     <!-- menu -->
     <string name="program_training_activity_menu_done">Сохранить</string>
