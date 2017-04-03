@@ -7,6 +7,7 @@
     tools:context="ru.codingworkshop.gymm.info.exercise.ExerciseInfoActivity">
 
     <data>
+        <import type="android.view.View" />
         <import type="ru.codingworkshop.gymm.data.model.MuscleGroup"/>
         <variable name="exercise" type="ru.codingworkshop.gymm.data.model.Exercise"/>
     </data>
@@ -40,18 +41,12 @@
                     app:layout_collapseMode="parallax">
 
                     <ImageView
+                        android:id="@+id/exercise_info_activity_appbar_image"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:adjustViewBounds="true"
                         android:fitsSystemWindows="true"
-                        app:srcCompat="@drawable/bodybuilder_splash" />
-
-                    <com.google.android.youtube.player.YouTubeThumbnailView
-                        android:id="@+id/youtube_thumbnail_view"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:adjustViewBounds="true"
-                        android:fitsSystemWindows="true"/>
+                        app:srcCompat="@drawable/man_in_gym" />
 
                     <ImageButton
                         android:id="@+id/exercise_info_activity_play_button"
@@ -60,7 +55,7 @@
                         android:layout_gravity="center"
                         android:background="@drawable/ic_circle_grey_24dp"
                         android:onClick="onVideoClick"
-                        android:visibility="gone"
+                        android:visibility="@{exercise.hasVideo() ? View.VISIBLE : View.GONE}"
                         app:srcCompat="@drawable/ic_play_arrow_white_24dp"
                         tools:visibility="visible" />
                 </FrameLayout>
@@ -198,8 +193,7 @@
                     android:layout_marginTop="32dp"
                     app:layout_constraintRight_toRightOf="@+id/exercise_info_activity_advice_layout"
                     app:layout_constraintTop_toBottomOf="@+id/exercise_info_activity_advice_layout"
-                    app:layout_constraintLeft_toLeftOf="@+id/exercise_info_activity_advice_layout"
-                    android:layout_marginRight="0dp">
+                    app:layout_constraintLeft_toLeftOf="@+id/exercise_info_activity_advice_layout">
 
                     <ImageView
                         android:layout_width="wrap_content"

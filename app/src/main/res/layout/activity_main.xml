@@ -23,6 +23,7 @@
             <!-- TODO фотография должна отображать что-то конкретное, а иллюстрация концептуальное и метафорическое -->
             <!-- FIXME рекомендованные соотношения 16:9 3:2 4:3 1:1 3:4 2:3-->
             <ImageView
+                android:id="@+id/main_activity_appbar_image"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 app:srcCompat="@drawable/man_in_gym"

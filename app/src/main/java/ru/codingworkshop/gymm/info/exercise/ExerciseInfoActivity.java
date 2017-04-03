@@ -9,12 +9,12 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.View;
+import android.widget.ImageView;
 
 import com.google.android.youtube.player.YouTubeApiServiceUtil;
 import com.google.android.youtube.player.YouTubeInitializationResult;
 import com.google.android.youtube.player.YouTubeStandalonePlayer;
-import com.google.android.youtube.player.YouTubeThumbnailLoader;
-import com.google.android.youtube.player.YouTubeThumbnailView;
+import com.squareup.picasso.Picasso;
 
 import java.util.List;
 
@@ -23,14 +23,13 @@ import ru.codingworkshop.gymm.data.model.Exercise;
 import ru.codingworkshop.gymm.data.model.MuscleGroup;
 import ru.codingworkshop.gymm.databinding.ActivityExerciseInfoBinding;
 
-public class ExerciseInfoActivity extends AppCompatActivity implements YouTubeThumbnailView.OnInitializedListener {
-    YouTubeThumbnailView thumbnailView;
-    YouTubeThumbnailLoader thumbnailLoader;
+public class ExerciseInfoActivity extends AppCompatActivity implements Picasso.Listener {
 
     private static Boolean IS_YOUTUBE_SERVICE_SUPPORTED;
 
     private static final String YOUTUBE_DEVELOPER_KEY = "AIzaSyCnjhekaG5JdIEtdbeMH4iE0pZiprQZYp4";
     private static final String YOUTUBE_EMBED_URI = "https://www.youtube.com/embed/";
+    private static final String GOOGLE_API_YOUTUBE_SNIPPET_URI = "https://www.googleapis.com/youtube/v3/videos?key=%s&part=snippet&id=%s";
     public static final String EXERCISE_ARG = Exercise.class.getCanonicalName();
     private static final String TAG = ExerciseInfoActivity.class.getSimpleName();
 
@@ -47,8 +46,6 @@ public class ExerciseInfoActivity extends AppCompatActivity implements YouTubeTh
         setSupportActionBar((Toolbar) findViewById(R.id.exercise_info_toolbar));
         getSupportActionBar().setDisplayShowTitleEnabled(false);
 
-        thumbnailView = (YouTubeThumbnailView) findViewById(R.id.youtube_thumbnail_view);
-
         Intent intent = getIntent();
         if (intent != null && intent.hasExtra(EXERCISE_ARG)) {
             mModel = intent.getParcelableExtra(EXERCISE_ARG);
@@ -58,80 +55,20 @@ public class ExerciseInfoActivity extends AppCompatActivity implements YouTubeTh
         }
 
         if (mModel.hasVideo()) {
-            if (IS_YOUTUBE_SERVICE_SUPPORTED)
-                thumbnailView.initialize(YOUTUBE_DEVELOPER_KEY, this);
+            Picasso picasso = new Picasso.Builder(this)
+                    .downloader(new YouTubeThumbnailsDownloader(this))
+                    .build();
 
-            findViewById(R.id.exercise_info_activity_play_button).setVisibility(View.VISIBLE);
+            Uri uri = makeUriForDownloader(mModel.getVideo());
+            picasso.load(uri)
+                    .placeholder(R.drawable.sporty_woman)
+                    .into((ImageView) findViewById(R.id.exercise_info_activity_appbar_image));
         }
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        if (thumbnailLoader != null)
-            thumbnailLoader.release();
-    }
-
-    @Override
-    public void onInitializationSuccess(YouTubeThumbnailView youTubeThumbnailView, YouTubeThumbnailLoader youTubeThumbnailLoader) {
-        if (thumbnailLoader != null)
-            thumbnailLoader.release();
-
-        thumbnailLoader = youTubeThumbnailLoader;
-        thumbnailLoader.setVideo(mModel.getVideo());
-        thumbnailLoader.setOnThumbnailLoadedListener(new YouTubeThumbnailLoader.OnThumbnailLoadedListener() {
-            @Override
-            public void onThumbnailLoaded(YouTubeThumbnailView youTubeThumbnailView, String s) {
-
-            }
-
-            @Override
-            public void onThumbnailError(YouTubeThumbnailView youTubeThumbnailView, YouTubeThumbnailLoader.ErrorReason errorReason) {
-                Log.e(TAG, "onThumbnailError: " + errorReason);
-            }
-        });
-    }
-
-    @Override
-    public void onInitializationFailure(YouTubeThumbnailView youTubeThumbnailView, YouTubeInitializationResult youTubeInitializationResult) {
-        String error = "The initialization attempt was successful.";
-        switch (youTubeInitializationResult) {
-            case CLIENT_LIBRARY_UPDATE_REQUIRED:
-                error = "The version of the client library used to connect to the YouTube API service is out of date.";
-                break;
-            case DEVELOPER_KEY_INVALID:
-                error = "The developer key which was supplied to the initialization function is invalid.";
-                break;
-            case ERROR_CONNECTING_TO_SERVICE:
-                error = "There was an error connecting to the YouTube API service.";
-                break;
-            case INTERNAL_ERROR:
-                error = "An internal error occurred.";
-                break;
-            case INVALID_APPLICATION_SIGNATURE:
-                error = "The application's APK has been incorrectly signed.";
-                break;
-            case NETWORK_ERROR:
-                error = "There was an error connecting to the network which prevented the YouTube Player API service initializing.";
-                break;
-            case SERVICE_DISABLED:
-                error = "The installed version of the YouTube API service has been disabled on this device.";
-                break;
-            case SERVICE_INVALID:
-                error = "The version of the YouTube API service installed on this device is not valid.";
-                break;
-            case SERVICE_MISSING:
-                error = "The YouTube API service is missing on this device.";
-                break;
-            case SERVICE_VERSION_UPDATE_REQUIRED:
-                error = "The installed version of YouTube API service is out of date.";
-                break;
-            case UNKNOWN_ERROR:
-                error = "The reason for the error is not known.";
-                break;
-        }
-
-        Log.e(TAG, error);
     }
 
     public void onVideoClick(View v) {
@@ -148,6 +85,15 @@ public class ExerciseInfoActivity extends AppCompatActivity implements YouTubeTh
         }
 
         startActivity(intent);
+    }
+
+    public static Uri makeUriForDownloader(String videoId) {
+        return Uri.parse(String.format(GOOGLE_API_YOUTUBE_SNIPPET_URI, YOUTUBE_DEVELOPER_KEY, videoId));
+    }
+
+    @Override
+    public void onImageLoadFailed(Picasso picasso, Uri uri, Exception e) {
+        Log.d(TAG, "onImageLoadFailed:"+e.getMessage() + "; Uri:"+uri.toString());
     }
 
     @BindingConversion
