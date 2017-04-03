@@ -1,4 +1,4 @@
-package ru.codingworkshop.gymm.program.activity.exercise.picker.exercises;
+package ru.codingworkshop.gymm.program.activity.exercise.picker;
 
 import android.content.Context;
 import android.support.annotation.LayoutRes;
@@ -19,18 +19,18 @@ import ru.codingworkshop.gymm.data.model.Exercise;
  */
 class ExercisesAdapter extends RecyclerView.Adapter<ExercisesAdapter.ViewHolder> {
     private List<Exercise> exercises;
-    private OnItemClickListener itemClickListener;
+    private OnExerciseClickListener itemClickListener;
     private Context context;
 
     private static final String TAG = ExercisesAdapter.class.getSimpleName();
     private static final int DIVIDER_VIEW_TYPE = 2;
 
-    interface OnItemClickListener {
-        void onItemClick(View view);
-        void onInfoButtonClick(View view);
+    interface OnExerciseClickListener {
+        void onExerciseClick(View view);
+        void onExerciseInfoClick(View view);
     }
 
-    ExercisesAdapter(OnItemClickListener listener, Context context) {
+    ExercisesAdapter(OnExerciseClickListener listener, Context context) {
         itemClickListener = listener;
         this.context = context;
     }
@@ -58,14 +58,14 @@ class ExercisesAdapter extends RecyclerView.Adapter<ExercisesAdapter.ViewHolder>
             itemView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    itemClickListener.onItemClick(v);
+                    itemClickListener.onExerciseClick(v);
                 }
             });
 
             itemView.findViewById(R.id.imageButton4).setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    itemClickListener.onInfoButtonClick(itemView);
+                    itemClickListener.onExerciseInfoClick(itemView);
                 }
             });
         }
@@ -96,7 +96,7 @@ class ExercisesAdapter extends RecyclerView.Adapter<ExercisesAdapter.ViewHolder>
 
     static final class ViewHolder extends RecyclerView.ViewHolder {
 
-        public ViewHolder(View itemView) {
+        ViewHolder(View itemView) {
             super(itemView);
         }
 

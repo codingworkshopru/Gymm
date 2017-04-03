@@ -12,7 +12,6 @@ import org.json.JSONObject;
 
 import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.Scanner;
 
@@ -30,16 +29,13 @@ class YouTubeThumbnailsDownloader extends UrlConnectionDownloader {
     public Downloader.Response load(Uri uri, int networkPolicy) throws IOException {
         Downloader.Response resp = super.load(uri, networkPolicy);
 
-        InputStream resultGoogleApi = resp.getInputStream();
-
-        InputStreamReader streamReader = new InputStreamReader(resultGoogleApi, "UTF-8");
-
+        InputStreamReader streamReader = new InputStreamReader(resp.getInputStream(), "UTF-8");
         Scanner s = new Scanner(new BufferedReader(streamReader));
+
         StringBuilder jsonString = new StringBuilder();
 
-        while (s.hasNext()) {
+        while (s.hasNext())
             jsonString.append(s.nextLine());
-        }
 
         Uri realImageUri;
         try {

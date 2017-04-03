@@ -1,4 +1,4 @@
-package ru.codingworkshop.gymm.program.activity.exercise.picker.muscles;
+package ru.codingworkshop.gymm.program.activity.exercise.picker;
 
 /**
  * Created by Радик on 21.03.2017.

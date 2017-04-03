@@ -1,6 +1,5 @@
-package ru.codingworkshop.gymm.program.activity.exercise.picker.muscles;
+package ru.codingworkshop.gymm.program.activity.exercise.picker;
 
-import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.FragmentPagerAdapter;
@@ -14,10 +13,10 @@ import java.util.List;
 
 import ru.codingworkshop.gymm.R;
 import ru.codingworkshop.gymm.data.model.MuscleGroup;
-import ru.codingworkshop.gymm.program.activity.exercise.picker.exercises.ExercisesActivity;
 
 public class MusclesActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<List<MuscleGroup>>, PlaceholderFragment.OnMuscleGroupSelectListener {
 
+    static final String MUSCLE_GROUP_ARG = MuscleGroup.class.getCanonicalName();
     private static final String TAG = MusclesActivity.class.getSimpleName();
 
     /**
@@ -54,7 +53,7 @@ public class MusclesActivity extends AppCompatActivity implements LoaderManager.
 
     @Override
     public Loader<List<MuscleGroup>> onCreateLoader(int id, Bundle args) {
-        return new MuscleGroupsLoader(this);
+        return new MuscleGroupsAsyncLoader(this);
     }
 
     @Override
@@ -80,16 +79,10 @@ public class MusclesActivity extends AppCompatActivity implements LoaderManager.
 
     @Override
     public void onMuscleGroupSelect(MuscleGroup muscleGroup) {
-        Intent intent = new Intent(this, ExercisesActivity.class);
-        intent.putExtra(ExercisesActivity.MUSCLE_GROUP_ARG, muscleGroup.getId());
-        startActivityForResult(intent, 0);
-    }
-
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (resultCode == RESULT_OK) {
-            setResult(resultCode, data);
-            finish();
-        }
+        ExercisePickerFragment f = new ExercisePickerFragment();
+        Bundle args = new Bundle(1);
+        args.putParcelable(MUSCLE_GROUP_ARG, muscleGroup);
+        f.setArguments(args);
+        f.show(getSupportFragmentManager(), null);
     }
 }

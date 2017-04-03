@@ -26,9 +26,8 @@
             <android.support.design.widget.CollapsingToolbarLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                app:layout_scrollFlags="scroll|exitUntilCollapsed"
+                app:layout_scrollFlags="scroll|enterAlways|enterAlwaysCollapsed"
                 app:contentScrim="?attr/colorPrimary"
-                app:titleEnabled="false"
                 android:fitsSystemWindows="true">
 
                 <!-- TODO фотография должна отображать что-то конкретное, а иллюстрация концептуальное и метафорическое -->
@@ -46,7 +45,7 @@
                         android:layout_height="wrap_content"
                         android:adjustViewBounds="true"
                         android:fitsSystemWindows="true"
-                        app:srcCompat="@drawable/man_in_gym" />
+                        app:srcCompat="@drawable/sporty_woman"/>
 
                     <ImageButton
                         android:id="@+id/exercise_info_activity_play_button"
@@ -58,13 +57,21 @@
                         android:visibility="@{exercise.hasVideo() ? View.VISIBLE : View.GONE}"
                         app:srcCompat="@drawable/ic_play_arrow_white_24dp"
                         tools:visibility="visible" />
+
+                    <ProgressBar
+                        android:id="@+id/exercise_info_activity_progress_bar"
+                        style="?android:attr/progressBarStyle"
+                        android:visibility="gone"
+                        android:layout_gravity="center"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content" />
                 </FrameLayout>
 
                 <android.support.v7.widget.Toolbar
                     android:id="@+id/exercise_info_toolbar"
                     android:layout_width="match_parent"
                     android:layout_height="?attr/actionBarSize"
-                    app:layout_collapseMode="pin"
+                    app:layout_scrollFlags="scroll|enterAlways"
                     app:popupTheme="@style/ThemeOverlay.AppCompat.Light"/>
 
             </android.support.design.widget.CollapsingToolbarLayout>
@@ -80,16 +87,19 @@
 
                 <TextView
                     android:id="@+id/exercise_info_activity_title"
-                    android:text="@{exercise.getName()}"
-                    android:layout_width="wrap_content"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_marginLeft="16dp"
+                    android:layout_marginStart="16dp"
+                    android:layout_marginRight="16dp"
+                    android:layout_marginEnd="16dp"
                     android:layout_marginTop="8dp"
+                    android:text="@{exercise.getName()}"
                     android:textAppearance="@style/TextAppearance.AppCompat.Headline"
                     app:layout_constraintLeft_toLeftOf="parent"
                     app:layout_constraintTop_toTopOf="parent"
                     tools:text="Сгибание рук со штангой"
-                    android:layout_marginStart="16dp" />
+                    app:layout_constraintRight_toRightOf="parent" />
 
                 <TextView
                     android:id="@+id/exercise_info_activity_main_muscle"
@@ -136,7 +146,7 @@
                     app:srcCompat="@android:color/transparent" />
 
                 <LinearLayout
-                    android:id="@+id/exercise_info_activity_description_layout"
+                    android:id="@+id/exercise_info_activity_steps_layout"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_marginLeft="16dp"
@@ -158,19 +168,18 @@
                         android:layout_marginLeft="16dp"
                         android:layout_marginStart="16dp"
                         android:textAppearance="@style/TextAppearance.AppCompat.Body1"
-                        tools:text="Встаньте с прямой спиной, держа в руках штангу хватом на ширине плеч. Гриф держите ладонями вверх, локти близко к торсу. " />
+                        android:text="Встаньте с прямой спиной, держа в руках штангу хватом на ширине плеч. Гриф держите ладонями вверх, локти близко к торсу. " />
                 </LinearLayout>
 
                 <LinearLayout
                     android:id="@+id/exercise_info_activity_advice_layout"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:layout_marginRight="0dp"
                     android:layout_marginTop="32dp"
                     android:orientation="horizontal"
-                    app:layout_constraintLeft_toLeftOf="@+id/exercise_info_activity_description_layout"
-                    app:layout_constraintRight_toRightOf="@+id/exercise_info_activity_description_layout"
-                    app:layout_constraintTop_toBottomOf="@+id/exercise_info_activity_description_layout">
+                    app:layout_constraintLeft_toLeftOf="@+id/exercise_info_activity_steps_layout"
+                    app:layout_constraintRight_toRightOf="@+id/exercise_info_activity_steps_layout"
+                    app:layout_constraintTop_toBottomOf="@+id/exercise_info_activity_steps_layout">
 
                     <ImageView
                         android:layout_width="wrap_content"
@@ -183,7 +192,7 @@
                         android:layout_marginLeft="16dp"
                         android:layout_marginStart="16dp"
                         android:textAppearance="@style/TextAppearance.AppCompat.Body1"
-                        tools:text="Не изменяйте положения локтей во время выполнения упражнения. " />
+                        android:text="Не изменяйте положения локтей во время выполнения упражнения. " />
                 </LinearLayout>
 
                 <LinearLayout
@@ -205,7 +214,7 @@
                         android:layout_height="wrap_content"
                         android:layout_marginLeft="16dp"
                         android:textAppearance="@style/TextAppearance.AppCompat.Body1"
-                        tools:text="Поскольку упражнение существенно нагружает сухожилия рук, вам нужно хорошо разогреть мышцы, перед тем как приступить к нему."
+                        android:text="Поскольку упражнение существенно нагружает сухожилия рук, вам нужно хорошо разогреть мышцы, перед тем как приступить к нему."
                         android:layout_marginStart="16dp" />
                 </LinearLayout>
 
@@ -229,7 +238,7 @@
                         android:layout_height="wrap_content"
                         android:layout_marginLeft="16dp"
                         android:textAppearance="@style/TextAppearance.AppCompat.Body1"
-                        tools:text="При использовании EZ-грифа уменьшается нагрузка на мышцы предплечий."
+                        android:text="При использовании EZ-грифа уменьшается нагрузка на мышцы предплечий. При использовании EZ-грифа уменьшается нагрузка на мышцы предплечий. При использовании EZ-грифа уменьшается нагрузка на мышцы предплечий. При использовании EZ-грифа уменьшается нагрузка на мышцы предплечий. При использовании EZ-грифа уменьшается нагрузка на мышцы предплечий. При использовании EZ-грифа уменьшается нагрузка на мышцы предплечий. При использовании EZ-грифа уменьшается нагрузка на мышцы предплечий. При использовании EZ-грифа уменьшается нагрузка на мышцы предплечий. При использовании EZ-грифа уменьшается нагрузка на мышцы предплечий. При использовании EZ-грифа уменьшается нагрузка на мышцы предплечий. При использовании EZ-грифа уменьшается нагрузка на мышцы предплечий. При использовании EZ-грифа уменьшается нагрузка на мышцы предплечий. При использовании EZ-грифа уменьшается нагрузка на мышцы предплечий. При использовании EZ-грифа уменьшается нагрузка на мышцы предплечий. При использовании EZ-грифа уменьшается нагрузка на мышцы предплечий. При использовании EZ-грифа уменьшается нагрузка на мышцы предплечий. При использовании EZ-грифа уменьшается нагрузка на мышцы предплечий. При использовании EZ-грифа уменьшается нагрузка на мышцы предплечий."
                         android:layout_marginStart="16dp" />
                 </LinearLayout>
 

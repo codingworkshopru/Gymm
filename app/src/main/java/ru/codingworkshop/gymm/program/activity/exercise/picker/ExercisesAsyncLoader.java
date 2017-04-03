@@ -1,4 +1,4 @@
-package ru.codingworkshop.gymm.program.activity.exercise.picker.exercises;
+package ru.codingworkshop.gymm.program.activity.exercise.picker;
 
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
@@ -34,7 +34,7 @@ class ExercisesAsyncLoader extends AsyncTaskLoader<List<Exercise>> {
 
     @Override
     public List<Exercise> loadInBackground() {
-        long muscleGroupId = args.getLong(ExercisesActivity.MUSCLE_GROUP_KEY);
+        long muscleGroupId = args.getLong(MusclesActivity.MUSCLE_GROUP_ARG);
         loadedExercises = new ArrayList<>();
 
         // first divider

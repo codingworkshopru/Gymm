@@ -14,6 +14,7 @@ import android.widget.ImageView;
 import com.google.android.youtube.player.YouTubeApiServiceUtil;
 import com.google.android.youtube.player.YouTubeInitializationResult;
 import com.google.android.youtube.player.YouTubeStandalonePlayer;
+import com.squareup.picasso.Callback;
 import com.squareup.picasso.Picasso;
 
 import java.util.List;
@@ -55,14 +56,30 @@ public class ExerciseInfoActivity extends AppCompatActivity implements Picasso.L
         }
 
         if (mModel.hasVideo()) {
+            final View progressBar = findViewById(R.id.exercise_info_activity_progress_bar);
+            progressBar.setVisibility(View.VISIBLE);
             Picasso picasso = new Picasso.Builder(this)
                     .downloader(new YouTubeThumbnailsDownloader(this))
                     .build();
 
             Uri uri = makeUriForDownloader(mModel.getVideo());
             picasso.load(uri)
-                    .placeholder(R.drawable.sporty_woman)
-                    .into((ImageView) findViewById(R.id.exercise_info_activity_appbar_image));
+                    .error(R.drawable.sporty_woman)
+                    .into(
+                            (ImageView) findViewById(R.id.exercise_info_activity_appbar_image)
+                            ,
+                            new Callback() {
+                                @Override
+                                public void onSuccess() {
+                                    progressBar.setVisibility(View.GONE);
+                                }
+
+                                @Override
+                                public void onError() {
+                                    progressBar.setVisibility(View.GONE);
+                                }
+                            }
+                    );
         }
     }
 

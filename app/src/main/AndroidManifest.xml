@@ -45,22 +45,13 @@
             android:label="@string/title_activity_actual_training"
             android:windowSoftInputMode="adjustPan" />
         <activity
-            android:name=".program.activity.exercise.picker.muscles.MusclesActivity"
+            android:name=".program.activity.exercise.picker.MusclesActivity"
             android:label="@string/muscles_activity_title"
             android:parentActivityName=".program.activity.exercise.ProgramExerciseActivity"
             android:theme="@style/AppTheme.NoActionBar">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="ru.codingworkshop.gymm.program.activity.exercise.ProgramExerciseActivity" />
-        </activity>
-        <activity
-            android:name=".program.activity.exercise.picker.exercises.ExercisesActivity"
-            android:parentActivityName=".program.activity.exercise.picker.muscles.MusclesActivity"
-            android:label="@string/exercises_picker_activity_title">
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:theme="@style/AppTheme.NoActionBar"
-                android:value="ru.codingworkshop.gymm.program.activity.exercise.picker.muscles.MusclesActivity" />
         </activity>
         <activity
             android:name=".info.exercise.ExerciseInfoActivity"

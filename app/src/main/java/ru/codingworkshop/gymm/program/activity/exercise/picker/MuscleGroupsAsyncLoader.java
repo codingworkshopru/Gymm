@@ -1,4 +1,4 @@
-package ru.codingworkshop.gymm.program.activity.exercise.picker.muscles;
+package ru.codingworkshop.gymm.program.activity.exercise.picker;
 
 import android.content.Context;
 import android.database.sqlite.SQLiteOpenHelper;
@@ -13,10 +13,10 @@ import ru.codingworkshop.gymm.data.model.MuscleGroup;
  * Created by Радик on 21.03.2017.
  */
 
-public class MuscleGroupsLoader extends AsyncTaskLoader<List<MuscleGroup>> {
+public class MuscleGroupsAsyncLoader extends AsyncTaskLoader<List<MuscleGroup>> {
     private List<MuscleGroup> loadedMuscles;
 
-    MuscleGroupsLoader(Context context) {
+    MuscleGroupsAsyncLoader(Context context) {
         super(context);
     }
 

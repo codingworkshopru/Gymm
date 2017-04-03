@@ -38,7 +38,7 @@ import ru.codingworkshop.gymm.data.model.ProgramSet;
 import ru.codingworkshop.gymm.databinding.ActivityProgramExerciseBinding;
 import ru.codingworkshop.gymm.program.ProgramAdapter;
 import ru.codingworkshop.gymm.program.ProgramUtils;
-import ru.codingworkshop.gymm.program.activity.exercise.picker.muscles.MusclesActivity;
+import ru.codingworkshop.gymm.program.activity.exercise.picker.MusclesActivity;
 import ru.codingworkshop.gymm.program.activity.training.ProgramTrainingActivity;
 
 import static ru.codingworkshop.gymm.info.exercise.ExerciseInfoActivity.EXERCISE_ARG;

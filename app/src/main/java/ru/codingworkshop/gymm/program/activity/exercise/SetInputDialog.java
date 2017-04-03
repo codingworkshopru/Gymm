@@ -86,7 +86,10 @@ public final class SetInputDialog extends DialogFragment
             mModel.setReps(REPS_MIN);
         }
 
-        mSetInputDialogListener = (SetInputDialogListener) getActivity();
+        if (getActivity() instanceof SetInputDialogListener)
+            mSetInputDialogListener = (SetInputDialogListener) getActivity();
+        else
+            throw new ClassCastException("Activity should implement SetInputDialogListener interface");
 
         return builder.create();
     }

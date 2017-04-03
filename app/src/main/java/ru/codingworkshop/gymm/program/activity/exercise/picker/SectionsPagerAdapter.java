@@ -1,4 +1,4 @@
-package ru.codingworkshop.gymm.program.activity.exercise.picker.muscles;
+package ru.codingworkshop.gymm.program.activity.exercise.picker;
 
 import android.content.Context;
 import android.support.v4.app.Fragment;
