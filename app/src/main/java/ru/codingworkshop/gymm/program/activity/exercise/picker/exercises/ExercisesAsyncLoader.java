@@ -1,4 +1,4 @@
-package ru.codingworkshop.gymm.program.activity.exercise.picker;
+package ru.codingworkshop.gymm.program.activity.exercise.picker.exercises;
 
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
@@ -11,6 +11,7 @@ import java.util.List;
 
 import ru.codingworkshop.gymm.data.GymDbHelper;
 import ru.codingworkshop.gymm.data.model.Exercise;
+import ru.codingworkshop.gymm.program.activity.exercise.picker.MusclesActivity;
 
 /**
  * Created by Радик on 30.03.2017.
@@ -37,9 +38,6 @@ class ExercisesAsyncLoader extends AsyncTaskLoader<List<Exercise>> {
         long muscleGroupId = args.getLong(MusclesActivity.MUSCLE_GROUP_ARG);
         loadedExercises = new ArrayList<>();
 
-        // first divider
-        loadedExercises.add(new Exercise());
-
         SQLiteOpenHelper dbHelper = new GymDbHelper(getContext());
         SQLiteDatabase db = dbHelper.getReadableDatabase();
 
@@ -47,7 +45,7 @@ class ExercisesAsyncLoader extends AsyncTaskLoader<List<Exercise>> {
 
         List<Exercise> secondaryMuscles = Exercise.readBySecondaryMuscles(db, muscleGroupId);
         if (!secondaryMuscles.isEmpty()) {
-            // second divider
+            // divider
             loadedExercises.add(new Exercise());
 
             loadedExercises.addAll(secondaryMuscles);

@@ -136,7 +136,6 @@ public final class Exercise extends MutableModel {
      * @return list of exercises including empty list.
      */
     private static List<Exercise> read(SQLiteDatabase db, String column, long id) {
-        List<Exercise> result = new ArrayList<>();
         String selection = null;
         String[] selectionArgs = null;
 
@@ -151,7 +150,7 @@ public final class Exercise extends MutableModel {
 
         Cursor c = db.rawQuery(QueryBuilder.build(exercisesPart), selectionArgs);
 
-        result = newListOfInstances(c, db);
+        List<Exercise> result = newListOfInstances(c, db);
 
         c.close();
 

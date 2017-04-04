@@ -13,10 +13,11 @@ import java.util.List;
 
 import ru.codingworkshop.gymm.R;
 import ru.codingworkshop.gymm.data.model.MuscleGroup;
+import ru.codingworkshop.gymm.program.activity.exercise.picker.exercises.ExercisePickerFragment;
 
 public class MusclesActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<List<MuscleGroup>>, PlaceholderFragment.OnMuscleGroupSelectListener {
 
-    static final String MUSCLE_GROUP_ARG = MuscleGroup.class.getCanonicalName();
+    public static final String MUSCLE_GROUP_ARG = MuscleGroup.class.getCanonicalName();
     private static final String TAG = MusclesActivity.class.getSimpleName();
 
     /**

@@ -63,13 +63,6 @@ public final class SetInputDialog extends DialogFragment
         mSecondsPicker.setMinValue(SECONDS_MIN);
         mSecondsPicker.setMaxValue(SECONDS_MAX);
 
-        AlertDialog.Builder builder = new AlertDialog.Builder(context);
-        builder.setTitle(R.string.program_exercise_activity_dialog_title)
-                .setCancelable(true)
-                .setView(customView)
-                .setPositiveButton(R.string.program_exercise_activity_dialog_positive_button_text, this)
-                .setNegativeButton(R.string.cancel_button_text, null);
-
         Bundle savedModel = getArguments();
         if (savedModel == null)
             savedModel = savedInstanceState;
@@ -90,6 +83,13 @@ public final class SetInputDialog extends DialogFragment
             mSetInputDialogListener = (SetInputDialogListener) getActivity();
         else
             throw new ClassCastException("Activity should implement SetInputDialogListener interface");
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(context)
+                .setTitle(mModel.isPhantom() ? R.string.program_exercise_activity_dialog_title : R.string.program_exercise_activity_dialog_title_edit)
+                .setCancelable(true)
+                .setView(customView)
+                .setPositiveButton(R.string.program_exercise_activity_dialog_positive_button_text, this)
+                .setNegativeButton(R.string.cancel_button_text, null);
 
         return builder.create();
     }

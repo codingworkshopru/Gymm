@@ -1,4 +1,4 @@
-package ru.codingworkshop.gymm.program.activity.exercise.picker;
+package ru.codingworkshop.gymm.program.activity.exercise.picker.exercises;
 
 import android.content.Context;
 import android.support.annotation.LayoutRes;

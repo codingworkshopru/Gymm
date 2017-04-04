@@ -78,12 +78,12 @@
 
                 </LinearLayout>
 
-            <android.support.v7.widget.Toolbar
-                android:layout_height="?attr/actionBarSize"
-                android:layout_width="match_parent"
-                android:background="?attr/colorPrimary"
-                android:id="@+id/toolbar2"
-                app:layout_collapseMode="pin"/>
+                <android.support.v7.widget.Toolbar
+                    android:id="@+id/program_training_toolbar"
+                    android:layout_width="match_parent"
+                    android:layout_height="?attr/actionBarSize"
+                    android:background="?attr/colorPrimary"
+                    app:layout_collapseMode="pin" />
 
             </ru.codingworkshop.gymm.program.activity.training.AnimatedCollapsingToolbarLayout>
         </android.support.design.widget.AppBarLayout>
@@ -92,9 +92,9 @@
             android:id="@+id/program_training_exercises_list"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:background="@color/color_material_grey_200"
-            android:paddingBottom="100dp"
+            android:background="?android:attr/colorBackground"
             android:clipToPadding="false"
+            android:paddingBottom="100dp"
             android:scrollbars="vertical"
             app:layout_behavior="@string/appbar_scrolling_view_behavior" />
 

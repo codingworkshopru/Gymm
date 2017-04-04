@@ -1,4 +1,4 @@
-package ru.codingworkshop.gymm.program.activity.exercise.picker;
+package ru.codingworkshop.gymm.program.activity.exercise.picker.exercises;
 
 import android.app.Activity;
 import android.app.Dialog;
@@ -23,6 +23,7 @@ import ru.codingworkshop.gymm.R;
 import ru.codingworkshop.gymm.data.model.Exercise;
 import ru.codingworkshop.gymm.data.model.MuscleGroup;
 import ru.codingworkshop.gymm.info.exercise.ExerciseInfoActivity;
+import ru.codingworkshop.gymm.program.activity.exercise.picker.MusclesActivity;
 
 /**
  * Created by Радик on 03.04.2017.
@@ -68,9 +69,11 @@ public class ExercisePickerFragment extends BottomSheetDialogFragment implements
                 if (newState == BottomSheetBehavior.STATE_HIDDEN) {
                     dialog.cancel();
                 } else if (newState == BottomSheetBehavior.STATE_EXPANDED && mExercisesList.computeVerticalScrollExtent() != mExercisesList.computeVerticalScrollRange()) {
+                    mExercisesList.setBackgroundResource(R.drawable.bottom_shadow);
                     title.setVisibility(View.GONE);
                     toolbar.setVisibility(View.VISIBLE);
                 } else if (toolbar.getVisibility() == View.VISIBLE) {
+                    mExercisesList.setBackgroundResource(0);
                     toolbar.setVisibility(View.GONE);
                     title.setVisibility(View.VISIBLE);
                 }

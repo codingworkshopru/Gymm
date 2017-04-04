@@ -63,7 +63,7 @@ public class ProgramTrainingActivity extends AppCompatActivity
         // data binding
         mBinding = DataBindingUtil.setContentView(this, R.layout.activity_program_training);
 
-        setSupportActionBar((Toolbar) findViewById(R.id.toolbar2));
+        setSupportActionBar((Toolbar) findViewById(R.id.program_training_toolbar));
         // setting "up" button
         ActionBar ab = getSupportActionBar();
         if (ab != null) {

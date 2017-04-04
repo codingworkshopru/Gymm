@@ -12,79 +12,74 @@
             name="model"
             type="ru.codingworkshop.gymm.data.model.ProgramExercise"/>
     </data>
+
     <android.support.constraint.ConstraintLayout
         android:layout_width="match_parent"
-        android:layout_height="72dp"
-        android:background="?android:attr/selectableItemBackground">
-
-        <ImageView
-            android:layout_height="0dp"
-            android:layout_width="0dp"
-            app:srcCompat="?android:attr/colorBackground"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintRight_toRightOf="parent"
-            app:layout_constraintLeft_toLeftOf="parent"/>
+        android:layout_height="@dimen/list_item_height"
+        android:background="?attr/selectableItemBackground">
 
         <LinearLayout
-            android:orientation="vertical"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            app:layout_constraintTop_toTopOf="parent"
+            android:orientation="vertical"
+            app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintRight_toLeftOf="@+id/program_training_list_item_icons"
-            app:layout_constraintBottom_toBottomOf="parent">
+            app:layout_constraintTop_toTopOf="parent">
 
             <TextView
                 android:id="@+id/program_training_list_item_reps"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:textAppearance="@style/TextAppearance.AppCompat.Menu"
-                android:text="@{model.exercise.name}"
-                android:layout_marginStart="16dp"
                 android:layout_marginLeft="16dp"
-                tools:text="Main text is here ffff fffff fffffff ffffffff  ffff "
+                android:layout_marginStart="16dp"
+                android:ellipsize="end"
                 android:maxLines="1"
-                android:ellipsize="end" />
+                android:text="@{model.exercise.name}"
+                android:textAppearance="@style/TextAppearance.AppCompat.Menu"
+                tools:text="Main text is here ffff fffff fffffff ffffffff  ffff " />
 
             <TextView
                 android:id="@+id/program_training_list_item_rest_time"
-                android:text="@{@plurals/number_of_sets(model.childrenCount(), model.childrenCount())}"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                tools:text="Very very long secondary text here. It is too long to fit here"
-                android:layout_marginStart="16dp"
                 android:layout_marginLeft="16dp"
+                android:layout_marginStart="16dp"
                 android:ellipsize="end"
-                android:maxLines="1" />
+                android:maxLines="1"
+                android:text="@{@plurals/number_of_sets(model.childrenCount(), model.childrenCount())}"
+                tools:text="Very very long secondary text here. It is too long to fit here" />
 
         </LinearLayout>
 
         <LinearLayout
             android:id="@+id/program_training_list_item_icons"
-            android:visibility="@{adapter.mInEditMode ? View.VISIBLE : View.GONE}"
             android:layout_width="wrap_content"
-            android:orientation="horizontal"
-            app:layout_constraintRight_toRightOf="parent"
-            app:layout_constraintBottom_toBottomOf="parent"
             android:layout_height="0dp"
+            android:orientation="horizontal"
+            android:visibility="@{adapter.mInEditMode ? View.VISIBLE : View.GONE}"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
             app:layout_constraintTop_toTopOf="parent">
+
             <ImageView
                 android:id="@+id/program_training_list_item_delete_sweep"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_vertical"
                 app:srcCompat="@drawable/ic_delete_sweep_24dp" />
+
             <ImageView
                 android:id="@+id/program_training_list_item_reorder_action"
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent"
-                app:srcCompat="@drawable/ic_reorder_24dp"
-                android:scaleType="center"
-                android:paddingStart="16dp"
-                android:paddingLeft="16dp"
                 android:paddingEnd="16dp"
-                android:paddingRight="16dp"/>
+                android:paddingLeft="16dp"
+                android:paddingRight="16dp"
+                android:paddingStart="16dp"
+                android:scaleType="center"
+                app:srcCompat="@drawable/ic_reorder_24dp" />
         </LinearLayout>
     </android.support.constraint.ConstraintLayout>
+
 </layout>

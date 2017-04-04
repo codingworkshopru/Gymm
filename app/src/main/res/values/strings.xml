@@ -33,6 +33,7 @@
     <string name="program_exercise_activity_exercise_empty_text">Выберите упражнение</string>
     <!-- exercise's reps and rest time input dialog -->
     <string name="program_exercise_activity_dialog_title">Добавление подхода</string>
+    <string name="program_exercise_activity_dialog_title_edit">Изменение подхода</string>
     <string name="program_exercise_activity_dialog_rest_time_label">Время на отдых</string>
     <string name="program_exercise_activity_dialog_positive_button_text">OK</string>
 

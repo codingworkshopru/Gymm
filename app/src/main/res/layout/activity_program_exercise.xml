@@ -72,11 +72,11 @@
             android:id="@+id/program_exercise_sets_list"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
+            android:background="?android:attr/colorBackground"
+            android:clipToPadding="false"
             android:paddingBottom="100dp"
             android:scrollbars="vertical"
-            android:background="@color/color_material_grey_200"
-            app:layout_behavior="@string/appbar_scrolling_view_behavior"
-            android:clipToPadding="false"/>
+            app:layout_behavior="@string/appbar_scrolling_view_behavior" />
 
         <LinearLayout
             android:id="@+id/program_exercise_empty_state"
