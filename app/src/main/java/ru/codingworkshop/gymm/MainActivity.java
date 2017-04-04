@@ -196,7 +196,8 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
 
     @Override
     public void onLoaderReset(Loader<Cursor> loader) {
-
+        mAdapter.swapCursor(null);
+        Log.d(TAG, "onLoaderReset");
     }
     //-----------------------------------------
 }
