@@ -49,10 +49,14 @@ public class TrainingAsyncLoader extends AsyncTaskLoader<ProgramTraining> {
             SQLiteDatabase db = dbHelper.getWritableDatabase();
             model.create(db, 0);
             model.update(db);
+            db.close();
         } else if (id == LOADER_TRAINING_LOAD) {
-            model = ProgramTraining.load(dbHelper.getReadableDatabase(), args.getLong(MainActivity.PROGRAM_TRAINING_ID_KEY));
+            SQLiteDatabase db = dbHelper.getReadableDatabase();
+            model = ProgramTraining.load(db, args.getLong(MainActivity.PROGRAM_TRAINING_ID_KEY));
+            db.close();
             return model;
         }
+
         return null;
     }
 }

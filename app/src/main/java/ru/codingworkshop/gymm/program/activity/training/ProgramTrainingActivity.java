@@ -1,6 +1,5 @@
 package ru.codingworkshop.gymm.program.activity.training;
 
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.databinding.BindingAdapter;
 import android.databinding.DataBindingUtil;
@@ -38,6 +37,7 @@ import ru.codingworkshop.gymm.R;
 import ru.codingworkshop.gymm.data.model.ProgramExercise;
 import ru.codingworkshop.gymm.data.model.ProgramTraining;
 import ru.codingworkshop.gymm.databinding.ActivityProgramTrainingBinding;
+import ru.codingworkshop.gymm.program.AlertDialogFragment;
 import ru.codingworkshop.gymm.program.ProgramAdapter;
 import ru.codingworkshop.gymm.program.ProgramUtils;
 import ru.codingworkshop.gymm.program.activity.exercise.ProgramExerciseActivity;
@@ -148,13 +148,13 @@ public class ProgramTrainingActivity extends AppCompatActivity
     @Override
     public void onBackPressed() {
         if (mModel.isChanged()) {
-            DialogInterface.OnClickListener listener = new DialogInterface.OnClickListener() {
+            AlertDialogFragment.OnDialogButtonClickListener listener = new AlertDialogFragment.OnDialogButtonClickListener() {
                 @Override
-                public void onClick(DialogInterface dialog, int which) {
-                    finishActivity(which == DialogInterface.BUTTON_POSITIVE);
+                public void onButtonClick(boolean positive) {
+                    finishActivity(positive);
                 }
             };
-            ProgramUtils.showAlert(this, listener, listener);
+            ProgramUtils.showAlert(this, listener, 0, R.string.save_changes_question, R.string.save_button_text, R.string.no_button_text);
         } else {
             super.onBackPressed();
         }
@@ -164,12 +164,24 @@ public class ProgramTrainingActivity extends AppCompatActivity
         if (!save) {
             NavUtils.navigateUpFromSameTask(this);
         } else {
-            TextInputEditText training = (TextInputEditText) findViewById(R.id.program_training_name);
-            if (training.length() == 0) {
-                ((TextInputLayout)findViewById(R.id.program_training_name_layout)).setError(getString(R.string.program_training_activity_name_empty_error));
+            TextInputEditText trainingName = (TextInputEditText) findViewById(R.id.program_training_name);
+            TextInputLayout trainingNameLayout = (TextInputLayout)findViewById(R.id.program_training_name_layout);
+            if (trainingName.length() == 0) {
+                trainingNameLayout.setError(getString(R.string.program_training_activity_name_empty_error));
+            } else if (mModel.childrenCount() == 0) {
+                trainingNameLayout.setError(null);
+
+                AlertDialogFragment.OnDialogButtonClickListener listener = new AlertDialogFragment.OnDialogButtonClickListener() {
+                    @Override
+                    public void onButtonClick(boolean positive) {
+                        if (positive)
+                            onAddButtonClick(null);
+                    }
+                };
+
+                ProgramUtils.showAlert(this, listener, 0, R.string.program_training_activity_empty_list_dialog_message, R.string.add_button_text, R.string.cancel_button_text);
             } else {
                 getSupportLoaderManager().initLoader(TrainingAsyncLoader.LOADER_TRAINING_SAVE, null, ProgramTrainingActivity.this);
-                NavUtils.navigateUpFromSameTask(this);
             }
         }
     }
@@ -218,6 +230,10 @@ public class ProgramTrainingActivity extends AppCompatActivity
     @Override
     public void onLoadFinished(Loader<ProgramTraining> loader, ProgramTraining data) {
         setModel(data);
+
+        if (loader.getId() == TrainingAsyncLoader.LOADER_TRAINING_SAVE) {
+            NavUtils.navigateUpFromSameTask(this);
+        }
     }
 
     @Override

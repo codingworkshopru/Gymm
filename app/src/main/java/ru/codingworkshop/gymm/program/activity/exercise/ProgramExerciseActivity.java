@@ -1,7 +1,6 @@
 package ru.codingworkshop.gymm.program.activity.exercise;
 
 import android.app.DialogFragment;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
 import android.databinding.BindingAdapter;
@@ -36,6 +35,7 @@ import ru.codingworkshop.gymm.data.model.Exercise;
 import ru.codingworkshop.gymm.data.model.ProgramExercise;
 import ru.codingworkshop.gymm.data.model.ProgramSet;
 import ru.codingworkshop.gymm.databinding.ActivityProgramExerciseBinding;
+import ru.codingworkshop.gymm.program.AlertDialogFragment;
 import ru.codingworkshop.gymm.program.ProgramAdapter;
 import ru.codingworkshop.gymm.program.ProgramUtils;
 import ru.codingworkshop.gymm.program.activity.exercise.picker.MusclesActivity;
@@ -147,13 +147,14 @@ public class ProgramExerciseActivity extends AppCompatActivity
     @Override
     public void onBackPressed() {
         if (mModel.isChanged()) {
-            DialogInterface.OnClickListener listener = new DialogInterface.OnClickListener() {
+            AlertDialogFragment.OnDialogButtonClickListener listener = new AlertDialogFragment.OnDialogButtonClickListener() {
                 @Override
-                public void onClick(DialogInterface dialog, int which) {
-                    finishActivity(which == DialogInterface.BUTTON_POSITIVE);
+                public void onButtonClick(boolean positive) {
+                    finishActivity(positive);
                 }
             };
-            ProgramUtils.showAlert(this, listener, listener);
+
+            ProgramUtils.showAlert(this, listener, 0, R.string.save_changes_question, R.string.save_button_text, R.string.no_button_text);
         } else {
             super.onBackPressed();
         }
@@ -175,12 +176,33 @@ public class ProgramExerciseActivity extends AppCompatActivity
 
     private void finishActivity(boolean save) {
         if (save) {
-            Intent resultIntent = new Intent();
-            resultIntent.putExtra(EXERCISE_MODEL_KEY, mModel);
-            setResult(RESULT_OK, resultIntent);
-            finishActivity(ProgramTrainingActivity.REQUEST_CODE_EXERCISE);
+            if (mModel.getExercise() == null || mModel.getExercise().isPhantom()) {
+                ProgramUtils.showAlert(this, new AlertDialogFragment.OnDialogButtonClickListener() {
+                    @Override
+                    public void onButtonClick(boolean positive) {
+                        if (positive)
+                            onExercisePick(null);
+                    }
+                }, 0, R.string.program_exercise_activity_exercise_not_selected_message, R.string.add_button_text, R.string.cancel_button_text);
+            } else if (mModel.childrenCount() == 0) {
+
+                AlertDialogFragment.OnDialogButtonClickListener listener = new AlertDialogFragment.OnDialogButtonClickListener() {
+                    @Override
+                    public void onButtonClick(boolean positive) {
+                        if (positive)
+                            onAddButtonClick(null);
+                    }
+                };
+
+                ProgramUtils.showAlert(this, listener, 0, R.string.program_exercise_activity_empty_list_dialog_message, R.string.add_button_text, R.string.cancel_button_text);
+            } else {
+                Intent resultIntent = new Intent();
+                resultIntent.putExtra(EXERCISE_MODEL_KEY, mModel);
+                setResult(RESULT_OK, resultIntent);
+                finishActivity(ProgramTrainingActivity.REQUEST_CODE_EXERCISE);
+                NavUtils.navigateUpFromSameTask(this);
+            }
         }
-        NavUtils.navigateUpFromSameTask(this);
     }
 
     private void doActionModeChangeAnimation(final boolean actionModeOn) {

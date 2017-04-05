@@ -1,4 +1,4 @@
-package ru.codingworkshop.gymm.program;
+package ru.codingworkshop.gymm;
 
 import android.os.Build;
 import android.support.annotation.DrawableRes;
@@ -13,7 +13,6 @@ import android.widget.TextView;
 import java.util.ArrayList;
 import java.util.List;
 
-import ru.codingworkshop.gymm.R;
 import ru.codingworkshop.gymm.data.model.ProgramTraining;
 
 /**

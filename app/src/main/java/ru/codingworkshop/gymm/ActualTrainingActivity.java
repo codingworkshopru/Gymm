@@ -11,7 +11,6 @@ import android.widget.AdapterView;
 import android.widget.ListView;
 
 import ru.codingworkshop.gymm.data.model.ProgramTraining;
-import ru.codingworkshop.gymm.program.ActualTrainingAdapter;
 import ru.codingworkshop.gymm.program.activity.training.TrainingAsyncLoader;
 
 public class ActualTrainingActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<ProgramTraining>,

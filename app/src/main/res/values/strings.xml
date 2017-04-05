@@ -18,6 +18,8 @@
     <string name="program_training_activity_empty_list">Вы ещё не добавили упражнения</string>
     <string name="program_training_activity_not_selected">не выбрано</string>
     <string name="program_training_activity_exercise_deleted_message">Упражнение удалено</string>
+    <!-- error dialog -->
+    <string name="program_training_activity_empty_list_dialog_message">Добавьте хотя бы одно упражнение</string>
     <!-- menu -->
     <string name="program_training_activity_menu_done">Сохранить</string>
 
@@ -31,6 +33,9 @@
     <string name="program_exercise_activity_rest_time_not_set">не задано</string>
     <string name="program_exercise_activity_set_deleted_message">Подход удалён</string>
     <string name="program_exercise_activity_exercise_empty_text">Выберите упражнение</string>
+    <!-- error dialog -->
+    <string name="program_exercise_activity_empty_list_dialog_message">Добавьте хотя бы один подход</string>
+    <string name="program_exercise_activity_exercise_not_selected_message">Выберите упражнение</string>
     <!-- exercise's reps and rest time input dialog -->
     <string name="program_exercise_activity_dialog_title">Добавление подхода</string>
     <string name="program_exercise_activity_dialog_title_edit">Изменение подхода</string>
@@ -52,6 +57,7 @@
     <string name="no_button_text">Нет</string>
     <string name="save_button_text">Сохранить</string>
     <string name="save_changes_question">Сохранить изменения?</string>
+    <string name="add_button_text">Добавить</string>
 
     <plurals name="number_of_reps">
         <item quantity="one">%d повтор</item>
