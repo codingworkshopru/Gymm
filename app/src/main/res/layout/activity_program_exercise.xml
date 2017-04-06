@@ -45,7 +45,8 @@
                     android:ellipsize="end"
                     android:maxLines="1"
                     android:text="@{exercise.exercise == null ? @string/program_exercise_activity_exercise_empty_text : exercise.exercise.name}"
-                    android:textAppearance="@style/TextAppearance.AppCompat.Large"
+                    android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+                    android:textColor="?android:attr/textColorPrimary"
                     tools:text="Some text" />
                 <ImageView
                     android:layout_width="wrap_content"
@@ -53,21 +54,6 @@
                     android:layout_gravity="end|center_vertical"
                     app:srcCompat="@drawable/ic_touch_app_white_24dp" />
             </LinearLayout>
-
-
-            <!--<Spinner-->
-                <!--android:id="@+id/program_exercise_exercises_dropdown"-->
-                <!--bind:value="@={exercise.exercise}"-->
-                <!--android:layout_width="match_parent"-->
-                <!--android:layout_height="wrap_content"-->
-                <!--android:layout_marginBottom="16dp"-->
-                <!--android:layout_marginEnd="16dp"-->
-                <!--android:layout_marginLeft="16dp"-->
-                <!--android:layout_marginRight="16dp"-->
-                <!--android:layout_marginStart="16dp"-->
-                <!--android:layout_marginTop="8dp"-->
-                <!--android:visibility="visible"-->
-                <!--app:popupTheme="@style/ThemeOverlay.AppCompat.Light" />-->
 
         </android.support.design.widget.AppBarLayout>
 

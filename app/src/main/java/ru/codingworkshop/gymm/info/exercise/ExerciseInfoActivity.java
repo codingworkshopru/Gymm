@@ -1,13 +1,17 @@
 package ru.codingworkshop.gymm.info.exercise;
 
 import android.content.Intent;
+import android.content.res.TypedArray;
 import android.databinding.BindingConversion;
 import android.databinding.DataBindingUtil;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.design.widget.AppBarLayout;
+import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
 
@@ -44,8 +48,42 @@ public class ExerciseInfoActivity extends AppCompatActivity implements Picasso.L
         if (IS_YOUTUBE_SERVICE_SUPPORTED == null)
             IS_YOUTUBE_SERVICE_SUPPORTED = YouTubeApiServiceUtil.isYouTubeApiServiceAvailable(this) == YouTubeInitializationResult.SUCCESS;
 
-        setSupportActionBar((Toolbar) findViewById(R.id.exercise_info_toolbar));
-        getSupportActionBar().setDisplayShowTitleEnabled(false);
+        final Toolbar toolbar = (Toolbar) findViewById(R.id.exercise_info_toolbar);
+        setSupportActionBar(toolbar);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+
+        // hide toolbar above video thumbnail but show when scroll up above text
+        final CollapsingToolbarLayout collapsing = (CollapsingToolbarLayout) findViewById(R.id.collapsingToolbarLayout);
+        ((AppBarLayout)findViewById(R.id.appBarLayout)).addOnOffsetChangedListener(new AppBarLayout.OnOffsetChangedListener() {
+            private boolean isCollapsed = false;
+            private boolean isToolbarTransparent = false;
+            private int totalScrollRange = -1;
+
+            @Override
+            public void onOffsetChanged(AppBarLayout appBarLayout, int verticalOffset) {
+                if (totalScrollRange == -1)
+                    totalScrollRange = appBarLayout.getTotalScrollRange();
+
+                if (totalScrollRange + verticalOffset == 0)
+                    isCollapsed = true;
+                else if (totalScrollRange + verticalOffset > toolbar.getHeight())
+                    isCollapsed = false;
+
+                if (isCollapsed) {
+                    if (isToolbarTransparent) {
+                        collapsing.setTitle(mModel.getName());
+                        TypedArray attributes = obtainStyledAttributes(null, new int[]{R.attr.colorPrimary}, 0, R.style.AppTheme_NoActionBar_TranslucentStatusOn);
+                        toolbar.setBackgroundColor(attributes.getColor(0, getResources().getColor(android.R.color.holo_red_light)));
+                        attributes.recycle();
+                        isToolbarTransparent = false;
+                    }
+                } else if (!isToolbarTransparent) {
+                    collapsing.setTitle(" ");
+                    toolbar.setBackgroundColor(getResources().getColor(android.R.color.transparent));
+                    isToolbarTransparent = true;
+                }
+            }
+        });
 
         Intent intent = getIntent();
         if (intent != null && intent.hasExtra(EXERCISE_ARG)) {
@@ -86,6 +124,15 @@ public class ExerciseInfoActivity extends AppCompatActivity implements Picasso.L
     @Override
     protected void onDestroy() {
         super.onDestroy();
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        if (item.getItemId() == android.R.id.home) {
+            onBackPressed();
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
     }
 
     public void onVideoClick(View v) {

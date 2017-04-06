@@ -11,7 +11,6 @@ import org.xmlpull.v1.XmlPullParserException;
 
 import java.io.IOException;
 import java.util.HashMap;
-import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import ru.codingworkshop.gymm.R;
@@ -25,6 +24,7 @@ import ru.codingworkshop.gymm.data.model.MuscleGroup;
 public final class GymDbHelper extends SQLiteOpenHelper {
     private static final String DATABASE_NAME = "Gym.db";
     private static final int DATABASE_VERSION = 1;
+    private static final Pattern BEAUTIFY_PATTERN = Pattern.compile("^ +", Pattern.MULTILINE);
 
     private Context mContext;
 
@@ -46,7 +46,7 @@ public final class GymDbHelper extends SQLiteOpenHelper {
         db.execSQL(GymContract.ProgramSetEntry.SQL_CREATE);
 
         try {
-            parseXml(db);
+            parseExercisesXml(db);
         } catch (XmlPullParserException | IOException e) {
             e.printStackTrace();
         }
@@ -127,7 +127,7 @@ public final class GymDbHelper extends SQLiteOpenHelper {
         return muscleGroupIds;
     }
 
-    private void parseXml(SQLiteDatabase db) throws XmlPullParserException, IOException {
+    private void parseExercisesXml(SQLiteDatabase db) throws XmlPullParserException, IOException {
         XmlResourceParser parser = mContext.getResources().getXml(R.xml.exercises);
         HashMap<String, MuscleGroup> muscleGroups = parseMuscleGroupsXml(db);
         String tag = "";
@@ -173,9 +173,19 @@ public final class GymDbHelper extends SQLiteOpenHelper {
                             break;
 
                         case "steps":
-                            Pattern p = Pattern.compile("^ +", Pattern.MULTILINE);
-                            Matcher m = p.matcher(text);
-                            exercise.setSteps(m.replaceAll("\u2022 "));
+                            exercise.setSteps(beautify(text));
+                            break;
+
+                        case "advices":
+                            exercise.setAdvices(beautify(text));
+                            break;
+
+                        case "caution":
+                            exercise.setCaution(beautify(text));
+                            break;
+
+                        case "variations":
+                            exercise.setVariations(beautify(text));
                             break;
 
                         case "muscle":
@@ -194,5 +204,9 @@ public final class GymDbHelper extends SQLiteOpenHelper {
 
             eventType = parser.next();
         }
+    }
+
+    private String beautify(String text) {
+        return BEAUTIFY_PATTERN.matcher(text).replaceAll("\u2022 ");
     }
 }
