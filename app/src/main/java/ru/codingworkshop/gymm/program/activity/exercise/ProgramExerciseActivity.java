@@ -2,16 +2,10 @@ package ru.codingworkshop.gymm.program.activity.exercise;
 
 import android.app.DialogFragment;
 import android.content.Intent;
-import android.database.Cursor;
-import android.databinding.BindingAdapter;
 import android.databinding.DataBindingUtil;
-import android.databinding.InverseBindingAdapter;
-import android.databinding.InverseBindingListener;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
-import android.support.v4.app.LoaderManager;
 import android.support.v4.app.NavUtils;
-import android.support.v4.content.Loader;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.view.ActionMode;
@@ -25,12 +19,8 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
-import android.widget.AdapterView;
-import android.widget.SimpleCursorAdapter;
-import android.widget.Spinner;
 
 import ru.codingworkshop.gymm.R;
-import ru.codingworkshop.gymm.data.GymContract;
 import ru.codingworkshop.gymm.data.model.Exercise;
 import ru.codingworkshop.gymm.data.model.ProgramExercise;
 import ru.codingworkshop.gymm.data.model.ProgramSet;
@@ -45,26 +35,17 @@ import static ru.codingworkshop.gymm.info.exercise.ExerciseInfoActivity.EXERCISE
 
 public class ProgramExerciseActivity extends AppCompatActivity
         implements ActionMode.Callback,
-        LoaderManager.LoaderCallbacks<Cursor>,
         SetInputDialog.SetInputDialogListener,
         ProgramAdapter.ListItemActionListener
 {
     private static final String TAG = ProgramExerciseActivity.class.getSimpleName();
 
     private ProgramExercise mModel;
-    private SimpleCursorAdapter mExercisesAdapter;
     private ProgramAdapter<SetViewHolder> mSetsAdapter;
     private RecyclerView mSetsView;
     private ActivityProgramExerciseBinding mBinding;
 
     public static final String EXERCISE_MODEL_KEY = ProgramExercise.class.getCanonicalName();
-    private static final int EXERCISES_LOADER_ID = 0;
-    static final String[] EXERCISES_PROJECTION = {
-            GymContract.ExerciseEntry._ID,
-            GymContract.ExerciseEntry.COLUMN_NAME
-    };
-    static final int EXERCISES_INDEX_ID = 0;
-    static final int EXERCISES_INDEX_NAME = 1;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -90,19 +71,6 @@ public class ProgramExerciseActivity extends AppCompatActivity
             ab.setDisplayShowTitleEnabled(false);
         }
 
-        // initializing adapter for spinner with exercises
-        mExercisesAdapter = new SimpleCursorAdapter(
-                this,
-                android.R.layout.simple_spinner_item,
-                null,
-                new String[] {GymContract.ExerciseEntry.COLUMN_NAME},
-                new int[] {android.R.id.text1},
-                0
-        );
-        mExercisesAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-//        Spinner spinner = (Spinner) findViewById(R.id.program_exercise_exercises_dropdown);
-//        spinner.setAdapter(mExercisesAdapter);
-
         // recycler view
         mSetsView = (RecyclerView) findViewById(R.id.program_exercise_sets_list);
         mSetsView.setLayoutManager(new LinearLayoutManager(this));
@@ -111,13 +79,8 @@ public class ProgramExerciseActivity extends AppCompatActivity
         mSetsAdapter = new ProgramAdapter<>(this, new SetViewHolderFactory());
         mSetsView.setAdapter(mSetsAdapter);
         mBinding.setAdapter(mSetsAdapter);
+        mBinding.setExercise(mModel);
         mSetsAdapter.setModel(mModel);
-
-        LoaderManager loaderManager = getSupportLoaderManager();
-        if (loaderManager.getLoader(EXERCISES_LOADER_ID) == null)
-            loaderManager.initLoader(EXERCISES_LOADER_ID, null, this);
-        else
-            loaderManager.restartLoader(EXERCISES_LOADER_ID, null, this);
     }
 
     @Override
@@ -167,6 +130,7 @@ public class ProgramExerciseActivity extends AppCompatActivity
 
         Exercise returnedExercise = data.getParcelableExtra(EXERCISE_ARG);
         mModel.setExercise(returnedExercise);
+        mBinding.setExercise(mModel);
     }
 
     public void onExercisePick(View v) {
@@ -233,7 +197,6 @@ public class ProgramExerciseActivity extends AppCompatActivity
     //-----------------------------------------
     @Override
     public boolean onCreateActionMode(ActionMode mode, Menu menu) {
-//        findViewById(R.id.program_exercise_exercises_dropdown).setVisibility(View.GONE);
         doActionModeChangeAnimation(true);
         mSetsAdapter.attachItemTouchHelper(mSetsView);
         mSetsAdapter.setEditMode(true);
@@ -257,7 +220,6 @@ public class ProgramExerciseActivity extends AppCompatActivity
         doActionModeChangeAnimation(false);
         mSetsAdapter.setEditMode(false);
         findViewById(R.id.program_exercise_name).setVisibility(View.VISIBLE);
-//        findViewById(R.id.program_exercise_exercises_dropdown).setVisibility(View.VISIBLE);
     }
     //-----------------------------------------
 
@@ -323,69 +285,4 @@ public class ProgramExerciseActivity extends AppCompatActivity
         }
     }
     //-----------------------------------------
-
-    // loader
-    //-----------------------------------------
-    @Override
-    public Loader<Cursor> onCreateLoader(int id, Bundle args) {
-        return new ProgramExercisesAsyncLoader(this, mExercisesAdapter.getCursor());
-    }
-
-    @Override
-    public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
-        mExercisesAdapter.swapCursor(data);
-        mBinding.setExercise(mModel);
-    }
-
-    @Override
-    public void onLoaderReset(Loader<Cursor> loader) {
-
-    }
-    //-----------------------------------------
-
-    // binding adapters
-    //-----------------------------------------
-    @BindingAdapter(value = {"bind:value", "bind:valueAttrChanged"}, requireAll = false)
-    public static void setSpinnerValue(Spinner spinner, Exercise exercise, final InverseBindingListener bindingListener) {
-        Cursor cursor = ((SimpleCursorAdapter) spinner.getAdapter()).getCursor();
-
-        if (cursor != null && exercise != null) {
-
-            cursor.moveToFirst();
-            do {
-                if (cursor.getLong(EXERCISES_INDEX_ID) == exercise.getId())
-                    break;
-            } while (cursor.moveToNext());
-
-            if (!cursor.isAfterLast())
-                spinner.setSelection(cursor.getPosition(), false);
-        }
-
-        spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-            @Override
-            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                if (bindingListener != null)
-                    bindingListener.onChange();
-            }
-
-            @Override
-            public void onNothingSelected(AdapterView<?> parent) {}
-        });
-    }
-
-    @InverseBindingAdapter(attribute = "bind:value", event = "bind:valueAttrChanged")
-    public static Exercise captureSpinnerValue(Spinner spinner) {
-        Cursor cursor = ((SimpleCursorAdapter) spinner.getAdapter()).getCursor();
-
-        if (cursor == null)
-            return null;
-
-        cursor.moveToPosition(spinner.getSelectedItemPosition());
-
-        Exercise exercise = new Exercise();
-        exercise.setId(cursor.getLong(EXERCISES_INDEX_ID));
-        exercise.setName(cursor.getString(EXERCISES_INDEX_NAME));
-
-        return exercise;
-    }
 }
