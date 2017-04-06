@@ -202,6 +202,8 @@ public class ProgramExerciseActivity extends AppCompatActivity
                 finishActivity(ProgramTrainingActivity.REQUEST_CODE_EXERCISE);
                 NavUtils.navigateUpFromSameTask(this);
             }
+        } else {
+            NavUtils.navigateUpFromSameTask(this);
         }
     }
 

@@ -161,9 +161,7 @@ public class ProgramTrainingActivity extends AppCompatActivity
     }
 
     private void finishActivity(boolean save) {
-        if (!save) {
-            NavUtils.navigateUpFromSameTask(this);
-        } else {
+        if (save) {
             TextInputEditText trainingName = (TextInputEditText) findViewById(R.id.program_training_name);
             TextInputLayout trainingNameLayout = (TextInputLayout)findViewById(R.id.program_training_name_layout);
             if (trainingName.length() == 0) {
@@ -183,6 +181,8 @@ public class ProgramTrainingActivity extends AppCompatActivity
             } else {
                 getSupportLoaderManager().initLoader(TrainingAsyncLoader.LOADER_TRAINING_SAVE, null, ProgramTrainingActivity.this);
             }
+        } else {
+            NavUtils.navigateUpFromSameTask(this);
         }
     }
 

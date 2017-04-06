@@ -11,6 +11,8 @@ import org.xmlpull.v1.XmlPullParserException;
 
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import ru.codingworkshop.gymm.R;
 import ru.codingworkshop.gymm.data.model.Exercise;
@@ -160,6 +162,20 @@ public final class GymDbHelper extends SQLiteOpenHelper {
                                 throw new Resources.NotFoundException("Muscle group not found " + text);
 
                             exercise.setPrimaryMuscleGroup(muscleGroups.get(text));
+                            break;
+
+                        case "is_with_weight":
+                            exercise.setWithWeight(text.equals("1"));
+                            break;
+
+                        case "difficulty":
+                            exercise.setDifficulty(Integer.valueOf(text));
+                            break;
+
+                        case "steps":
+                            Pattern p = Pattern.compile("^ +", Pattern.MULTILINE);
+                            Matcher m = p.matcher(text);
+                            exercise.setSteps(m.replaceAll("\u2022 "));
                             break;
 
                         case "muscle":

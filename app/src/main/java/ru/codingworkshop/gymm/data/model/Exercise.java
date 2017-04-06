@@ -2,6 +2,7 @@ package ru.codingworkshop.gymm.data.model;
 
 import android.content.ContentValues;
 import android.database.Cursor;
+import android.database.CursorIndexOutOfBoundsException;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Parcel;
 
@@ -23,7 +24,12 @@ public final class Exercise extends MutableModel {
     private MuscleGroup primaryMuscleGroup;
     private String name;
     private boolean isWithWeight;
+    private int difficulty;
     private String video;
+    private String steps;
+    private String advices;
+    private String caution;
+    private String variations;
     private List<MuscleGroup> secondaryMuscles;
 
     private static final String TABLE_NAME = ExerciseEntry.TABLE_NAME;
@@ -56,6 +62,18 @@ public final class Exercise extends MutableModel {
         this.id = id;
     }
 
+    public MuscleGroup getPrimaryMuscleGroup() {
+        return primaryMuscleGroup;
+    }
+
+    public void setPrimaryMuscleGroup(MuscleGroup primaryMuscleGroup) {
+        this.primaryMuscleGroup = primaryMuscleGroup;
+    }
+
+    public String getName() {
+        return name;
+    }
+
     public boolean isWithWeight() {
         return isWithWeight;
     }
@@ -64,20 +82,12 @@ public final class Exercise extends MutableModel {
         isWithWeight = withWeight;
     }
 
-    public String getName() {
-        return name;
+    public int getDifficulty() {
+        return difficulty;
     }
 
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public MuscleGroup getPrimaryMuscleGroup() {
-        return primaryMuscleGroup;
-    }
-
-    public void setPrimaryMuscleGroup(MuscleGroup primaryMuscleGroup) {
-        this.primaryMuscleGroup = primaryMuscleGroup;
+    public void setDifficulty(int difficulty) {
+        this.difficulty = difficulty;
     }
 
     public String getVideo() {
@@ -92,21 +102,63 @@ public final class Exercise extends MutableModel {
         return video != null && !video.isEmpty();
     }
 
+    public String getSteps() {
+        return steps;
+    }
+
+    public void setSteps(String steps) {
+        this.steps = steps;
+    }
+
+    public String getAdvices() {
+        return advices;
+    }
+
+    public void setAdvices(String advices) {
+        this.advices = advices;
+    }
+
+    public String getCaution() {
+        return caution;
+    }
+
+    public void setCaution(String caution) {
+        this.caution = caution;
+    }
+
+    public String getVariations() {
+        return variations;
+    }
+
+    public void setVariations(String variations) {
+        this.variations = variations;
+    }
+
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
     @Override
     public boolean equals(Object obj) {
         return this == obj || obj instanceof Exercise && getId() == ((Exercise)obj).getId();
     }
 
-    private static Exercise newInstance(Cursor c) {
-        Exercise exercise = new Exercise();
-        exercise.setId(c.getLong(c.getColumnIndex(ExerciseEntry._ID)));
-        exercise.setName(c.getString(c.getColumnIndex(ExerciseEntry.COLUMN_NAME)));
+    private Exercise(Cursor c) {
+        this();
 
-        int columnIndex = c.getColumnIndex(ExerciseEntry.COLUMN_YOUTUBE_VIDEO);
-        if (columnIndex != -1)
-            exercise.setVideo(c.getString(columnIndex));
+        if (c.isClosed() || c.isAfterLast() || c.isBeforeFirst())
+            throw new CursorIndexOutOfBoundsException("Provided cursor is in wrong state");
 
-        return exercise;
+        setId(c.getLong(c.getColumnIndex(ExerciseEntry._ID)));
+        setName(c.getString(c.getColumnIndex(ExerciseEntry.COLUMN_NAME)));
+        setWithWeight(c.getInt(c.getColumnIndex(ExerciseEntry.COLUMN_IS_WITH_WEIGHT)) == 1);
+        setDifficulty(c.getInt(c.getColumnIndex(ExerciseEntry.COLUMN_DIFFICULTY)));
+        setVideo(c.getString(c.getColumnIndex(ExerciseEntry.COLUMN_YOUTUBE_VIDEO)));
+        setSteps(c.getString(c.getColumnIndex(ExerciseEntry.COLUMN_STEPS)));
+        setAdvices(c.getString(c.getColumnIndex(ExerciseEntry.COLUMN_ADVICES)));
+        setCaution(c.getString(c.getColumnIndex(ExerciseEntry.COLUMN_CAUTION)));
+        setVariations(c.getString(c.getColumnIndex(ExerciseEntry.COLUMN_VARIATIONS)));
     }
 
     private static List<Exercise> newListOfInstances(Cursor c, SQLiteDatabase db) {
@@ -116,7 +168,7 @@ public final class Exercise extends MutableModel {
             return result;
 
         while (c.moveToNext()) {
-            Exercise exercise = newInstance(c);
+            Exercise exercise = new Exercise(c);
 
             long primaryMuscleId = c.getLong(c.getColumnIndex(ExerciseEntry.COLUMN_PRIMARY_MUSCLE_GROUP_ID));
             exercise.primaryMuscleGroup = MuscleGroup.read(db, primaryMuscleId);
@@ -135,12 +187,12 @@ public final class Exercise extends MutableModel {
      * @param id id of the exercise to readAll from DB. If 0 all records will be loaded.
      * @return list of exercises including empty list.
      */
-    private static List<Exercise> read(SQLiteDatabase db, String column, long id) {
+    private static List<Exercise> read(SQLiteDatabase db, String selectionColumn, long id) {
         String selection = null;
         String[] selectionArgs = null;
 
-        if (column != null && id != 0) {
-            selection = column + "=?";
+        if (selectionColumn != null && id != 0) {
+            selection = selectionColumn + "=?";
             selectionArgs = new String[] {String.valueOf(id)};
         }
 
@@ -232,11 +284,16 @@ public final class Exercise extends MutableModel {
     }
 
     @Override
-
     protected void addFieldsToContentValues(ContentValues cv, boolean onlyChanged) {
         cv.put(ExerciseEntry.COLUMN_PRIMARY_MUSCLE_GROUP_ID, getPrimaryMuscleGroup().getId());
         cv.put(ExerciseEntry.COLUMN_NAME, getName());
+        cv.put(ExerciseEntry.COLUMN_IS_WITH_WEIGHT, isWithWeight() ? 1 : 0);
+        cv.put(ExerciseEntry.COLUMN_DIFFICULTY, getDifficulty());
         cv.put(ExerciseEntry.COLUMN_YOUTUBE_VIDEO, getVideo());
+        cv.put(ExerciseEntry.COLUMN_STEPS, getSteps());
+        cv.put(ExerciseEntry.COLUMN_ADVICES, getAdvices());
+        cv.put(ExerciseEntry.COLUMN_CAUTION, getCaution());
+        cv.put(ExerciseEntry.COLUMN_VARIATIONS, getVariations());
     }
 
     // Parcelable implementation
@@ -246,7 +303,12 @@ public final class Exercise extends MutableModel {
         primaryMuscleGroup = in.readParcelable(MuscleGroup.class.getClassLoader());
         name = in.readString();
         isWithWeight = in.readByte() != 0;
+        difficulty = in.readInt();
         video = in.readString();
+        steps = in.readString();
+        advices = in.readString();
+        caution = in.readString();
+        variations = in.readString();
         ArrayList<MuscleGroup> muscleGroupsArrayList = in.createTypedArrayList(MuscleGroup.CREATOR);
         if (muscleGroupsArrayList != null && muscleGroupsArrayList.size() > 0)
             secondaryMuscles = new LinkedList<>(muscleGroupsArrayList);
@@ -258,7 +320,12 @@ public final class Exercise extends MutableModel {
         dest.writeParcelable(primaryMuscleGroup, flags);
         dest.writeString(name);
         dest.writeByte((byte) (isWithWeight ? 1 : 0));
+        dest.writeInt(difficulty);
         dest.writeString(video);
+        dest.writeString(steps);
+        dest.writeString(advices);
+        dest.writeString(caution);
+        dest.writeString(variations);
         dest.writeTypedList(secondaryMuscles);
     }
 

@@ -54,14 +54,26 @@ public final class GymContract {
         public static final String TABLE_NAME = "exercise";
         public static final String COLUMN_PRIMARY_MUSCLE_GROUP_ID = "primary_muscle_group_id";
         public static final String COLUMN_NAME = "name";
+        public static final String COLUMN_IS_WITH_WEIGHT = "is_with_weight";
+        public static final String COLUMN_DIFFICULTY = "difficulty";
         public static final String COLUMN_YOUTUBE_VIDEO = "youtube_video";
+        public static final String COLUMN_STEPS = "steps";
+        public static final String COLUMN_ADVICES = "advices";
+        public static final String COLUMN_CAUTION = "caution";
+        public static final String COLUMN_VARIATIONS= "variations";
 
         public static final String SQL_CREATE = createTableStatement(
                 TABLE_NAME,
                 primaryKey(),
                 String.format("%s INTEGER NOT NULL", COLUMN_PRIMARY_MUSCLE_GROUP_ID),
                 String.format("%s TEXT NOT NULL", COLUMN_NAME),
+                String.format("%s INTEGER NOT NULL", COLUMN_IS_WITH_WEIGHT),
+                String.format("%s INTEGER NOT NULL", COLUMN_DIFFICULTY),
                 String.format("%s TEXT NULL", COLUMN_YOUTUBE_VIDEO),
+                String.format("%s TEXT NULL", COLUMN_STEPS),
+                String.format("%s TEXT NULL", COLUMN_ADVICES),
+                String.format("%s TEXT NULL", COLUMN_CAUTION),
+                String.format("%s TEXT NULL", COLUMN_VARIATIONS),
                 foreignKey(COLUMN_PRIMARY_MUSCLE_GROUP_ID, MuscleGroupEntry.TABLE_NAME, MuscleGroupEntry._ID, "CASCADE", "RESTRICT")
         );
         public static final String SQL_DROP = dropTableStatement(TABLE_NAME);
