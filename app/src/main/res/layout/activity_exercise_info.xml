@@ -54,7 +54,7 @@
                         android:layout_gravity="center"
                         android:background="@drawable/ic_circle_grey_24dp"
                         android:onClick="onVideoClick"
-                        android:visibility="@{exercise.hasVideo() ? View.VISIBLE : View.GONE}"
+                        android:visibility="gone"
                         app:srcCompat="@drawable/ic_play_arrow_white_24dp"
                         tools:visibility="visible" />
 

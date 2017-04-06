@@ -110,6 +110,7 @@ public class ExerciseInfoActivity extends AppCompatActivity implements Picasso.L
                                 @Override
                                 public void onSuccess() {
                                     progressBar.setVisibility(View.GONE);
+                                    findViewById(R.id.exercise_info_activity_play_button).setVisibility(View.VISIBLE);
                                 }
 
                                 @Override
