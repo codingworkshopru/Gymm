@@ -233,7 +233,7 @@ public class ProgramTrainingActivity extends AppCompatActivity
         setModel(data);
 
         if (loader.getId() == TrainingAsyncLoader.LOADER_TRAINING_SAVE) {
-            NavUtils.navigateUpFromSameTask(this);
+            finish();
         }
     }
 

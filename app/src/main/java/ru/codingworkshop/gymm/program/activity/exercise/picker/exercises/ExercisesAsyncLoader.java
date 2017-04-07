@@ -51,6 +51,10 @@ class ExercisesAsyncLoader extends AsyncTaskLoader<List<Exercise>> {
             loadedExercises.addAll(secondaryMuscles);
         }
 
+        db.close();
+
+        dbHelper.close();
+
         return loadedExercises;
     }
 }

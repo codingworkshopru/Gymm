@@ -29,7 +29,6 @@ import ru.codingworkshop.gymm.program.AlertDialogFragment;
 import ru.codingworkshop.gymm.program.ProgramAdapter;
 import ru.codingworkshop.gymm.program.ProgramUtils;
 import ru.codingworkshop.gymm.program.activity.exercise.picker.MusclesActivity;
-import ru.codingworkshop.gymm.program.activity.training.ProgramTrainingActivity;
 
 import static ru.codingworkshop.gymm.info.exercise.ExerciseInfoActivity.EXERCISE_ARG;
 
@@ -164,8 +163,7 @@ public class ProgramExerciseActivity extends AppCompatActivity
                 Intent resultIntent = new Intent();
                 resultIntent.putExtra(EXERCISE_MODEL_KEY, mModel);
                 setResult(RESULT_OK, resultIntent);
-                finishActivity(ProgramTrainingActivity.REQUEST_CODE_EXERCISE);
-                NavUtils.navigateUpFromSameTask(this);
+                finish();
             }
         } else {
             NavUtils.navigateUpFromSameTask(this);

@@ -183,6 +183,8 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
                 while (cursor.moveToNext()) {
                     Log.d(TAG, cursor.getLong(0) + " " + cursor.getString(1) + " " + cursor.getInt(2) + " " + cursor.getString(3));
                 }
+                db.close();
+                dbHelper.close();
                 return cursor;
             }
         };

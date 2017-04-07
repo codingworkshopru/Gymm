@@ -1,6 +1,7 @@
 package ru.codingworkshop.gymm.program.activity.exercise.picker;
 
 import android.content.Context;
+import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.support.v4.content.AsyncTaskLoader;
 
@@ -31,7 +32,10 @@ public class MuscleGroupsAsyncLoader extends AsyncTaskLoader<List<MuscleGroup>> 
     @Override
     public List<MuscleGroup> loadInBackground() {
         SQLiteOpenHelper dbHelper = new GymDbHelper(getContext());
-        loadedMuscles = MuscleGroup.read(dbHelper.getReadableDatabase());
+        SQLiteDatabase db = dbHelper.getReadableDatabase();
+        loadedMuscles = MuscleGroup.read(db);
+        db.close();
+        dbHelper.close();
         return loadedMuscles;
     }
 }
