@@ -26,7 +26,7 @@
     <!-- program exercise activity -->
     <string name="program_exercise_activity_title">Упражнение</string>
     <!-- layout items -->
-    <string name="program_exercise_activity_reps_label">Повторы</string>
+    <string name="program_exercise_activity_reps_label">Повторения</string>
     <string name="program_exercise_activity_rest_time_minutes_label">Минуты</string>
     <string name="program_exercise_activity_rest_time_seconds_label">Секунды</string>
     <string name="program_exercise_activity_empty_list">Вы ещё не добавили подходы</string>
@@ -40,7 +40,6 @@
     <string name="program_exercise_activity_dialog_title">Добавление подхода</string>
     <string name="program_exercise_activity_dialog_title_edit">Изменение подхода</string>
     <string name="program_exercise_activity_dialog_rest_time_label">Время на отдых</string>
-    <string name="program_exercise_activity_dialog_positive_button_text">OK</string>
 
     <!-- program picker muscles activity -->
     <string name="muscles_activity_title">Группы мышц</string>
@@ -53,16 +52,17 @@
     <string name="exercises_picker_activity_secondary">С задействованием</string>
 
     <!-- common -->
+    <string name="ok_button_text">OK</string>
     <string name="cancel_button_text">Отмена</string>
     <string name="no_button_text">Нет</string>
     <string name="save_button_text">Сохранить</string>
-    <string name="save_changes_question">Сохранить изменения?</string>
+    <string name="save_changes_question">Отменить изменения?</string>
     <string name="add_button_text">Добавить</string>
 
     <plurals name="number_of_reps">
-        <item quantity="one">%d повтор</item>
-        <item quantity="few">%d повтора</item>
-        <item quantity="other">%d повторов</item>
+        <item quantity="one">%d повторение</item>
+        <item quantity="few">%d повторения</item>
+        <item quantity="other">%d повторений</item>
     </plurals>
 
     <plurals name="number_of_sets">

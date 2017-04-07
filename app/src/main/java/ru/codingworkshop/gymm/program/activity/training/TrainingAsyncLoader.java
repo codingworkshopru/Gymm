@@ -57,6 +57,7 @@ public class TrainingAsyncLoader extends AsyncTaskLoader<ProgramTraining> {
             return model;
         }
 
+        dbHelper.close();
         return null;
     }
 }

@@ -113,11 +113,12 @@ public class ProgramExerciseActivity extends AppCompatActivity
             AlertDialogFragment.OnDialogButtonClickListener listener = new AlertDialogFragment.OnDialogButtonClickListener() {
                 @Override
                 public void onButtonClick(boolean positive) {
-                    finishActivity(positive);
+                    if (positive)
+                        finishActivity(false);
                 }
             };
 
-            ProgramUtils.showAlert(this, listener, 0, R.string.save_changes_question, R.string.save_button_text, R.string.no_button_text);
+            ProgramUtils.showAlert(this, listener, 0, R.string.save_changes_question, R.string.ok_button_text, R.string.cancel_button_text);
         } else {
             super.onBackPressed();
         }

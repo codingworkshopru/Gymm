@@ -22,7 +22,7 @@ import ru.codingworkshop.gymm.data.model.ProgramTraining;
 public class ActualTrainingAdapter extends BaseAdapter {
 
     public interface OnActiveStepChangeListener {
-        void onActiveStepChange(View view);
+        void onActiveStepChange(View oldItemView, View newItemView);
     }
 
     private OnActiveStepChangeListener activeStepChangeListener;
@@ -87,9 +87,9 @@ public class ActualTrainingAdapter extends BaseAdapter {
         if (activeViewHolder != null)
             activeViewHolder.setActive(false);
 
-        activeViewHolder = vh;
         vh.setActive(true);
-        activeStepChangeListener.onActiveStepChange(vh.itemView);
+        activeStepChangeListener.onActiveStepChange(activeViewHolder != null ? activeViewHolder.itemView : null, vh.itemView);
+        activeViewHolder = vh;
     }
 
     public ViewHolder findViewHolder(View view) {

@@ -88,7 +88,7 @@ public final class SetInputDialog extends DialogFragment
                 .setTitle(mModel.isPhantom() ? R.string.program_exercise_activity_dialog_title : R.string.program_exercise_activity_dialog_title_edit)
                 .setCancelable(true)
                 .setView(customView)
-                .setPositiveButton(R.string.program_exercise_activity_dialog_positive_button_text, this)
+                .setPositiveButton(R.string.ok_button_text, this)
                 .setNegativeButton(R.string.cancel_button_text, null);
 
         return builder.create();
