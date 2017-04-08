@@ -1,5 +1,8 @@
 package ru.codingworkshop.gymm;
 
+import android.app.ActivityManager;
+import android.content.Context;
+import android.content.Intent;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -11,6 +14,9 @@ import android.support.v4.app.LoaderManager;
 import android.support.v4.content.Loader;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
@@ -19,11 +25,13 @@ import android.widget.ListView;
 
 import ru.codingworkshop.gymm.data.model.ProgramTraining;
 import ru.codingworkshop.gymm.program.activity.training.TrainingAsyncLoader;
+import ru.codingworkshop.gymm.service.TrainingTimeService;
 
 public class ActualTrainingActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<ProgramTraining>,
         ActualTrainingAdapter.OnActiveStepChangeListener,
         BlankFragment.OnFragmentInteractionListener
 {
+    private static final String TAG = ActualTrainingActivity.class.getSimpleName();
 
     private ActualTrainingAdapter mAdapter;
     private BlankFragment mFragment;
@@ -54,7 +62,7 @@ public class ActualTrainingActivity extends AppCompatActivity implements LoaderM
 
         mFragmentContainer = new FrameLayout(this);
         mFragmentContainer.setId(mFragmentContainerId);
-}
+    }
 
     @Override
     public Loader<ProgramTraining> onCreateLoader(int id, Bundle args) {
@@ -64,6 +72,40 @@ public class ActualTrainingActivity extends AppCompatActivity implements LoaderM
     @Override
     public void onLoadFinished(Loader<ProgramTraining> loader, ProgramTraining data) {
         mAdapter.setModel(data);
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater menuInflater = getMenuInflater();
+        menuInflater.inflate(R.menu.actual_training_menu, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        boolean isServiceRunning = false;
+        ActivityManager manager = (ActivityManager) getSystemService(Context.ACTIVITY_SERVICE);
+        for (ActivityManager.RunningServiceInfo service : manager.getRunningServices(Integer.MAX_VALUE)) {
+            if (TrainingTimeService.class.getName().equals(service.service.getClassName())) {
+                isServiceRunning = true;
+                break;
+            }
+        }
+
+        switch (item.getItemId()) {
+            case R.id.actual_training_start_action:
+                if (!isServiceRunning) {
+                    Intent intent = new Intent(this, TrainingTimeService.class);
+                    intent.putExtra("model", mAdapter.getModel());
+                    startService(intent);
+                }
+                break;
+
+            case R.id.actual_training_finish_action:
+                stopService(new Intent(this, TrainingTimeService.class));
+                break;
+        }
+        return super.onOptionsItemSelected(item);
     }
 
     @Override

@@ -1,7 +1,7 @@
 <resources>
     <string name="app_name">Gymm</string>
     <!-- service -->
-    <string name="time_service_description">Сервис, позволяющий следить за временем тренировки.</string>
+    <string name="time_service_description">Служба, позволяющая следить за временем тренировки.</string>
 
     <!-- main activity -->
     <!-- menu -->

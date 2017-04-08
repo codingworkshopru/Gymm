@@ -12,7 +12,7 @@
         android:theme="@style/AppTheme.NoActionBar">
 
         <service
-            android:name=".service.TimeService"
+            android:name=".service.TrainingTimeService"
             android:exported="false"
             android:description="@string/time_service_description" />
 
@@ -44,7 +44,7 @@
             android:theme="@style/AppTheme.NoActionBar.SpinnerInAppBar">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="program.activity.training.ProgramTrainingActivity" />
+                android:value="ru.codingworkshop.gymm.program.activity.training.ProgramTrainingActivity" />
         </activity>
         <activity
             android:name=".ActualTrainingActivity"

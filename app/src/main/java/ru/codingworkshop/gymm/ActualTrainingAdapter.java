@@ -80,6 +80,10 @@ public class ActualTrainingAdapter extends BaseAdapter {
         notifyDataSetChanged();
     }
 
+    public ProgramTraining getModel() {
+        return programTraining;
+    }
+
     public void setActiveViewHolder(ViewHolder vh) {
         if (vh == null || (activeViewHolder != null && activeViewHolder.itemView == vh.itemView))
             return;

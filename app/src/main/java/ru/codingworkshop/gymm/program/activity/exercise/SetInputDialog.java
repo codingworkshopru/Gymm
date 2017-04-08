@@ -33,6 +33,7 @@ public final class SetInputDialog extends DialogFragment
 
     private static final int SECONDS_MIN = 0;
     private static final int SECONDS_MAX = 59;
+    private static final int SECONDS_STEP = 5;
 
     public static final String DIALOG_MODEL_KEY = ProgramSet.class.getCanonicalName();
 
@@ -60,8 +61,12 @@ public final class SetInputDialog extends DialogFragment
         mMinutesPicker.setMaxValue(MINUTES_MAX);
 
         mSecondsPicker = (NumberPicker) customView.findViewById(R.id.program_exercise_rest_seconds_picker);
+        String[] valuesForSeconds = new String[SECONDS_MAX / SECONDS_STEP + 1];
+        for (int i = 0; i < valuesForSeconds.length; i++)
+            valuesForSeconds[i] = String.valueOf(i * SECONDS_STEP);
         mSecondsPicker.setMinValue(SECONDS_MIN);
-        mSecondsPicker.setMaxValue(SECONDS_MAX);
+        mSecondsPicker.setMaxValue(SECONDS_MAX / SECONDS_STEP);
+        mSecondsPicker.setDisplayedValues(valuesForSeconds);
 
         Bundle savedModel = getArguments();
         if (savedModel == null)
@@ -72,7 +77,7 @@ public final class SetInputDialog extends DialogFragment
             if (mModel != null) {
                 mRepsPicker.setValue(mModel.getReps());
                 mMinutesPicker.setValue(mModel.getRestMinutes());
-                mSecondsPicker.setValue(mModel.getRestSeconds());
+                mSecondsPicker.setValue(mModel.getRestSeconds() / SECONDS_STEP);
             }
         } else {
             mModel = new ProgramSet();
@@ -103,7 +108,7 @@ public final class SetInputDialog extends DialogFragment
     @Override
     public void onClick(DialogInterface dialog, int which) {
         mModel.setReps(mRepsPicker.getValue());
-        mModel.setTimeForRest(mMinutesPicker.getValue(), mSecondsPicker.getValue());
+        mModel.setTimeForRest(mMinutesPicker.getValue(), mSecondsPicker.getValue() * SECONDS_STEP);
         mSetInputDialogListener.onProgramSetReturn(mModel);
     }
 }
