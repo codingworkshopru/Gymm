@@ -11,6 +11,7 @@ import android.support.constraint.ConstraintLayout;
 import android.support.constraint.ConstraintSet;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.app.LoaderManager;
+import android.support.v4.app.NavUtils;
 import android.support.v4.content.Loader;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -45,6 +46,7 @@ public class ActualTrainingActivity extends AppCompatActivity implements LoaderM
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         ListView listView = (ListView) findViewById(R.id.list_view);
         mAdapter = new ActualTrainingAdapter(this);
@@ -103,6 +105,10 @@ public class ActualTrainingActivity extends AppCompatActivity implements LoaderM
 
             case R.id.actual_training_finish_action:
                 stopService(new Intent(this, TrainingTimeService.class));
+                break;
+
+            case android.R.id.home:
+                NavUtils.navigateUpFromSameTask(this);
                 break;
         }
         return super.onOptionsItemSelected(item);

@@ -6,6 +6,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.annotation.StringRes;
 import android.support.v7.app.AlertDialog;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -72,6 +73,8 @@ public final class SetInputDialog extends DialogFragment
         if (savedModel == null)
             savedModel = savedInstanceState;
 
+        @StringRes int title = R.string.program_exercise_activity_dialog_title_edit;
+
         if (savedModel != null && savedModel.containsKey(DIALOG_MODEL_KEY)) {
             mModel = savedModel.getParcelable(DIALOG_MODEL_KEY);
             if (mModel != null) {
@@ -82,6 +85,7 @@ public final class SetInputDialog extends DialogFragment
         } else {
             mModel = new ProgramSet();
             mModel.setReps(REPS_MIN);
+            title = R.string.program_exercise_activity_dialog_title;
         }
 
         if (getActivity() instanceof SetInputDialogListener)
@@ -90,7 +94,7 @@ public final class SetInputDialog extends DialogFragment
             throw new ClassCastException("Activity should implement SetInputDialogListener interface");
 
         AlertDialog.Builder builder = new AlertDialog.Builder(context)
-                .setTitle(mModel.isPhantom() ? R.string.program_exercise_activity_dialog_title : R.string.program_exercise_activity_dialog_title_edit)
+                .setTitle(title)
                 .setCancelable(true)
                 .setView(customView)
                 .setPositiveButton(R.string.ok_button_text, this)

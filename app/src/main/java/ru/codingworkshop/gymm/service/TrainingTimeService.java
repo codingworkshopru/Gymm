@@ -103,7 +103,7 @@ public class TrainingTimeService extends Service {
         actualTrainingIntent.putExtra(MainActivity.PROGRAM_TRAINING_ID_KEY, programTraining.getId());
 
         TaskStackBuilder stackBuilder = TaskStackBuilder.create(this)
-                .addParentStack(MainActivity.class)
+                .addParentStack(ActualTrainingActivity.class)
                 .addNextIntent(actualTrainingIntent);
 
         PendingIntent pendingIntent = stackBuilder.getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT);

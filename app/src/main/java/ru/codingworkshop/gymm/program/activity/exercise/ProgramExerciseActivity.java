@@ -80,6 +80,13 @@ public class ProgramExerciseActivity extends AppCompatActivity
         mBinding.setAdapter(mSetsAdapter);
         mBinding.setExercise(mModel);
         mSetsAdapter.setModel(mModel);
+
+        findViewById(R.id.program_exercise_name_layout).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                onExercisePick(v);
+            }
+        });
     }
 
     @Override
@@ -199,7 +206,7 @@ public class ProgramExerciseActivity extends AppCompatActivity
         doActionModeChangeAnimation(true);
         mSetsAdapter.attachItemTouchHelper(mSetsView);
         mSetsAdapter.setEditMode(true);
-        findViewById(R.id.program_exercise_name).setVisibility(View.GONE);
+        findViewById(R.id.program_exercise_name_layout).setVisibility(View.GONE);
         return true;
     }
 
@@ -218,7 +225,7 @@ public class ProgramExerciseActivity extends AppCompatActivity
         mSetsAdapter.attachItemTouchHelper(null);
         doActionModeChangeAnimation(false);
         mSetsAdapter.setEditMode(false);
-        findViewById(R.id.program_exercise_name).setVisibility(View.VISIBLE);
+        findViewById(R.id.program_exercise_name_layout).setVisibility(View.VISIBLE);
     }
     //-----------------------------------------
 
