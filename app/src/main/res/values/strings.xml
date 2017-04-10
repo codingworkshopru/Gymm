@@ -45,8 +45,7 @@
     <string name="muscles_activity_title">Группы мышц</string>
     <string name="muscles_activity_anterior">Спереди</string>
     <string name="muscles_activity_posterior">Сзади</string>
-
-    <!-- program picker exercises activity -->
+    <!-- program picker exercises sheet -->
     <string name="exercises_picker_activity_title">Выберите упражнение</string>
     <string name="exercises_picker_activity_primary">Основные</string>
     <string name="exercises_picker_activity_secondary">С задействованием</string>
