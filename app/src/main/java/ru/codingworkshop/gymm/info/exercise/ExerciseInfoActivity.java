@@ -93,6 +93,15 @@ public class ExerciseInfoActivity extends AppCompatActivity implements Picasso.L
             throw new IllegalArgumentException("No argument for " + this.getClass().getName());
         }
 
+        // setting difficulty
+        ImageView difficultyImage = ((ImageView) findViewById(R.id.exercise_info_activity_difficulty));
+        // for 0 already set
+        if (mModel.getDifficulty() == 1)
+            difficultyImage.setImageResource(R.drawable.ic_signal_cellular_2_bar_primary_24dp);
+        else if (mModel.getDifficulty() == 2)
+            difficultyImage.setImageResource(R.drawable.ic_signal_cellular_4_bar_primary_24dp);
+
+        // loading youtube thumbnail
         if (mModel.hasVideo()) {
             final View progressBar = findViewById(R.id.exercise_info_activity_progress_bar);
             progressBar.setVisibility(View.VISIBLE);

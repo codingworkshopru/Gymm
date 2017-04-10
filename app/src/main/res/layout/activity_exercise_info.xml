@@ -141,7 +141,7 @@
                     android:layout_marginEnd="16dp"
                     android:layout_marginRight="16dp"
                     app:layout_constraintRight_toRightOf="parent"
-                    android:background="@{exercise.difficulty == 0 ? @drawable/ic_signal_cellular_0_bar_primary_24dp : (exercise.difficulty == 1 ? @drawable/ic_signal_cellular_2_bar_primary_24dp : @drawable/ic_signal_cellular_4_bar_primary_24dp)}"
+                    app:srcCompat="@drawable/ic_signal_cellular_0_bar_primary_24dp"
                     app:layout_constraintBottom_toBottomOf="@+id/exercise_info_activity_main_muscle"/>
 
                 <LinearLayout
