@@ -7,37 +7,32 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.IdRes;
-import android.support.constraint.ConstraintLayout;
-import android.support.constraint.ConstraintSet;
-import android.support.v4.app.FragmentTransaction;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.app.NavUtils;
 import android.support.v4.content.Loader;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.ViewGroup;
-import android.widget.AdapterView;
-import android.widget.FrameLayout;
-import android.widget.ListView;
 
 import ru.codingworkshop.gymm.data.model.ProgramTraining;
 import ru.codingworkshop.gymm.program.activity.training.TrainingAsyncLoader;
 import ru.codingworkshop.gymm.service.TrainingTimeService;
 
 public class ActualTrainingActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<ProgramTraining>,
-        ActualTrainingAdapter.OnActiveStepChangeListener,
+        ActualTrainingAdapter.OnStepClickListener,
         BlankFragment.OnFragmentInteractionListener
 {
     private static final String TAG = ActualTrainingActivity.class.getSimpleName();
 
+    private RecyclerView mStepsView;
     private ActualTrainingAdapter mAdapter;
     private BlankFragment mFragment;
-    private FrameLayout mFragmentContainer;
-    private @IdRes int mFragmentContainerId = Build.VERSION.SDK_INT < Build.VERSION_CODES.JELLY_BEAN_MR1 ? 1 : View.generateViewId();
+    static final @IdRes int FRAGMENT_CONTAINER_ID = Build.VERSION.SDK_INT < Build.VERSION_CODES.JELLY_BEAN_MR1 ? 1 : View.generateViewId();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -48,22 +43,13 @@ public class ActualTrainingActivity extends AppCompatActivity implements LoaderM
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
-        ListView listView = (ListView) findViewById(R.id.list_view);
+        mStepsView = (RecyclerView) findViewById(R.id.list_view);
+        mStepsView.setLayoutManager(new LinearLayoutManager(this));
+        mStepsView.setHasFixedSize(true);
         mAdapter = new ActualTrainingAdapter(this);
-        listView.setAdapter(mAdapter);
-        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                mAdapter.setActiveViewHolder(mAdapter.findViewHolder(view));
-            }
-        });
-
-        mFragment = new BlankFragment();
+        mStepsView.setAdapter(mAdapter);
 
         getSupportLoaderManager().initLoader(TrainingAsyncLoader.LOADER_TRAINING_LOAD, getIntent().getExtras(), this);
-
-        mFragmentContainer = new FrameLayout(this);
-        mFragmentContainer.setId(mFragmentContainerId);
     }
 
     @Override
@@ -120,30 +106,12 @@ public class ActualTrainingActivity extends AppCompatActivity implements LoaderM
     }
 
     @Override
-    public void onActiveStepChange(View oldActiveView, View newActiveView) {
-        FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-        if (oldActiveView != null) {
-            transaction.detach(mFragment);
-            ((ViewGroup) oldActiveView).removeView(mFragmentContainer);
-        } else {
-            transaction.add(mFragmentContainer.getId(), mFragment);
-        }
+    public void onStepClick(View view) {
+        if (mFragment == null)
+            mFragment = (BlankFragment) getSupportFragmentManager().getFragments().get(0);
 
-        @IdRes int aboveViewId = R.id.linearLayout;
-
-        ConstraintLayout newActiveConstraint = (ConstraintLayout) newActiveView;
-
-        newActiveConstraint.addView(mFragmentContainer);
-        ConstraintSet s = new ConstraintSet();
-        s.constrainHeight(mFragmentContainerId, ConstraintSet.WRAP_CONTENT);
-        s.constrainWidth(mFragmentContainerId, 0);
-        s.connect(mFragmentContainerId, ConstraintSet.LEFT, aboveViewId, ConstraintSet.LEFT);
-        s.connect(mFragmentContainerId, ConstraintSet.RIGHT, aboveViewId, ConstraintSet.RIGHT);
-        s.connect(mFragmentContainerId, ConstraintSet.TOP, aboveViewId, ConstraintSet.BOTTOM);
-        s.applyTo(newActiveConstraint);
-
-        transaction.attach(mFragment);
-        transaction.commit();
+        int position = view == null ? 0 : mStepsView.getChildAdapterPosition(view);
+        mAdapter.setActivePosition(position);
     }
 
     @Override
