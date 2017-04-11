@@ -5,7 +5,7 @@
 
     android:layout_height="match_parent"
     android:layout_width="match_parent"
-    android:padding="16dp"
+    android:layout_margin="16dp"
     android:orientation="vertical">
 
     <LinearLayout
@@ -49,14 +49,13 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="TextView"
-        android:textAppearance="@style/TextAppearance.AppCompat.Notification.Title"
-        android:layout_marginTop="4dp" />
+        android:textAppearance="@style/TextAppearance.AppCompat.Notification.Title" />
 
-    <TextView
-        android:id="@+id/textView9"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="4dp"
-        android:text="TextView"
-        android:textAppearance="@style/TextAppearance.AppCompat.Notification.Line2"/>
+    <!--<TextView-->
+        <!--android:id="@+id/textView9"-->
+        <!--android:layout_width="wrap_content"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:layout_marginTop="4dp"-->
+        <!--android:text="TextView"-->
+        <!--android:textAppearance="@style/TextAppearance.AppCompat.Notification.Line2"/>-->
 </LinearLayout>

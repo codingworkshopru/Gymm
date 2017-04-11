@@ -10,12 +10,10 @@ import android.os.IBinder;
 import android.os.Looper;
 import android.os.Message;
 import android.os.Process;
-import android.os.SystemClock;
 import android.support.annotation.Nullable;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.TaskStackBuilder;
 import android.util.Log;
-import android.widget.RemoteViews;
 
 import ru.codingworkshop.gymm.ActualTrainingActivity;
 import ru.codingworkshop.gymm.MainActivity;
@@ -94,16 +92,12 @@ public class TrainingTimeService extends Service {
 
         ProgramTraining programTraining = intent.getParcelableExtra("model");
 
-        RemoteViews remoteViews = new RemoteViews(getPackageName(), R.layout.notification_layout);
-        remoteViews.setChronometer(R.id.chronometer2, SystemClock.elapsedRealtime(), null, true);
-        remoteViews.setTextViewText(R.id.textView, programTraining.getName());
-        remoteViews.setTextViewText(R.id.textView2, programTraining.getChild(0).getExercise().getName());
-        remoteViews.setImageViewResource(R.id.imageView10, R.drawable.ic_fitness_200dp);
-
         NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(this)
-                .setCustomContentView(remoteViews)
-                .setSmallIcon(R.drawable.ic_fitness_200dp)
+                .setContentTitle(programTraining.getName())
+                .setContentText(programTraining.getChild(0).getExercise().getName())
+                .setSmallIcon(R.mipmap.ic_launcher)
                 .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
+                .setUsesChronometer(true)
                 .setOngoing(true);
 
         Intent actualTrainingIntent = new Intent(this, ActualTrainingActivity.class);
@@ -113,7 +107,7 @@ public class TrainingTimeService extends Service {
                 .addParentStack(ActualTrainingActivity.class)
                 .addNextIntent(actualTrainingIntent);
 
-        PendingIntent pendingIntent = stackBuilder.getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT);
+        PendingIntent pendingIntent = stackBuilder.getPendingIntent(123, PendingIntent.FLAG_UPDATE_CURRENT);
 
         notificationBuilder.setContentIntent(pendingIntent);
 
