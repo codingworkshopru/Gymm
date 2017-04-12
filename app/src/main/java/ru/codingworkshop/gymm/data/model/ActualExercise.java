@@ -5,7 +5,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.os.Parcel;
 
 import ru.codingworkshop.gymm.data.GymContract.ActualExerciseEntry;
-import ru.codingworkshop.gymm.data.model.base.MutableModel;
+import ru.codingworkshop.gymm.data.model.base.Model;
 import ru.codingworkshop.gymm.data.model.base.Parent;
 import ru.codingworkshop.gymm.data.model.field.ChildrenField;
 import ru.codingworkshop.gymm.data.model.field.Field;
@@ -14,9 +14,10 @@ import ru.codingworkshop.gymm.data.model.field.Field;
  * Created by Радик on 12.03.2017.
  */
 
-public class ActualExercise extends MutableModel implements Parent<ActualSet> {
+public class ActualExercise extends Model implements Parent<ActualSet> {
     private Field<Long> id = new Field<>(ActualExerciseEntry._ID, 0L);
-    private Field<Long> trainingTimestamp = new Field<>(ActualExerciseEntry.COLUMN_TRAINING_TIMESTAMP, 0L);
+    private Field<Exercise> exercise = new Field<>(ActualExerciseEntry.COLUMN_EXERCISE_ID, Exercise.class);
+
     private ChildrenField<ActualSet> children = new ChildrenField<>(ActualSet.class);
 
     private static final String TABLE_NAME = ActualExerciseEntry.TABLE_NAME;
@@ -26,8 +27,12 @@ public class ActualExercise extends MutableModel implements Parent<ActualSet> {
         return id.getData();
     }
 
-    public long getTrainingTimestamp() {
-        return trainingTimestamp.getData();
+    public Exercise getExercise() {
+        return exercise.getData();
+    }
+
+    public void setExercise(Exercise exercise) {
+        this.exercise.setData(exercise);
     }
 
     @Override
@@ -82,13 +87,13 @@ public class ActualExercise extends MutableModel implements Parent<ActualSet> {
 
     @Override
     public boolean isChanged() {
-        return id.isChanged() || trainingTimestamp.isChanged();
+        return exercise.isChanged() || children.isChanged();
     }
 
     @Override
     protected void commit() {
         id.commit();
-        trainingTimestamp.commit();
+        exercise.commit();
     }
 
     @Override
@@ -99,13 +104,14 @@ public class ActualExercise extends MutableModel implements Parent<ActualSet> {
     @Override
     protected void addFieldsToContentValues(ContentValues cv, boolean onlyChanged) {
         Field.addToValues(cv, id, onlyChanged);
-        Field.addToValues(cv, trainingTimestamp, onlyChanged);
+        Field.addToValues(cv, exercise, onlyChanged);
     }
 
     private ActualExercise(Parcel in) {
         ClassLoader cl = Field.class.getClassLoader();
         id = in.readParcelable(cl);
-        trainingTimestamp = in.readParcelable(cl);
+        exercise = in.readParcelable(cl);
+        children = in.readParcelable(ChildrenField.class.getClassLoader());
     }
 
     public final Creator<ActualExercise> CREATOR = new Creator<ActualExercise>() {
@@ -128,6 +134,7 @@ public class ActualExercise extends MutableModel implements Parent<ActualSet> {
     @Override
     public void writeToParcel(Parcel dest, int flags) {
         dest.writeParcelable(id, flags);
-        dest.writeParcelable(trainingTimestamp, flags);
+        dest.writeParcelable(exercise, flags);
+        dest.writeParcelable(children, flags);
     }
 }

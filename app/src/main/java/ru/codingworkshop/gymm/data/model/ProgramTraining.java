@@ -3,7 +3,6 @@ package ru.codingworkshop.gymm.data.model;
 import android.content.ContentValues;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
-import android.database.sqlite.SQLiteException;
 import android.os.Parcel;
 
 import java.util.Calendar;
@@ -11,7 +10,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import ru.codingworkshop.gymm.data.GymContract.ProgramTrainingEntry;
-import ru.codingworkshop.gymm.data.model.base.MutableModel;
+import ru.codingworkshop.gymm.data.model.base.Model;
 import ru.codingworkshop.gymm.data.model.base.Parent;
 import ru.codingworkshop.gymm.data.model.field.ChildrenField;
 import ru.codingworkshop.gymm.data.model.field.Field;
@@ -20,7 +19,7 @@ import ru.codingworkshop.gymm.data.model.field.Field;
  * Created by Радик on 18.02.2017.
  */
 
-public final class ProgramTraining extends MutableModel implements Parent<ProgramExercise> {
+public final class ProgramTraining extends Model implements Parent<ProgramExercise> {
     private Field<Long> id = new Field<>(ProgramTrainingEntry._ID, 0L);
     private Field<String> name = new Field<>(ProgramTrainingEntry.COLUMN_NAME, String.class);
     private Field<Integer> weekday = new Field<>(ProgramTrainingEntry.COLUMN_WEEKDAY, 0);
@@ -133,22 +132,8 @@ public final class ProgramTraining extends MutableModel implements Parent<Progra
 
     @Override
     public long create(SQLiteDatabase db, long parentId) {
-        if (!isPhantom())
-            return -1;
-
-        ContentValues cv = new ContentValues();
-        addFieldsToContentValues(cv, false);
-
-        long trainingId = db.insert(TABLE_NAME, null, cv);
-
-        if (trainingId == -1)
-            throw new SQLiteException("Insertion error: " + cv);
-
-        id.setData(trainingId);
-        commit();
-
-        children.save(db, getId());
-
+        long trainingId = create(db, TABLE_NAME, null, 0, id);
+        children.save(db, trainingId);
         return trainingId;
     }
 
@@ -204,29 +189,14 @@ public final class ProgramTraining extends MutableModel implements Parent<Progra
 
     @Override
     public int update(SQLiteDatabase db) {
-        if (isPhantom() || !isChanged())
-            return 0;
-
         children.save(db, getId());
 
-        ContentValues cv = new ContentValues();
-        addFieldsToContentValues(cv, true);
-        if (cv.size() != 0) {
-            commit();
-            return db.update(TABLE_NAME, cv, id.getColumnName() + "=" + getId(), null);
-        } else {
-            return 0;
-        }
+        return update(db, TABLE_NAME, id);
     }
 
     @Override
     public int delete(SQLiteDatabase db) {
-        int rows = db.delete(TABLE_NAME, id.getColumnName() + "=" + getId(), null);
-
-        if (rows == 1)
-            id.setInitialData(0L);
-
-        return rows;
+        return delete(db, TABLE_NAME, id);
     }
 
     private ProgramTraining(Parcel in) {

@@ -5,14 +5,14 @@ import android.database.sqlite.SQLiteDatabase;
 import android.os.Parcel;
 
 import ru.codingworkshop.gymm.data.GymContract.ActualSetEntry;
-import ru.codingworkshop.gymm.data.model.base.MutableModel;
+import ru.codingworkshop.gymm.data.model.base.Model;
 import ru.codingworkshop.gymm.data.model.field.Field;
 
 /**
  * Created by Радик on 12.03.2017.
  */
 
-public class ActualSet extends MutableModel  {
+public class ActualSet extends Model {
     private Field<Long> id = new Field<>(ActualSetEntry._ID, 0L);
     private Field<Integer> reps = new Field<>(ActualSetEntry.COLUMN_REPS, 0);
     private Field<Double> weight = new Field<>(ActualSetEntry.COLUMN_WEIGHT, 0d);

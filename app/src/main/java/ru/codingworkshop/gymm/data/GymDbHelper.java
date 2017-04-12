@@ -39,11 +39,12 @@ public final class GymDbHelper extends SQLiteOpenHelper {
         db.execSQL(GymContract.MuscleGroupEntry.SQL_CREATE);
         db.execSQL(GymContract.ExerciseEntry.SQL_CREATE);
         db.execSQL(GymContract.SecondaryMuscleGroupLinkEntry.SQL_CREATE);
-        db.execSQL(GymContract.ActualExerciseEntry.SQL_CREATE);
-        db.execSQL(GymContract.ActualSetEntry.SQL_CREATE);
         db.execSQL(GymContract.ProgramTrainingEntry.SQL_CREATE);
         db.execSQL(GymContract.ProgramExerciseEntry.SQL_CREATE);
         db.execSQL(GymContract.ProgramSetEntry.SQL_CREATE);
+        db.execSQL(GymContract.ActualTrainingEntry.SQL_CREATE);
+        db.execSQL(GymContract.ActualExerciseEntry.SQL_CREATE);
+        db.execSQL(GymContract.ActualSetEntry.SQL_CREATE);
 
         try {
             parseExercisesXml(db);
@@ -57,11 +58,12 @@ public final class GymDbHelper extends SQLiteOpenHelper {
         db.execSQL(GymContract.MuscleGroupEntry.SQL_DROP);
         db.execSQL(GymContract.ExerciseEntry.SQL_DROP);
         db.execSQL(GymContract.SecondaryMuscleGroupLinkEntry.SQL_DROP);
-        db.execSQL(GymContract.ActualExerciseEntry.SQL_DROP);
-        db.execSQL(GymContract.ActualSetEntry.SQL_DROP);
         db.execSQL(GymContract.ProgramTrainingEntry.SQL_DROP);
         db.execSQL(GymContract.ProgramExerciseEntry.SQL_DROP);
         db.execSQL(GymContract.ProgramSetEntry.SQL_DROP);
+        db.execSQL(GymContract.ActualTrainingEntry.SQL_DROP);
+        db.execSQL(GymContract.ActualExerciseEntry.SQL_DROP);
+        db.execSQL(GymContract.ActualSetEntry.SQL_DROP);
         onCreate(db);
     }
 

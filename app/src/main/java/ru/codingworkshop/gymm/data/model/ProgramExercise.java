@@ -9,7 +9,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import ru.codingworkshop.gymm.data.GymContract.ProgramExerciseEntry;
-import ru.codingworkshop.gymm.data.model.base.MutableModel;
+import ru.codingworkshop.gymm.data.model.base.Model;
 import ru.codingworkshop.gymm.data.model.base.Orderable;
 import ru.codingworkshop.gymm.data.model.base.Parent;
 import ru.codingworkshop.gymm.data.model.field.ChildrenField;
@@ -19,7 +19,7 @@ import ru.codingworkshop.gymm.data.model.field.Field;
  * Created by Радик on 17.02.2017.
  */
 
-public final class ProgramExercise extends MutableModel implements Orderable, Parent<ProgramSet> {
+public final class ProgramExercise extends Model implements Orderable, Parent<ProgramSet> {
     private Field<Long> id = new Field<>(ProgramExerciseEntry._ID, 0L);
     private Field<Exercise> exercise = new Field<>(ProgramExerciseEntry.COLUMN_EXERCISE_ID, Exercise.class);
     private Field<Integer> sortOrder = new Field<>(ProgramExerciseEntry.COLUMN_SORT_ORDER, -1);

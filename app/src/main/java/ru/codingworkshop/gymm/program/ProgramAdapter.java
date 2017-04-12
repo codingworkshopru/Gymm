@@ -8,7 +8,7 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 
-import ru.codingworkshop.gymm.data.model.base.MutableModel;
+import ru.codingworkshop.gymm.data.model.base.Model;
 import ru.codingworkshop.gymm.data.model.base.Parent;
 
 /**
@@ -125,7 +125,7 @@ public final class ProgramAdapter<VH extends ProgramViewHolder> extends Recycler
 
     @Override
     public void onBindViewHolder(VH holder, int position) {
-        MutableModel child = mModel.getChild(position);
+        Model child = mModel.getChild(position);
         holder.setModel(child);
     }
 

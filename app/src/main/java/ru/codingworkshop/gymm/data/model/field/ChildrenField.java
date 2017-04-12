@@ -11,10 +11,10 @@ import android.os.Parcelable;
 import java.util.LinkedList;
 import java.util.List;
 
-import ru.codingworkshop.gymm.data.model.base.MutableModel;
+import ru.codingworkshop.gymm.data.model.base.Model;
 import ru.codingworkshop.gymm.data.model.base.Orderable;
 
-public class ChildrenField<T extends MutableModel> implements Cloneable, Parcelable {
+public class ChildrenField<T extends Model> implements Cloneable, Parcelable {
     private Class<T> type;
     private List<T> data;
     private List<T> changedData;

@@ -12,14 +12,14 @@ import java.util.List;
 import ru.codingworkshop.gymm.data.GymContract.MuscleGroupEntry;
 import ru.codingworkshop.gymm.data.GymContract.SecondaryMuscleGroupLinkEntry;
 import ru.codingworkshop.gymm.data.QueryBuilder;
-import ru.codingworkshop.gymm.data.model.base.MutableModel;
+import ru.codingworkshop.gymm.data.model.base.Model;
 
 
 /**
  * Created by Радик on 14.02.2017.
  */
 
-public final class MuscleGroup extends MutableModel {
+public final class MuscleGroup extends Model {
     private long id;
     private String name;
     private String mapColorRgb;

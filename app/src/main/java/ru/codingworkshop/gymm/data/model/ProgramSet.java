@@ -10,7 +10,7 @@ import java.util.List;
 
 import ru.codingworkshop.gymm.data.GymContract.ProgramSetEntry;
 import ru.codingworkshop.gymm.data.QueryBuilder;
-import ru.codingworkshop.gymm.data.model.base.MutableModel;
+import ru.codingworkshop.gymm.data.model.base.Model;
 import ru.codingworkshop.gymm.data.model.base.Orderable;
 import ru.codingworkshop.gymm.data.model.field.Field;
 
@@ -18,7 +18,7 @@ import ru.codingworkshop.gymm.data.model.field.Field;
  * Created by Радик on 17.02.2017.
  */
 
-public final class ProgramSet extends MutableModel implements Orderable {
+public final class ProgramSet extends Model implements Orderable {
     private Field<Long> id = new Field<>(ProgramSetEntry._ID, 0L);
     private Field<Integer> reps = new Field<>(ProgramSetEntry.COLUMN_REPS, 0);
     private Field<Integer> secondsForRest = new Field<>(ProgramSetEntry.COLUMN_SECONDS_FOR_REST, 0);

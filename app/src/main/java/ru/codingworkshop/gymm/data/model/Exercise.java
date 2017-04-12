@@ -13,13 +13,13 @@ import java.util.List;
 import ru.codingworkshop.gymm.data.GymContract.ExerciseEntry;
 import ru.codingworkshop.gymm.data.GymContract.SecondaryMuscleGroupLinkEntry;
 import ru.codingworkshop.gymm.data.QueryBuilder;
-import ru.codingworkshop.gymm.data.model.base.MutableModel;
+import ru.codingworkshop.gymm.data.model.base.Model;
 
 /**
  * Created by Радик on 14.02.2017.
  */
 
-public final class Exercise extends MutableModel {
+public final class Exercise extends Model {
     private long id;
     private MuscleGroup primaryMuscleGroup;
     private String name;

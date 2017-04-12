@@ -94,38 +94,6 @@ public final class GymContract {
         public static final String SQL_DROP = dropTableStatement(TABLE_NAME);
     }
 
-    public static final class ActualExerciseEntry implements BaseColumns {
-        public static final String TABLE_NAME = "actual_exercise";
-        public static final String COLUMN_EXERCISE_ID = "exercise_id";
-        public static final String COLUMN_TRAINING_TIMESTAMP = "training_timestamp";
-
-        public static final String SQL_CREATE = createTableStatement(
-                TABLE_NAME,
-                primaryKey(),
-                String.format("%s INTEGER NOT NULL", COLUMN_EXERCISE_ID),
-                String.format("%s TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP", COLUMN_TRAINING_TIMESTAMP),
-                foreignKey(COLUMN_EXERCISE_ID, ExerciseEntry.TABLE_NAME, ExerciseEntry._ID, "CASCADE", "RESTRICT")
-        );
-        public static final String SQL_DROP = dropTableStatement(TABLE_NAME);
-    }
-
-    public static final class ActualSetEntry implements BaseColumns {
-        public static final String TABLE_NAME = "actual_set";
-        public static final String COLUMN_ACTUAL_EXERCISE_ID = "actual_exercise_id";
-        public static final String COLUMN_REPS = "reps";
-        public static final String COLUMN_WEIGHT = "weight";
-
-        public static final String SQL_CREATE = createTableStatement(
-                TABLE_NAME,
-                primaryKey(),
-                String.format("%s INTEGER NOT NULL", COLUMN_ACTUAL_EXERCISE_ID),
-                String.format("%s INTEGER NOT NULL", COLUMN_REPS),
-                String.format("%s REAL NOT NULL", COLUMN_WEIGHT),
-                foreignKey(COLUMN_ACTUAL_EXERCISE_ID, ActualExerciseEntry.TABLE_NAME, ActualExerciseEntry._ID, "RESTRICT", "RESTRICT")
-        );
-        public static final String SQL_DROP = dropTableStatement(TABLE_NAME);
-    }
-
     public static final class ProgramTrainingEntry implements BaseColumns {
         public static final String TABLE_NAME = "program_training";
         public static final String COLUMN_NAME = "name";
@@ -173,6 +141,56 @@ public final class GymContract {
                 String.format("%s INTEGER NULL", COLUMN_SECONDS_FOR_REST),
                 String.format("%s INTEGER NOT NULL", COLUMN_SORT_ORDER),
                 foreignKey(COLUMN_PROGRAM_EXERCISE_ID, ProgramExerciseEntry.TABLE_NAME, ProgramExerciseEntry._ID, "CASCADE", "CASCADE")
+        );
+        public static final String SQL_DROP = dropTableStatement(TABLE_NAME);
+    }
+
+    public static final class ActualTrainingEntry implements BaseColumns {
+        public static final String TABLE_NAME = "actual_training";
+        public static final String COLUMN_START_TIME = "start_time";
+        public static final String COLUMN_FINISH_TIME = "finish_time";
+        public static final String COLUMN_PROGRAM_TRAINING_ID = "program_training_id";
+
+        public static final String SQL_CREATE = createTableStatement(
+                TABLE_NAME,
+                primaryKey(),
+                String.format("%s TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP", COLUMN_START_TIME),
+                String.format("%s TIMESTAMP NULL", COLUMN_FINISH_TIME),
+                String.format("%s INTEGER NULL", COLUMN_PROGRAM_TRAINING_ID),
+                foreignKey(COLUMN_PROGRAM_TRAINING_ID, ProgramTrainingEntry.TABLE_NAME, ProgramTrainingEntry._ID, "CASCADE", "SET NULL")
+        );
+        public static final String SQL_DROP = dropTableStatement(TABLE_NAME);
+    }
+
+    public static final class ActualExerciseEntry implements BaseColumns {
+        public static final String TABLE_NAME = "actual_exercise";
+        public static final String COLUMN_ACTUAL_TRAINING_ID = "actual_training_id";
+        public static final String COLUMN_EXERCISE_ID = "exercise_id";
+
+        public static final String SQL_CREATE = createTableStatement(
+                TABLE_NAME,
+                primaryKey(),
+                String.format("%s INTEGER NOT NULL", COLUMN_ACTUAL_TRAINING_ID),
+                String.format("%s INTEGER NOT NULL", COLUMN_EXERCISE_ID),
+                foreignKey(COLUMN_ACTUAL_TRAINING_ID, ActualTrainingEntry.TABLE_NAME, ActualTrainingEntry._ID, "RESTRICT", "RESTRICT"),
+                foreignKey(COLUMN_EXERCISE_ID, ExerciseEntry.TABLE_NAME, ExerciseEntry._ID, "CASCADE", "RESTRICT")
+        );
+        public static final String SQL_DROP = dropTableStatement(TABLE_NAME);
+    }
+
+    public static final class ActualSetEntry implements BaseColumns {
+        public static final String TABLE_NAME = "actual_set";
+        public static final String COLUMN_ACTUAL_EXERCISE_ID = "actual_exercise_id";
+        public static final String COLUMN_REPS = "reps";
+        public static final String COLUMN_WEIGHT = "weight";
+
+        public static final String SQL_CREATE = createTableStatement(
+                TABLE_NAME,
+                primaryKey(),
+                String.format("%s INTEGER NOT NULL", COLUMN_ACTUAL_EXERCISE_ID),
+                String.format("%s INTEGER NOT NULL", COLUMN_REPS),
+                String.format("%s REAL NOT NULL", COLUMN_WEIGHT),
+                foreignKey(COLUMN_ACTUAL_EXERCISE_ID, ActualExerciseEntry.TABLE_NAME, ActualExerciseEntry._ID, "RESTRICT", "RESTRICT")
         );
         public static final String SQL_DROP = dropTableStatement(TABLE_NAME);
     }
