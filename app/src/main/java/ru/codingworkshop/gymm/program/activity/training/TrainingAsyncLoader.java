@@ -47,8 +47,10 @@ public class TrainingAsyncLoader extends AsyncTaskLoader<ProgramTraining> {
         GymDbHelper dbHelper = new GymDbHelper(getContext());
         if (id == LOADER_TRAINING_SAVE) {
             SQLiteDatabase db = dbHelper.getWritableDatabase();
-            model.create(db, 0);
-            model.update(db);
+            if (model.isPhantom())
+                model.create(db, 0);
+            else
+                model.update(db);
             db.close();
         } else if (id == LOADER_TRAINING_LOAD) {
             SQLiteDatabase db = dbHelper.getReadableDatabase();
