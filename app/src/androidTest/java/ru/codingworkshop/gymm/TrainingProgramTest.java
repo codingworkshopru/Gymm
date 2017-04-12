@@ -3,14 +3,18 @@ package ru.codingworkshop.gymm;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.support.test.InstrumentationRegistry;
+import android.support.test.espresso.action.CoordinatesProvider;
+import android.support.test.espresso.action.GeneralClickAction;
 import android.support.test.espresso.action.GeneralLocation;
 import android.support.test.espresso.action.GeneralSwipeAction;
 import android.support.test.espresso.action.Press;
 import android.support.test.espresso.action.Swipe;
+import android.support.test.espresso.action.Tap;
 import android.support.test.espresso.contrib.RecyclerViewActions;
 import android.support.test.filters.LargeTest;
 import android.support.test.rule.ActivityTestRule;
 import android.support.test.runner.AndroidJUnit4;
+import android.view.View;
 
 import org.junit.Before;
 import org.junit.Rule;
@@ -52,6 +56,21 @@ public class TrainingProgramTest {
         db.delete(ProgramTrainingEntry.TABLE_NAME, ProgramTrainingEntry.COLUMN_NAME + "=?", new String[] {TRAINING_NAME_TEXT});
     }
 
+    private void selectExercise() {
+        // choose exercise
+        onView(withId(R.id.program_exercise_name_layout)).perform(click());
+        CoordinatesProvider cp = new CoordinatesProvider() {
+            @Override
+            public float[] calculateCoordinates(View view) {
+                int xy[] = new int[2];
+                view.getLocationOnScreen(xy);
+                return new float[] {xy[0] + 30, xy[1] + 220};
+            }
+        };
+        onView(withId(R.id.imageView5)).perform(new GeneralClickAction(Tap.SINGLE, cp, Press.FINGER));
+        onView(withId(R.id.fragment_exercise_picker_exercises)).perform(RecyclerViewActions.actionOnItemAtPosition(0, click()));
+    }
+
     @Test
     @LargeTest
     public void test_setAddAndCreate() {
@@ -59,12 +78,24 @@ public class TrainingProgramTest {
         onView(withId(R.id.action_add_program)).perform(click());
         onView(withId(R.id.program_training_name)).perform(typeText(TRAINING_NAME_TEXT));
         onView(withId(R.id.program_training_add_exercise_button)).perform(click());
+
+        onView(withId(R.id.program_exercise_add_set)).perform(click());
+        onView(withId(android.R.id.button1)).perform(click());
+        selectExercise();
+        // save all
+        onView(withId(R.id.action_done)).perform(click());
+        onView(withId(R.id.action_done)).perform(click());
+
+        onView(withId(R.id.rv_test_main)).perform(RecyclerViewActions.scrollTo(withChild(withText(TRAINING_NAME_TEXT))));
+        onView(withId(R.id.rv_test_main)).perform(RecyclerViewActions.actionOnItem(withChild(withText(TRAINING_NAME_TEXT)), longClick()));
+        onView(withId(R.id.program_training_add_exercise_button)).perform(click());
+        selectExercise();
         onView(withId(R.id.program_exercise_add_set)).perform(click());
         onView(withId(android.R.id.button1)).perform(click());
         onView(withId(R.id.action_done)).perform(click());
         onView(withId(R.id.action_done)).perform(click());
 
-        // add new set in created training
+        // add new set in created exercise
         onView(withId(R.id.rv_test_main)).perform(RecyclerViewActions.scrollTo(withChild(withText(TRAINING_NAME_TEXT))));
         onView(withId(R.id.rv_test_main)).perform(RecyclerViewActions.actionOnItem(withChild(withText(TRAINING_NAME_TEXT)), longClick()));
         onView(withId(R.id.program_training_exercises_list)).perform(RecyclerViewActions.actionOnItemAtPosition(0, click()));
@@ -93,6 +124,7 @@ public class TrainingProgramTest {
             onView(withId(R.id.program_exercise_add_set)).perform(click());
             onView(withId(android.R.id.button1)).perform(click());
         }
+        selectExercise();
         onView(withId(R.id.action_done)).perform(click());
         onView(withId(R.id.action_done)).perform(click());
 
