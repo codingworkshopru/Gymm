@@ -12,7 +12,7 @@ import ru.codingworkshop.gymm.data.model.field.Field;
  * Created by Радик on 12.03.2017.
  */
 
-public class ActualSet extends Model {
+public final class ActualSet extends Model {
     private Field<Long> id = new Field<>(ActualSetEntry._ID, 0L);
     private Field<Integer> reps = new Field<>(ActualSetEntry.COLUMN_REPS, 0);
     private Field<Double> weight = new Field<>(ActualSetEntry.COLUMN_WEIGHT, 0d);

@@ -1,6 +1,7 @@
 package ru.codingworkshop.gymm.program.activity.training;
 
 import android.content.Intent;
+import android.database.sqlite.SQLiteDatabase;
 import android.databinding.BindingAdapter;
 import android.databinding.DataBindingUtil;
 import android.databinding.InverseBindingAdapter;
@@ -34,6 +35,7 @@ import java.util.Locale;
 
 import ru.codingworkshop.gymm.MainActivity;
 import ru.codingworkshop.gymm.R;
+import ru.codingworkshop.gymm.data.GymDbHelper;
 import ru.codingworkshop.gymm.data.model.ProgramExercise;
 import ru.codingworkshop.gymm.data.model.ProgramTraining;
 import ru.codingworkshop.gymm.databinding.ActivityProgramTrainingBinding;
@@ -136,6 +138,11 @@ public class ProgramTrainingActivity extends AppCompatActivity
             } else {
                 mModel.setChild(order, exercise);
                 mExercisesAdapter.notifyItemChanged(order);
+            }
+            if (!mModel.isPhantom()) {
+                SQLiteDatabase db = new GymDbHelper(this).getWritableDatabase();
+                mModel.saveChildren(db, mModel.getId());
+                db.close();
             }
         }
     }

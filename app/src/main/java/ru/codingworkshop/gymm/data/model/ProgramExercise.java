@@ -91,6 +91,11 @@ public final class ProgramExercise extends Model implements Orderable, Parent<Pr
     }
 
     @Override
+    public void saveChildren(SQLiteDatabase db, long parentId) {
+        children.save(db, parentId);
+    }
+
+    @Override
     public ProgramExercise clone() throws CloneNotSupportedException {
         try {
             ProgramExercise cloned = (ProgramExercise) super.clone();
@@ -131,9 +136,7 @@ public final class ProgramExercise extends Model implements Orderable, Parent<Pr
     @Override
     public long create(SQLiteDatabase db, long parentId) {
         long exerciseId = create(db, TABLE_NAME, ProgramExerciseEntry.COLUMN_PROGRAM_TRAINING_ID, parentId, id);
-
-        children.save(db, exerciseId);
-
+        saveChildren(db, exerciseId);
         return exerciseId;
     }
 
@@ -165,8 +168,7 @@ public final class ProgramExercise extends Model implements Orderable, Parent<Pr
 
     @Override
     public int update(SQLiteDatabase db) {
-        children.save(db, getId());
-
+        saveChildren(db, getId());
         return update(db, TABLE_NAME, id);
     }
 

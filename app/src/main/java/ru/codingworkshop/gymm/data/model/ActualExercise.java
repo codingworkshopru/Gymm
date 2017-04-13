@@ -14,7 +14,7 @@ import ru.codingworkshop.gymm.data.model.field.Field;
  * Created by Радик on 12.03.2017.
  */
 
-public class ActualExercise extends Model implements Parent<ActualSet> {
+public final class ActualExercise extends Model implements Parent<ActualSet> {
     private Field<Long> id = new Field<>(ActualExerciseEntry._ID, 0L);
     private Field<Exercise> exercise = new Field<>(ActualExerciseEntry.COLUMN_EXERCISE_ID, Exercise.class);
 
@@ -71,12 +71,20 @@ public class ActualExercise extends Model implements Parent<ActualSet> {
     }
 
     @Override
+    public void saveChildren(SQLiteDatabase db, long parentId) {
+        children.save(db, parentId);
+    }
+
+    @Override
     public long create(SQLiteDatabase db, long parentId) {
-        return create(db, TABLE_NAME, ActualExerciseEntry.COLUMN_EXERCISE_ID, parentId, id);
+        long exerciseId = create(db, TABLE_NAME, ActualExerciseEntry.COLUMN_EXERCISE_ID, parentId, id);
+        saveChildren(db, exerciseId);
+        return exerciseId;
     }
 
     @Override
     public int update(SQLiteDatabase db) {
+        saveChildren(db, getId());
         return update(db, TABLE_NAME, id);
     }
 

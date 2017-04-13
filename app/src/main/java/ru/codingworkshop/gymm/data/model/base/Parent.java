@@ -1,5 +1,7 @@
 package ru.codingworkshop.gymm.data.model.base;
 
+import android.database.sqlite.SQLiteDatabase;
+
 /**
  * Created by Радик on 02.03.2017.
  */
@@ -11,4 +13,5 @@ public interface Parent<T extends Model> {
     int restoreLastRemoved();
     T getChild(int index);
     int childrenCount();
+    void saveChildren(SQLiteDatabase db, long parentId);
 }

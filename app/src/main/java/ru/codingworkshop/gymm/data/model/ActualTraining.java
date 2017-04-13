@@ -18,7 +18,7 @@ import ru.codingworkshop.gymm.data.model.field.Field;
  * Created by Радик on 12.04.2017.
  */
 
-public class ActualTraining extends Model implements Parent<ActualExercise> {
+public final class ActualTraining extends Model implements Parent<ActualExercise> {
     private Field<Long> id = new Field<>(ActualTrainingEntry._ID, 0L);
     private Field<String> startTime = new Field<>(ActualTrainingEntry.COLUMN_START_TIME, String.class);
     private Field<String> finishTime = new Field<>(ActualTrainingEntry.COLUMN_FINISH_TIME, String.class);
@@ -56,11 +56,14 @@ public class ActualTraining extends Model implements Parent<ActualExercise> {
 
     @Override
     public long create(SQLiteDatabase db, long parentId) {
-        return create(db, TABLE_NAME, null, 0, id);
+        long trainingId = create(db, TABLE_NAME, null, 0, id);
+        saveChildren(db, trainingId);
+        return trainingId;
     }
 
     @Override
     public int update(SQLiteDatabase db) {
+        saveChildren(db, getId());
         return update(db, TABLE_NAME, id);
     }
 
@@ -161,5 +164,10 @@ public class ActualTraining extends Model implements Parent<ActualExercise> {
     @Override
     public int childrenCount() {
         return children.size();
+    }
+
+    @Override
+    public void saveChildren(SQLiteDatabase db, long parentId) {
+        children.save(db, parentId);
     }
 }

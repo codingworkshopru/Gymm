@@ -108,6 +108,11 @@ public final class ProgramTraining extends Model implements Parent<ProgramExerci
     }
 
     @Override
+    public void saveChildren(SQLiteDatabase db, long parentId) {
+        children.save(db, parentId);
+    }
+
+    @Override
     public boolean isChanged() {
         return name.isChanged() || weekday.isChanged() || children.isChanged();
     }
@@ -133,7 +138,7 @@ public final class ProgramTraining extends Model implements Parent<ProgramExerci
     @Override
     public long create(SQLiteDatabase db, long parentId) {
         long trainingId = create(db, TABLE_NAME, null, 0, id);
-        children.save(db, trainingId);
+        saveChildren(db, trainingId);
         return trainingId;
     }
 
@@ -189,7 +194,7 @@ public final class ProgramTraining extends Model implements Parent<ProgramExerci
 
     @Override
     public int update(SQLiteDatabase db) {
-        children.save(db, getId());
+        saveChildren(db, getId());
 
         return update(db, TABLE_NAME, id);
     }
