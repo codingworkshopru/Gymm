@@ -2,6 +2,9 @@ package ru.codingworkshop.gymm.data;
 
 import android.provider.BaseColumns;
 
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -12,6 +15,18 @@ import java.util.regex.Pattern;
 public final class QueryBuilder {
     private static final String TAG = QueryBuilder.class.getSimpleName();
 
+    public static String build(List<QueryPart> parts) {
+        QueryPart[] partsArray = parts.toArray(new QueryPart[parts.size()]);
+        return build(partsArray);
+    }
+
+
+    /**
+     * Used to join parts to one SQL query. If the same table is presented in multiple parts aliases will be assigned for 2nd and other tables.
+     * For example if table dummy_table presented 3 times following aliases will be generated: dummy_table, dummy_table2, dummy_table3.
+     * @param parts parts to join
+     * @return SQL query
+     */
     public static String build(QueryPart... parts) {
         int partsCount = parts.length;
 
@@ -20,14 +35,24 @@ public final class QueryBuilder {
         StringBuilder where = new StringBuilder();
         StringBuilder group = new StringBuilder();
         StringBuilder order = new StringBuilder();
+        Map<String, Integer> tablesMap = new HashMap<>(partsCount);
+
         for (int i = 0; i < partsCount; i++) {
             QueryPart part = parts[i];
             String table = part.mTable;
+            String alias = table;
+            if (tablesMap.containsKey(table)) {
+                int tablesCount = tablesMap.get(table);
+                alias += ++tablesCount;
+                tablesMap.put(table, tablesCount);
+            } else {
+                tablesMap.put(table, 1);
+            }
 
-            if (part.mColumns != null && !part.mColumns.isEmpty()) {
+            if (part.mColumns != null && part.mColumns.length != 0) {
                 if (i == 0 && part.mDistinct)
                     columns.append("DISTINCT ");
-                columns.append(part.mColumns).append(",");
+                columns.append(getColumnsWithTable(part.mColumns, alias)).append(",");
             }
 
             if (i == 0) {
@@ -35,39 +60,42 @@ public final class QueryBuilder {
             } else {
                 if (part.mThisJoiningColumn == null)
                     throw new IllegalArgumentException("joining column not presented");
-                else
-                    part.mThisJoiningColumn = getColumnWithTable(part.mThisJoiningColumn, table);
 
-                String otherColumn = part.mOtherJoiningColumn == null ? BaseColumns._ID : part.mOtherJoiningColumn;
-                part.mOtherJoiningColumn = getColumnWithTable(otherColumn, parts[i-1].mTable);
+                String thisJoinColumn = getColumnWithTable(part.mThisJoiningColumn, alias);
+                String otherJoinColumn = getColumnWithTable(
+                        part.mOtherJoiningColumn == null ? BaseColumns._ID : part.mOtherJoiningColumn,
+                        part.mOtherJoiningTable == null ? parts[i-1].mTable : part.mOtherJoiningTable
+                );
 
-                from.append(" JOIN ")
+                from.append(part.mIsLeftJoin ? " LEFT JOIN " : " JOIN ")
                         .append(table)
+                        .append(table.equals(alias) ? "" : " " + alias)
                         .append(" ON ")
-                        .append(part.mThisJoiningColumn)
+                        .append(thisJoinColumn)
                         .append("=")
-                        .append(part.mOtherJoiningColumn);
+                        .append(otherJoinColumn);
             }
 
             if (part.mSelection != null && !part.mSelection.isEmpty()) {
-                if (where.toString().isEmpty())
+                if (where.length() == 0)
                     where.append(" WHERE ");
                 where.append(part.mSelection).append(" AND ");
             }
 
-            if (part.mGroup != null && !part.mGroup.isEmpty()) {
-                if (group.toString().isEmpty())
+            if (part.mGroup != null && part.mGroup.length != 0) {
+                if (group.length() == 0)
                     group.append(" GROUP BY ");
-                group.append(part.mGroup).append(",");
+                group.append(getColumnsWithTable(part.mGroup, alias)).append(",");
             }
 
-            if (part.mOrder != null && !part.mOrder.isEmpty()) {
-                if (order.toString().isEmpty())
+            if (part.mOrder != null && part.mOrder.length != 0) {
+                if (order.length() == 0)
                     order.append(" ORDER BY ");
-                order.append(part.mOrder).append(",");
+                order.append(getColumnsWithTable(part.mOrder, alias)).append(",");
             }
         }
 
+        // if no columns specified
         if (columns.length() == 7)
             columns.append("*");
 
@@ -129,13 +157,15 @@ public final class QueryBuilder {
     }
 
     public static final class QueryPart implements Cloneable {
-        String mColumns;
+        String[] mColumns;
         String mTable;
         String mThisJoiningColumn;
         String mOtherJoiningColumn;
+        String mOtherJoiningTable;
+        boolean mIsLeftJoin;
         String mSelection;
-        String mGroup;
-        String mOrder;
+        String[] mGroup;
+        String[] mOrder;
         boolean mDistinct;
 
         public QueryPart(String tableName) {
@@ -143,7 +173,7 @@ public final class QueryBuilder {
         }
 
         public QueryPart setColumns(String... columns) {
-            mColumns = getColumnsWithTable(columns, mTable);
+            mColumns = columns;
             return this;
         }
 
@@ -152,8 +182,33 @@ public final class QueryBuilder {
             return this;
         }
 
+        /**
+         *
+         * @param joinColumn column of other table by which this table will join. Default column is "_id".
+         * @return <b>this</b> object
+         */
         public QueryPart setOtherJoinColumn(String joinColumn) {
             mOtherJoiningColumn = joinColumn;
+            return this;
+        }
+
+        /**
+         *
+         * @param joinTable to table from the param will be joined table from this part. If is not set previous table will be used.
+         * @return <b>this</b> object
+         */
+        public QueryPart setOtherJoinTable(String joinTable) {
+            mOtherJoiningTable = joinTable;
+            return this;
+        }
+
+        /**
+         *
+         * @param leftJoin <b>true</b> to use LEFT OUTER JOIN and <b>false</b> to use INNER JOIN. By default this option is set to <b>false</b>, there is no need to set it to <b>false</b> explicitly.
+         * @return <b>this</b> object
+         */
+        public QueryPart setLeftJoin(boolean leftJoin) {
+            mIsLeftJoin = leftJoin;
             return this;
         }
 
@@ -163,12 +218,12 @@ public final class QueryBuilder {
         }
 
         public QueryPart setGroup(String... group) {
-            mGroup = getColumnsWithTable(group, mTable);
+            mGroup = group;
             return this;
         }
 
         public QueryPart setOrder(String... order) {
-            mOrder = getColumnsWithTable(order, mTable);
+            mOrder = order;
             return this;
         }
 
@@ -183,12 +238,13 @@ public final class QueryBuilder {
             try {
                 cloned = (QueryPart) super.clone();
                 cloned.mTable = mTable;
-                cloned.mColumns = mColumns;
+                System.arraycopy(mColumns, 0, cloned.mColumns, 0, mColumns.length);
                 cloned.mThisJoiningColumn = mThisJoiningColumn;
                 cloned.mOtherJoiningColumn = mOtherJoiningColumn;
+                cloned.mIsLeftJoin = mIsLeftJoin;
                 cloned.mSelection = mSelection;
-                cloned.mGroup = mGroup;
-                cloned.mOrder = mOrder;
+                System.arraycopy(mGroup, 0, cloned.mGroup, 0, mGroup.length);
+                System.arraycopy(mOrder, 0, cloned.mOrder, 0, mOrder.length);
                 cloned.mDistinct = mDistinct;
             }
             catch (CloneNotSupportedException e) {
