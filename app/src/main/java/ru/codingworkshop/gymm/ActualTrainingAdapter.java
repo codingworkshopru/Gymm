@@ -41,7 +41,7 @@ public class ActualTrainingAdapter extends RecyclerView.Adapter<ActualTrainingAd
 
     @Override
     public int getItemCount() {
-        return programTraining != null ? programTraining.childrenCount() : 0;
+        return programTraining != null ? programTraining.getExercises().size() : 0;
     }
 
     @Override
@@ -95,7 +95,7 @@ public class ActualTrainingAdapter extends RecyclerView.Adapter<ActualTrainingAd
     @Override
     public void onBindViewHolder(ViewHolder holder, int position) {
         holder.setIndex(position + 1);
-        holder.setTitle(programTraining.getChild(position).getExercise().getName());
+        holder.setTitle(programTraining.getExercises().get(position).getExercise().getName());
 
         holder.setTopLineVisibility(position > 0);
         holder.setBottomLineVisibility(position < getItemCount() - 1);

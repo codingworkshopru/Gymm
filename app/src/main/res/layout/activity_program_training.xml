@@ -6,9 +6,6 @@
     <data>
         <import type="android.view.View" />
         <variable
-            name="adapter"
-            type="ru.codingworkshop.gymm.program.ProgramAdapter"/>
-        <variable
             name="training"
             type="ru.codingworkshop.gymm.data.model.ProgramTraining" />
     </data>
@@ -24,7 +21,7 @@
             android:layout_height="wrap_content"
             android:theme="?attr/actionBarTheme">
 
-            <ru.codingworkshop.gymm.program.activity.training.AnimatedCollapsingToolbarLayout
+            <android.support.design.widget.CollapsingToolbarLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 app:layout_scrollFlags="scroll|exitUntilCollapsed"
@@ -70,12 +67,13 @@
 
                     <Spinner
                         android:id="@+id/program_training_weekday"
+                        app:value="@={training.weekday}"
+                        android:layout_width="match_parent"
                         android:layout_height="48dp"
                         android:layout_gravity="bottom"
-                        bind:value="@={training.weekday}"
-                        android:layout_width="match_parent"
-                        app:popupTheme="@style/ThemeOverlay.AppCompat.Light"
-                        android:layout_marginBottom="16dp" />
+                        android:layout_marginBottom="16dp"
+                        android:entries="@array/days_of_week"
+                        app:popupTheme="@style/ThemeOverlay.AppCompat.Light" />
 
                 </LinearLayout>
 
@@ -86,7 +84,7 @@
                     android:background="?attr/colorPrimary"
                     app:layout_collapseMode="pin" />
 
-            </ru.codingworkshop.gymm.program.activity.training.AnimatedCollapsingToolbarLayout>
+            </android.support.design.widget.CollapsingToolbarLayout>
         </android.support.design.widget.AppBarLayout>
 
         <android.support.v7.widget.RecyclerView
@@ -101,7 +99,7 @@
 
         <LinearLayout
             android:id="@+id/program_training_empty_state"
-            android:visibility="@{adapter.mIsEmpty ? View.VISIBLE : View.GONE}"
+            android:visibility="@{training.exercises.size == 0 ? View.VISIBLE : View.GONE}"
             android:orientation="vertical"
             android:layout_gravity="top"
             android:layout_width="wrap_content"

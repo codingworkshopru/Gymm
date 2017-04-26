@@ -5,17 +5,14 @@
     <data>
         <import type="android.view.View"/>
         <variable
-            name="adapter"
-            type="ru.codingworkshop.gymm.program.ProgramAdapter"/>
-        <variable
             name="exercise"
-            type="ru.codingworkshop.gymm.data.model.ProgramExercise"/>
+            type="ru.codingworkshop.gymm.data.model.Exercise"/>
     </data>
 
     <android.support.design.widget.CoordinatorLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        tools:context="ru.codingworkshop.gymm.program.activity.exercise.ProgramExerciseActivity">
+        tools:context="ru.codingworkshop.gymm.ui.program.exercise.ProgramExerciseActivity">
 
         <android.support.design.widget.AppBarLayout
             android:id="@+id/program_exercise_app_bar_layout"
@@ -34,7 +31,8 @@
                 android:layout_height="wrap_content"
                 android:padding="16dp"
                 android:background="?attr/selectableItemBackground"
-                android:orientation="horizontal">
+                android:orientation="horizontal"
+                android:onClick="onExercisePick">
 
                 <TextView
                     android:layout_width="0dp"
@@ -43,7 +41,7 @@
                     android:layout_weight="1"
                     android:ellipsize="end"
                     android:maxLines="1"
-                    android:text="@{exercise.exercise == null ? @string/program_exercise_activity_exercise_empty_text : exercise.exercise.name}"
+                    android:text="@{exercise.name ?? @string/program_exercise_activity_exercise_empty_text}"
                     android:textAppearance="@style/TextAppearance.AppCompat.Medium"
                     android:textColor="?android:attr/textColorPrimary"
                     tools:text="Some text" />
@@ -72,7 +70,6 @@
             android:layout_gravity="center_horizontal|top"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:visibility="@{adapter.mIsEmpty ? View.VISIBLE : View.GONE}"
             app:layout_behavior="@string/appbar_scrolling_view_behavior" >
             <ImageView
                 android:layout_width="wrap_content"

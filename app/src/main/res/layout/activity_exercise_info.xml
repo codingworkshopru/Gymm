@@ -17,18 +17,18 @@
         android:layout_height="match_parent">
 
         <android.support.design.widget.AppBarLayout
+            android:id="@+id/appBarLayout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:theme="?attr/actionBarTheme"
             android:fitsSystemWindows="true"
-            android:id="@+id/appBarLayout">
+            android:theme="?attr/actionBarTheme">
 
             <android.support.design.widget.CollapsingToolbarLayout
                 android:id="@+id/collapsingToolbarLayout"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                app:layout_scrollFlags="scroll|enterAlways|enterAlwaysCollapsed"
-                android:fitsSystemWindows="true">
+                android:fitsSystemWindows="true"
+                app:layout_scrollFlags="scroll|enterAlways|enterAlwaysCollapsed">
 
                 <!-- TODO фотография должна отображать что-то конкретное, а иллюстрация концептуальное и метафорическое -->
                 <!-- FIXME рекомендованные соотношения 16:9 3:2 4:3 1:1 3:4 2:3-->
@@ -42,7 +42,8 @@
                     <ImageView
                         android:id="@+id/exercise_info_activity_appbar_image"
                         android:layout_width="match_parent"
-                        android:layout_height="200dp"
+                        android:layout_height="wrap_content"
+                        android:adjustViewBounds="true"
                         android:fitsSystemWindows="true"
                         android:scaleType="centerCrop"
                         app:srcCompat="@drawable/sporty_woman" />
@@ -56,7 +57,7 @@
                         android:onClick="onVideoClick"
                         android:visibility="gone"
                         app:srcCompat="@drawable/ic_play_arrow_white_24dp"
-                        tools:visibility="visible" />
+                        tools:visibility="gone" />
 
                     <ProgressBar
                         android:id="@+id/exercise_info_activity_progress_bar"
@@ -72,15 +73,19 @@
                     android:layout_height="?attr/actionBarSize"
                     android:background="?attr/colorPrimary"
                     app:layout_collapseMode="pin"
-                    app:popupTheme="@style/ThemeOverlay.AppCompat.Light"/>
+                    app:popupTheme="@style/ThemeOverlay.AppCompat.Light" />
 
             </android.support.design.widget.CollapsingToolbarLayout>
         </android.support.design.widget.AppBarLayout>
 
         <android.support.v4.widget.NestedScrollView
+            android:id="@+id/exercise_info_nested_content_scroll"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingBottom="32dp"
+            android:scrollbars="vertical"
             app:layout_behavior="@string/appbar_scrolling_view_behavior">
+
             <android.support.constraint.ConstraintLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content">
@@ -89,24 +94,24 @@
                     android:id="@+id/exercise_info_activity_title"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:layout_marginLeft="16dp"
-                    android:layout_marginStart="16dp"
-                    android:layout_marginRight="16dp"
                     android:layout_marginEnd="16dp"
+                    android:layout_marginLeft="16dp"
+                    android:layout_marginRight="16dp"
+                    android:layout_marginStart="16dp"
                     android:layout_marginTop="8dp"
                     android:text="@{exercise.name}"
                     android:textAppearance="@style/TextAppearance.AppCompat.Headline"
                     app:layout_constraintLeft_toLeftOf="parent"
+                    app:layout_constraintRight_toRightOf="parent"
                     app:layout_constraintTop_toTopOf="parent"
-                    tools:text="Сгибание рук со штангой"
-                    app:layout_constraintRight_toRightOf="parent" />
+                    tools:text="Сгибание рук со штангой" />
 
                 <TextView
                     android:id="@+id/exercise_info_activity_main_muscle"
-                    android:text="@{exercise.primaryMuscleGroup.name}"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="8dp"
+                    android:text="@{exercise.primaryMuscleGroup.name}"
                     android:textAppearance="@style/TextAppearance.AppCompat.Medium"
                     app:layout_constraintLeft_toLeftOf="@+id/exercise_info_activity_title"
                     app:layout_constraintTop_toBottomOf="@+id/exercise_info_activity_title"
@@ -114,11 +119,11 @@
 
                 <TextView
                     android:id="@+id/exercise_info_activity_secondary_muscles"
-                    android:text="@{exercise.secondaryMuscles}"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="7dp"
-                    android:visibility="@{exercise.secondaryMuscles == null ? View.GONE : View.VISIBLE}"
+                    android:text="@{exercise.secondaryMuscleGroups}"
+                    android:visibility="@{exercise.secondaryMuscleGroups == null ? View.GONE : View.VISIBLE}"
                     app:layout_constraintLeft_toLeftOf="@+id/exercise_info_activity_main_muscle"
                     app:layout_constraintTop_toBottomOf="@+id/exercise_info_activity_main_muscle"
                     tools:text="Предплечья &#8226; Плечи" />
@@ -127,12 +132,12 @@
                     android:id="@+id/exercise_info_activity_divider"
                     android:layout_width="0dp"
                     android:layout_height="1dp"
+                    android:layout_marginTop="16dp"
                     android:alpha="0.12"
                     app:layout_constraintLeft_toLeftOf="parent"
                     app:layout_constraintRight_toRightOf="parent"
-                    app:srcCompat="@android:color/black"
-                    android:layout_marginTop="16dp"
-                    app:layout_constraintTop_toBottomOf="@+id/exercise_info_activity_secondary_muscles" />
+                    app:layout_constraintTop_toBottomOf="@+id/exercise_info_activity_secondary_muscles"
+                    app:srcCompat="@android:color/black" />
 
                 <ImageView
                     android:id="@+id/exercise_info_activity_difficulty"
@@ -140,9 +145,9 @@
                     android:layout_height="24dp"
                     android:layout_marginEnd="16dp"
                     android:layout_marginRight="16dp"
+                    app:layout_constraintBottom_toBottomOf="@+id/exercise_info_activity_main_muscle"
                     app:layout_constraintRight_toRightOf="parent"
-                    app:srcCompat="@drawable/ic_signal_cellular_0_bar_primary_24dp"
-                    app:layout_constraintBottom_toBottomOf="@+id/exercise_info_activity_main_muscle"/>
+                    app:srcCompat="@drawable/ic_signal_cellular_0_bar_primary_24dp" />
 
                 <LinearLayout
                     android:id="@+id/exercise_info_activity_steps_layout"
@@ -152,7 +157,6 @@
                     android:layout_marginRight="16dp"
                     android:layout_marginTop="16dp"
                     android:orientation="horizontal"
-                    android:visibility="@{exercise.steps == null ? View.GONE : View.VISIBLE}"
                     app:layout_constraintLeft_toLeftOf="parent"
                     app:layout_constraintRight_toRightOf="parent"
                     app:layout_constraintTop_toBottomOf="@+id/exercise_info_activity_divider">
@@ -167,8 +171,8 @@
                         android:layout_height="wrap_content"
                         android:layout_marginLeft="16dp"
                         android:layout_marginStart="16dp"
-                        android:textAppearance="@style/TextAppearance.AppCompat.Body1"
                         android:text="@{exercise.steps}"
+                        android:textAppearance="@style/TextAppearance.AppCompat.Body1"
                         tools:text="Встаньте с прямой спиной, держа в руках штангу хватом на ширине плеч. Гриф держите ладонями вверх, локти близко к торсу. " />
                 </LinearLayout>
 
@@ -176,11 +180,13 @@
                     android:id="@+id/exercise_info_activity_advice_layout"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
+                    android:layout_marginLeft="16dp"
+                    android:layout_marginRight="16dp"
                     android:layout_marginTop="16dp"
                     android:orientation="horizontal"
                     android:visibility="@{exercise.advices == null ? View.GONE : View.VISIBLE}"
-                    app:layout_constraintLeft_toLeftOf="@+id/exercise_info_activity_steps_layout"
-                    app:layout_constraintRight_toRightOf="@+id/exercise_info_activity_steps_layout"
+                    app:layout_constraintLeft_toLeftOf="parent"
+                    app:layout_constraintRight_toRightOf="parent"
                     app:layout_constraintTop_toBottomOf="@+id/exercise_info_activity_steps_layout">
 
                     <ImageView
@@ -202,10 +208,12 @@
                     android:id="@+id/exercise_info_activity_caution_layout"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
+                    android:layout_marginLeft="16dp"
+                    android:layout_marginRight="16dp"
                     android:layout_marginTop="16dp"
                     android:visibility="@{exercise.caution == null ? View.GONE : View.VISIBLE}"
-                    app:layout_constraintLeft_toLeftOf="@+id/exercise_info_activity_advice_layout"
-                    app:layout_constraintRight_toRightOf="@+id/exercise_info_activity_advice_layout"
+                    app:layout_constraintLeft_toLeftOf="parent"
+                    app:layout_constraintRight_toRightOf="parent"
                     app:layout_constraintTop_toBottomOf="@+id/exercise_info_activity_advice_layout">
 
                     <ImageView
@@ -227,10 +235,12 @@
                     android:id="@+id/exercise_info_activity_variations_layout"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
+                    android:layout_marginLeft="16dp"
+                    android:layout_marginRight="16dp"
                     android:layout_marginTop="16dp"
                     android:visibility="@{exercise.variations == null ? View.GONE : View.VISIBLE}"
-                    app:layout_constraintLeft_toLeftOf="@+id/exercise_info_activity_caution_layout"
-                    app:layout_constraintRight_toRightOf="@+id/exercise_info_activity_caution_layout"
+                    app:layout_constraintLeft_toLeftOf="parent"
+                    app:layout_constraintRight_toRightOf="parent"
                     app:layout_constraintTop_toBottomOf="@+id/exercise_info_activity_caution_layout">
 
                     <ImageView

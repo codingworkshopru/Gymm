@@ -1,0 +1,77 @@
+[
+  {
+    "name": "Плечи",
+    "mapColorRgb": "#993399",
+    "isAnterior": true
+  },
+  {
+    "name": "Шея",
+    "mapColorRgb": "#CC3399",
+    "isAnterior": true
+  },
+  {
+    "name": "Грудь",
+    "mapColorRgb": "#FF3333",
+    "isAnterior": true
+  },
+  {
+    "name": "Бицепс",
+    "mapColorRgb": "#FFCC33",
+    "isAnterior": true
+  },
+  {
+    "name": "Пресс",
+    "mapColorRgb": "#99CC66",
+    "isAnterior": true
+  },
+  {
+    "name": "Предплечья",
+    "mapColorRgb": "#FF9933",
+    "isAnterior": true
+  },
+  {
+    "name": "Квадрицепс",
+    "mapColorRgb": "#0066CC",
+    "isAnterior": true
+  },
+  {
+    "name": "Трицепс",
+    "mapColorRgb": "#99CC66",
+    "isAnterior": false
+  },
+  {
+    "name": "Трапеции",
+    "mapColorRgb": "#0066CC",
+    "isAnterior": false
+  },
+  {
+    "name": "Средняя часть спины",
+    "mapColorRgb": "#993399",
+    "isAnterior": false
+  },
+  {
+    "name": "Широчайшие мышцы спины",
+    "mapColorRgb": "#00CCCC",
+    "isAnterior": false
+  },
+  {
+    "name": "Ягодицы",
+    "mapColorRgb": "#FF3333",
+    "isAnterior": false
+  },
+  {
+    "name": "Нижняя часть спины",
+    "mapColorRgb": "#CC3399",
+    "isAnterior": false
+  },
+  {
+    "name": "Икры",
+    "mapColorRgb": "#FFCC33",
+    "isAnterior": false
+  },
+  {
+    "name": "Бедра",
+    "mapColorRgb": "#FF9933",
+    "isAnterior": false
+  }
+]

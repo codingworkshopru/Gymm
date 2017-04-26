@@ -1,7 +1,5 @@
 package ru.codingworkshop.gymm;
 
-import android.database.sqlite.SQLiteDatabase;
-import android.database.sqlite.SQLiteOpenHelper;
 import android.support.test.InstrumentationRegistry;
 import android.support.test.espresso.action.CoordinatesProvider;
 import android.support.test.espresso.action.GeneralClickAction;
@@ -21,8 +19,11 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
-import ru.codingworkshop.gymm.data.GymContract.ProgramTrainingEntry;
-import ru.codingworkshop.gymm.data.GymDbHelper;
+import io.requery.Persistable;
+import io.requery.sql.EntityDataStore;
+import ru.codingworkshop.gymm.data.GymDatabaseSource;
+import ru.codingworkshop.gymm.data.model.ProgramTraining;
+import ru.codingworkshop.gymm.data.model.ProgramTrainingEntity;
 
 import static android.support.test.espresso.Espresso.closeSoftKeyboard;
 import static android.support.test.espresso.Espresso.onView;
@@ -51,9 +52,8 @@ public class TrainingProgramTest {
 
     @Before
     public void cleanup() {
-        SQLiteOpenHelper helper = new GymDbHelper(InstrumentationRegistry.getTargetContext());
-        SQLiteDatabase db = helper.getWritableDatabase();
-        db.delete(ProgramTrainingEntry.TABLE_NAME, ProgramTrainingEntry.COLUMN_NAME + "=?", new String[] {TRAINING_NAME_TEXT});
+        EntityDataStore<Persistable> data = GymDatabaseSource.createDataStore(InstrumentationRegistry.getTargetContext());
+        data.delete(ProgramTraining.class).where(ProgramTrainingEntity.NAME.eq(TRAINING_NAME_TEXT));
     }
 
     private void selectExercise() {

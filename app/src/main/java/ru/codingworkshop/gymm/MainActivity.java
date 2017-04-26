@@ -1,17 +1,11 @@
 package ru.codingworkshop.gymm;
 
 import android.content.Intent;
-import android.database.Cursor;
-import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
-import android.support.v4.app.LoaderManager;
-import android.support.v4.content.AsyncTaskLoader;
-import android.support.v4.content.Loader;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -20,16 +14,14 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import ru.codingworkshop.gymm.data.GymContract.ExerciseEntry;
-import ru.codingworkshop.gymm.data.GymContract.MuscleGroupEntry;
-import ru.codingworkshop.gymm.data.GymContract.ProgramExerciseEntry;
-import ru.codingworkshop.gymm.data.GymContract.ProgramTrainingEntry;
-import ru.codingworkshop.gymm.data.GymDbHelper;
-import ru.codingworkshop.gymm.data.QueryBuilder;
-import ru.codingworkshop.gymm.data.model.ProgramTraining;
-import ru.codingworkshop.gymm.program.activity.training.ProgramTrainingActivity;
+import java.util.List;
 
-public class MainActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<Cursor> {
+import io.requery.query.Result;
+import ru.codingworkshop.gymm.data.ModelLoader;
+import ru.codingworkshop.gymm.data.model.ProgramTraining;
+import ru.codingworkshop.gymm.ui.program.training.ProgramTrainingActivity;
+
+public class MainActivity extends AppCompatActivity implements ModelLoader.ModelLoaderCallbacks<ProgramTraining> {
     public static final String PROGRAM_TRAINING_ID_KEY = ProgramTraining.class.getCanonicalName() + ".id";
     private static final String TAG = MainActivity.class.getSimpleName();
     private static final int TEST_LOADER = 0;
@@ -43,8 +35,7 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
 
         setSupportActionBar((Toolbar) findViewById(R.id.main_activity_toolbar));
 
-        LoaderManager loaderManager = getSupportLoaderManager();
-        loaderManager.initLoader(TEST_LOADER, null, this);
+        new ModelLoader<>(this, ProgramTraining.class, this);
 
         RecyclerView rv = ((RecyclerView) findViewById(R.id.rv_test_main));
         rv.setLayoutManager(new LinearLayoutManager(this));
@@ -52,12 +43,15 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         mAdapter = new MyAdapter();
         mAdapter.setHasStableIds(true);
         rv.setAdapter(mAdapter);
+    }
 
-        Log.d(TAG, "onCreate");
+    @Override
+    public void onModelLoadFinished(Result<ProgramTraining> data) {
+        mAdapter.setTrainings(data.toList());
     }
 
     public static class MyAdapter extends RecyclerView.Adapter<MyAdapter.VH> {
-        Cursor mCursor;
+        List<ProgramTraining> trainings;
 
         @Override
         public VH onCreateViewHolder(ViewGroup parent, int viewType) {
@@ -68,27 +62,24 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
 
         @Override
         public void onBindViewHolder(MyAdapter.VH holder, int position) {
-            mCursor.moveToPosition(position);
-            holder.setText1(mCursor.getString(1));
-            holder.setText2(mCursor.getString(3));
+            ProgramTraining training = trainings.get(position);
+            holder.setText1(training.getName());
+            holder.setText2(holder.itemView.getResources().getStringArray(R.array.days_of_week)[training.getWeekday()]);
         }
 
-        public void swapCursor(Cursor cursor) {
-            if (mCursor != null)
-                mCursor.close();
-            mCursor = cursor;
+        public void setTrainings(List<ProgramTraining> trainings) {
+            this.trainings = trainings;
             notifyDataSetChanged();
         }
 
         @Override
         public long getItemId(int position) {
-            mCursor.moveToPosition(position);
-            return mCursor.getLong(0);
+            return trainings.get(position).getId();
         }
 
         @Override
         public int getItemCount() {
-            return mCursor != null ? mCursor.getCount() : 0;
+            return trainings != null ? trainings.size() : 0;
         }
 
         public static class VH extends RecyclerView.ViewHolder {
@@ -144,62 +135,6 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
             default:
                 return super.onOptionsItemSelected(item);
         }
-    }
-    //-----------------------------------------
-
-    // loader
-    //-----------------------------------------
-    @Override
-    public Loader<Cursor> onCreateLoader(int id, final Bundle args) {
-        return new AsyncTaskLoader<Cursor>(this) {
-            @Override
-            protected void onStartLoading() {
-                forceLoad();
-            }
-
-            @Override
-            public Cursor loadInBackground() {
-                GymDbHelper dbHelper = new GymDbHelper(MainActivity.this);
-                SQLiteDatabase db = dbHelper.getReadableDatabase();
-                QueryBuilder.QueryPart training = new QueryBuilder.QueryPart(ProgramTrainingEntry.TABLE_NAME)
-                        .setColumns(ProgramTrainingEntry._ID, ProgramTrainingEntry.COLUMN_NAME, ProgramTrainingEntry.COLUMN_WEEKDAY)
-                        .setGroup(ProgramTrainingEntry._ID);
-
-                QueryBuilder.QueryPart programExercise = new QueryBuilder.QueryPart(ProgramExerciseEntry.TABLE_NAME)
-                        .setThisJoinColumn(ProgramExerciseEntry.COLUMN_PROGRAM_TRAINING_ID);
-
-                QueryBuilder.QueryPart exercise = new QueryBuilder.QueryPart(ExerciseEntry.TABLE_NAME)
-                        .setThisJoinColumn(ExerciseEntry._ID)
-                        .setOtherJoinColumn(ProgramExerciseEntry.COLUMN_EXERCISE_ID);
-
-                QueryBuilder.QueryPart muscleGroup = new QueryBuilder.QueryPart(MuscleGroupEntry.TABLE_NAME)
-                        .setColumns("group_concat(DISTINCT "+ MuscleGroupEntry.COLUMN_NAME + ")")
-                        .setThisJoinColumn(MuscleGroupEntry._ID)
-                        .setOtherJoinColumn(ExerciseEntry.COLUMN_PRIMARY_MUSCLE_GROUP_ID);
-
-                String query = QueryBuilder.build(training, programExercise, exercise, muscleGroup);
-                Log.d(TAG, query);
-                Cursor cursor = db.rawQuery(query, null);
-                while (cursor.moveToNext()) {
-                    Log.d(TAG, cursor.getLong(0) + " " + cursor.getString(1) + " " + cursor.getInt(2) + " " + cursor.getString(3));
-                }
-                db.close();
-                dbHelper.close();
-                return cursor;
-            }
-        };
-    }
-
-    @Override
-    public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
-        mAdapter.swapCursor(data);
-        Log.d(TAG, "onLoadFinished");
-    }
-
-    @Override
-    public void onLoaderReset(Loader<Cursor> loader) {
-        mAdapter.swapCursor(null);
-        Log.d(TAG, "onLoaderReset");
     }
     //-----------------------------------------
 }

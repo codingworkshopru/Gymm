@@ -1,20 +1,20 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="ru.codingworkshop.gymm">
-    
-    <uses-permission android:name="android.permission.INTERNET"/>
+
+    <uses-permission android:name="android.permission.INTERNET" />
 
     <application
+        android:name=".App"
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:supportsRtl="true"
         android:theme="@style/AppTheme.NoActionBar">
-
         <service
             android:name=".service.TrainingTimeService"
-            android:exported="false"
-            android:description="@string/time_service_description" />
+            android:description="@string/time_service_description"
+            android:exported="false" />
 
         <activity
             android:name=".MainActivity"
@@ -26,25 +26,25 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
         <activity
-            android:name=".program.activity.training.ProgramTrainingActivity"
+            android:name=".ui.program.training.ProgramTrainingActivity"
             android:label="@string/program_training_activity_title"
-            android:launchMode="singleTop"
             android:parentActivityName=".MainActivity"
             android:theme="@style/AppTheme.NoActionBar.SpinnerInAppBar">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".MainActivity" />
         </activity>
+
         <activity
-            android:name=".program.activity.exercise.ProgramExerciseActivity"
+            android:name=".ui.program.exercise.ProgramExerciseActivity"
             android:label="@string/program_exercise_activity_title"
-            android:launchMode="singleTop"
-            android:parentActivityName=".program.activity.training.ProgramTrainingActivity"
+            android:parentActivityName=".ui.program.training.ProgramTrainingActivity"
             android:theme="@style/AppTheme.NoActionBar.SpinnerInAppBar">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="ru.codingworkshop.gymm.program.activity.training.ProgramTrainingActivity" />
+                android:value="ru.codingworkshop.gymm.ui.program.training.ProgramTrainingActivity" />
         </activity>
         <activity
             android:name=".ActualTrainingActivity"
@@ -55,17 +55,17 @@
                 android:value="ru.codingworkshop.gymm.MainActivity" />
         </activity>
         <activity
-            android:name=".program.activity.exercise.picker.MusclesActivity"
+            android:name=".ui.program.exercise.picker.MuscleGroupsActivity"
             android:label="@string/muscles_activity_title"
-            android:parentActivityName=".program.activity.exercise.ProgramExerciseActivity"
+            android:parentActivityName=".ui.program.exercise.ProgramExerciseActivity"
             android:theme="@style/AppTheme.NoActionBar">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="ru.codingworkshop.gymm.program.activity.exercise.ProgramExerciseActivity" />
+                android:value="ru.codingworkshop.gymm.ui.program.exercise.ProgramExerciseActivity" />
         </activity>
         <activity
             android:name=".info.exercise.ExerciseInfoActivity"
-            android:theme="@style/AppTheme.NoActionBar.TranslucentStatusOn"/>
+            android:theme="@style/AppTheme.NoActionBar.TranslucentStatusOn" />
     </application>
 
 </manifest>

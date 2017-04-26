@@ -20,7 +20,6 @@ import android.view.MenuItem;
 import android.view.View;
 
 import ru.codingworkshop.gymm.data.model.ProgramTraining;
-import ru.codingworkshop.gymm.program.activity.training.TrainingAsyncLoader;
 import ru.codingworkshop.gymm.service.TrainingTimeService;
 
 public class ActualTrainingActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<ProgramTraining>,
@@ -49,12 +48,13 @@ public class ActualTrainingActivity extends AppCompatActivity implements LoaderM
         mAdapter = new ActualTrainingAdapter(this);
         mStepsView.setAdapter(mAdapter);
 
-        getSupportLoaderManager().initLoader(TrainingAsyncLoader.LOADER_TRAINING_LOAD, getIntent().getExtras(), this);
+//        getSupportLoaderManager().initLoader(TrainingAsyncLoader.LOADER_TRAINING_LOAD, getIntent().getExtras(), this);
     }
 
     @Override
     public Loader<ProgramTraining> onCreateLoader(int id, Bundle args) {
-        return new TrainingAsyncLoader(this, id, args);
+//        return new TrainingAsyncLoader(this, id, args);
+        return null;
     }
 
     @Override

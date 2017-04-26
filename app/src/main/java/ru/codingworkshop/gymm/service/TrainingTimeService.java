@@ -94,7 +94,7 @@ public class TrainingTimeService extends Service {
 
         NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(this)
                 .setContentTitle(programTraining.getName())
-                .setContentText(programTraining.getChild(0).getExercise().getName())
+                .setContentText(programTraining.getExercises().get(0).getExercise().getName())
                 .setSmallIcon(R.mipmap.ic_launcher)
                 .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
                 .setUsesChronometer(true)
