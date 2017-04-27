@@ -1,4 +1,4 @@
-package ru.codingworkshop.gymm.info.exercise;
+package ru.codingworkshop.gymm.ui.info.exercise;
 
 import android.content.AsyncTaskLoader;
 import android.content.Context;

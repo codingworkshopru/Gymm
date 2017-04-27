@@ -4,7 +4,7 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    tools:context="ru.codingworkshop.gymm.info.exercise.ExerciseInfoActivity">
+    tools:context=".ui.info.exercise.ExerciseInfoActivity">
 
     <data>
         <import type="android.view.View" />

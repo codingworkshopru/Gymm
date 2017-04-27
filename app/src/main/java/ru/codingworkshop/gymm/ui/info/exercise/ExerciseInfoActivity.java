@@ -1,4 +1,4 @@
-package ru.codingworkshop.gymm.info.exercise;
+package ru.codingworkshop.gymm.ui.info.exercise;
 
 import android.app.LoaderManager;
 import android.content.Intent;

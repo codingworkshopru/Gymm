@@ -1,4 +1,4 @@
-package ru.codingworkshop.gymm;
+package ru.codingworkshop.gymm.ui.actual;
 
 import android.content.Context;
 import android.os.Build;
@@ -16,6 +16,7 @@ import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import ru.codingworkshop.gymm.R;
 import ru.codingworkshop.gymm.data.model.ProgramTraining;
 
 /**

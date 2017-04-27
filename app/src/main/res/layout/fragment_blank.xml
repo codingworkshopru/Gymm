@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:focusableInTouchMode="true"
-    tools:context="ru.codingworkshop.gymm.BlankFragment">
+    tools:context="ru.codingworkshop.gymm.ui.actual.BlankFragment">
 
     <ImageButton
         android:id="@+id/imageButton"

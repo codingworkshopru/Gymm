@@ -1,4 +1,4 @@
-package ru.codingworkshop.gymm;
+package ru.codingworkshop.gymm.ui.actual;
 
 import android.app.ActivityManager;
 import android.content.Context;
@@ -7,6 +7,7 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.IdRes;
+import android.support.annotation.UiThread;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.app.NavUtils;
 import android.support.v4.content.Loader;
@@ -19,6 +20,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 
+import ru.codingworkshop.gymm.R;
 import ru.codingworkshop.gymm.data.model.ProgramTraining;
 import ru.codingworkshop.gymm.service.TrainingTimeService;
 
@@ -105,6 +107,7 @@ public class ActualTrainingActivity extends AppCompatActivity implements LoaderM
 
     }
 
+    @UiThread
     @Override
     public void onStepClick(View view) {
         if (mFragment == null)

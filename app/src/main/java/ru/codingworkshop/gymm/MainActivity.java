@@ -19,6 +19,7 @@ import java.util.List;
 import io.requery.query.Result;
 import ru.codingworkshop.gymm.data.ModelLoader;
 import ru.codingworkshop.gymm.data.model.ProgramTraining;
+import ru.codingworkshop.gymm.ui.actual.ActualTrainingActivity;
 import ru.codingworkshop.gymm.ui.program.training.ProgramTrainingActivity;
 
 public class MainActivity extends AppCompatActivity implements ModelLoader.ModelLoaderCallbacks<ProgramTraining> {

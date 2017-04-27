@@ -15,10 +15,10 @@ import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.TaskStackBuilder;
 import android.util.Log;
 
-import ru.codingworkshop.gymm.ActualTrainingActivity;
 import ru.codingworkshop.gymm.MainActivity;
 import ru.codingworkshop.gymm.R;
 import ru.codingworkshop.gymm.data.model.ProgramTraining;
+import ru.codingworkshop.gymm.ui.actual.ActualTrainingActivity;
 
 /**
  * Created by Радик on 07.04.2017.

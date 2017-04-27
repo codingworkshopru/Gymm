@@ -14,7 +14,7 @@ import ru.codingworkshop.gymm.R;
 import ru.codingworkshop.gymm.data.ModelLoader;
 import ru.codingworkshop.gymm.data.model.Exercise;
 import ru.codingworkshop.gymm.data.model.MuscleGroup;
-import ru.codingworkshop.gymm.info.exercise.ExerciseInfoActivity;
+import ru.codingworkshop.gymm.ui.info.exercise.ExerciseInfoActivity;
 import ru.codingworkshop.gymm.ui.program.exercise.ProgramExerciseActivity;
 
 final public class MuscleGroupsActivity extends AppCompatActivity
