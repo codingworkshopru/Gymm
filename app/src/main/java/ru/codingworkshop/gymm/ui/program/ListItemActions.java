@@ -20,9 +20,7 @@ import ru.codingworkshop.gymm.ui.program.events.TouchViewEvent;
 public class ListItemActions extends ItemTouchHelper.SimpleCallback implements View.OnClickListener {
     private ItemTouchHelper itemTouchHelper;
     private Adapter adapter;
-    private
-    @StringRes
-    int deletedMessageId;
+    private @StringRes int deletedMessageId;
 
     public ListItemActions(@NonNull EventBus bus, @NonNull Adapter a, @StringRes int deletedMessage) {
         super(ItemTouchHelper.UP | ItemTouchHelper.DOWN, ItemTouchHelper.RIGHT);

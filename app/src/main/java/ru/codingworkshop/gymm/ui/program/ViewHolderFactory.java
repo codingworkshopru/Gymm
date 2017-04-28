@@ -21,12 +21,8 @@ import ru.codingworkshop.gymm.ui.program.events.TouchViewEvent;
 
 public class ViewHolderFactory<B extends ViewDataBinding> {
     private EventBus eventBus;
-    private
-    @LayoutRes
-    int layoutId;
-    private
-    @IdRes
-    int dragItemId;
+    private @LayoutRes int layoutId;
+    private @IdRes int dragItemId;
 
     public ViewHolderFactory(@NonNull EventBus bus, @LayoutRes int layout, @IdRes int dragItem) {
         eventBus = bus;
