@@ -10,7 +10,9 @@
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:supportsRtl="true"
+        android:fullBackupContent="true"
         android:theme="@style/AppTheme.NoActionBar">
+
         <service
             android:name=".service.TrainingTimeService"
             android:description="@string/time_service_description"

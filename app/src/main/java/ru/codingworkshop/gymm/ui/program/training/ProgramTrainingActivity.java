@@ -12,6 +12,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.support.v7.widget.helper.ItemTouchHelper;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -19,6 +20,9 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.Spinner;
+
+import com.google.common.eventbus.EventBus;
+import com.google.common.eventbus.Subscribe;
 
 import io.requery.Persistable;
 import io.requery.sql.EntityDataStore;
@@ -31,6 +35,9 @@ import ru.codingworkshop.gymm.data.model.ProgramTrainingEntity;
 import ru.codingworkshop.gymm.databinding.ActivityProgramTrainingBinding;
 import ru.codingworkshop.gymm.databinding.ActivityProgramTrainingListItemBinding;
 import ru.codingworkshop.gymm.ui.program.Adapter;
+import ru.codingworkshop.gymm.ui.program.ListItemActions;
+import ru.codingworkshop.gymm.ui.program.ViewHolderFactory;
+import ru.codingworkshop.gymm.ui.program.events.ClickViewEvent;
 import ru.codingworkshop.gymm.ui.program.exercise.ProgramExerciseActivity;
 
 /**
@@ -41,6 +48,9 @@ public class ProgramTrainingActivity extends AppCompatActivity {
     private ActivityProgramTrainingBinding binding;
     private EntityDataStore<Persistable> data;
     private Adapter<ActivityProgramTrainingListItemBinding, ProgramExercise> adapter;
+    private EventBus eventBus;
+
+    private static final String PROGRAM_TRAINING_MODEL = "programTrainingModel";
 
     private static final String TAG = ProgramTrainingActivity.class.getSimpleName();
 
@@ -49,6 +59,9 @@ public class ProgramTrainingActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
 
         binding = DataBindingUtil.setContentView(this, R.layout.activity_program_training);
+
+        eventBus = new EventBus();
+        eventBus.register(this);
 
         setSupportActionBar((Toolbar) findViewById(R.id.program_training_toolbar));
         if (getSupportActionBar() != null) {
@@ -59,8 +72,8 @@ public class ProgramTrainingActivity extends AppCompatActivity {
 
         ProgramTraining model;
         Intent startedIntent = getIntent();
-        if (savedInstanceState != null && savedInstanceState.containsKey("model")) {
-            model = savedInstanceState.getParcelable("model");
+        if (savedInstanceState != null && savedInstanceState.containsKey(PROGRAM_TRAINING_MODEL)) {
+            model = savedInstanceState.getParcelable(PROGRAM_TRAINING_MODEL);
         } else if (startedIntent != null && startedIntent.hasExtra(MainActivity.PROGRAM_TRAINING_ID_KEY)) {
             long trainingId = startedIntent.getLongExtra(MainActivity.PROGRAM_TRAINING_ID_KEY, 0L);
             model = data.select(ProgramTraining.class)
@@ -69,14 +82,25 @@ public class ProgramTrainingActivity extends AppCompatActivity {
                     .first();
         } else {
             model = new ProgramTrainingEntity();
+            data.insert(model);
         }
         binding.setTraining(model);
 
-        adapter = new Adapter<>(R.layout.activity_program_training_list_item);
+        ViewHolderFactory<ActivityProgramTrainingListItemBinding> factory = new ViewHolderFactory<>(
+                eventBus,
+                R.layout.activity_program_training_list_item,
+                R.id.program_training_list_item_reorder_action
+        );
+        adapter = new Adapter<>(factory);
         adapter.setDataList(model.getExercises());
         RecyclerView recyclerView = (RecyclerView) findViewById(R.id.program_training_exercises_list);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         recyclerView.setAdapter(adapter);
+
+        ListItemActions callbacks = new ListItemActions(eventBus, adapter, R.string.program_training_activity_exercise_deleted_message);
+        ItemTouchHelper itemTouchHelper = new ItemTouchHelper(callbacks);
+        itemTouchHelper.attachToRecyclerView(recyclerView);
+        callbacks.setItemTouchHelper(itemTouchHelper);
 
         Log.d(TAG, "onCreate");
     }
@@ -84,7 +108,7 @@ public class ProgramTrainingActivity extends AppCompatActivity {
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-        outState.putParcelable("model", binding.getTraining());
+        outState.putParcelable(PROGRAM_TRAINING_MODEL, binding.getTraining());
     }
 
     public void onAddButtonClick(View view) {
@@ -128,9 +152,17 @@ public class ProgramTrainingActivity extends AppCompatActivity {
         }
     }
 
+    @Subscribe
+    public void exerciseClick(ClickViewEvent<ActivityProgramTrainingListItemBinding> event) {
+        ProgramExercise exercise = event.getBinding().getModel();
+        Intent intent = new Intent(this, ProgramExerciseActivity.class);
+        startActivityForResult(intent, 0);
+
+    }
+
     // binding adapters
     //-----------------------------------------
-    @BindingAdapter(value = {"app:value", "bind:valueAttrChanged"}, requireAll = false)
+    @BindingAdapter(value = {"app:value", "app:valueAttrChanged"}, requireAll = false)
     public static void setSpinnerValue(Spinner spinner, int value, final InverseBindingListener bindingListener) {
         spinner.setSelection(value, false);
         spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
@@ -147,7 +179,7 @@ public class ProgramTrainingActivity extends AppCompatActivity {
         });
     }
 
-    @InverseBindingAdapter(attribute = "app:value", event = "bind:valueAttrChanged")
+    @InverseBindingAdapter(attribute = "app:value", event = "app:valueAttrChanged")
     public static int captureSpinnerValue(Spinner spinner) {
         return (int) spinner.getSelectedItemId();
     }

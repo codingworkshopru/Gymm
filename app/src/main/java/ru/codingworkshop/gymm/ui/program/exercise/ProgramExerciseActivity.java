@@ -9,11 +9,15 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.support.v7.widget.helper.ItemTouchHelper;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+
+import com.google.common.eventbus.EventBus;
+import com.google.common.eventbus.Subscribe;
 
 import io.requery.Persistable;
 import io.requery.sql.EntityDataStore;
@@ -26,6 +30,9 @@ import ru.codingworkshop.gymm.data.model.ProgramSet;
 import ru.codingworkshop.gymm.databinding.ActivityProgramExerciseBinding;
 import ru.codingworkshop.gymm.databinding.ActivityProgramExerciseListItemBinding;
 import ru.codingworkshop.gymm.ui.program.Adapter;
+import ru.codingworkshop.gymm.ui.program.ListItemActions;
+import ru.codingworkshop.gymm.ui.program.ViewHolderFactory;
+import ru.codingworkshop.gymm.ui.program.events.ClickViewEvent;
 import ru.codingworkshop.gymm.ui.program.exercise.picker.MuscleGroupsActivity;
 
 /**
@@ -38,7 +45,8 @@ public class ProgramExerciseActivity extends AppCompatActivity
     private ProgramExercise model;
     private SetInputFragment setInputFragment;
     private Adapter<ActivityProgramExerciseListItemBinding, ProgramSet> adapter;
-    ActivityProgramExerciseBinding binding;
+    private ActivityProgramExerciseBinding binding;
+    private EventBus eventBus;
 
     private static final String TAG = ProgramExerciseActivity.class.getSimpleName();
 
@@ -50,10 +58,14 @@ public class ProgramExerciseActivity extends AppCompatActivity
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         binding = DataBindingUtil.setContentView(this, R.layout.activity_program_exercise);
+        eventBus = new EventBus();
+        eventBus.register(this);
 
         data = ((App) getApplication()).getData();
 
-        setInputFragment = SetInputFragment.newInstance();
+        setInputFragment = (SetInputFragment) getFragmentManager().findFragmentByTag(SetInputFragment.TAG);
+        if (setInputFragment == null)
+            setInputFragment = SetInputFragment.newInstance();
 
         setSupportActionBar((Toolbar) findViewById(R.id.program_exercise_toolbar));
         ActionBar ab = getSupportActionBar();
@@ -78,11 +90,21 @@ public class ProgramExerciseActivity extends AppCompatActivity
             }
         }
 
-        adapter = new Adapter<>(R.layout.activity_program_exercise_list_item);
+        ViewHolderFactory<ActivityProgramExerciseListItemBinding> factory = new ViewHolderFactory<>(
+                eventBus,
+                R.layout.activity_program_exercise_list_item,
+                R.id.program_exercise_list_item_reorder_action
+        );
+        adapter = new Adapter<>(factory);
         adapter.setDataList(model.getSets());
         RecyclerView recyclerView = (RecyclerView) findViewById(R.id.program_exercise_sets_list);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         recyclerView.setAdapter(adapter);
+
+        ListItemActions callbacks = new ListItemActions(eventBus, adapter, R.string.program_exercise_activity_set_deleted_message);
+        ItemTouchHelper itemTouchHelper = new ItemTouchHelper(callbacks);
+        itemTouchHelper.attachToRecyclerView(recyclerView);
+        callbacks.setItemTouchHelper(itemTouchHelper);
 
         Log.d(TAG, "onCreate");
     }
@@ -94,10 +116,7 @@ public class ProgramExerciseActivity extends AppCompatActivity
     }
 
     public void onAddButtonClick(View view) {
-        getFragmentManager()
-                .beginTransaction()
-                .add(0, setInputFragment, SetInputFragment.class.getSimpleName())
-                .commit();
+        setInputFragment.create(getFragmentManager());
     }
 
     @Override
@@ -127,15 +146,15 @@ public class ProgramExerciseActivity extends AppCompatActivity
         }
     }
 
-    @Override
-    public void onSetInputDialogFinished(ProgramSet model) {
-        if (model.getExercise() == null)
-            adapter.addModel(model);
-    }
-
     public void onExercisePick(View view) {
         Intent intent = new Intent(ProgramExerciseActivity.this, MuscleGroupsActivity.class);
         startActivityForResult(intent, 0);
+    }
+
+    @Subscribe
+    public void onSetClick(ClickViewEvent<ActivityProgramExerciseListItemBinding> event) {
+        ProgramSet set = event.getBinding().getModel();
+        setInputFragment.modify(getFragmentManager(), set);
     }
 
     @Override
@@ -147,5 +166,15 @@ public class ProgramExerciseActivity extends AppCompatActivity
             model.setExercise(returnedExercise);
             binding.setExercise(returnedExercise);
         }
+    }
+
+    @Override
+    public void onSetCreated(ProgramSet model) {
+        adapter.addModel(model);
+    }
+
+    @Override
+    public void onSetModified(ProgramSet model) {
+        adapter.replaceModel(model);
     }
 }

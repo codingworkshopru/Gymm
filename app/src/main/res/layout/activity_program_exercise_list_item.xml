@@ -77,4 +77,5 @@
                 app:srcCompat="@drawable/ic_reorder_24dp" />
         </LinearLayout>
     </android.support.constraint.ConstraintLayout>
+
 </layout>

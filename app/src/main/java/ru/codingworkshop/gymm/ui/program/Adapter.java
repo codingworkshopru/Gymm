@@ -1,16 +1,14 @@
 package ru.codingworkshop.gymm.ui.program;
 
-import android.databinding.DataBindingUtil;
 import android.databinding.ViewDataBinding;
-import android.support.annotation.LayoutRes;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
-import android.view.LayoutInflater;
 import android.view.ViewGroup;
 
+import java.util.Collections;
 import java.util.List;
 
-import ru.codingworkshop.gymm.BR;
+import .BR;
 import ru.codingworkshop.gymm.data.model.Orderable;
 
 /**
@@ -19,17 +17,16 @@ import ru.codingworkshop.gymm.data.model.Orderable;
 
 public class Adapter<B extends ViewDataBinding, M extends Orderable> extends RecyclerView.Adapter<BindingHolder<B>> {
     private List<M> dataList;
-    private final @LayoutRes int layout;
+    private ViewHolderFactory<B> viewHolderFactory;
+    private M lastRemoved;
 
-    public Adapter(@LayoutRes int layoutRes) {
-        layout = layoutRes;
+    public Adapter(ViewHolderFactory<B> factory) {
+        viewHolderFactory = factory;
     }
 
     @Override
     public BindingHolder<B> onCreateViewHolder(ViewGroup parent, int viewType) {
-        LayoutInflater inflater = LayoutInflater.from(parent.getContext());
-        B binding = DataBindingUtil.inflate(inflater, layout, parent, false);
-        return new BindingHolder<>(binding);
+        return viewHolderFactory.createViewHolder(parent);
     }
 
     @Override
@@ -64,9 +61,35 @@ public class Adapter<B extends ViewDataBinding, M extends Orderable> extends Rec
         notifyItemChanged(index);
     }
 
+    public void moveModel(int fromPosition, int toPosition) {
+        Collections.swap(dataList, fromPosition, toPosition);
+        updateSortOrders(Math.min(fromPosition, toPosition), Math.max(fromPosition, toPosition));
+        notifyItemMoved(fromPosition, toPosition);
+    }
+
     public void removeModel(@NonNull M model) {
-        int index = model.getSortOrder();
-        dataList.remove(index);
+        removeModel(model.getSortOrder());
+    }
+
+    public void removeModel(int index) {
+        lastRemoved = dataList.remove(index);
+        updateSortOrders(index);
         notifyItemRemoved(index);
+    }
+
+    public void restoreLastRemoved() {
+        int index = lastRemoved.getSortOrder();
+        dataList.add(index, lastRemoved);
+        updateSortOrders(index);
+        notifyItemInserted(index);
+    }
+
+    private void updateSortOrders(int start) {
+        updateSortOrders(start, getItemCount() - 1);
+    }
+
+    private void updateSortOrders(int start, int end) {
+        for (int i = start; i <= end; i++)
+            dataList.get(i).setSortOrder(i);
     }
 }

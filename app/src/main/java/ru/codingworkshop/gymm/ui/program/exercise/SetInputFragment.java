@@ -1,11 +1,8 @@
 package ru.codingworkshop.gymm.ui.program.exercise;
 
-/**
- * Created by Радик on 21.04.2017.
- */
-
 import android.app.Dialog;
 import android.app.DialogFragment;
+import android.app.FragmentManager;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.os.Bundle;
@@ -22,14 +19,16 @@ import ru.codingworkshop.gymm.data.model.ProgramSet;
 import ru.codingworkshop.gymm.data.model.ProgramSetEntity;
 
 /**
- * Created by Радик on 25.02.2017.
+ * Created by Радик on 21.04.2017.
  */
 
 public final class SetInputFragment extends DialogFragment
         implements DialogInterface.OnClickListener {
 
     interface SetInputDialogListener {
-        void onSetInputDialogFinished(ProgramSet model);
+        void onSetCreated(ProgramSet model);
+
+        void onSetModified(ProgramSet model);
     }
 
     private static final int REPS_MIN = 1;
@@ -43,6 +42,9 @@ public final class SetInputFragment extends DialogFragment
     private static final int SECONDS_STEP = 5;
 
     public static final String DIALOG_MODEL_KEY = ProgramSet.class.getCanonicalName();
+    public static final String DIALOG_ACTION_KEY = "dialogActionKey";
+    public static final int DIALOG_ACTION_CREATE = 0;
+    public static final int DIALOG_ACTION_MODIFY = 1;
 
     public static final String TAG = SetInputFragment.class.getSimpleName();
 
@@ -58,29 +60,45 @@ public final class SetInputFragment extends DialogFragment
         return new SetInputFragment();
     }
 
+    public void create(FragmentManager manager) {
+        Bundle args = new Bundle(1);
+        args.putInt(DIALOG_ACTION_KEY, DIALOG_ACTION_CREATE);
+        setArguments(args);
+        show(manager, TAG);
+    }
+
+    public void modify(FragmentManager manager, ProgramSet set) {
+        Bundle args = new Bundle(2);
+        args.putInt(DIALOG_ACTION_KEY, DIALOG_ACTION_MODIFY);
+        args.putParcelable(DIALOG_MODEL_KEY, set);
+        setArguments(args);
+        show(manager, TAG);
+    }
+
     @NonNull
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
         Context context = getActivity();
-        LayoutInflater inflater = getActivity().getLayoutInflater();
+
+        Bundle arguments = getArguments();
+        if (arguments == null)
+            throw new IllegalArgumentException("arguments bundle mustn't be null");
+
+        int action = arguments.getInt(DIALOG_ACTION_KEY);
 
         @StringRes int title = R.string.program_exercise_activity_dialog_title_edit;
 
-        Bundle arguments = getArguments();
-        if (arguments != null && arguments.containsKey(DIALOG_MODEL_KEY)) {
+        if (savedInstanceState != null) {
+            mModel = savedInstanceState.getParcelable(DIALOG_MODEL_KEY);
+        } else if (action == DIALOG_ACTION_MODIFY) {
             mModel = arguments.getParcelable(DIALOG_MODEL_KEY);
-        } else {
-            ProgramSet newModel = new ProgramSetEntity();
-            if (mModel != null) {
-                newModel.setReps(mModel.getReps());
-                newModel.setSecondsForRest(mModel.getSecondsForRest());
-            } else {
-                newModel.setReps(REPS_MIN);
-            }
+        } else if (action == DIALOG_ACTION_CREATE) {
+            mModel = new ProgramSetEntity();
+            mModel.setReps(REPS_MIN);
             title = R.string.program_exercise_activity_dialog_title;
-            mModel = newModel;
         }
 
+        LayoutInflater inflater = getActivity().getLayoutInflater();
         View customView = inflater.inflate(R.layout.activity_program_exercise_dialog, null);
 
         mRepsPicker = initPicker(customView, R.id.program_exercise_reps_picker, REPS_MIN, REPS_MAX, 1, mModel.getReps());
@@ -96,10 +114,16 @@ public final class SetInputFragment extends DialogFragment
                 .setTitle(title)
                 .setCancelable(true)
                 .setView(customView)
-                .setPositiveButton(R.string.ok_button_text, this)
-                .setNegativeButton(R.string.cancel_button_text, null);
+                .setPositiveButton(android.R.string.ok, this)
+                .setNegativeButton(android.R.string.cancel, null);
 
         return builder.create();
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putParcelable(DIALOG_MODEL_KEY, mModel);
     }
 
     private NumberPicker initPicker(@NonNull View parent, @IdRes int pickerId, int min, int max, int step, int value) {
@@ -129,6 +153,19 @@ public final class SetInputFragment extends DialogFragment
     public void onClick(DialogInterface dialog, int which) {
         mModel.setReps(mRepsPicker.getValue());
         mModel.setSecondsForRest(mMinutesPicker.getValue() * 60 + mSecondsPicker.getValue() * SECONDS_STEP);
-        mSetInputDialogListener.onSetInputDialogFinished(mModel);
+
+        switch (getArguments().getInt(DIALOG_ACTION_KEY)) {
+
+            case DIALOG_ACTION_CREATE:
+                mSetInputDialogListener.onSetCreated(mModel);
+                break;
+
+            case DIALOG_ACTION_MODIFY:
+                mSetInputDialogListener.onSetModified(mModel);
+                break;
+
+            default:
+                throw new IllegalStateException("Unknown dialog action");
+        }
     }
 }
