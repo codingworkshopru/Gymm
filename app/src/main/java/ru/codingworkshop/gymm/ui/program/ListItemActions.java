@@ -65,4 +65,8 @@ public class ListItemActions extends ItemTouchHelper.SimpleCallback implements V
     public void setItemTouchHelper(@NonNull ItemTouchHelper touchHelper) {
         itemTouchHelper = touchHelper;
     }
+
+    public ItemTouchHelper getItemTouchHelper() {
+        return itemTouchHelper;
+    }
 }

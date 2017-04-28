@@ -11,6 +11,7 @@ import android.view.ViewGroup;
 
 import com.google.common.eventbus.EventBus;
 
+import .BR;
 import ru.codingworkshop.gymm.ui.program.events.ClickViewEvent;
 import ru.codingworkshop.gymm.ui.program.events.LongClickViewEvent;
 import ru.codingworkshop.gymm.ui.program.events.TouchViewEvent;
@@ -21,11 +22,13 @@ import ru.codingworkshop.gymm.ui.program.events.TouchViewEvent;
 
 public class ViewHolderFactory<B extends ViewDataBinding> {
     private EventBus eventBus;
+    private EditModeActions editModeActions;
     private @LayoutRes int layoutId;
     private @IdRes int dragItemId;
 
-    public ViewHolderFactory(@NonNull EventBus bus, @LayoutRes int layout, @IdRes int dragItem) {
+    public ViewHolderFactory(@NonNull EventBus bus, @NonNull EditModeActions actions, @LayoutRes int layout, @IdRes int dragItem) {
         eventBus = bus;
+        editModeActions = actions;
         layoutId = layout;
         dragItemId = dragItem;
     }
@@ -33,6 +36,7 @@ public class ViewHolderFactory<B extends ViewDataBinding> {
     public BindingHolder<B> createViewHolder(@NonNull ViewGroup parent) {
         LayoutInflater inflater = LayoutInflater.from(parent.getContext());
         final B binding = DataBindingUtil.inflate(inflater, layoutId, parent, false);
+        binding.setVariable(BR.editModeActions, editModeActions);
         BindingHolder<B> viewHolder = new BindingHolder<>(binding);
 
         View root = binding.getRoot();

@@ -9,7 +9,6 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
-import android.support.v7.widget.helper.ItemTouchHelper;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -30,7 +29,7 @@ import ru.codingworkshop.gymm.data.model.ProgramSet;
 import ru.codingworkshop.gymm.databinding.ActivityProgramExerciseBinding;
 import ru.codingworkshop.gymm.databinding.ActivityProgramExerciseListItemBinding;
 import ru.codingworkshop.gymm.ui.program.Adapter;
-import ru.codingworkshop.gymm.ui.program.ListItemActions;
+import ru.codingworkshop.gymm.ui.program.EditModeActions;
 import ru.codingworkshop.gymm.ui.program.ViewHolderFactory;
 import ru.codingworkshop.gymm.ui.program.events.ClickViewEvent;
 import ru.codingworkshop.gymm.ui.program.exercise.picker.MuscleGroupsActivity;
@@ -90,21 +89,26 @@ public class ProgramExerciseActivity extends AppCompatActivity
             }
         }
 
+        RecyclerView recyclerView = (RecyclerView) findViewById(R.id.program_exercise_sets_list);
+        recyclerView.setLayoutManager(new LinearLayoutManager(this));
+
+        EditModeActions editModeActions = new EditModeActions(
+                eventBus,
+                this,
+                recyclerView,
+                R.id.program_exercise_name_layout,
+                R.string.program_exercise_activity_set_deleted_message
+        );
+
         ViewHolderFactory<ActivityProgramExerciseListItemBinding> factory = new ViewHolderFactory<>(
                 eventBus,
+                editModeActions,
                 R.layout.activity_program_exercise_list_item,
                 R.id.program_exercise_list_item_reorder_action
         );
         adapter = new Adapter<>(factory);
         adapter.setDataList(model.getSets());
-        RecyclerView recyclerView = (RecyclerView) findViewById(R.id.program_exercise_sets_list);
-        recyclerView.setLayoutManager(new LinearLayoutManager(this));
         recyclerView.setAdapter(adapter);
-
-        ListItemActions callbacks = new ListItemActions(eventBus, adapter, R.string.program_exercise_activity_set_deleted_message);
-        ItemTouchHelper itemTouchHelper = new ItemTouchHelper(callbacks);
-        itemTouchHelper.attachToRecyclerView(recyclerView);
-        callbacks.setItemTouchHelper(itemTouchHelper);
 
         Log.d(TAG, "onCreate");
     }
@@ -129,9 +133,11 @@ public class ProgramExerciseActivity extends AppCompatActivity
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
+
             case android.R.id.home:
                 onBackPressed();
                 return true;
+
             case R.id.action_done:
                 if (model.getId() != 0L)
                     data.update(model);
@@ -140,7 +146,9 @@ public class ProgramExerciseActivity extends AppCompatActivity
                 resultData.putExtra(PROGRAM_EXERCISE_MODEL, model);
                 setResult(RESULT_OK, resultData);
                 finish();
+
                 return true;
+
             default:
                 return super.onOptionsItemSelected(item);
         }
