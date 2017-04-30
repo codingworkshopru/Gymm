@@ -6,8 +6,8 @@
     <data>
         <import type="android.view.View"/>
         <variable
-            name="editModeActions"
-            type="ru.codingworkshop.gymm.ui.program.EditModeActions"/>
+            name="properties"
+            type="ru.codingworkshop.gymm.ui.program.ActivityProperties"/>
         <variable
             name="model"
             type="ru.codingworkshop.gymm.data.model.ProgramSet"/>
@@ -57,7 +57,7 @@
             android:layout_width="wrap_content"
             android:layout_height="0dp"
             android:orientation="horizontal"
-            android:visibility="@{editModeActions.editMode ? View.VISIBLE : View.GONE}"
+            android:visibility="@{properties.inEditMode ? View.VISIBLE : View.GONE}"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintRight_toRightOf="parent"
             app:layout_constraintTop_toTopOf="parent">

@@ -33,6 +33,7 @@ import ru.codingworkshop.gymm.data.model.ProgramTraining;
 import ru.codingworkshop.gymm.data.model.ProgramTrainingEntity;
 import ru.codingworkshop.gymm.databinding.ActivityProgramTrainingBinding;
 import ru.codingworkshop.gymm.databinding.ActivityProgramTrainingListItemBinding;
+import ru.codingworkshop.gymm.ui.program.ActivityProperties;
 import ru.codingworkshop.gymm.ui.program.Adapter;
 import ru.codingworkshop.gymm.ui.program.EditModeActions;
 import ru.codingworkshop.gymm.ui.program.ViewHolderFactory;
@@ -88,11 +89,14 @@ public class ProgramTrainingActivity extends AppCompatActivity {
         RecyclerView recyclerView = (RecyclerView) findViewById(R.id.program_training_exercises_list);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
 
-        EditModeActions editModeActions = new EditModeActions(eventBus, this, recyclerView, R.id.program_training_app_bar_content, R.string.program_training_activity_exercise_deleted_message);
+        ActivityProperties properties = new ActivityProperties(eventBus);
+        binding.setProperties(properties);
+
+        new EditModeActions(eventBus, this, recyclerView, R.string.program_training_activity_exercise_deleted_message);
 
         ViewHolderFactory<ActivityProgramTrainingListItemBinding> factory = new ViewHolderFactory<>(
                 eventBus,
-                editModeActions,
+                properties,
                 R.layout.activity_program_training_list_item,
                 R.id.program_training_list_item_reorder_action
         );

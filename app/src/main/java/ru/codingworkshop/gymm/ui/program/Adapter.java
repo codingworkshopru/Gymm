@@ -8,8 +8,8 @@ import android.view.ViewGroup;
 import java.util.Collections;
 import java.util.List;
 
-import .BR;
 import ru.codingworkshop.gymm.data.model.Orderable;
+import ru.codingworkshop.gymm.ui.program.events.ListEmptinessChangeEvent;
 
 /**
  * Created by Радик on 26.04.2017.
@@ -22,6 +22,24 @@ public class Adapter<B extends ViewDataBinding, M extends Orderable> extends Rec
 
     public Adapter(ViewHolderFactory<B> factory) {
         viewHolderFactory = factory;
+        registerAdapterDataObserver(new RecyclerView.AdapterDataObserver() {
+            @Override
+            public void onChanged() {
+                viewHolderFactory.getEventBus().post(new ListEmptinessChangeEvent(dataList.isEmpty()));
+            }
+
+            @Override
+            public void onItemRangeInserted(int positionStart, int itemCount) {
+                if (dataList.size() == 1)
+                    viewHolderFactory.getEventBus().post(new ListEmptinessChangeEvent(dataList.isEmpty()));
+            }
+
+            @Override
+            public void onItemRangeRemoved(int positionStart, int itemCount) {
+                if (dataList.size() == 0)
+                    viewHolderFactory.getEventBus().post(new ListEmptinessChangeEvent(dataList.isEmpty()));
+            }
+        });
     }
 
     @Override
@@ -31,7 +49,7 @@ public class Adapter<B extends ViewDataBinding, M extends Orderable> extends Rec
 
     @Override
     public void onBindViewHolder(BindingHolder<B> holder, int position) {
-        holder.binding.setVariable(BR.model, dataList.get(position));
+        holder.binding.setVariable(ru.codingworkshop.gymm.BR.model, dataList.get(position));
     }
 
     @Override

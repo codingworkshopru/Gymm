@@ -28,6 +28,7 @@ import ru.codingworkshop.gymm.data.model.ProgramExerciseEntity;
 import ru.codingworkshop.gymm.data.model.ProgramSet;
 import ru.codingworkshop.gymm.databinding.ActivityProgramExerciseBinding;
 import ru.codingworkshop.gymm.databinding.ActivityProgramExerciseListItemBinding;
+import ru.codingworkshop.gymm.ui.program.ActivityProperties;
 import ru.codingworkshop.gymm.ui.program.Adapter;
 import ru.codingworkshop.gymm.ui.program.EditModeActions;
 import ru.codingworkshop.gymm.ui.program.ViewHolderFactory;
@@ -56,9 +57,12 @@ public class ProgramExerciseActivity extends AppCompatActivity
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        binding = DataBindingUtil.setContentView(this, R.layout.activity_program_exercise);
+
         eventBus = new EventBus();
         eventBus.register(this);
+
+        binding = DataBindingUtil.setContentView(this, R.layout.activity_program_exercise);
+        binding.setProperties(new ActivityProperties(eventBus));
 
         data = ((App) getApplication()).getData();
 
@@ -92,17 +96,16 @@ public class ProgramExerciseActivity extends AppCompatActivity
         RecyclerView recyclerView = (RecyclerView) findViewById(R.id.program_exercise_sets_list);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
 
-        EditModeActions editModeActions = new EditModeActions(
+        new EditModeActions(
                 eventBus,
                 this,
                 recyclerView,
-                R.id.program_exercise_name_layout,
                 R.string.program_exercise_activity_set_deleted_message
         );
 
         ViewHolderFactory<ActivityProgramExerciseListItemBinding> factory = new ViewHolderFactory<>(
                 eventBus,
-                editModeActions,
+                binding.getProperties(),
                 R.layout.activity_program_exercise_list_item,
                 R.id.program_exercise_list_item_reorder_action
         );
@@ -172,7 +175,7 @@ public class ProgramExerciseActivity extends AppCompatActivity
         if (resultCode == RESULT_OK && data.hasExtra(EXERCISE_MODEL)) {
             Exercise returnedExercise = data.getParcelableExtra(EXERCISE_MODEL);
             model.setExercise(returnedExercise);
-            binding.setExercise(returnedExercise);
+            binding.setExercise(model);
         }
     }
 

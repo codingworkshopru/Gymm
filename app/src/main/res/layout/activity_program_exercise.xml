@@ -5,8 +5,11 @@
     <data>
         <import type="android.view.View"/>
         <variable
+            name="properties"
+            type="ru.codingworkshop.gymm.ui.program.ActivityProperties"/>
+        <variable
             name="exercise"
-            type="ru.codingworkshop.gymm.data.model.Exercise"/>
+            type="ru.codingworkshop.gymm.data.model.ProgramExercise"/>
     </data>
 
     <android.support.design.widget.CoordinatorLayout
@@ -32,7 +35,8 @@
                 android:padding="16dp"
                 android:background="?attr/selectableItemBackground"
                 android:orientation="horizontal"
-                android:onClick="onExercisePick">
+                android:onClick="onExercisePick"
+                android:visibility="@{properties.inEditMode ? View.GONE : View.VISIBLE}">
 
                 <TextView
                     android:layout_width="0dp"
@@ -41,7 +45,7 @@
                     android:layout_weight="1"
                     android:ellipsize="end"
                     android:maxLines="1"
-                    android:text="@{exercise.name ?? @string/program_exercise_activity_exercise_empty_text}"
+                    android:text="@{exercise.exercise.name ?? @string/program_exercise_activity_exercise_empty_text}"
                     android:textAppearance="@style/TextAppearance.AppCompat.Medium"
                     android:textColor="?android:attr/textColorPrimary"
                     tools:text="Some text" />
@@ -70,6 +74,7 @@
             android:layout_gravity="center_horizontal|top"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:visibility="@{properties.listEmpty ? View.VISIBLE : View.GONE}"
             app:layout_behavior="@string/appbar_scrolling_view_behavior" >
             <ImageView
                 android:layout_width="wrap_content"

@@ -11,7 +11,7 @@ import android.view.ViewGroup;
 
 import com.google.common.eventbus.EventBus;
 
-import .BR;
+import ru.codingworkshop.gymm.BR;
 import ru.codingworkshop.gymm.ui.program.events.ClickViewEvent;
 import ru.codingworkshop.gymm.ui.program.events.LongClickViewEvent;
 import ru.codingworkshop.gymm.ui.program.events.TouchViewEvent;
@@ -22,13 +22,13 @@ import ru.codingworkshop.gymm.ui.program.events.TouchViewEvent;
 
 public class ViewHolderFactory<B extends ViewDataBinding> {
     private EventBus eventBus;
-    private EditModeActions editModeActions;
+    private ActivityProperties activityProperties;
     private @LayoutRes int layoutId;
     private @IdRes int dragItemId;
 
-    public ViewHolderFactory(@NonNull EventBus bus, @NonNull EditModeActions actions, @LayoutRes int layout, @IdRes int dragItem) {
+    public ViewHolderFactory(@NonNull EventBus bus, @NonNull ActivityProperties properties, @LayoutRes int layout, @IdRes int dragItem) {
         eventBus = bus;
-        editModeActions = actions;
+        activityProperties = properties;
         layoutId = layout;
         dragItemId = dragItem;
     }
@@ -36,7 +36,7 @@ public class ViewHolderFactory<B extends ViewDataBinding> {
     public BindingHolder<B> createViewHolder(@NonNull ViewGroup parent) {
         LayoutInflater inflater = LayoutInflater.from(parent.getContext());
         final B binding = DataBindingUtil.inflate(inflater, layoutId, parent, false);
-        binding.setVariable(BR.editModeActions, editModeActions);
+        binding.setVariable(BR.properties, activityProperties);
         BindingHolder<B> viewHolder = new BindingHolder<>(binding);
 
         View root = binding.getRoot();
@@ -44,5 +44,9 @@ public class ViewHolderFactory<B extends ViewDataBinding> {
         root.setOnLongClickListener(LongClickViewEvent.createLongClickEvent(eventBus, binding));
         root.findViewById(dragItemId).setOnTouchListener(TouchViewEvent.createTouchEvent(eventBus, viewHolder));
         return viewHolder;
+    }
+
+    public EventBus getEventBus() {
+        return eventBus;
     }
 }
