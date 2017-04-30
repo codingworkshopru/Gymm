@@ -45,8 +45,4 @@ public class ViewHolderFactory<B extends ViewDataBinding> {
         root.findViewById(dragItemId).setOnTouchListener(TouchViewEvent.createTouchEvent(eventBus, viewHolder));
         return viewHolder;
     }
-
-    public EventBus getEventBus() {
-        return eventBus;
-    }
 }

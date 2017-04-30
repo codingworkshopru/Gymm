@@ -5,6 +5,8 @@ import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.view.ViewGroup;
 
+import com.google.common.eventbus.EventBus;
+
 import java.util.Collections;
 import java.util.List;
 
@@ -16,30 +18,14 @@ import ru.codingworkshop.gymm.ui.program.events.ListEmptinessChangeEvent;
  */
 
 public class Adapter<B extends ViewDataBinding, M extends Orderable> extends RecyclerView.Adapter<BindingHolder<B>> {
-    private List<M> dataList;
     private ViewHolderFactory<B> viewHolderFactory;
+    private EventBus eventBus;
+    private List<M> dataList;
     private M lastRemoved;
 
-    public Adapter(ViewHolderFactory<B> factory) {
+    public Adapter(@NonNull ViewHolderFactory<B> factory, @NonNull EventBus bus) {
         viewHolderFactory = factory;
-        registerAdapterDataObserver(new RecyclerView.AdapterDataObserver() {
-            @Override
-            public void onChanged() {
-                viewHolderFactory.getEventBus().post(new ListEmptinessChangeEvent(dataList.isEmpty()));
-            }
-
-            @Override
-            public void onItemRangeInserted(int positionStart, int itemCount) {
-                if (dataList.size() == 1)
-                    viewHolderFactory.getEventBus().post(new ListEmptinessChangeEvent(dataList.isEmpty()));
-            }
-
-            @Override
-            public void onItemRangeRemoved(int positionStart, int itemCount) {
-                if (dataList.size() == 0)
-                    viewHolderFactory.getEventBus().post(new ListEmptinessChangeEvent(dataList.isEmpty()));
-            }
-        });
+        eventBus = bus;
     }
 
     @Override
@@ -57,9 +43,28 @@ public class Adapter<B extends ViewDataBinding, M extends Orderable> extends Rec
         return dataList.size();
     }
 
+    private void dataSetChanged() {
+        notifyDataSetChanged();
+        ListEmptinessChangeEvent.post(eventBus, dataList.isEmpty());
+    }
+
+    private void itemInserted(int position) {
+        notifyItemInserted(position);
+
+        if (dataList.size() == 1)
+            ListEmptinessChangeEvent.post(eventBus, false);
+    }
+
+    private void itemRemoved(int position) {
+        notifyItemRemoved(position);
+
+        if (dataList.size() == 0)
+            ListEmptinessChangeEvent.post(eventBus, true);
+    }
+
     public void setDataList(List<M> list) {
         dataList = list;
-        notifyDataSetChanged();
+        dataSetChanged();
     }
 
     public List<M> getDataList() {
@@ -70,7 +75,7 @@ public class Adapter<B extends ViewDataBinding, M extends Orderable> extends Rec
         int index = getItemCount();
         model.setSortOrder(index);
         dataList.add(model);
-        notifyItemInserted(index);
+        itemInserted(index);
     }
 
     public void replaceModel(@NonNull M model) {
@@ -92,14 +97,14 @@ public class Adapter<B extends ViewDataBinding, M extends Orderable> extends Rec
     public void removeModel(int index) {
         lastRemoved = dataList.remove(index);
         updateSortOrders(index);
-        notifyItemRemoved(index);
+        itemRemoved(index);
     }
 
     public void restoreLastRemoved() {
         int index = lastRemoved.getSortOrder();
         dataList.add(index, lastRemoved);
         updateSortOrders(index);
-        notifyItemInserted(index);
+        itemInserted(index);
     }
 
     private void updateSortOrders(int start) {

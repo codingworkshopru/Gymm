@@ -109,7 +109,7 @@ public class ProgramExerciseActivity extends AppCompatActivity
                 R.layout.activity_program_exercise_list_item,
                 R.id.program_exercise_list_item_reorder_action
         );
-        adapter = new Adapter<>(factory);
+        adapter = new Adapter<>(factory, eventBus);
         adapter.setDataList(model.getSets());
         recyclerView.setAdapter(adapter);
 
