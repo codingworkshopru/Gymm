@@ -11,18 +11,19 @@ import android.view.View;
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
 
+import ru.codingworkshop.gymm.ui.UiUtil;
 import ru.codingworkshop.gymm.ui.program.events.TouchViewEvent;
 
 /**
  * Created by Радик on 28.04.2017.
  */
 
-public class ListItemActions extends ItemTouchHelper.SimpleCallback implements View.OnClickListener {
+public class ListItemCallbacks extends ItemTouchHelper.SimpleCallback implements View.OnClickListener {
     private ItemTouchHelper itemTouchHelper;
     private Adapter adapter;
     private @StringRes int deletedMessageId;
 
-    public ListItemActions(@NonNull EventBus bus, @NonNull Adapter a, @StringRes int deletedMessage) {
+    public ListItemCallbacks(@NonNull EventBus bus, @NonNull Adapter a, @StringRes int deletedMessage) {
         super(ItemTouchHelper.UP | ItemTouchHelper.DOWN, ItemTouchHelper.RIGHT);
         adapter = a;
         deletedMessageId = deletedMessage;

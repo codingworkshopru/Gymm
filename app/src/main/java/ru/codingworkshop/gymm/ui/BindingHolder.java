@@ -1,4 +1,4 @@
-package ru.codingworkshop.gymm.ui.program;
+package ru.codingworkshop.gymm.ui;
 
 import android.databinding.ViewDataBinding;
 import android.support.v7.widget.RecyclerView;

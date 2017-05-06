@@ -8,6 +8,7 @@ import android.support.v4.view.ViewPager;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.view.MenuItem;
 
 import io.requery.query.Result;
 import ru.codingworkshop.gymm.R;
@@ -23,8 +24,6 @@ final public class MuscleGroupsActivity extends AppCompatActivity
         ModelLoader.ModelLoaderCallbacks<MuscleGroup>
 {
 
-//    private EntityDataStore<Persistable> data;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -36,13 +35,16 @@ final public class MuscleGroupsActivity extends AppCompatActivity
             ab.setDisplayHomeAsUpEnabled(true);
 
         new ModelLoader<>(this, MuscleGroup.class, this).queryAll();
+    }
 
-//        data = ((App) getApplication()).getData();
-
-//        List<MuscleGroup> muscleGroups = data
-//                .select(MuscleGroup.class)
-//                .get()
-//                .toList();
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        if (item.getItemId() == android.R.id.home) {
+            finish();
+            return true;
+        } else {
+            return super.onOptionsItemSelected(item);
+        }
     }
 
     @Override
@@ -68,8 +70,6 @@ final public class MuscleGroupsActivity extends AppCompatActivity
 
     @Override
     public void onModelLoadFinished(Result<MuscleGroup> data) {
-
-
         PagerAdapter adapter = new MuscleGroupsPagerAdapter(this, data.toList());
 
         ViewPager viewPager = (ViewPager) findViewById(R.id.container);

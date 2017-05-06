@@ -13,7 +13,7 @@ import io.requery.Persistable;
  */
 
 @Entity
-public interface ProgramSet extends Persistable, Parcelable, Orderable {
+public interface ProgramSet extends Persistable, Parcelable, Orderable, Draftable {
     @Key
     @Generated
     long getId();
@@ -27,6 +27,10 @@ public interface ProgramSet extends Persistable, Parcelable, Orderable {
     int getSortOrder();
     void setSortOrder(int sortOrder);
 
+    boolean isDrafting();
+    void setDrafting(boolean drafting);
+
     @ManyToOne
-    ProgramExercise getExercise();
+    ProgramExercise getProgramExercise();
+    void setProgramExercise(ProgramExercise programExercise);
 }

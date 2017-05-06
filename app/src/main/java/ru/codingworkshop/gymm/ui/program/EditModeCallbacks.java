@@ -19,16 +19,16 @@ import ru.codingworkshop.gymm.ui.program.events.LongClickViewEvent;
  * Created by Радик on 28.04.2017.
  */
 
-public class EditModeActions implements ActionMode.Callback {
+public class EditModeCallbacks implements ActionMode.Callback {
 
     private EventBus eventBus;
     private Activity activity;
     private RecyclerView recyclerView;
     private @StringRes int deleteMessage;
 
-    private ListItemActions listItemActions;
+    private ListItemCallbacks listItemCallbacks;
 
-    public EditModeActions(@NonNull EventBus bus, @NonNull Activity parentActivity, @NonNull RecyclerView rv, @StringRes int deleteMessageRes) {
+    public EditModeCallbacks(@NonNull EventBus bus, @NonNull Activity parentActivity, @NonNull RecyclerView rv, @StringRes int deleteMessageRes) {
         eventBus = bus;
         activity = parentActivity;
         recyclerView = rv;
@@ -45,12 +45,12 @@ public class EditModeActions implements ActionMode.Callback {
     @Override
     public boolean onCreateActionMode(ActionMode mode, Menu menu) {
         eventBus.post(new EditModeChangeEvent(true));
-        if (listItemActions == null) {
-            listItemActions = new ListItemActions(eventBus, (Adapter) recyclerView.getAdapter(), deleteMessage);
-            ItemTouchHelper itemTouchHelper = new ItemTouchHelper(listItemActions);
-            listItemActions.setItemTouchHelper(itemTouchHelper);
+        if (listItemCallbacks == null) {
+            listItemCallbacks = new ListItemCallbacks(eventBus, (Adapter) recyclerView.getAdapter(), deleteMessage);
+            ItemTouchHelper itemTouchHelper = new ItemTouchHelper(listItemCallbacks);
+            listItemCallbacks.setItemTouchHelper(itemTouchHelper);
         }
-        listItemActions.getItemTouchHelper().attachToRecyclerView(recyclerView);
+        listItemCallbacks.getItemTouchHelper().attachToRecyclerView(recyclerView);
         return true;
     }
 
@@ -67,6 +67,6 @@ public class EditModeActions implements ActionMode.Callback {
     @Override
     public void onDestroyActionMode(ActionMode mode) {
         eventBus.post(new EditModeChangeEvent(false));
-        listItemActions.getItemTouchHelper().attachToRecyclerView(null);
+        listItemCallbacks.getItemTouchHelper().attachToRecyclerView(null);
     }
 }

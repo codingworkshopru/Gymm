@@ -36,7 +36,7 @@ public class MainActivity extends AppCompatActivity implements ModelLoader.Model
 
         setSupportActionBar((Toolbar) findViewById(R.id.main_activity_toolbar));
 
-        new ModelLoader<>(this, ProgramTraining.class, this);
+        new ModelLoader<>(this, ProgramTraining.class, this).queryAll();
 
         RecyclerView rv = ((RecyclerView) findViewById(R.id.rv_test_main));
         rv.setLayoutManager(new LinearLayoutManager(this));

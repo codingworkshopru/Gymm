@@ -4,6 +4,7 @@ import android.os.Parcelable;
 
 import java.util.List;
 
+import io.requery.CascadeAction;
 import io.requery.Entity;
 import io.requery.Generated;
 import io.requery.Key;
@@ -16,7 +17,7 @@ import io.requery.Persistable;
  */
 
 @Entity
-public interface ProgramTraining extends Persistable, Parcelable {
+public interface ProgramTraining extends Persistable, Parcelable, Draftable {
     @Key
     @Generated
     long getId();
@@ -27,7 +28,10 @@ public interface ProgramTraining extends Persistable, Parcelable {
     int getWeekday();
     void setWeekday(int weekday);
 
-    @OneToMany
+    boolean isDrafting();
+    void setDrafting(boolean drafting);
+
+    @OneToMany(cascade = {CascadeAction.SAVE, CascadeAction.DELETE})
     @OrderBy(value = "sortOrder")
     List<ProgramExercise> getExercises();
     void setExercises(List<? extends ProgramExercise> exercises);

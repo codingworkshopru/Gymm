@@ -12,6 +12,7 @@
     <!-- layout items -->
     <string name="program_training_activity_name_hint">Название тренировки</string>
     <string name="program_training_activity_name_empty_error">У тренировки должно быть название</string>
+    <string name="program_training_activity_name_duplicate_error">Тренировка с таким названием уже есть</string>
     <string name="program_training_activity_weekday_label">День недели (необязательно)</string>
     <string name="program_training_activity_exercises_label">Упражнения</string>
     <string name="program_training_activity_add_exercise">Добавить упражнение</string>
@@ -55,6 +56,7 @@
     <string name="save_button_text">Сохранить</string>
     <string name="save_changes_question">Отменить изменения?</string>
     <string name="add_button_text">Добавить</string>
+    <string name="select_button_text">Выбрать</string>
 
     <plurals name="number_of_reps">
         <item quantity="one">%d повторение</item>

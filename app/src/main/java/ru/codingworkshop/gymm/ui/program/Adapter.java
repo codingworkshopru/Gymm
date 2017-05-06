@@ -11,6 +11,7 @@ import java.util.Collections;
 import java.util.List;
 
 import ru.codingworkshop.gymm.data.model.Orderable;
+import ru.codingworkshop.gymm.ui.BindingHolder;
 import ru.codingworkshop.gymm.ui.program.events.ListEmptinessChangeEvent;
 
 /**
@@ -99,7 +100,6 @@ public class Adapter<B extends ViewDataBinding, M extends Orderable> extends Rec
         updateSortOrders(index);
         itemRemoved(index);
     }
-
     public void restoreLastRemoved() {
         int index = lastRemoved.getSortOrder();
         dataList.add(index, lastRemoved);

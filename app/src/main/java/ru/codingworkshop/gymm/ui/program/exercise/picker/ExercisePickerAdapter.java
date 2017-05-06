@@ -16,7 +16,7 @@ import ru.codingworkshop.gymm.data.model.Exercise;
 import ru.codingworkshop.gymm.data.model.MuscleGroup;
 import ru.codingworkshop.gymm.databinding.ActivityExercisesListItemBinding;
 import ru.codingworkshop.gymm.databinding.ListSubheaderItemBinding;
-import ru.codingworkshop.gymm.ui.program.BindingHolder;
+import ru.codingworkshop.gymm.ui.BindingHolder;
 
 /**
  * Created by Радик on 23.04.2017.

@@ -7,11 +7,15 @@ import android.databinding.InverseBindingAdapter;
 import android.databinding.InverseBindingListener;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.design.widget.TextInputEditText;
+import android.support.design.widget.TextInputLayout;
 import android.support.v4.app.NavUtils;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -20,22 +24,28 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.Spinner;
 
+import com.google.common.base.Strings;
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
 
 import io.requery.Persistable;
 import io.requery.sql.EntityDataStore;
 import ru.codingworkshop.gymm.App;
+import ru.codingworkshop.gymm.BuildConfig;
 import ru.codingworkshop.gymm.MainActivity;
 import ru.codingworkshop.gymm.R;
+import ru.codingworkshop.gymm.data.ModelUtil;
 import ru.codingworkshop.gymm.data.model.ProgramExercise;
+import ru.codingworkshop.gymm.data.model.ProgramExerciseEntity;
+import ru.codingworkshop.gymm.data.model.ProgramSet;
+import ru.codingworkshop.gymm.data.model.ProgramSetEntity;
 import ru.codingworkshop.gymm.data.model.ProgramTraining;
 import ru.codingworkshop.gymm.data.model.ProgramTrainingEntity;
 import ru.codingworkshop.gymm.databinding.ActivityProgramTrainingBinding;
 import ru.codingworkshop.gymm.databinding.ActivityProgramTrainingListItemBinding;
 import ru.codingworkshop.gymm.ui.program.ActivityProperties;
 import ru.codingworkshop.gymm.ui.program.Adapter;
-import ru.codingworkshop.gymm.ui.program.EditModeActions;
+import ru.codingworkshop.gymm.ui.program.EditModeCallbacks;
 import ru.codingworkshop.gymm.ui.program.ViewHolderFactory;
 import ru.codingworkshop.gymm.ui.program.events.ClickViewEvent;
 import ru.codingworkshop.gymm.ui.program.exercise.ProgramExerciseActivity;
@@ -44,13 +54,16 @@ import ru.codingworkshop.gymm.ui.program.exercise.ProgramExerciseActivity;
  * Created by Радик on 20.04.2017.
  */
 
-public class ProgramTrainingActivity extends AppCompatActivity {
+public class ProgramTrainingActivity extends AppCompatActivity implements ProgramTrainingActivityAlerts.Callback {
+
     private ActivityProgramTrainingBinding binding;
     private EntityDataStore<Persistable> data;
     private Adapter<ActivityProgramTrainingListItemBinding, ProgramExercise> adapter;
     private EventBus eventBus;
+    private ProgramTrainingActivityAlerts alerts;
+    private TextInputLayout nameInputLayout;
 
-    private static final String PROGRAM_TRAINING_MODEL = "programTrainingModel";
+    public static final String PROGRAM_TRAINING_MODEL = "programTrainingModel";
 
     private static final String TAG = ProgramTrainingActivity.class.getSimpleName();
 
@@ -58,10 +71,22 @@ public class ProgramTrainingActivity extends AppCompatActivity {
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        binding = DataBindingUtil.setContentView(this, R.layout.activity_program_training);
-
         eventBus = new EventBus();
         eventBus.register(this);
+
+        binding = DataBindingUtil.setContentView(this, R.layout.activity_program_training);
+        binding.setProperties(new ActivityProperties(eventBus));
+
+        alerts = new ProgramTrainingActivityAlerts(this);
+        nameInputLayout = ((TextInputLayout)findViewById(R.id.program_training_name_layout));
+
+        ((TextInputEditText) findViewById(R.id.program_training_name)).addTextChangedListener(new TextWatcher() {
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                nameInputLayout.setError(null);
+            }
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+            public void afterTextChanged(Editable s) {}
+        });
 
         setSupportActionBar((Toolbar) findViewById(R.id.program_training_toolbar));
         if (getSupportActionBar() != null) {
@@ -82,21 +107,20 @@ public class ProgramTrainingActivity extends AppCompatActivity {
                     .first();
         } else {
             model = new ProgramTrainingEntity();
+            model.setDrafting(true);
             data.insert(model);
         }
+
         binding.setTraining(model);
 
         RecyclerView recyclerView = (RecyclerView) findViewById(R.id.program_training_exercises_list);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
 
-        ActivityProperties properties = new ActivityProperties(eventBus);
-        binding.setProperties(properties);
-
-        new EditModeActions(eventBus, this, recyclerView, R.string.program_training_activity_exercise_deleted_message);
+        new EditModeCallbacks(eventBus, this, recyclerView, R.string.program_training_activity_exercise_deleted_message);
 
         ViewHolderFactory<ActivityProgramTrainingListItemBinding> factory = new ViewHolderFactory<>(
                 eventBus,
-                properties,
+                binding.getProperties(),
                 R.layout.activity_program_training_list_item,
                 R.id.program_training_list_item_reorder_action
         );
@@ -105,17 +129,46 @@ public class ProgramTrainingActivity extends AppCompatActivity {
         recyclerView.setAdapter(adapter);
 
         Log.d(TAG, "onCreate");
+
+        // check for garbage
+        if (BuildConfig.DEBUG) {
+            int exerciseGarbage = 0;
+            int setGarbage = 0;
+            try {
+                exerciseGarbage = data.count(ProgramExercise.class).where(ProgramExerciseEntity.PROGRAM_TRAINING.isNull()).get().call();
+                setGarbage = data.count(ProgramSet.class).where(ProgramSetEntity.PROGRAM_EXERCISE.isNull()).get().call();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            if (exerciseGarbage > 0)
+                throw new IllegalStateException(exerciseGarbage + " program exercise haven't parent program training");
+            if (setGarbage > 0)
+                throw new IllegalStateException(setGarbage + " program set haven't parent program exercise");
+        }
+    }
+
+    private ProgramTraining getModel() {
+        return binding.getTraining();
     }
 
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-        outState.putParcelable(PROGRAM_TRAINING_MODEL, binding.getTraining());
+        outState.putParcelable(PROGRAM_TRAINING_MODEL, getModel());
+    }
+
+    @Override
+    public void onBackPressed() {
+        if (ModelUtil.isEntityModified(getModel())) {
+            alerts.showUnsavedChanges();
+        } else {
+            finishWithoutSaving();
+        }
     }
 
     public void onAddButtonClick(View view) {
         Intent intent = new Intent(this, ProgramExerciseActivity.class);
-        startActivityForResult(intent, 0);
+        startActivityForResult(intent, ProgramExerciseActivity.PROGRAM_EXERCISE_CREATE_REQUEST_CODE);
     }
 
     @Override
@@ -123,12 +176,14 @@ public class ProgramTrainingActivity extends AppCompatActivity {
         super.onActivityResult(requestCode, resultCode, data);
 
         if (resultCode == RESULT_OK) {
-            ProgramExercise returnedModel = data.getParcelableExtra(ProgramExerciseActivity.PROGRAM_EXERCISE_MODEL);
-            if (returnedModel.getProgramTraining() == null) {
-                adapter.addModel(returnedModel);
-            } else {
-                adapter.replaceModel(returnedModel);
-            }
+            ProgramExercise returnedExercise = this.data.select(ProgramExercise.class)
+                    .where(ProgramExerciseEntity.ID.eq(data.getLongExtra(ProgramExerciseActivity.PROGRAM_EXERCISE_ID, 0L)))
+                    .get()
+                    .first();
+            if (requestCode == ProgramExerciseActivity.PROGRAM_EXERCISE_CREATE_REQUEST_CODE)
+                adapter.addModel(returnedExercise);
+            else if (requestCode == ProgramExerciseActivity.PROGRAM_EXERCISE_MODIFY_REQUEST_CODE)
+                adapter.replaceModel(returnedExercise);
         }
     }
 
@@ -141,15 +196,34 @@ public class ProgramTrainingActivity extends AppCompatActivity {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
+        ProgramTraining model = getModel();
+
         switch (item.getItemId()) {
 
             case android.R.id.home:
-                NavUtils.navigateUpFromSameTask(this);
+                onBackPressed();
                 return true;
 
             case R.id.action_done:
-                data.upsert(binding.getTraining());
-                onBackPressed();
+                String trainingName = model.getName();
+                int trainingsWithSameName = 0;
+                try {
+                    trainingsWithSameName = data.count(ProgramTraining.class)
+                            .where(ProgramTrainingEntity.NAME.eq(trainingName)
+                                            .and(ProgramTrainingEntity.ID.notEqual(model.getId())))
+                            .get()
+                            .call();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+                if (Strings.isNullOrEmpty(trainingName))
+                    nameInputLayout.setError(getString(R.string.program_training_activity_name_empty_error));
+                else if (trainingsWithSameName != 0)
+                    nameInputLayout.setError(getString(R.string.program_training_activity_name_duplicate_error));
+                else if (adapter.getDataList().isEmpty())
+                    alerts.showOnEmptyList();
+                else
+                    finishWithSaving();
                 return true;
 
             default:
@@ -161,7 +235,42 @@ public class ProgramTrainingActivity extends AppCompatActivity {
     public void exerciseClick(ClickViewEvent<ActivityProgramTrainingListItemBinding> event) {
         ProgramExercise exercise = event.getBinding().getModel();
         Intent intent = new Intent(this, ProgramExerciseActivity.class);
-        startActivityForResult(intent, 0);
+        intent.putExtra(ProgramExerciseActivity.PROGRAM_EXERCISE_ID, exercise.getId());
+        startActivityForResult(intent, ProgramExerciseActivity.PROGRAM_EXERCISE_MODIFY_REQUEST_CODE);
+    }
+
+    public void finishWithSaving() {
+        ProgramTraining model = getModel();
+        if (model.isDrafting())
+            model.setDrafting(false);
+        data.update(model);
+        try {
+            data.delete(ProgramExercise.class)
+                    .where(ProgramExerciseEntity.PROGRAM_TRAINING.isNull())
+                    .get()
+                    .call();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        NavUtils.navigateUpFromSameTask(this);
+    }
+
+    @Override
+    public void finishWithoutSaving() {
+        ProgramTraining model = getModel();
+
+        if (model.isDrafting()) {
+            data.delete(model);
+        } else if (ModelUtil.areAssociationsModified(model)) {
+            ModelUtil.refreshAll(model, data);
+        }
+
+        NavUtils.navigateUpFromSameTask(this);
+    }
+
+    @Override
+    public void addListItem() {
+        onAddButtonClick(null);
     }
 
     // binding adapters

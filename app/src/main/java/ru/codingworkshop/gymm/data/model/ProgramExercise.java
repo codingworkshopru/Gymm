@@ -1,14 +1,18 @@
 package ru.codingworkshop.gymm.data.model;
 
+import android.databinding.Bindable;
+import android.databinding.Observable;
 import android.os.Parcelable;
 
 import java.util.List;
 
+import io.requery.CascadeAction;
 import io.requery.Entity;
 import io.requery.Generated;
 import io.requery.Key;
 import io.requery.ManyToOne;
 import io.requery.OneToMany;
+import io.requery.OrderBy;
 import io.requery.Persistable;
 
 /**
@@ -16,7 +20,7 @@ import io.requery.Persistable;
  */
 
 @Entity
-public interface ProgramExercise extends Persistable, Parcelable, Orderable {
+public interface ProgramExercise extends Persistable, Parcelable, Orderable, Observable, Draftable {
     @Key
     @Generated
     long getId();
@@ -24,14 +28,20 @@ public interface ProgramExercise extends Persistable, Parcelable, Orderable {
     int getSortOrder();
     void setSortOrder(int sortOrder);
 
+    boolean isDrafting();
+    void setDrafting(boolean drafting);
+
     @ManyToOne
+    @Bindable
     Exercise getExercise();
     void setExercise(Exercise exercise);
 
     @ManyToOne
     ProgramTraining getProgramTraining();
+    void setProgramTraining(ProgramTraining programTraining);
 
-    @OneToMany
+    @OneToMany(cascade = {CascadeAction.SAVE, CascadeAction.DELETE})
+    @OrderBy(value = "sortOrder")
     List<ProgramSet> getSets();
     void setSets(List<? extends ProgramSet> sets);
 }
