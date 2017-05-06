@@ -52,7 +52,7 @@ import static org.junit.Assert.assertEquals;
 @RunWith(AndroidJUnit4.class)
 @LargeTest
 public class TrainingProgramTest {
-    private static final String TRAINING_NAME_TEXT = "my test training name";
+    private static final String TRAINING_NAME_TEXT = "qwerty";
 
     @Rule
     public ActivityTestRule<MainActivity> mActivityRule = new ActivityTestRule<>(MainActivity.class);
@@ -159,7 +159,7 @@ public class TrainingProgramTest {
     @Test
     @LargeTest
     public void test_createCreate() {
-        final int SETS = 5;
+        final int SETS = 3;
         final int TO_DELETE = 2;
 
         // create
@@ -240,6 +240,23 @@ public class TrainingProgramTest {
         close(false);
 
         onView(withText(exerciseName)).check(matches(isDisplayed()));
+        close(false);
+    }
+
+    @Test
+    @LargeTest
+    public void test3() {
+        addProgramTraining(TRAINING_NAME_TEXT);
+        addProgramExercise();
+        addProgramSet();
+        close(true);
+
+        selectProgramExercise(0);
+        addProgramSet();
+        close(false);
+        onView(withText(mActivityRule.getActivity().getResources().getQuantityString(R.plurals.number_of_sets, 1, 1))).check(matches(isDisplayed()));
+
+        close(false);
     }
 
     @After

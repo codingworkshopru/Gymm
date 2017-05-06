@@ -6,8 +6,10 @@ import java.util.List;
 
 import io.requery.Persistable;
 import io.requery.meta.QueryAttribute;
+import io.requery.proxy.CollectionChanges;
 import io.requery.query.LogicalCondition;
 import io.requery.sql.EntityDataStore;
+import io.requery.util.ObservableList;
 import ru.codingworkshop.gymm.data.ModelUtil;
 import ru.codingworkshop.gymm.data.model.Draftable;
 import ru.codingworkshop.gymm.data.model.Orderable;
@@ -53,8 +55,6 @@ public class ModelHolder<T extends Persistable & Draftable, C extends Persistabl
 
     public void addNewChild(C child) {
         l("add new child");
-        if (!child.isDrafting())
-            child.setDrafting(true);
         adapter.setParent(child, model);
         db.upsert(child);
     }
@@ -85,17 +85,6 @@ public class ModelHolder<T extends Persistable & Draftable, C extends Persistabl
                 .first();
     }
 
-    private void deleteDraftingChildren() {
-        try {
-            db.delete(adapter.getChildClass())
-                    .where(adapter.childDraftingAttribute().eq(true).and(adapter.childParentAttribute().eq(model)))
-                    .get()
-                    .call();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-
     private void deleteUnattachedChildren() {
         try {
             db.delete(adapter.getChildClass())
@@ -105,13 +94,6 @@ public class ModelHolder<T extends Persistable & Draftable, C extends Persistabl
         } catch (Exception e) {
             e.printStackTrace();
         }
-    }
-
-    private void setChildrenNotDrafting() {
-        for (C child : getChildren())
-            if (child.isDrafting())
-                child.setDrafting(false);
-        db.update(getChildren());
     }
 
     public T createNewModel() {
@@ -127,7 +109,6 @@ public class ModelHolder<T extends Persistable & Draftable, C extends Persistabl
         l("save all changes");
         if (model.isDrafting())
             model.setDrafting(false);
-        setChildrenNotDrafting();
         db.update(model);
         deleteUnattachedChildren();
     }
@@ -139,7 +120,7 @@ public class ModelHolder<T extends Persistable & Draftable, C extends Persistabl
             db.delete(model);
         } else if (ModelUtil.areAssociationsModified(model)) {
             l("\trefresh model");
-            deleteDraftingChildren();
+            db.delete(((CollectionChanges)((ObservableList) getChildren()).observer()).addedElements());
             ModelUtil.refreshAll(model, db);
         }
     }

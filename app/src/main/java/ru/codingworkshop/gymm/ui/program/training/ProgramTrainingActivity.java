@@ -174,10 +174,13 @@ public class ProgramTrainingActivity extends AppCompatActivity implements Progra
                     .where(ProgramExerciseEntity.ID.eq(data.getLongExtra(ProgramExerciseActivity.PROGRAM_EXERCISE_ID, 0L)))
                     .get()
                     .first();
+
             if (requestCode == ProgramExerciseActivity.PROGRAM_EXERCISE_CREATE_REQUEST_CODE)
                 adapter.addModel(returnedExercise);
             else if (requestCode == ProgramExerciseActivity.PROGRAM_EXERCISE_MODIFY_REQUEST_CODE)
                 adapter.replaceModel(returnedExercise);
+        } else {
+            adapter.notifyDataSetChanged();
         }
     }
 
