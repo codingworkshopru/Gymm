@@ -10,6 +10,8 @@ import com.google.common.eventbus.EventBus;
 import java.util.Collections;
 import java.util.List;
 
+import io.requery.Persistable;
+import ru.codingworkshop.gymm.data.model.Draftable;
 import ru.codingworkshop.gymm.data.model.Orderable;
 import ru.codingworkshop.gymm.ui.BindingHolder;
 import ru.codingworkshop.gymm.ui.program.events.ListEmptinessChangeEvent;
@@ -18,15 +20,19 @@ import ru.codingworkshop.gymm.ui.program.events.ListEmptinessChangeEvent;
  * Created by Радик on 26.04.2017.
  */
 
-public class Adapter<B extends ViewDataBinding, M extends Orderable> extends RecyclerView.Adapter<BindingHolder<B>> {
+public class Adapter<B extends ViewDataBinding, M extends Orderable & Persistable & Draftable> extends RecyclerView.Adapter<BindingHolder<B>> {
     private ViewHolderFactory<B> viewHolderFactory;
     private EventBus eventBus;
-    private List<M> dataList;
+    private ModelHolder<?, M> modelHolder;
     private M lastRemoved;
 
     public Adapter(@NonNull ViewHolderFactory<B> factory, @NonNull EventBus bus) {
         viewHolderFactory = factory;
         eventBus = bus;
+    }
+
+    private List<M> list() {
+        return modelHolder.getChildren();
     }
 
     @Override
@@ -36,57 +42,55 @@ public class Adapter<B extends ViewDataBinding, M extends Orderable> extends Rec
 
     @Override
     public void onBindViewHolder(BindingHolder<B> holder, int position) {
-        holder.binding.setVariable(ru.codingworkshop.gymm.BR.model, dataList.get(position));
+        holder.binding.setVariable(ru.codingworkshop.gymm.BR.model, list().get(position));
     }
 
     @Override
     public int getItemCount() {
-        return dataList.size();
+        return list().size();
     }
 
     private void dataSetChanged() {
         notifyDataSetChanged();
-        ListEmptinessChangeEvent.post(eventBus, dataList.isEmpty());
+        ListEmptinessChangeEvent.post(eventBus, list().isEmpty());
     }
 
     private void itemInserted(int position) {
         notifyItemInserted(position);
 
-        if (dataList.size() == 1)
+        if (list().size() == 1)
             ListEmptinessChangeEvent.post(eventBus, false);
     }
 
     private void itemRemoved(int position) {
         notifyItemRemoved(position);
 
-        if (dataList.size() == 0)
+        if (list().size() == 0)
             ListEmptinessChangeEvent.post(eventBus, true);
     }
 
-    public void setDataList(List<M> list) {
-        dataList = list;
+    public void setModelHolder(ModelHolder<?, M> holder) {
+        modelHolder = holder;
         dataSetChanged();
-    }
-
-    public List<M> getDataList() {
-        return dataList;
     }
 
     public void addModel(@NonNull M model) {
         int index = getItemCount();
         model.setSortOrder(index);
-        dataList.add(model);
+        list().add(model);
+        modelHolder.addNewChild(model);
         itemInserted(index);
     }
 
     public void replaceModel(@NonNull M model) {
         int index = model.getSortOrder();
-        dataList.set(index, model);
+        list().set(index, model);
+        modelHolder.replaceChild(model);
         notifyItemChanged(index);
     }
 
     public void moveModel(int fromPosition, int toPosition) {
-        Collections.swap(dataList, fromPosition, toPosition);
+        Collections.swap(list(), fromPosition, toPosition);
         updateSortOrders(Math.min(fromPosition, toPosition), Math.max(fromPosition, toPosition));
         notifyItemMoved(fromPosition, toPosition);
     }
@@ -96,13 +100,14 @@ public class Adapter<B extends ViewDataBinding, M extends Orderable> extends Rec
     }
 
     public void removeModel(int index) {
-        lastRemoved = dataList.remove(index);
+        lastRemoved = list().remove(index);
         updateSortOrders(index);
         itemRemoved(index);
     }
+
     public void restoreLastRemoved() {
         int index = lastRemoved.getSortOrder();
-        dataList.add(index, lastRemoved);
+        list().add(index, lastRemoved);
         updateSortOrders(index);
         itemInserted(index);
     }
@@ -112,7 +117,8 @@ public class Adapter<B extends ViewDataBinding, M extends Orderable> extends Rec
     }
 
     private void updateSortOrders(int start, int end) {
+        List<M> list = list();
         for (int i = start; i <= end; i++)
-            dataList.get(i).setSortOrder(i);
+            list.get(i).setSortOrder(i);
     }
 }

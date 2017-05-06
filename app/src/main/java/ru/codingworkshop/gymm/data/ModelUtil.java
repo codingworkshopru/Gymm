@@ -65,8 +65,7 @@ public final class ModelUtil {
                 Object field = proxy.get(attribute);
                 if (field instanceof List) {
                     List<E> entityList = (List<E>) field;
-                    for (E childEntity : entityList)
-                        refreshAll(childEntity, data);
+                    data.refresh(entityList, null);
                 } else {
                     refreshAll((Persistable) field, data);
                 }

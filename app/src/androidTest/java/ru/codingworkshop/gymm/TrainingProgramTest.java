@@ -15,6 +15,7 @@ import android.support.test.runner.AndroidJUnit4;
 import android.view.View;
 
 import org.hamcrest.Matcher;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -22,10 +23,13 @@ import org.junit.runner.RunWith;
 
 import io.requery.Persistable;
 import io.requery.sql.EntityDataStore;
+import ru.codingworkshop.gymm.data.model.ProgramExercise;
+import ru.codingworkshop.gymm.data.model.ProgramExerciseEntity;
+import ru.codingworkshop.gymm.data.model.ProgramSet;
+import ru.codingworkshop.gymm.data.model.ProgramSetEntity;
 import ru.codingworkshop.gymm.data.model.ProgramTraining;
 import ru.codingworkshop.gymm.data.model.ProgramTrainingEntity;
 
-import static android.support.test.espresso.Espresso.closeSoftKeyboard;
 import static android.support.test.espresso.Espresso.onView;
 import static android.support.test.espresso.Espresso.pressBack;
 import static android.support.test.espresso.action.ViewActions.actionWithAssertions;
@@ -39,6 +43,7 @@ import static android.support.test.espresso.matcher.ViewMatchers.withChild;
 import static android.support.test.espresso.matcher.ViewMatchers.withContentDescription;
 import static android.support.test.espresso.matcher.ViewMatchers.withId;
 import static android.support.test.espresso.matcher.ViewMatchers.withText;
+import static org.junit.Assert.assertEquals;
 
 /**
  * Created by Радик on 24.02.2017.
@@ -51,17 +56,16 @@ public class TrainingProgramTest {
 
     @Rule
     public ActivityTestRule<MainActivity> mActivityRule = new ActivityTestRule<>(MainActivity.class);
+    private EntityDataStore<Persistable> data;
 
     @Before
     public void cleanup() throws Exception {
-        EntityDataStore<Persistable> data = ((App) mActivityRule.getActivity().getApplication()).getData();
-        data.transaction().begin();
+        data = ((App) mActivityRule.getActivity().getApplication()).getData();
         data.delete(ProgramTraining.class).where(ProgramTrainingEntity.NAME.eq(TRAINING_NAME_TEXT)).get().call();
-        data.transaction().commit();
-        data.transaction().close();
     }
 
-    private void selectExercise() {
+    private void selectExercise() { selectExercise(0); }
+    private void selectExercise(int index) {
         // choose exercise
         onView(withId(R.id.program_exercise_name_layout)).perform(click());
         CoordinatesProvider cp = new CoordinatesProvider() {
@@ -73,7 +77,7 @@ public class TrainingProgramTest {
             }
         };
         onView(withId(R.id.imageView5)).perform(new GeneralClickAction(Tap.SINGLE, cp, Press.FINGER));
-        onView(withId(R.id.fragment_exercise_picker_exercises)).perform(RecyclerViewActions.actionOnItemAtPosition(0, click()));
+        onView(withId(R.id.fragment_exercise_picker_exercises)).perform(RecyclerViewActions.actionOnItemAtPosition(index, click()));
     }
 
     private void addProgramTraining(String name) {
@@ -90,6 +94,19 @@ public class TrainingProgramTest {
         onView(withId(R.id.program_training_add_exercise_button)).perform(click());
         selectExercise();
         onView(withText(R.string.program_exercise_activity_exercise_not_selected_message)).check(doesNotExist());
+    }
+
+    private void deleteProgramExercise() {
+        onView(withId(R.id.program_training_exercises_list)).perform(RecyclerViewActions.actionOnItemAtPosition(0, longClick()));
+        onView(withId(R.id.program_training_exercises_list)).perform(RecyclerViewActions.actionOnItemAtPosition(0, actionWithAssertions(
+                new GeneralSwipeAction(
+                        Swipe.FAST,
+                        GeneralLocation.CENTER_LEFT,
+                        GeneralLocation.CENTER_RIGHT,
+                        Press.FINGER
+                )
+        )));
+        pressBack();
     }
 
     private void selectProgramExercise(int index) {
@@ -118,6 +135,15 @@ public class TrainingProgramTest {
             )));
         }
         pressBack();
+    }
+
+    private void close(boolean save, boolean mustAsk) {
+        Matcher<View> matcher = save ? withId(R.id.action_done) : withContentDescription(R.string.abc_action_bar_up_description);
+        onView(matcher).perform(click());
+        if (mustAsk) {
+            onView(withId(android.R.id.button1)).check(matches(isDisplayed()));
+            onView(withId(android.R.id.button1)).perform(click());
+        }
     }
 
     private void close(boolean save) {
@@ -162,57 +188,74 @@ public class TrainingProgramTest {
 
     @Test
     @LargeTest
-    public void test_setAddAndCreate() {
-        //create training, exercise and set
+    public void test0() {
         addProgramTraining(TRAINING_NAME_TEXT);
-        addProgramExercise();
-        addProgramSet();
 
-        // save all
-        close(true);
-        close(true);
-
-        selectProgramTraining(TRAINING_NAME_TEXT);
         addProgramExercise();
         addProgramSet();
         close(true);
+
+        addProgramExercise();
+        addProgramSet();
         close(true);
 
-        // add new set in created exercise
-        selectProgramTraining(TRAINING_NAME_TEXT);
         selectProgramExercise(0);
-        addProgramSet();
-        close(true);
-        close(true);
-
-        // check if set has been added
-        selectProgramTraining(TRAINING_NAME_TEXT);
-        closeSoftKeyboard();
-        onView(withText(mActivityRule.getActivity().getResources().getQuantityString(R.plurals.number_of_sets, 2, 2))).check(matches(isDisplayed()));
+        close(false, false);
+        close(false);
     }
 
     @Test
     @LargeTest
-    public void test_deleteSet() {
-        //create training, exercise and set
+    public void test1() {
+        addProgramTraining(TRAINING_NAME_TEXT);
+
+        addProgramExercise();
+        addProgramSet();
+        close(true);
+
+        addProgramExercise();
+        addProgramSet();
+        close(true);
+        close(true);
+
+        selectProgramTraining(TRAINING_NAME_TEXT);
+        deleteProgramExercise();
+        close(true);
+
+        selectProgramTraining(TRAINING_NAME_TEXT);
+    }
+
+    @Test
+    @LargeTest
+    public void test2() throws Exception {
         addProgramTraining(TRAINING_NAME_TEXT);
         addProgramExercise();
-
-        final int SETS_COUNT = 2;
-        addProgramSet(SETS_COUNT);
-
-        close(true);
+        addProgramSet();
         close(true);
 
-        selectProgramTraining(TRAINING_NAME_TEXT);
+        String exerciseName = data.select(ProgramExercise.class).get().first().getExercise().getName();
+
         selectProgramExercise(0);
-        deleteProgramSet();
-        close(true);
-        close(true);
+        selectExercise(1);
+        close(false);
 
-        selectProgramTraining(TRAINING_NAME_TEXT);
+        onView(withText(exerciseName)).check(matches(isDisplayed()));
+    }
 
-        closeSoftKeyboard();
-        onView(withText(mActivityRule.getActivity().getResources().getQuantityString(R.plurals.number_of_sets, SETS_COUNT - 1, SETS_COUNT - 1))).check(matches(isDisplayed()));
+    @After
+    public void checkForPeacesOfShit() {
+        int trainingGarbage = 0;
+        int exerciseGarbage = 0;
+        int setGarbage = 0;
+        try {
+            trainingGarbage = data.count(ProgramTraining.class).where(ProgramTrainingEntity.DRAFTING.eq(true)).get().call();
+            exerciseGarbage = data.count(ProgramExercise.class).where(ProgramExerciseEntity.DRAFTING.eq(true).or(ProgramExerciseEntity.PROGRAM_TRAINING.isNull())).get().call();
+            setGarbage = data.count(ProgramSet.class).where(ProgramSetEntity.DRAFTING.eq(true).or(ProgramSetEntity.PROGRAM_EXERCISE.isNull())).get().call();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        assertEquals("program training peace of shit", 0, trainingGarbage);
+        assertEquals("program exercise peace of shit", 0, exerciseGarbage);
+        assertEquals("program set peace of shit", 0, setGarbage);
     }
 }

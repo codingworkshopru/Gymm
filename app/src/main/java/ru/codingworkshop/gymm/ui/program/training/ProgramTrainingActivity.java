@@ -34,7 +34,6 @@ import ru.codingworkshop.gymm.App;
 import ru.codingworkshop.gymm.BuildConfig;
 import ru.codingworkshop.gymm.MainActivity;
 import ru.codingworkshop.gymm.R;
-import ru.codingworkshop.gymm.data.ModelUtil;
 import ru.codingworkshop.gymm.data.model.ProgramExercise;
 import ru.codingworkshop.gymm.data.model.ProgramExerciseEntity;
 import ru.codingworkshop.gymm.data.model.ProgramSet;
@@ -46,6 +45,7 @@ import ru.codingworkshop.gymm.databinding.ActivityProgramTrainingListItemBinding
 import ru.codingworkshop.gymm.ui.program.ActivityProperties;
 import ru.codingworkshop.gymm.ui.program.Adapter;
 import ru.codingworkshop.gymm.ui.program.EditModeCallbacks;
+import ru.codingworkshop.gymm.ui.program.ModelHolder;
 import ru.codingworkshop.gymm.ui.program.ViewHolderFactory;
 import ru.codingworkshop.gymm.ui.program.events.ClickViewEvent;
 import ru.codingworkshop.gymm.ui.program.exercise.ProgramExerciseActivity;
@@ -62,7 +62,9 @@ public class ProgramTrainingActivity extends AppCompatActivity implements Progra
     private EventBus eventBus;
     private ProgramTrainingActivityAlerts alerts;
     private TextInputLayout nameInputLayout;
+    private ModelHolder<ProgramTraining, ProgramExercise> modelHolder;
 
+    public static final String PROGRAM_TRAINING_ID = "programTrainingId";
     public static final String PROGRAM_TRAINING_MODEL = "programTrainingModel";
 
     private static final String TAG = ProgramTrainingActivity.class.getSimpleName();
@@ -94,24 +96,20 @@ public class ProgramTrainingActivity extends AppCompatActivity implements Progra
         }
 
         data = ((App) getApplication()).getData();
+        modelHolder = new ModelHolder<>(data, new ModelHolder.ProgramTrainingAdapter());
 
-        ProgramTraining model;
         Intent startedIntent = getIntent();
-        if (savedInstanceState != null && savedInstanceState.containsKey(PROGRAM_TRAINING_MODEL)) {
-            model = savedInstanceState.getParcelable(PROGRAM_TRAINING_MODEL);
+        if (savedInstanceState != null && savedInstanceState.containsKey(PROGRAM_TRAINING_ID)) {
+            long trainingId = savedInstanceState.getLong(PROGRAM_TRAINING_ID);
+            modelHolder.selectWithDrafting(trainingId);
         } else if (startedIntent != null && startedIntent.hasExtra(MainActivity.PROGRAM_TRAINING_ID_KEY)) {
             long trainingId = startedIntent.getLongExtra(MainActivity.PROGRAM_TRAINING_ID_KEY, 0L);
-            model = data.select(ProgramTraining.class)
-                    .where(ProgramTrainingEntity.ID.eq(trainingId))
-                    .get()
-                    .first();
+            modelHolder.select(trainingId);
         } else {
-            model = new ProgramTrainingEntity();
-            model.setDrafting(true);
-            data.insert(model);
+            modelHolder.createNewModel();
         }
 
-        binding.setTraining(model);
+        binding.setTraining(modelHolder.getModel());
 
         RecyclerView recyclerView = (RecyclerView) findViewById(R.id.program_training_exercises_list);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
@@ -125,7 +123,7 @@ public class ProgramTrainingActivity extends AppCompatActivity implements Progra
                 R.id.program_training_list_item_reorder_action
         );
         adapter = new Adapter<>(factory, eventBus);
-        adapter.setDataList(model.getExercises());
+        adapter.setModelHolder(modelHolder);
         recyclerView.setAdapter(adapter);
 
         Log.d(TAG, "onCreate");
@@ -147,22 +145,18 @@ public class ProgramTrainingActivity extends AppCompatActivity implements Progra
         }
     }
 
-    private ProgramTraining getModel() {
-        return binding.getTraining();
-    }
-
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-        outState.putParcelable(PROGRAM_TRAINING_MODEL, getModel());
+        outState.putLong(PROGRAM_TRAINING_ID, modelHolder.getModel().getId());
     }
 
     @Override
     public void onBackPressed() {
-        if (ModelUtil.isEntityModified(getModel())) {
+        if (modelHolder.isModified() || modelHolder.getModel().isDrafting()) {
             alerts.showUnsavedChanges();
         } else {
-            finishWithoutSaving();
+            super.onBackPressed();
         }
     }
 
@@ -196,7 +190,7 @@ public class ProgramTrainingActivity extends AppCompatActivity implements Progra
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        ProgramTraining model = getModel();
+        ProgramTraining model = modelHolder.getModel();
 
         switch (item.getItemId()) {
 
@@ -220,7 +214,7 @@ public class ProgramTrainingActivity extends AppCompatActivity implements Progra
                     nameInputLayout.setError(getString(R.string.program_training_activity_name_empty_error));
                 else if (trainingsWithSameName != 0)
                     nameInputLayout.setError(getString(R.string.program_training_activity_name_duplicate_error));
-                else if (adapter.getDataList().isEmpty())
+                else if (adapter.getItemCount() == 0)
                     alerts.showOnEmptyList();
                 else
                     finishWithSaving();
@@ -240,30 +234,13 @@ public class ProgramTrainingActivity extends AppCompatActivity implements Progra
     }
 
     public void finishWithSaving() {
-        ProgramTraining model = getModel();
-        if (model.isDrafting())
-            model.setDrafting(false);
-        data.update(model);
-        try {
-            data.delete(ProgramExercise.class)
-                    .where(ProgramExerciseEntity.PROGRAM_TRAINING.isNull())
-                    .get()
-                    .call();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        modelHolder.saveAllChanges();
         NavUtils.navigateUpFromSameTask(this);
     }
 
     @Override
     public void finishWithoutSaving() {
-        ProgramTraining model = getModel();
-
-        if (model.isDrafting()) {
-            data.delete(model);
-        } else if (ModelUtil.areAssociationsModified(model)) {
-            ModelUtil.refreshAll(model, data);
-        }
+        modelHolder.undoAllChanges();
 
         NavUtils.navigateUpFromSameTask(this);
     }

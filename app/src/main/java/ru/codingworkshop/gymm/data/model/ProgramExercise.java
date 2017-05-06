@@ -6,7 +6,6 @@ import android.os.Parcelable;
 
 import java.util.List;
 
-import io.requery.CascadeAction;
 import io.requery.Entity;
 import io.requery.Generated;
 import io.requery.Key;
@@ -40,7 +39,7 @@ public interface ProgramExercise extends Persistable, Parcelable, Orderable, Obs
     ProgramTraining getProgramTraining();
     void setProgramTraining(ProgramTraining programTraining);
 
-    @OneToMany(cascade = {CascadeAction.SAVE, CascadeAction.DELETE})
+    @OneToMany
     @OrderBy(value = "sortOrder")
     List<ProgramSet> getSets();
     void setSets(List<? extends ProgramSet> sets);

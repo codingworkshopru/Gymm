@@ -63,7 +63,7 @@ public final class GymDatabaseSource extends DatabaseSource {
 
     public static EntityDataStore<Persistable> createDataStore(Context context) {
         DatabaseSource source = new GymDatabaseSource(context, Models.DEFAULT, DATABASE_NAME, 1);
-        source.setLoggingEnabled(true);
+        context.deleteDatabase(DATABASE_NAME);
         if (BuildConfig.DEBUG) {
             source.setTableCreationMode(TableCreationMode.DROP_CREATE);
         }

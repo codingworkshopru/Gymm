@@ -4,7 +4,6 @@ import android.os.Parcelable;
 
 import java.util.List;
 
-import io.requery.CascadeAction;
 import io.requery.Entity;
 import io.requery.Generated;
 import io.requery.Key;
@@ -31,7 +30,7 @@ public interface ProgramTraining extends Persistable, Parcelable, Draftable {
     boolean isDrafting();
     void setDrafting(boolean drafting);
 
-    @OneToMany(cascade = {CascadeAction.SAVE, CascadeAction.DELETE})
+    @OneToMany
     @OrderBy(value = "sortOrder")
     List<ProgramExercise> getExercises();
     void setExercises(List<? extends ProgramExercise> exercises);

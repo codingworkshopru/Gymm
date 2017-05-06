@@ -1,16 +1,22 @@
 package ru.codingworkshop.gymm.ui.program;
 
+import android.util.Log;
+
 import java.util.List;
 
 import io.requery.Persistable;
-import io.requery.query.Condition;
+import io.requery.meta.QueryAttribute;
+import io.requery.query.LogicalCondition;
 import io.requery.sql.EntityDataStore;
 import ru.codingworkshop.gymm.data.ModelUtil;
 import ru.codingworkshop.gymm.data.model.Draftable;
 import ru.codingworkshop.gymm.data.model.Orderable;
+import ru.codingworkshop.gymm.data.model.ProgramExercise;
 import ru.codingworkshop.gymm.data.model.ProgramExerciseEntity;
 import ru.codingworkshop.gymm.data.model.ProgramSet;
 import ru.codingworkshop.gymm.data.model.ProgramSetEntity;
+import ru.codingworkshop.gymm.data.model.ProgramTraining;
+import ru.codingworkshop.gymm.data.model.ProgramTrainingEntity;
 
 /**
  * Created by Радик on 05.05.2017.
@@ -21,59 +27,119 @@ public class ModelHolder<T extends Persistable & Draftable, C extends Persistabl
     private EntityDataStore<Persistable> db;
     private EntityAdapter<T, C> adapter;
 
-    public ModelHolder(EntityDataStore<Persistable> db) {
+    private static final String TAG = ModelHolder.class.getSimpleName();
+
+    public ModelHolder(EntityDataStore<Persistable> db, EntityAdapter<T, C> adapter) {
         this.db = db;
+        this.adapter = adapter;
+    }
+
+    private void l(String message) {
+        Log.d(TAG, message);
     }
 
     public void setModel(T m) {
+        l("new model set");
         model = m;
     }
 
-    public List<C> getList() {
+    public T getModel() {
+        return model;
+    }
+
+    public List<C> getChildren() {
         return adapter.getChildren(model);
     }
 
     public void addNewChild(C child) {
-        int index = getList().size();
+        l("add new child");
         if (!child.isDrafting())
             child.setDrafting(true);
-        child.setSortOrder(index);
         adapter.setParent(child, model);
         db.upsert(child);
-        getList().add(index, child);
     }
 
     public void replaceChild(C child) {
-        getList().set(child.getSortOrder(), child);
+        l("replace child");
+        db.update(child);
     }
 
     public void select(long id) {
-        setModel(adapter.select(db, id, false));
+        l("select");
+        setModel(select(id, true));
     }
 
     public void selectWithDrafting(long id) {
-        setModel(adapter.select(db, id, true));
+        l("select with drafting");
+        setModel(select(id, true));
+    }
+
+    private T select(long id, boolean withDrafting) {
+        LogicalCondition<?, ?> condition = adapter.idAttribute().eq(id);
+        if (!withDrafting)
+            condition = condition.and(adapter.draftingAttribute().eq(false));
+
+        return db.select(adapter.getEntityClass())
+                .where(condition)
+                .get()
+                .first();
+    }
+
+    private void deleteDraftingChildren() {
+        try {
+            db.delete(adapter.getChildClass())
+                    .where(adapter.childDraftingAttribute().eq(true).and(adapter.childParentAttribute().eq(model)))
+                    .get()
+                    .call();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void deleteUnattachedChildren() {
+        try {
+            db.delete(adapter.getChildClass())
+                    .where(adapter.childParentAttribute().isNull())
+                    .get()
+                    .call();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void setChildrenNotDrafting() {
+        for (C child : getChildren())
+            if (child.isDrafting())
+                child.setDrafting(false);
+        db.update(getChildren());
     }
 
     public T createNewModel() {
+        l("create new model");
         T m = adapter.create();
         m.setDrafting(true);
-        db.insert(m);
+        db.upsert(m);
         setModel(m);
         return m;
     }
 
     public void saveAllChanges() {
+        l("save all changes");
         if (model.isDrafting())
             model.setDrafting(false);
+        setChildrenNotDrafting();
         db.update(model);
-        adapter.deleteUnneededChildren(model, db);
+        deleteUnattachedChildren();
     }
 
     public void undoAllChanges() {
+        l("undo all changes");
         if (model.isDrafting()) {
+            l("\tdelete model");
             db.delete(model);
         } else if (ModelUtil.areAssociationsModified(model)) {
+            l("\trefresh model");
+            deleteDraftingChildren();
             ModelUtil.refreshAll(model, db);
         }
     }
@@ -86,45 +152,106 @@ public class ModelHolder<T extends Persistable & Draftable, C extends Persistabl
         T create();
         void setParent(C model, T parent);
         List<C> getChildren(T model);
-        T select(EntityDataStore<Persistable> db, long id, boolean withDrafting);
-        void deleteUnneededChildren(T model, EntityDataStore<Persistable> db);
+        QueryAttribute<?, Long> idAttribute();
+        QueryAttribute<?, Boolean> draftingAttribute();
+        QueryAttribute<?, Boolean> childDraftingAttribute();
+        QueryAttribute<?, T> childParentAttribute();
+        Class<T> getEntityClass();
+        Class<C> getChildClass();
     }
 
-    public static final class ProgramExerciseAdapter implements EntityAdapter<ProgramExerciseEntity, ProgramSet> {
+    public static final class ProgramExerciseAdapter implements EntityAdapter<ProgramExercise, ProgramSet> {
         @Override
-        public ProgramExerciseEntity create() {
+        public ProgramExercise create() {
             return new ProgramExerciseEntity();
         }
 
         @Override
-        public void setParent(ProgramSet model, ProgramExerciseEntity parent) {
+        public void setParent(ProgramSet model, ProgramExercise parent) {
             model.setProgramExercise(parent);
         }
 
         @Override
-        public List<ProgramSet> getChildren(ProgramExerciseEntity model) {
+        public List<ProgramSet> getChildren(ProgramExercise model) {
             return model.getSets();
         }
 
         @Override
-        public ProgramExerciseEntity select(EntityDataStore<Persistable> db, long id, boolean withDrafting) {
-            Condition<?, ?> condition = withDrafting ? ProgramExerciseEntity.ID.eq(id) : ProgramExerciseEntity.ID.eq(id).and(ProgramExerciseEntity.DRAFTING.eq(false));
-            return db.select(ProgramExerciseEntity.class)
-                    .where(condition)
-                    .get()
-                    .first();
+        public QueryAttribute<?, Long> idAttribute() {
+            return ProgramExerciseEntity.ID;
         }
 
         @Override
-        public void deleteUnneededChildren(ProgramExerciseEntity model, EntityDataStore<Persistable> db) {
-            try {
-                db.delete(ProgramSetEntity.class)
-                        .where(ProgramSetEntity.DRAFTING.eq(true).and(ProgramSetEntity.PROGRAM_EXERCISE.eq(model)))
-                        .get()
-                        .call();
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
+        public QueryAttribute<?, Boolean> draftingAttribute() {
+            return ProgramExerciseEntity.DRAFTING;
+        }
+
+        @Override
+        public QueryAttribute<?, Boolean> childDraftingAttribute() {
+            return ProgramSetEntity.DRAFTING;
+        }
+
+        @Override
+        public QueryAttribute<?, ProgramExercise> childParentAttribute() {
+            return ProgramSetEntity.PROGRAM_EXERCISE;
+        }
+
+        @Override
+        public Class<ProgramExercise> getEntityClass() {
+            return ProgramExercise.class;
+        }
+
+        @Override
+        public Class<ProgramSet> getChildClass() {
+            return ProgramSet.class;
+        }
+    }
+
+    public static final class ProgramTrainingAdapter implements EntityAdapter<ProgramTraining, ProgramExercise> {
+
+        @Override
+        public ProgramTraining create() {
+            return new ProgramTrainingEntity();
+        }
+
+        @Override
+        public void setParent(ProgramExercise model, ProgramTraining parent) {
+            model.setProgramTraining(parent);
+        }
+
+        @Override
+        public List<ProgramExercise> getChildren(ProgramTraining model) {
+            return model.getExercises();
+        }
+
+        @Override
+        public QueryAttribute<?, Long> idAttribute() {
+            return ProgramTrainingEntity.ID;
+        }
+
+        @Override
+        public QueryAttribute<?, Boolean> draftingAttribute() {
+            return ProgramTrainingEntity.DRAFTING;
+        }
+
+        @Override
+        public QueryAttribute<?, Boolean> childDraftingAttribute() {
+            return ProgramExerciseEntity.DRAFTING;
+        }
+
+        @Override
+        public QueryAttribute<?, ProgramTraining> childParentAttribute() {
+            return ProgramExerciseEntity.PROGRAM_TRAINING;
+        }
+
+        @Override
+        public Class<ProgramTraining> getEntityClass() {
+            return ProgramTraining.class;
+        }
+
+        @Override
+        public Class<ProgramExercise> getChildClass() {
+            return ProgramExercise.class;
         }
     }
 }
