@@ -2,6 +2,7 @@ package ru.codingworkshop.gymm.ui.program;
 
 import android.util.Log;
 
+import java.util.Collection;
 import java.util.List;
 
 import io.requery.Persistable;
@@ -120,8 +121,11 @@ public class ModelHolder<T extends Persistable & Draftable, C extends Persistabl
             db.delete(model);
         } else if (ModelUtil.areAssociationsModified(model)) {
             l("\trefresh model");
-            db.delete(((CollectionChanges)((ObservableList) getChildren()).observer()).addedElements());
+            ObservableList list = (ObservableList) getChildren();
+            CollectionChanges observer = (CollectionChanges) list.observer();
+            Collection toDelete = observer.addedElements();
             ModelUtil.refreshAll(model, db);
+            db.delete(toDelete);
         }
     }
 
@@ -135,7 +139,6 @@ public class ModelHolder<T extends Persistable & Draftable, C extends Persistabl
         List<C> getChildren(T model);
         QueryAttribute<?, Long> idAttribute();
         QueryAttribute<?, Boolean> draftingAttribute();
-        QueryAttribute<?, Boolean> childDraftingAttribute();
         QueryAttribute<?, T> childParentAttribute();
         Class<T> getEntityClass();
         Class<C> getChildClass();
@@ -165,11 +168,6 @@ public class ModelHolder<T extends Persistable & Draftable, C extends Persistabl
         @Override
         public QueryAttribute<?, Boolean> draftingAttribute() {
             return ProgramExerciseEntity.DRAFTING;
-        }
-
-        @Override
-        public QueryAttribute<?, Boolean> childDraftingAttribute() {
-            return ProgramSetEntity.DRAFTING;
         }
 
         @Override
@@ -213,11 +211,6 @@ public class ModelHolder<T extends Persistable & Draftable, C extends Persistabl
         @Override
         public QueryAttribute<?, Boolean> draftingAttribute() {
             return ProgramTrainingEntity.DRAFTING;
-        }
-
-        @Override
-        public QueryAttribute<?, Boolean> childDraftingAttribute() {
-            return ProgramExerciseEntity.DRAFTING;
         }
 
         @Override
