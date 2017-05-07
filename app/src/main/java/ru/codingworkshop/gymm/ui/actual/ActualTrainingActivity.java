@@ -8,9 +8,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.IdRes;
 import android.support.annotation.UiThread;
-import android.support.v4.app.LoaderManager;
 import android.support.v4.app.NavUtils;
-import android.support.v4.content.Loader;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -20,11 +18,16 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 
+import io.requery.Persistable;
+import io.requery.sql.EntityDataStore;
+import ru.codingworkshop.gymm.App;
+import ru.codingworkshop.gymm.MainActivity;
 import ru.codingworkshop.gymm.R;
 import ru.codingworkshop.gymm.data.model.ProgramTraining;
+import ru.codingworkshop.gymm.data.model.ProgramTrainingEntity;
 import ru.codingworkshop.gymm.service.TrainingTimeService;
 
-public class ActualTrainingActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<ProgramTraining>,
+public class ActualTrainingActivity extends AppCompatActivity implements
         ActualTrainingAdapter.OnStepClickListener,
         BlankFragment.OnFragmentInteractionListener
 {
@@ -33,12 +36,15 @@ public class ActualTrainingActivity extends AppCompatActivity implements LoaderM
     private RecyclerView mStepsView;
     private ActualTrainingAdapter mAdapter;
     private BlankFragment mFragment;
+    private EntityDataStore<Persistable> data;
     static final @IdRes int FRAGMENT_CONTAINER_ID = Build.VERSION.SDK_INT < Build.VERSION_CODES.JELLY_BEAN_MR1 ? 1 : View.generateViewId();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_actual_training);
+
+        data = ((App) getApplication()).getData();
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -50,18 +56,12 @@ public class ActualTrainingActivity extends AppCompatActivity implements LoaderM
         mAdapter = new ActualTrainingAdapter(this);
         mStepsView.setAdapter(mAdapter);
 
-//        getSupportLoaderManager().initLoader(TrainingAsyncLoader.LOADER_TRAINING_LOAD, getIntent().getExtras(), this);
-    }
-
-    @Override
-    public Loader<ProgramTraining> onCreateLoader(int id, Bundle args) {
-//        return new TrainingAsyncLoader(this, id, args);
-        return null;
-    }
-
-    @Override
-    public void onLoadFinished(Loader<ProgramTraining> loader, ProgramTraining data) {
-        mAdapter.setModel(data);
+        mAdapter.setModel(
+                data.select(ProgramTraining.class)
+                        .where(ProgramTrainingEntity.ID.eq(getIntent().getLongExtra(MainActivity.PROGRAM_TRAINING_ID_KEY, 0L)))
+                        .get()
+                        .first()
+        );
     }
 
     @Override
@@ -100,11 +100,6 @@ public class ActualTrainingActivity extends AppCompatActivity implements LoaderM
                 break;
         }
         return super.onOptionsItemSelected(item);
-    }
-
-    @Override
-    public void onLoaderReset(Loader<ProgramTraining> loader) {
-
     }
 
     @UiThread
