@@ -92,17 +92,13 @@ public class ProgramExerciseActivity extends AppCompatActivity implements
         );
         adapter = new Adapter<>(factory, eventBus);
 
-        modelHolder = new ModelHolder<>(data, new ModelHolder.ProgramExerciseAdapter());
+        modelHolder = ModelHolder.newInstance(
+                data,
+                new ModelHolder.ProgramExerciseAdapter(),
+                savedInstanceState != null ? savedInstanceState : getIntent().getExtras(),
+                PROGRAM_EXERCISE_ID
+        );
 
-        if (savedInstanceState != null && savedInstanceState.containsKey(PROGRAM_EXERCISE_ID)) {
-            long exerciseId = savedInstanceState.getLong(PROGRAM_EXERCISE_ID);
-            modelHolder.selectWithDrafting(exerciseId);
-        } else if (getIntent().hasExtra(PROGRAM_EXERCISE_ID)) {
-            long exerciseId = getIntent().getLongExtra(PROGRAM_EXERCISE_ID, 0L);
-            modelHolder.select(exerciseId);
-        } else {
-            modelHolder.createNewModel();
-        }
         binding.setExercise(modelHolder.getModel());
 
         RecyclerView recyclerView = (RecyclerView) findViewById(R.id.program_exercise_sets_list);

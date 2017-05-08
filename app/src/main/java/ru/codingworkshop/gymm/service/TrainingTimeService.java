@@ -15,10 +15,10 @@ import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.TaskStackBuilder;
 import android.util.Log;
 
-import ru.codingworkshop.gymm.MainActivity;
 import ru.codingworkshop.gymm.R;
 import ru.codingworkshop.gymm.data.model.ProgramTraining;
 import ru.codingworkshop.gymm.ui.actual.ActualTrainingActivity;
+import ru.codingworkshop.gymm.ui.program.training.ProgramTrainingActivity;
 
 /**
  * Created by Радик on 07.04.2017.
@@ -101,7 +101,7 @@ public class TrainingTimeService extends Service {
                 .setOngoing(true);
 
         Intent actualTrainingIntent = new Intent(this, ActualTrainingActivity.class);
-        actualTrainingIntent.putExtra(MainActivity.PROGRAM_TRAINING_ID_KEY, programTraining.getId());
+        actualTrainingIntent.putExtra(ProgramTrainingActivity.PROGRAM_TRAINING_ID, programTraining.getId());
 
         TaskStackBuilder stackBuilder = TaskStackBuilder.create(this)
                 .addParentStack(ActualTrainingActivity.class)

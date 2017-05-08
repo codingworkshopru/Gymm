@@ -23,7 +23,6 @@ import ru.codingworkshop.gymm.ui.actual.ActualTrainingActivity;
 import ru.codingworkshop.gymm.ui.program.training.ProgramTrainingActivity;
 
 public class MainActivity extends AppCompatActivity implements ModelLoader.ModelLoaderCallbacks<ProgramTraining> {
-    public static final String PROGRAM_TRAINING_ID_KEY = ProgramTraining.class.getCanonicalName() + ".id";
     private static final String TAG = MainActivity.class.getSimpleName();
     private static final int TEST_LOADER = 0;
 
@@ -90,7 +89,7 @@ public class MainActivity extends AppCompatActivity implements ModelLoader.Model
                     @Override
                     public void onClick(View v) {
                         Intent intent = new Intent(itemView.getContext(), ActualTrainingActivity.class);
-                        intent.putExtra(PROGRAM_TRAINING_ID_KEY, getItemId());
+                        intent.putExtra(ProgramTrainingActivity.PROGRAM_TRAINING_ID, getItemId());
                         itemView.getContext().startActivity(intent);
                     }
                 });
@@ -98,7 +97,7 @@ public class MainActivity extends AppCompatActivity implements ModelLoader.Model
                     @Override
                     public boolean onLongClick(View v) {
                         Intent intent = new Intent(itemView.getContext(), ProgramTrainingActivity.class);
-                        intent.putExtra(PROGRAM_TRAINING_ID_KEY, getItemId());
+                        intent.putExtra(ProgramTrainingActivity.PROGRAM_TRAINING_ID, getItemId());
                         itemView.getContext().startActivity(intent);
                         return true;
                     }

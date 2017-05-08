@@ -1,5 +1,6 @@
 package ru.codingworkshop.gymm.ui.program;
 
+import android.os.Bundle;
 import android.util.Log;
 
 import java.util.Collection;
@@ -8,7 +9,6 @@ import java.util.List;
 import io.requery.Persistable;
 import io.requery.meta.QueryAttribute;
 import io.requery.proxy.CollectionChanges;
-import io.requery.query.LogicalCondition;
 import io.requery.sql.EntityDataStore;
 import io.requery.util.ObservableList;
 import ru.codingworkshop.gymm.data.ModelUtil;
@@ -35,6 +35,21 @@ public class ModelHolder<T extends Persistable & Draftable, C extends Persistabl
     public ModelHolder(EntityDataStore<Persistable> db, EntityAdapter<T, C> adapter) {
         this.db = db;
         this.adapter = adapter;
+    }
+
+    public static <T extends Persistable & Draftable, C extends Persistable & Orderable & Draftable>
+    ModelHolder<T, C> newInstance(EntityDataStore<Persistable> db, EntityAdapter<T, C> adapter, Bundle args, String key)
+    {
+        ModelHolder<T, C> instance = new ModelHolder<>(db, adapter);
+
+        if (args != null && args.containsKey(key)) {
+            long id = args.getLong(key);
+            instance.select(id);
+        } else {
+            instance.createNewModel();
+        }
+
+        return instance;
     }
 
     private void l(String message) {
@@ -65,25 +80,14 @@ public class ModelHolder<T extends Persistable & Draftable, C extends Persistabl
         db.update(child);
     }
 
-    public void select(long id) {
+    private void select(long id ) {
         l("select");
-        setModel(select(id, true));
-    }
-
-    public void selectWithDrafting(long id) {
-        l("select with drafting");
-        setModel(select(id, true));
-    }
-
-    private T select(long id, boolean withDrafting) {
-        LogicalCondition<?, ?> condition = adapter.idAttribute().eq(id);
-        if (!withDrafting)
-            condition = condition.and(adapter.draftingAttribute().eq(false));
-
-        return db.select(adapter.getEntityClass())
-                .where(condition)
-                .get()
-                .first();
+        setModel(
+                db.select(adapter.getEntityClass())
+                        .where(adapter.idAttribute().eq(id))
+                        .get()
+                        .first()
+        );
     }
 
     private void deleteUnattachedChildren() {
@@ -138,7 +142,6 @@ public class ModelHolder<T extends Persistable & Draftable, C extends Persistabl
         void setParent(C model, T parent);
         List<C> getChildren(T model);
         QueryAttribute<?, Long> idAttribute();
-        QueryAttribute<?, Boolean> draftingAttribute();
         QueryAttribute<?, T> childParentAttribute();
         Class<T> getEntityClass();
         Class<C> getChildClass();
@@ -163,11 +166,6 @@ public class ModelHolder<T extends Persistable & Draftable, C extends Persistabl
         @Override
         public QueryAttribute<?, Long> idAttribute() {
             return ProgramExerciseEntity.ID;
-        }
-
-        @Override
-        public QueryAttribute<?, Boolean> draftingAttribute() {
-            return ProgramExerciseEntity.DRAFTING;
         }
 
         @Override
@@ -206,11 +204,6 @@ public class ModelHolder<T extends Persistable & Draftable, C extends Persistabl
         @Override
         public QueryAttribute<?, Long> idAttribute() {
             return ProgramTrainingEntity.ID;
-        }
-
-        @Override
-        public QueryAttribute<?, Boolean> draftingAttribute() {
-            return ProgramTrainingEntity.DRAFTING;
         }
 
         @Override

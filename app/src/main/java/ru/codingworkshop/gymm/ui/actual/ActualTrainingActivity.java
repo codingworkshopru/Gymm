@@ -21,11 +21,11 @@ import android.view.View;
 import io.requery.Persistable;
 import io.requery.sql.EntityDataStore;
 import ru.codingworkshop.gymm.App;
-import ru.codingworkshop.gymm.MainActivity;
 import ru.codingworkshop.gymm.R;
 import ru.codingworkshop.gymm.data.model.ProgramTraining;
 import ru.codingworkshop.gymm.data.model.ProgramTrainingEntity;
 import ru.codingworkshop.gymm.service.TrainingTimeService;
+import ru.codingworkshop.gymm.ui.program.training.ProgramTrainingActivity;
 
 public class ActualTrainingActivity extends AppCompatActivity implements
         ActualTrainingAdapter.OnStepClickListener,
@@ -58,7 +58,7 @@ public class ActualTrainingActivity extends AppCompatActivity implements
 
         mAdapter.setModel(
                 data.select(ProgramTraining.class)
-                        .where(ProgramTrainingEntity.ID.eq(getIntent().getLongExtra(MainActivity.PROGRAM_TRAINING_ID_KEY, 0L)))
+                        .where(ProgramTrainingEntity.ID.eq(getIntent().getLongExtra(ProgramTrainingActivity.PROGRAM_TRAINING_ID, 0L)))
                         .get()
                         .first()
         );

@@ -2,9 +2,10 @@ package ru.codingworkshop.gymm.data.model;
 
 import android.os.Parcelable;
 
-import java.util.Date;
+import java.sql.Timestamp;
 import java.util.List;
 
+import io.requery.Column;
 import io.requery.Entity;
 import io.requery.ForeignKey;
 import io.requery.Generated;
@@ -24,11 +25,12 @@ public interface ActualTraining extends Persistable, Parcelable {
     @Generated
     long getId();
 
-    Date getStartTime();
-    void setStartTime(Date startTime);
+    @Column(value = "CURRENT_TIMESTAMP")
+    Timestamp getStartTime();
+    void setStartTime(Timestamp startTime);
 
-    Date getFinishTime();
-    void setFinishTime(Date finishTime);
+    Timestamp getFinishTime();
+    void setFinishTime(Timestamp finishTime);
 
     @OneToOne
     @ForeignKey

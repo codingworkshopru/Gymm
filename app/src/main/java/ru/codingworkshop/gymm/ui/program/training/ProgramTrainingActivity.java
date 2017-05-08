@@ -32,7 +32,6 @@ import io.requery.Persistable;
 import io.requery.sql.EntityDataStore;
 import ru.codingworkshop.gymm.App;
 import ru.codingworkshop.gymm.BuildConfig;
-import ru.codingworkshop.gymm.MainActivity;
 import ru.codingworkshop.gymm.R;
 import ru.codingworkshop.gymm.data.model.ProgramExercise;
 import ru.codingworkshop.gymm.data.model.ProgramExerciseEntity;
@@ -96,18 +95,13 @@ public class ProgramTrainingActivity extends AppCompatActivity implements Progra
         }
 
         data = ((App) getApplication()).getData();
-        modelHolder = new ModelHolder<>(data, new ModelHolder.ProgramTrainingAdapter());
 
-        Intent startedIntent = getIntent();
-        if (savedInstanceState != null && savedInstanceState.containsKey(PROGRAM_TRAINING_ID)) {
-            long trainingId = savedInstanceState.getLong(PROGRAM_TRAINING_ID);
-            modelHolder.selectWithDrafting(trainingId);
-        } else if (startedIntent != null && startedIntent.hasExtra(MainActivity.PROGRAM_TRAINING_ID_KEY)) {
-            long trainingId = startedIntent.getLongExtra(MainActivity.PROGRAM_TRAINING_ID_KEY, 0L);
-            modelHolder.select(trainingId);
-        } else {
-            modelHolder.createNewModel();
-        }
+        modelHolder = ModelHolder.newInstance(
+                data,
+                new ModelHolder.ProgramTrainingAdapter(),
+                savedInstanceState != null ? savedInstanceState : getIntent().getExtras(),
+                PROGRAM_TRAINING_ID
+        );
 
         binding.setTraining(modelHolder.getModel());
 
