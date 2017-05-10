@@ -113,6 +113,12 @@ public class ProgramExerciseActivity extends AppCompatActivity implements
         adapter.setModelHolder(modelHolder);
         recyclerView.setAdapter(adapter);
 
+        findViewById(R.id.program_exercise_name_layout).setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                ProgramExerciseActivity.this.onExercisePick(v);
+            }
+        });
+
         Log.d(TAG, "onCreate");
     }
 
@@ -165,7 +171,7 @@ public class ProgramExerciseActivity extends AppCompatActivity implements
         }
     }
 
-    public void onExercisePick(View view) {
+    public void onExercisePick(View v) {
         Intent intent = new Intent(ProgramExerciseActivity.this, MuscleGroupsActivity.class);
         startActivityForResult(intent, 0);
     }

@@ -1,5 +1,8 @@
 package ru.codingworkshop.gymm;
 
+import android.content.Context;
+import android.content.res.Resources;
+import android.support.test.InstrumentationRegistry;
 import android.support.test.espresso.NoMatchingViewException;
 import android.support.test.espresso.action.CoordinatesProvider;
 import android.support.test.espresso.action.GeneralClickAction;
@@ -12,6 +15,7 @@ import android.support.test.espresso.contrib.RecyclerViewActions;
 import android.support.test.filters.LargeTest;
 import android.support.test.rule.ActivityTestRule;
 import android.support.test.runner.AndroidJUnit4;
+import android.util.TypedValue;
 import android.view.View;
 
 import org.hamcrest.Matcher;
@@ -57,6 +61,7 @@ public class TrainingProgramTest {
     @Rule
     public ActivityTestRule<MainActivity> mActivityRule = new ActivityTestRule<>(MainActivity.class);
     private EntityDataStore<Persistable> data;
+    private Context context = InstrumentationRegistry.getTargetContext();
 
     @Before
     public void cleanup() throws Exception {
@@ -71,12 +76,17 @@ public class TrainingProgramTest {
         CoordinatesProvider cp = new CoordinatesProvider() {
             @Override
             public float[] calculateCoordinates(View view) {
+                Resources r = context.getResources();
                 int xy[] = new int[2];
                 view.getLocationOnScreen(xy);
-                return new float[] {xy[0] + 30, xy[1] + 220};
+                System.out.println("!!!!!!! " + xy[0] + TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 5, r.getDisplayMetrics()) + " " + xy[1] + TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 110, r.getDisplayMetrics()));
+                return new float[] {
+                        xy[0] + TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 20, r.getDisplayMetrics()),
+                        xy[1] + TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 70, r.getDisplayMetrics())
+                };
             }
         };
-        onView(withId(R.id.imageView5)).perform(new GeneralClickAction(Tap.SINGLE, cp, Press.FINGER));
+        onView(withId(R.id.imageView5)).perform(new GeneralClickAction(Tap.SINGLE, cp, Press.THUMB));
         onView(withId(R.id.fragment_exercise_picker_exercises)).perform(RecyclerViewActions.actionOnItemAtPosition(index, click()));
     }
 
@@ -86,8 +96,10 @@ public class TrainingProgramTest {
     }
 
     private void selectProgramTraining(String name) {
-        onView(withId(R.id.rv_test_main)).perform(RecyclerViewActions.scrollTo(withChild(withText(name))));
-        onView(withId(R.id.rv_test_main)).perform(RecyclerViewActions.actionOnItem(withChild(withText(name)), longClick()));
+        onView(withId(R.id.rv_test_main)).perform(
+                RecyclerViewActions.scrollTo(withChild(withText(name))),
+                RecyclerViewActions.actionOnItem(withChild(withText(name)), longClick())
+        );
     }
 
     private void addProgramExercise() {
@@ -97,15 +109,16 @@ public class TrainingProgramTest {
     }
 
     private void deleteProgramExercise() {
-        onView(withId(R.id.program_training_exercises_list)).perform(RecyclerViewActions.actionOnItemAtPosition(0, longClick()));
-        onView(withId(R.id.program_training_exercises_list)).perform(RecyclerViewActions.actionOnItemAtPosition(0, actionWithAssertions(
-                new GeneralSwipeAction(
-                        Swipe.FAST,
-                        GeneralLocation.CENTER_LEFT,
-                        GeneralLocation.CENTER_RIGHT,
-                        Press.FINGER
-                )
-        )));
+        onView(withId(R.id.program_training_exercises_list)).perform(
+                RecyclerViewActions.actionOnItemAtPosition(0, longClick()),
+                RecyclerViewActions.actionOnItemAtPosition(0, actionWithAssertions(
+                        new GeneralSwipeAction(
+                                Swipe.FAST,
+                                GeneralLocation.CENTER_LEFT,
+                                GeneralLocation.CENTER_RIGHT,
+                                Press.FINGER)
+                        )
+                ));
         pressBack();
     }
 
@@ -174,7 +187,7 @@ public class TrainingProgramTest {
         selectProgramExercise(0);
         deleteProgramSets(TO_DELETE);
         close(false);
-        onView(withText(mActivityRule.getActivity().getResources().getQuantityString(R.plurals.number_of_sets, SETS, SETS))).check(matches(isDisplayed()));
+        onView(withText(context.getResources().getQuantityString(R.plurals.number_of_sets, SETS, SETS))).check(matches(isDisplayed()));
         close(false);
 
         // delete two sets and save
@@ -182,7 +195,7 @@ public class TrainingProgramTest {
         selectProgramExercise(0);
         deleteProgramSets(TO_DELETE);
         close(true);
-        onView(withText(mActivityRule.getActivity().getResources().getQuantityString(R.plurals.number_of_sets, SETS - TO_DELETE, SETS - TO_DELETE))).check(matches(isDisplayed()));
+        onView(withText(context.getResources().getQuantityString(R.plurals.number_of_sets, SETS - TO_DELETE, SETS - TO_DELETE))).check(matches(isDisplayed()));
         close(true);
     }
 
@@ -254,7 +267,7 @@ public class TrainingProgramTest {
         selectProgramExercise(0);
         addProgramSet();
         close(false);
-        onView(withText(mActivityRule.getActivity().getResources().getQuantityString(R.plurals.number_of_sets, 1, 1))).check(matches(isDisplayed()));
+        onView(withText(context.getResources().getQuantityString(R.plurals.number_of_sets, 1, 1))).check(matches(isDisplayed()));
 
         close(false);
     }

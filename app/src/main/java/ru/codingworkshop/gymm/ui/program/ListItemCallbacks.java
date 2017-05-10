@@ -11,8 +11,8 @@ import android.view.View;
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
 
-import ru.codingworkshop.gymm.ui.UiUtil;
 import ru.codingworkshop.gymm.ui.program.events.TouchViewEvent;
+import ru.codingworkshop.gymm.ui.util.UiUtil;
 
 /**
  * Created by Радик on 28.04.2017.

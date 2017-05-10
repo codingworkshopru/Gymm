@@ -48,6 +48,7 @@ import ru.codingworkshop.gymm.ui.program.ModelHolder;
 import ru.codingworkshop.gymm.ui.program.ViewHolderFactory;
 import ru.codingworkshop.gymm.ui.program.events.ClickViewEvent;
 import ru.codingworkshop.gymm.ui.program.exercise.ProgramExerciseActivity;
+import ru.codingworkshop.gymm.ui.util.HiddenTitleAppBarBehavior;
 
 /**
  * Created by Радик on 20.04.2017.
@@ -89,10 +90,10 @@ public class ProgramTrainingActivity extends AppCompatActivity implements Progra
             public void afterTextChanged(Editable s) {}
         });
 
-        setSupportActionBar((Toolbar) findViewById(R.id.program_training_toolbar));
-        if (getSupportActionBar() != null) {
-            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        }
+        Toolbar toolbar = (Toolbar) findViewById(R.id.program_training_toolbar);
+        setSupportActionBar(toolbar);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        new HiddenTitleAppBarBehavior(toolbar, getTitle().toString());
 
         data = ((App) getApplication()).getData();
 

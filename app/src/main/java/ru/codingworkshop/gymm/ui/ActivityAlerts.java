@@ -5,7 +5,7 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.StringRes;
 
-import ru.codingworkshop.gymm.ui.UiUtil.AlertDialogFragment;
+import ru.codingworkshop.gymm.ui.util.AlertDialogFragment;
 
 /**
  * Created by Радик on 04.05.2017.

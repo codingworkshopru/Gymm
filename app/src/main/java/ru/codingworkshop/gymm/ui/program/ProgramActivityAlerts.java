@@ -7,7 +7,7 @@ import android.support.annotation.StringRes;
 
 import ru.codingworkshop.gymm.R;
 import ru.codingworkshop.gymm.ui.ActivityAlerts;
-import ru.codingworkshop.gymm.ui.UiUtil;
+import ru.codingworkshop.gymm.ui.util.AlertDialogFragment;
 
 /**
  * Created by Радик on 04.05.2017.
@@ -37,7 +37,7 @@ public abstract class ProgramActivityAlerts extends ActivityAlerts {
     abstract public void showOnEmptyList();
 
     protected void showOnEmptyList(@StringRes int message) {
-        Bundle args = new UiUtil.AlertDialogFragment.ArgumentsBuilder()
+        Bundle args = new AlertDialogFragment.ArgumentsBuilder()
                 .setMessage(message)
                 .setPositiveButtonText(R.string.add_button_text)
                 .setNegativeButtonDefaultText()

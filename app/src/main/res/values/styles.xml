@@ -16,37 +16,26 @@
     <style name="AppTheme.NoActionBar" parent="AppTheme">
         <item name="windowActionBar">false</item>
         <item name="windowNoTitle">true</item>
-        <item name="actionBarTheme">@style/AppTheme.NoActionBar.SpinnerInActionBar.ActionBarTheme
-        </item>
+        <item name="actionBarTheme">@style/AppTheme.NoActionBar.ActionBarTheme</item>
         <item name="windowActionModeOverlay">true</item>
+    </style>
+
+    <style name="AppTheme.NoActionBar.ActionBarTheme" parent="@style/ThemeOverlay.AppCompat.Dark.ActionBar">
+        <item name="colorAccent">@color/color_material_pink_A100</item>
     </style>
 
     <style name="AppTheme.NoActionBar.SpinnerInAppBar" parent="AppTheme.NoActionBar">
         <item name="android:spinnerStyle">@style/Widget.AppCompat.Spinner.Underlined</item>
-        <!--<item name="android:spinnerItemStyle">@style/SpinnerItemStyle</item>-->
+        <item name="spinnerDropDownItemStyle">@style/hui</item>
     </style>
-
-    <style name="AppTheme.NoActionBar.SpinnerInActionBar.ActionBarTheme" parent="@style/ThemeOverlay.AppCompat.Dark.ActionBar">
-        <item name="colorAccent">@color/color_material_pink_A100</item>
+    <style name="hui" parent="Widget.AppCompat.DropDownItem.Spinner">
+        <item name="android:textColor">@android:color/black</item>
     </style>
-
-    <!--<style name="SpinnerItemStyle" parent="Widget.AppCompat.TextView.SpinnerItem">-->
-        <!--<item name="android:textAppearance">@style/SpinnerItemStyle.TextAppearance</item>-->
-    <!--</style>-->
-
-    <!--<style name="SpinnerItemStyle.TextAppearance" parent="TextAppearance.AppCompat.Widget.TextView.SpinnerItem">-->
-        <!--<item name="android:textColor">?android:attr/textColorPrimary</item>-->
-    <!--</style>-->
 
     <style name="AppTheme.NoActionBar.TranslucentStatusOn" parent="AppTheme.NoActionBar">
         <item name="android:windowTranslucentStatus">true</item>
     </style>
 
-    <style name="InvisibleText" parent="Widget.Design.CollapsingToolbar">
-        <item name="android:textColor">@android:color/transparent</item>
-    </style>
-
     <style name="AppTheme.NoActionBar.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
-
     <style name="AppTheme.NoActionBar.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
 </resources>

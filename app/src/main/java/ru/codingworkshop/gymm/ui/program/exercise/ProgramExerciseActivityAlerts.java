@@ -5,8 +5,8 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 
 import ru.codingworkshop.gymm.R;
-import ru.codingworkshop.gymm.ui.UiUtil;
 import ru.codingworkshop.gymm.ui.program.ProgramActivityAlerts;
+import ru.codingworkshop.gymm.ui.util.AlertDialogFragment;
 
 /**
  * Created by Радик on 04.05.2017.
@@ -28,7 +28,7 @@ final class ProgramExerciseActivityAlerts extends ProgramActivityAlerts {
     }
 
     void showExerciseNotSelected() {
-        Bundle args = new UiUtil.AlertDialogFragment.ArgumentsBuilder()
+        Bundle args = new AlertDialogFragment.ArgumentsBuilder()
                 .setMessage(R.string.program_exercise_activity_exercise_not_selected_message)
                 .setPositiveButtonText(R.string.select_button_text)
                 .setNegativeButtonDefaultText()

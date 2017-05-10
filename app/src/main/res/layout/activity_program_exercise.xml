@@ -35,7 +35,6 @@
                 android:padding="16dp"
                 android:background="?attr/selectableItemBackground"
                 android:orientation="horizontal"
-                android:onClick="onExercisePick"
                 android:visibility="@{properties.inEditMode ? View.GONE : View.VISIBLE}">
 
                 <TextView

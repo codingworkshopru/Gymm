@@ -10,8 +10,6 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.ColorInt;
-import android.support.design.widget.AppBarLayout;
-import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
@@ -24,6 +22,7 @@ import com.google.android.youtube.player.YouTubeInitializationResult;
 import com.google.android.youtube.player.YouTubeStandalonePlayer;
 import com.squareup.picasso.Callback;
 import com.squareup.picasso.Picasso;
+import com.squareup.picasso.RequestCreator;
 
 import java.util.List;
 
@@ -33,6 +32,7 @@ import ru.codingworkshop.gymm.data.model.Exercise;
 import ru.codingworkshop.gymm.data.model.ExerciseEntity;
 import ru.codingworkshop.gymm.data.model.MuscleGroup;
 import ru.codingworkshop.gymm.databinding.ActivityExerciseInfoBinding;
+import ru.codingworkshop.gymm.ui.util.HiddenTitleAppBarBehavior;
 
 public class ExerciseInfoActivity extends AppCompatActivity
         implements LoaderManager.LoaderCallbacks<Uri>,
@@ -56,10 +56,6 @@ public class ExerciseInfoActivity extends AppCompatActivity
         if (IS_YOUTUBE_SERVICE_SUPPORTED == null)
             IS_YOUTUBE_SERVICE_SUPPORTED = YouTubeApiServiceUtil.isYouTubeApiServiceAvailable(this) == YouTubeInitializationResult.SUCCESS;
 
-        final Toolbar toolbar = (Toolbar) findViewById(R.id.exercise_info_toolbar);
-        setSupportActionBar(toolbar);
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-
         Intent intent = getIntent();
         if (intent != null && intent.hasExtra(EXERCISE_ID)) {
             long exerciseId = intent.getLongExtra(EXERCISE_ID, 0L);
@@ -69,13 +65,15 @@ public class ExerciseInfoActivity extends AppCompatActivity
             throw new IllegalArgumentException("No argument for " + this.getClass().getName());
         }
 
+        Toolbar toolbar = (Toolbar) findViewById(R.id.exercise_info_toolbar);
+        setSupportActionBar(toolbar);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         // hide toolbar above video thumbnail but show when scroll up above text
-        CollapsingToolbarLayout collapsing = (CollapsingToolbarLayout) findViewById(R.id.collapsingToolbarLayout);
-        ((AppBarLayout)findViewById(R.id.appBarLayout)).addOnOffsetChangedListener(new OnOffsetChangedListener(toolbar, collapsing, model.getName()));
+        new OnOffsetChangedListener(toolbar, model.getName());
 
         // setting difficulty
         ImageView difficultyImage = ((ImageView) findViewById(R.id.exercise_info_activity_difficulty));
-        // for 0 already set
+        // for 0 already set in the xml
         if (model.getDifficulty() == 1)
             difficultyImage.setImageResource(R.drawable.ic_signal_cellular_2_bar_primary_24dp);
         else if (model.getDifficulty() == 2)
@@ -95,11 +93,6 @@ public class ExerciseInfoActivity extends AppCompatActivity
             else
                 loaderManager.restartLoader(loaderId, args, this);
         }
-    }
-
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
     }
 
     @Override
@@ -142,13 +135,16 @@ public class ExerciseInfoActivity extends AppCompatActivity
             ImageView thumbnailImageView = (ImageView) findViewById(R.id.exercise_info_activity_appbar_image);
             thumbnailImageView.setMinimumHeight(imageHeight);
 
-            Picasso.with(this)
+            RequestCreator creator = Picasso.with(this)
                     .load(data)
                     .resize(imageWidth, imageHeight)
-                    .centerCrop()
-                    .placeholder(R.drawable.sporty_woman)
-                    .error(R.drawable.sporty_woman)
-                    .into(thumbnailImageView, this);
+                    .centerCrop();
+
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                creator = creator.error(R.drawable.sporty_woman);
+            }
+
+            creator.into(thumbnailImageView, this);
         }
     }
 
@@ -179,7 +175,7 @@ public class ExerciseInfoActivity extends AppCompatActivity
             return "";
 
         StringBuilder builder = new StringBuilder(2 * muscleGroups.size()); // for elements and dividers
-        String divider = " \u2022 ";
+        String divider = " • ";
 
         for (MuscleGroup g : muscleGroups)
             builder.append(g.getName()).append(divider);
@@ -189,20 +185,12 @@ public class ExerciseInfoActivity extends AppCompatActivity
         return built.substring(0, built.length() - 2);
     }
 
-    private static final class OnOffsetChangedListener implements AppBarLayout.OnOffsetChangedListener {
-        private final Toolbar toolbar;
-        private final CollapsingToolbarLayout collapsingLayout;
-        private final String title;
+    private static final class OnOffsetChangedListener extends HiddenTitleAppBarBehavior {
         private final @ColorInt int toolbarBackground;
         private final @ColorInt int transparent;
-        private boolean isVisible;
-        private int offsetTotal;
-        private int offsetToolbarOnly;
 
-        OnOffsetChangedListener(Toolbar toolbar, CollapsingToolbarLayout collapsingLayout, String title) {
-            this.toolbar = toolbar;
-            this.collapsingLayout = collapsingLayout;
-            this.title = title;
+        OnOffsetChangedListener(Toolbar toolbar, String title) {
+            super(toolbar, title);
 
             toolbarBackground = ((ColorDrawable) toolbar.getBackground()).getColor();
 
@@ -210,29 +198,12 @@ public class ExerciseInfoActivity extends AppCompatActivity
                 transparent = toolbar.getResources().getColor(android.R.color.transparent);
             else
                 transparent = toolbar.getResources().getColor(android.R.color.transparent, null);
-
-            setVisible(false);
         }
 
         @Override
-        public void onOffsetChanged(AppBarLayout appBarLayout, int verticalOffset) {
-            if (offsetTotal == 0) {
-                offsetTotal = -appBarLayout.getTotalScrollRange();
-                offsetToolbarOnly = offsetTotal + toolbar.getHeight();
-            }
-
-            if (verticalOffset == offsetTotal && !isVisible)
-                setVisible(true);
-
-            if (verticalOffset > offsetToolbarOnly && isVisible)
-                setVisible(false);
-        }
-
-        private void setVisible(boolean visible) {
+        protected void setVisible(boolean visible) {
             toolbar.setBackgroundColor(visible ? toolbarBackground : transparent);
-            collapsingLayout.setTitle(visible ? title : " ");
-            isVisible = visible;
-            Log.d(TAG, "call");
+            super.setVisible(visible);
         }
     }
 }

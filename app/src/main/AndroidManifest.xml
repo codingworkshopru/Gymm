@@ -43,7 +43,7 @@
             android:name=".ui.program.exercise.ProgramExerciseActivity"
             android:label="@string/program_exercise_activity_title"
             android:parentActivityName=".ui.program.training.ProgramTrainingActivity"
-            android:theme="@style/AppTheme.NoActionBar.SpinnerInAppBar">
+            android:theme="@style/AppTheme.NoActionBar">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="ru.codingworkshop.gymm.ui.program.training.ProgramTrainingActivity" />

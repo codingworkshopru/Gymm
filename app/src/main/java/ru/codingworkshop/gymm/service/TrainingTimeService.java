@@ -15,6 +15,7 @@ import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.TaskStackBuilder;
 import android.util.Log;
 
+import ru.codingworkshop.gymm.App;
 import ru.codingworkshop.gymm.R;
 import ru.codingworkshop.gymm.data.model.ProgramTraining;
 import ru.codingworkshop.gymm.ui.actual.ActualTrainingActivity;
@@ -75,7 +76,7 @@ public class TrainingTimeService extends Service {
         mThread = new HandlerThread(TrainingTimeService.class.getName(), Process.THREAD_PRIORITY_FOREGROUND);
         mThread.start();
 
-        mHandler = new TimeHandler(mThread.getLooper());
+        mHandler = new TimeHandler(mThread.getLooper()); // TODO replace with CountDownTimer
         Message msg = mHandler.obtainMessage();
         msg.what = IDLE_MESSAGE;
         mHandler.sendMessage(msg);
@@ -91,6 +92,7 @@ public class TrainingTimeService extends Service {
             return START_STICKY;
 
         ProgramTraining programTraining = intent.getParcelableExtra("model");
+        ((App) getApplication()).getData().refresh(programTraining);
 
         NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(this)
                 .setContentTitle(programTraining.getName())
