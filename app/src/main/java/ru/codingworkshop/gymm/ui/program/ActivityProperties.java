@@ -7,8 +7,8 @@ import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
 
 import ru.codingworkshop.gymm.BR;
-import ru.codingworkshop.gymm.ui.program.events.EditModeChangeEvent;
-import ru.codingworkshop.gymm.ui.program.events.ListEmptinessChangeEvent;
+import ru.codingworkshop.gymm.ui.program.event.EditModeChangeEvent;
+import ru.codingworkshop.gymm.ui.program.event.ListEmptinessChangeEvent;
 
 /**
  * Created by Радик on 30.04.2017.

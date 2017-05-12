@@ -1,4 +1,4 @@
-package ru.codingworkshop.gymm.ui.program.events;
+package ru.codingworkshop.gymm.ui.program.event;
 
 import com.google.common.eventbus.EventBus;
 

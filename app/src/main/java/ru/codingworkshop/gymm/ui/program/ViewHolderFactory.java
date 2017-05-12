@@ -13,9 +13,9 @@ import com.google.common.eventbus.EventBus;
 
 import ru.codingworkshop.gymm.BR;
 import ru.codingworkshop.gymm.ui.BindingHolder;
-import ru.codingworkshop.gymm.ui.program.events.ClickViewEvent;
-import ru.codingworkshop.gymm.ui.program.events.LongClickViewEvent;
-import ru.codingworkshop.gymm.ui.program.events.TouchViewEvent;
+import ru.codingworkshop.gymm.ui.program.event.ClickViewEvent;
+import ru.codingworkshop.gymm.ui.program.event.LongClickViewEvent;
+import ru.codingworkshop.gymm.ui.program.event.TouchViewEvent;
 
 /**
  * Created by Радик on 28.04.2017.

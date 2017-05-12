@@ -1,87 +1,88 @@
 package ru.codingworkshop.gymm.service;
 
-import android.app.NotificationManager;
-import android.app.PendingIntent;
+import android.app.ActivityManager;
 import android.app.Service;
+import android.content.Context;
 import android.content.Intent;
-import android.os.Handler;
+import android.os.Binder;
+import android.os.Build;
 import android.os.HandlerThread;
 import android.os.IBinder;
-import android.os.Looper;
 import android.os.Message;
 import android.os.Process;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.v4.app.NotificationCompat;
-import android.support.v4.app.TaskStackBuilder;
 import android.util.Log;
 
-import ru.codingworkshop.gymm.App;
-import ru.codingworkshop.gymm.R;
+import com.google.common.eventbus.EventBus;
+import com.google.common.eventbus.Subscribe;
+
+import java.util.concurrent.TimeUnit;
+
 import ru.codingworkshop.gymm.data.model.ProgramTraining;
-import ru.codingworkshop.gymm.ui.actual.ActualTrainingActivity;
-import ru.codingworkshop.gymm.ui.program.training.ProgramTrainingActivity;
+import ru.codingworkshop.gymm.ui.TrainingNotification;
 
 /**
  * Created by Радик on 07.04.2017.
  */
 
 public class TrainingTimeService extends Service {
-    private static boolean isStarted = false;
-    private static final int IDLE_MESSAGE = 5146;
-    private static final int STOP_MESSAGE = 6245;
-    private HandlerThread mThread;
-    private TimeHandler mHandler;
-    private NotificationManager mNotificationManager;
+    private HandlerThread handlerThread;
+    private TimeHandler timeHandler;
+    private EventBus serviceEventBus;
+    private TrainingNotification notification;
+    private IBinder binder;
+    private RestTimer restTimer;
 
     private static final String TAG = TrainingTimeService.class.getSimpleName();
-
-    private class TimeHandler extends Handler {
-        private final long mStartTime = System.currentTimeMillis();
-        private long mElapsedTimeSecs;
-
-        private final String TAG = TimeHandler.class.getSimpleName();
-
-        TimeHandler(Looper looper) {
-            super(looper);
-        }
-
-        @Override
-        public void handleMessage(Message msg) {
-            long currentElapsedTimeSecs = (System.currentTimeMillis() - mStartTime) / 1000;
-            if (mElapsedTimeSecs < currentElapsedTimeSecs) {
-                mElapsedTimeSecs = currentElapsedTimeSecs;
-                Log.d(TAG, "handleMessage: " + mElapsedTimeSecs);
-            }
-
-            switch (msg.what) {
-                // loop
-                case IDLE_MESSAGE:
-                    sendMessageDelayed(obtainMessage(IDLE_MESSAGE), 100);
-                    break;
-
-                case STOP_MESSAGE:
-                    removeMessages(IDLE_MESSAGE);
-                    break;
-            }
-        }
-    }
 
     @Override
     public void onCreate() {
         Log.d(TAG, "onCreate");
 
-        if (isStarted)
-            throw new RuntimeException(TrainingTimeService.class.getSimpleName() + " already exists");
+        serviceEventBus = new EventBus();
+        serviceEventBus.register(this);
 
-        mThread = new HandlerThread(TrainingTimeService.class.getName(), Process.THREAD_PRIORITY_FOREGROUND);
-        mThread.start();
+        binder = new TimeServiceBinder(this);
 
-        mHandler = new TimeHandler(mThread.getLooper()); // TODO replace with CountDownTimer
-        Message msg = mHandler.obtainMessage();
-        msg.what = IDLE_MESSAGE;
-        mHandler.sendMessage(msg);
+        handlerThread = new HandlerThread(TrainingTimeService.class.getName(), Process.THREAD_PRIORITY_FOREGROUND);
+        handlerThread.start();
 
-        isStarted = true;
+        timeHandler = new TimeHandler(handlerThread.getLooper());
+    }
+
+    @Subscribe
+    public void onTimerTick(RestTimer.TickEvent event) {
+        notification.setRestTime(event.millisUntilFinished);
+    }
+
+    @Subscribe
+    public void onTimerFinish(RestTimer.FinishEvent event) {
+        Log.d(TAG, "onTimerFinish");
+        restTimer = null;
+        notification.setRestSectionVisibility(false);
+    }
+
+    public boolean isRestInProgress() {
+        return restTimer != null;
+    }
+
+    public void startRest(long seconds, String exerciseName) {
+        if (seconds > 0) {
+            long milliseconds = TimeUnit.SECONDS.toMillis(seconds);
+            restTimer = new RestTimer(milliseconds, serviceEventBus);
+            Message msg = timeHandler.obtainMessage(TimeHandler.MSG_START_REST_COUNTDOWN, restTimer);
+            timeHandler.sendMessage(msg);
+            notification.setExerciseName(exerciseName);
+        }
+    }
+
+    public void registerObserver(@NonNull Object obj) {
+        serviceEventBus.register(obj);
+    }
+
+    public void unregisterObserver(@NonNull Object obj) {
+        serviceEventBus.unregister(obj);
     }
 
     @Override
@@ -92,50 +93,63 @@ public class TrainingTimeService extends Service {
             return START_STICKY;
 
         ProgramTraining programTraining = intent.getParcelableExtra("model");
-        ((App) getApplication()).getData().refresh(programTraining);
 
-        NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(this)
-                .setContentTitle(programTraining.getName())
-                .setContentText(programTraining.getExercises().get(0).getExercise().getName())
-                .setSmallIcon(R.mipmap.ic_launcher)
-                .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
-                .setUsesChronometer(true)
-                .setOngoing(true);
+        notification = new TrainingNotification(
+                this,
+                programTraining.getName(),
+                programTraining.getId()
+        );
 
-        Intent actualTrainingIntent = new Intent(this, ActualTrainingActivity.class);
-        actualTrainingIntent.putExtra(ProgramTrainingActivity.PROGRAM_TRAINING_ID, programTraining.getId());
+        startForeground(TrainingNotification.NOTIFICATION_ID, notification.getNotification());
 
-        TaskStackBuilder stackBuilder = TaskStackBuilder.create(this)
-                .addParentStack(ActualTrainingActivity.class)
-                .addNextIntent(actualTrainingIntent);
-
-        PendingIntent pendingIntent = stackBuilder.getPendingIntent(123, PendingIntent.FLAG_UPDATE_CURRENT);
-
-        notificationBuilder.setContentIntent(pendingIntent);
-
-        startForeground(12341234, notificationBuilder.build());
-
-        return Service.START_STICKY;
+        return START_STICKY;
     }
 
     @Nullable
     @Override
     public IBinder onBind(Intent intent) {
-        return null;
+        Log.d(TAG, "onBind");
+        return binder;
     }
 
     @Override
     public void onDestroy() {
         Log.d(TAG, "onDestroy");
 
-        mHandler.sendMessage(mHandler.obtainMessage(STOP_MESSAGE));
+        if (restTimer != null)
+            restTimer.cancel();
+
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.JELLY_BEAN_MR2)
+            handlerThread.getLooper().quit();
+        else
+            handlerThread.getLooper().quitSafely();
 
         stopForeground(true);
-
-        isStarted = false;
     }
 
-    public static boolean isStarted() {
-        return isStarted;
+    public static boolean isRunning(Context context) {
+        return isServiceRunning(context, TrainingTimeService.class);
+    }
+
+    public static <S extends Service> boolean isServiceRunning(Context context, Class<S> serviceClass) {
+        ActivityManager manager = (ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE);
+        for (ActivityManager.RunningServiceInfo service : manager.getRunningServices(Integer.MAX_VALUE)) {
+            if (serviceClass.getName().equals(service.service.getClassName())) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    public static final class TimeServiceBinder extends Binder {
+        TrainingTimeService service;
+        private TimeServiceBinder(TrainingTimeService service) {
+            this.service = service;
+        }
+
+        public TrainingTimeService getService() {
+            return service;
+        }
     }
 }

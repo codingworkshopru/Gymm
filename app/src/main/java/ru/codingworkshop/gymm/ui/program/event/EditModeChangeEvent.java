@@ -1,4 +1,4 @@
-package ru.codingworkshop.gymm.ui.program.events;
+package ru.codingworkshop.gymm.ui.program.event;
 
 /**
  * Created by Радик on 30.04.2017.

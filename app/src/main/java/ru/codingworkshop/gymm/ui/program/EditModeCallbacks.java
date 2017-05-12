@@ -12,8 +12,8 @@ import android.view.MenuItem;
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
 
-import ru.codingworkshop.gymm.ui.program.events.EditModeChangeEvent;
-import ru.codingworkshop.gymm.ui.program.events.LongClickViewEvent;
+import ru.codingworkshop.gymm.ui.program.event.EditModeChangeEvent;
+import ru.codingworkshop.gymm.ui.program.event.LongClickViewEvent;
 
 /**
  * Created by Радик on 28.04.2017.

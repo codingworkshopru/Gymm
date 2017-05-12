@@ -46,7 +46,7 @@ import ru.codingworkshop.gymm.ui.program.Adapter;
 import ru.codingworkshop.gymm.ui.program.EditModeCallbacks;
 import ru.codingworkshop.gymm.ui.program.ModelHolder;
 import ru.codingworkshop.gymm.ui.program.ViewHolderFactory;
-import ru.codingworkshop.gymm.ui.program.events.ClickViewEvent;
+import ru.codingworkshop.gymm.ui.program.event.ClickViewEvent;
 import ru.codingworkshop.gymm.ui.program.exercise.ProgramExerciseActivity;
 import ru.codingworkshop.gymm.ui.util.HiddenTitleAppBarBehavior;
 

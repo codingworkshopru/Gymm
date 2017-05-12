@@ -10,4 +10,9 @@
         android:id="@+id/actual_training_finish_action"
         android:title="Закончить тренировку"
         app:showAsAction="never" />
+
+    <item
+        android:id="@+id/actual_training_some_action"
+        android:title="Сделать что-нибудь"
+        app:showAsAction="never" />
 </menu>

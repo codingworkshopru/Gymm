@@ -14,7 +14,7 @@ import io.requery.Persistable;
 import ru.codingworkshop.gymm.data.model.Draftable;
 import ru.codingworkshop.gymm.data.model.Orderable;
 import ru.codingworkshop.gymm.ui.BindingHolder;
-import ru.codingworkshop.gymm.ui.program.events.ListEmptinessChangeEvent;
+import ru.codingworkshop.gymm.ui.program.event.ListEmptinessChangeEvent;
 
 /**
  * Created by Радик on 26.04.2017.

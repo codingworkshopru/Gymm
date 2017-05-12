@@ -1,4 +1,4 @@
-package ru.codingworkshop.gymm.ui.program.events;
+package ru.codingworkshop.gymm.ui.program.event;
 
 import android.databinding.ViewDataBinding;
 import android.support.annotation.NonNull;
