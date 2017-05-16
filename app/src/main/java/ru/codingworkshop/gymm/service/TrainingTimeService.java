@@ -41,7 +41,7 @@ public class TrainingTimeService extends Service {
         Log.d(TAG, "onCreate");
 
         serviceEventBus = new EventBus();
-        serviceEventBus.register(this);
+        registerObserver(this);
 
         binder = new TimeServiceBinder(this);
 
@@ -60,20 +60,23 @@ public class TrainingTimeService extends Service {
     public void onTimerFinish(RestTimer.FinishEvent event) {
         Log.d(TAG, "onTimerFinish");
         restTimer = null;
-        notification.setRestSectionVisibility(false);
+        notification.restFinished();
     }
 
     public boolean isRestInProgress() {
         return restTimer != null;
     }
 
-    public void startRest(long seconds, String exerciseName) {
-        if (seconds > 0) {
+    public void startRest(long seconds) {
+        if (seconds > 0 && restTimer == null) {
+            Log.d(TAG, "startRest");
             long milliseconds = TimeUnit.SECONDS.toMillis(seconds);
             restTimer = new RestTimer(milliseconds, serviceEventBus);
             Message msg = timeHandler.obtainMessage(TimeHandler.MSG_START_REST_COUNTDOWN, restTimer);
             timeHandler.sendMessage(msg);
-            notification.setExerciseName(exerciseName);
+            notification.restStarted();
+        } else if (restTimer != null) {
+            throw new IllegalStateException("Rest timer isn't null");
         }
     }
 
@@ -100,7 +103,7 @@ public class TrainingTimeService extends Service {
                 programTraining.getId()
         );
 
-        startForeground(TrainingNotification.NOTIFICATION_ID, notification.getNotification());
+        notification.show(this);
 
         return START_STICKY;
     }

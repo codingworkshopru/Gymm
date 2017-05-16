@@ -51,7 +51,12 @@
     <string name="exercises_picker_activity_primary">Основные</string>
     <string name="exercises_picker_activity_secondary">С задействованием</string>
 
+    <!-- notification -->
+    <string name="notification_time_till_rest_finish">Время до конца отдыха: </string>
+    <string name="notification_rest_finished">Пора продолжить тренировку!</string>
+
     <!-- common -->
+    <string name="bullet" translatable="false">•</string>
     <string name="no_button_text">Нет</string>
     <string name="save_button_text">Сохранить</string>
     <string name="save_changes_question">Отменить изменения?</string>

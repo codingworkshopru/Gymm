@@ -124,8 +124,7 @@ public class ActualTrainingActivity extends AppCompatActivity implements
 
             case R.id.actual_training_some_action:
                 if (!timeService.isRestInProgress()) {
-                    String currentExerciseName = mAdapter.getModel().getExercises().get(mAdapter.getActivePosition()).getExercise().getName();
-                    timeService.startRest(90, currentExerciseName);
+                    timeService.startRest(90);
                 }
                 break;
 

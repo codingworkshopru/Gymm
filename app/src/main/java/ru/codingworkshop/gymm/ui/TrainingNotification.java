@@ -3,11 +3,16 @@ package ru.codingworkshop.gymm.ui;
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
+import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
+import android.os.Build;
 import android.os.SystemClock;
+import android.support.annotation.IdRes;
+import android.support.annotation.StringRes;
 import android.support.v4.app.TaskStackBuilder;
 import android.support.v7.app.NotificationCompat;
+import android.util.Log;
 import android.view.View;
 import android.widget.RemoteViews;
 
@@ -27,27 +32,19 @@ public final class TrainingNotification {
     private NotificationManager notificationManager;
     private Notification notification;
     private RemoteViews remoteViews;
+    private Context context;
 
-    public static final int NOTIFICATION_ID = 1;
+    private static final int NOTIFICATION_ID = 1;
     private static final String TAG = TrainingNotification.class.getSimpleName();
 
-    public TrainingNotification(Context context, String title, long id) {
+    public TrainingNotification(Context c, String title, long id) {
+        context = c;
+
         notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
 
         remoteViews = new RemoteViews(context.getPackageName(), R.layout.notification_layout);
-        setTrainingName(title);
+        remoteViews.setTextViewText(R.id.notification_title, title);
         remoteViews.setChronometer(R.id.notification_chronometer, SystemClock.elapsedRealtime(), null, true);
-        setRestSectionVisibility(false);
-
-        NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(context);
-        notificationBuilder
-                .setSmallIcon(R.mipmap.ic_launcher)
-                .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
-                .setOngoing(true)
-                .setOnlyAlertOnce(false)
-                .setCustomContentView(remoteViews)
-                .setShowWhen(false)
-                .setStyle(new NotificationCompat.DecoratedCustomViewStyle());
 
         Intent actualTrainingIntent = new Intent(context, ActualTrainingActivity.class);
         actualTrainingIntent.putExtra(ProgramTrainingActivity.PROGRAM_TRAINING_ID, id);
@@ -56,39 +53,84 @@ public final class TrainingNotification {
                 .addParentStack(ActualTrainingActivity.class)
                 .addNextIntent(actualTrainingIntent);
 
-        PendingIntent pendingIntent = stackBuilder.getPendingIntent(123, PendingIntent.FLAG_UPDATE_CURRENT);
-        notificationBuilder.setContentIntent(pendingIntent);
+        PendingIntent mainAction = stackBuilder.getPendingIntent(123, PendingIntent.FLAG_UPDATE_CURRENT);
 
-        notification = notificationBuilder.build();
+        notification = new NotificationCompat.Builder(context)
+                .setSmallIcon(R.mipmap.ic_launcher)
+                .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
+                .setOngoing(true)
+                .setOnlyAlertOnce(false)
+                .setCustomContentView(remoteViews)
+                .setShowWhen(false)
+                .setStyle(new NotificationCompat.DecoratedCustomViewStyle())
+                .setContentIntent(mainAction)
+                .build();
     }
 
-    public Notification getNotification() {
-        return notification;
+    public void show(Service service) {
+        setGone(R.id.notification_rest_layout);
+        service.startForeground(NOTIFICATION_ID, notification);
     }
 
-    private void setTrainingName(String title) {
-        remoteViews.setTextViewText(R.id.notification_training_name, title);
+    public void restStarted() {
+        Log.d(TAG, "restStarted");
+        setDefaults(0);
+        setNotificationText(R.string.notification_time_till_rest_finish);
+        setVisible(R.id.notification_rest_elapsed_time);
+        setVisible(R.id.notification_rest_layout);
+        update();
     }
 
-    public void setExerciseName(String text) {
-        remoteViews.setTextViewText(R.id.notification_exercise_name, text);
-        setRestSectionVisibility(true);
+    public void restFinished() {
+        setNotificationText(R.string.notification_rest_finished);
+        setGone(R.id.notification_rest_elapsed_time);
+        setDefaults(NotificationCompat.DEFAULT_ALL);
+        update();
     }
 
     public void setRestTime(long milliseconds) {
         DateFormat f = new SimpleDateFormat("mm:ss");
         String time = f.format(new Date(milliseconds));
-        remoteViews.setTextViewText(R.id.notification_rest_elapsed_time, time);
+        setText(R.id.notification_rest_elapsed_time, time);
         update();
-    }
-
-    public void setRestSectionVisibility(boolean visible) {
-        remoteViews.setViewVisibility(R.id.notification_rest_layout, visible ? View.VISIBLE : View.GONE);
-        if (notification != null)
-            update();
     }
 
     private void update() {
         notificationManager.notify(NOTIFICATION_ID, notification);
+    }
+
+    // change defaults
+    private void setDefaults(int defaults) {
+        notification.defaults = defaults;
+    }
+
+    // change text
+    private void setNotificationText(@StringRes int stringRes) {
+        setText(R.id.notification_text, stringRes);
+    }
+
+    private void setText(@IdRes int viewId, @StringRes int stringRes) {
+        setText(viewId, context.getString((stringRes)));
+    }
+
+    private void setText(@IdRes int viewId, String text) {
+        getRemoteViews().setTextViewText(viewId, text);
+    }
+
+    // change visibility
+    private void setVisible(@IdRes int viewId) {
+        setVisibility(viewId, View.VISIBLE);
+    }
+
+    private void setGone(@IdRes int viewId) {
+        setVisibility(viewId, View.GONE);
+    }
+
+    private void setVisibility(@IdRes int viewId, int visibility) {
+        getRemoteViews().setViewVisibility(viewId, visibility);
+    }
+
+    private RemoteViews getRemoteViews() {
+        return Build.VERSION.SDK_INT < Build.VERSION_CODES.N ? notification.contentView : remoteViews;
     }
 }
