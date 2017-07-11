@@ -2,15 +2,12 @@ package ru.codingworkshop.gymm.ui;
 
 import android.app.Notification;
 import android.app.NotificationManager;
-import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Context;
-import android.content.Intent;
 import android.os.Build;
 import android.os.SystemClock;
 import android.support.annotation.IdRes;
 import android.support.annotation.StringRes;
-import android.support.v4.app.TaskStackBuilder;
 import android.support.v7.app.NotificationCompat;
 import android.util.Log;
 import android.view.View;
@@ -21,8 +18,8 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 
 import ru.codingworkshop.gymm.R;
-import ru.codingworkshop.gymm.ui.actual.ActualTrainingActivity;
-import ru.codingworkshop.gymm.ui.program.training.ProgramTrainingActivity;
+
+import static android.databinding.DynamicUtil.safeUnbox;
 
 /**
  * Created by Радик on 11.05.2017.
@@ -46,14 +43,14 @@ public final class TrainingNotification {
         remoteViews.setTextViewText(R.id.notification_title, title);
         remoteViews.setChronometer(R.id.notification_chronometer, SystemClock.elapsedRealtime(), null, true);
 
-        Intent actualTrainingIntent = new Intent(context, ActualTrainingActivity.class);
-        actualTrainingIntent.putExtra(ProgramTrainingActivity.PROGRAM_TRAINING_ID, id);
+//        Intent actualTrainingIntent = new Intent(context, ActualTrainingActivity.class);
+//        actualTrainingIntent.putExtra(ProgramTrainingActivity.PROGRAM_TRAINING_ID, id);
+//
+//        TaskStackBuilder stackBuilder = TaskStackBuilder.createTraining(context)
+//                .addParentStack(ActualTrainingActivity.class)
+//                .addNextIntent(actualTrainingIntent);
 
-        TaskStackBuilder stackBuilder = TaskStackBuilder.create(context)
-                .addParentStack(ActualTrainingActivity.class)
-                .addNextIntent(actualTrainingIntent);
-
-        PendingIntent mainAction = stackBuilder.getPendingIntent(123, PendingIntent.FLAG_UPDATE_CURRENT);
+//        PendingIntent mainAction = stackBuilder.getPendingIntent(123, PendingIntent.FLAG_UPDATE_CURRENT);
 
         notification = new NotificationCompat.Builder(context)
                 .setSmallIcon(R.mipmap.ic_launcher)
@@ -63,7 +60,7 @@ public final class TrainingNotification {
                 .setCustomContentView(remoteViews)
                 .setShowWhen(false)
                 .setStyle(new NotificationCompat.DecoratedCustomViewStyle())
-                .setContentIntent(mainAction)
+//                .setContentIntent(mainAction)
                 .build();
     }
 

@@ -1,44 +1,23 @@
 package ru.codingworkshop.gymm.data.model;
 
-import android.os.Parcelable;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 
-import java.sql.Timestamp;
-import java.util.List;
+import java.util.Date;
 
-import io.requery.Column;
-import io.requery.Entity;
-import io.requery.ForeignKey;
-import io.requery.Generated;
-import io.requery.Key;
-import io.requery.Nullable;
-import io.requery.OneToMany;
-import io.requery.OneToOne;
-import io.requery.Persistable;
+import ru.codingworkshop.gymm.data.model.common.Model;
 
 /**
- * Created by Радик on 19.04.2017.
+ * Created by Радик on 04.06.2017.
  */
 
-@Entity
-public interface ActualTraining extends Persistable, Parcelable {
-    @Key
-    @Generated
-    long getId();
+public interface ActualTraining extends Model {
+    Date getStartTime();
+    void setStartTime(@NonNull Date startTime);
 
-    @Column(value = "CURRENT_TIMESTAMP")
-    Timestamp getStartTime();
-    void setStartTime(Timestamp startTime);
+    @Nullable Date getFinishTime();
+    void setFinishTime(Date finishTime);
 
-    Timestamp getFinishTime();
-    void setFinishTime(Timestamp finishTime);
-
-    @OneToOne
-    @ForeignKey
-    @Nullable
-    ProgramTraining getProgramTraining();
-    void setProgramTraining(ProgramTraining programTraining);
-
-    @OneToMany
-    List<ActualExercise> getExercises();
-    void setExercises(List<? extends ActualExercise> actualExercises);
+    @Nullable Long getProgramTrainingId();
+    void setProgramTrainingId(Long programTrainingId);
 }

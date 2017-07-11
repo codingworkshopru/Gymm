@@ -1,112 +1,37 @@
 package ru.codingworkshop.gymm.data.model;
 
-import android.os.Parcelable;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 
-import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
-import io.requery.Convert;
-import io.requery.Converter;
-import io.requery.Entity;
-import io.requery.Generated;
-import io.requery.JunctionTable;
-import io.requery.Key;
-import io.requery.Lazy;
-import io.requery.ManyToMany;
-import io.requery.ManyToOne;
-import io.requery.Nullable;
-import io.requery.Persistable;
+import ru.codingworkshop.gymm.data.ExerciseDifficulty;
+import ru.codingworkshop.gymm.data.model.common.NamedModel;
 
 /**
- * Created by Радик on 19.04.2017.
+ * Created by Радик on 22.05.2017.
  */
 
-@Entity
-public interface Exercise extends Persistable, Parcelable {
-    @Key
-    @Generated
-    long getId();
+public interface Exercise extends NamedModel {
+    ExerciseDifficulty getDifficulty();
+    void setDifficulty(@NonNull ExerciseDifficulty difficulty);
 
-    String getName();
-    void setName(String name);
+    long getPrimaryMuscleGroupId();
+    void setPrimaryMuscleGroupId(long primaryMuscleGroupId);
 
-    boolean getIsWithWeight();
-    void setIsWithWeight(boolean isWithWeight);
+    boolean isWithWeight();
+    void setWithWeight(boolean withWeight);
 
-    int getDifficulty();
-    void setDifficulty(int difficulty);
-
-    @Nullable
-    String getYouTubeVideo();
+    @Nullable String getYouTubeVideo();
     void setYouTubeVideo(String youTubeVideo);
 
-    @Lazy
-    @Nullable
-    @Convert(ListConverter.class)
-    String getSteps();
+    @Nullable String getSteps();
     void setSteps(String steps);
 
-    @Lazy
-    @Nullable
-    @Convert(ListConverter.class)
-    String getAdvices();
-    void setAdvices(String advices);
-
-    @Lazy
-    @Nullable
-    @Convert(ListConverter.class)
-    String getCaution();
+    @Nullable String getCaution();
     void setCaution(String caution);
 
-    @Lazy
-    @Nullable
-    @Convert(ListConverter.class)
-    String getVariations();
+    @Nullable String getAdvices();
+    void setAdvices(String advices);
+
+    @Nullable String getVariations();
     void setVariations(String variations);
-
-    @Lazy
-    @ManyToOne
-    MuscleGroup getPrimaryMuscleGroup();
-    void setPrimaryMuscleGroup(MuscleGroup primaryMuscleGroup);
-
-    @Lazy
-    @ManyToMany
-    @JunctionTable
-    List<MuscleGroup> getSecondaryMuscleGroups();
-    void setSecondaryMuscleGroups(List<? extends MuscleGroup> secondaryMuscleGroups);
-
-    final class ListConverter implements Converter<String, String> {
-
-        @Override
-        public Class<String> getMappedType() {
-            return String.class;
-        }
-
-        @Override
-        public Class<String> getPersistedType() {
-            return String.class;
-        }
-
-        @Nullable
-        @Override
-        public Integer getPersistedSize() {
-            return null;
-        }
-
-        @Override
-        public String convertToPersisted(String value) {
-            return value;
-        }
-
-        @Override
-        public String convertToMapped(Class<? extends String> type, String value) {
-            if (value == null || value.length() == 0)
-                return value;
-
-            Pattern pattern = Pattern.compile("^+", Pattern.MULTILINE);
-            Matcher matcher = pattern.matcher(value);
-            return matcher.replaceAll("\u2022 ");
-        }
-    }
 }

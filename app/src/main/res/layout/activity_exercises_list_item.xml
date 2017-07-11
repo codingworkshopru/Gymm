@@ -8,17 +8,12 @@
         <variable
             name="exercise"
             type="ru.codingworkshop.gymm.data.model.Exercise"/>
-
-        <variable
-            name="handler"
-            type="ru.codingworkshop.gymm.ui.program.exercise.picker.ExercisePickerAdapter.OnExerciseClickListener"/>
     </data>
 
     <android.support.constraint.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="@dimen/bottom_sheet_list_item_height"
-        android:background="?attr/selectableItemBackground"
-        android:onClick="@{() -> handler.onExerciseClick(exercise)}">
+        android:background="?attr/selectableItemBackground">
 
         <ImageButton
             android:id="@+id/imageButton4"
@@ -28,7 +23,6 @@
             android:layout_marginEnd="8dp"
             android:layout_marginRight="8dp"
             android:padding="8dp"
-            android:onClick="@{() -> handler.onExerciseInfoClick(exercise)}"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintRight_toRightOf="parent"
             app:layout_constraintTop_toTopOf="parent"

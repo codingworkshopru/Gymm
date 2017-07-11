@@ -1,35 +1,51 @@
 package ru.codingworkshop.gymm;
 
+import android.app.Activity;
 import android.app.Application;
-import android.support.annotation.NonNull;
 
 import com.squareup.leakcanary.LeakCanary;
 
-import io.requery.Persistable;
-import io.requery.sql.EntityDataStore;
-import ru.codingworkshop.gymm.data.GymDatabaseSource;
+import javax.inject.Inject;
+
+import dagger.android.AndroidInjector;
+import dagger.android.DispatchingAndroidInjector;
+import dagger.android.HasActivityInjector;
+import ru.codingworkshop.gymm.di.DaggerApplicationComponent;
+import timber.log.Timber;
 
 /**
  * Created by Радик on 19.04.2017.
  */
 
-public class App extends Application {
-    private EntityDataStore<Persistable> dataStore;
+public class App extends Application implements HasActivityInjector {
+    @Inject DispatchingAndroidInjector<Activity> dispatchingAndroidInjector;
+    @Inject AppInitializer initializer;
 
     @Override
     public void onCreate() {
         super.onCreate();
-        if (LeakCanary.isInAnalyzerProcess(this))
-            return;
 
-        LeakCanary.install(this);
+        if (BuildConfig.DEBUG) {
+            Timber.plant(new Timber.DebugTree());
+        }
+
+        DaggerApplicationComponent.builder()
+                .injectContext(getApplicationContext())
+                .build()
+                .inject(this);
+
+        initializer.initialize();
+
+        installLeakCanary();
     }
 
-    @NonNull
-    public EntityDataStore<Persistable> getData() {
-        if (dataStore == null) {
-            dataStore = GymDatabaseSource.createDataStore(this);
-        }
-        return dataStore;
+    private void installLeakCanary() {
+        if (!LeakCanary.isInAnalyzerProcess(this))
+            LeakCanary.install(this);
+    }
+
+    @Override
+    public AndroidInjector<Activity> activityInjector() {
+        return dispatchingAndroidInjector;
     }
 }

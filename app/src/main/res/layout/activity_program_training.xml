@@ -6,9 +6,6 @@
     <data>
         <import type="android.view.View" />
         <variable
-            name="properties"
-            type="ru.codingworkshop.gymm.ui.program.ActivityProperties"/>
-        <variable
             name="training"
             type="ru.codingworkshop.gymm.data.model.ProgramTraining" />
     </data>
@@ -38,8 +35,7 @@
                     android:layout_marginLeft="72dp"
                     android:layout_marginStart="72dp"
                     android:layout_marginEnd="16dp"
-                    android:layout_marginRight="16dp"
-                    android:visibility="@{properties.inEditMode ? View.GONE : View.VISIBLE}">
+                    android:layout_marginRight="16dp">
 
                     <android.support.design.widget.TextInputLayout
                         android:id="@+id/program_training_name_layout"
@@ -70,7 +66,6 @@
 
                     <Spinner
                         android:id="@+id/program_training_weekday"
-                        app:value="@={training.weekday}"
                         android:layout_width="match_parent"
                         android:layout_height="48dp"
                         android:layout_gravity="bottom"
@@ -102,7 +97,6 @@
 
         <LinearLayout
             android:id="@+id/program_training_empty_state"
-            android:visibility="@{properties.listEmpty ? View.VISIBLE : View.GONE}"
             android:orientation="vertical"
             android:layout_gravity="top"
             android:layout_width="wrap_content"

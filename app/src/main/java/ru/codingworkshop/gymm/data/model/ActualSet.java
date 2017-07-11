@@ -1,29 +1,22 @@
 package ru.codingworkshop.gymm.data.model;
 
-import android.os.Parcelable;
+import android.arch.persistence.room.Delete;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 
-import io.requery.Entity;
-import io.requery.Generated;
-import io.requery.Key;
-import io.requery.ManyToOne;
-import io.requery.Persistable;
+import ru.codingworkshop.gymm.data.model.common.Model;
 
 /**
- * Created by Радик on 19.04.2017.
+ * Created by Радик on 04.06.2017.
  */
 
-@Entity
-public interface ActualSet extends Persistable, Parcelable {
-    @Key
-    @Generated
-    long getId();
+public interface ActualSet extends Model {
+    long getActualExerciseId();
+    void setActualExerciseId(long actualExerciseId);
 
     int getReps();
     void setReps(int reps);
 
-    double getWeight();
-    void setWeight(double weight);
-
-    @ManyToOne
-    ActualExercise getActualExercise();
+    @Nullable Double getWeight();
+    void setWeight(Double weight);
 }

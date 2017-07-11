@@ -1,34 +1,21 @@
 package ru.codingworkshop.gymm.data.model;
 
-import android.os.Parcelable;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 
-import java.util.List;
-
-import io.requery.Entity;
-import io.requery.Generated;
-import io.requery.Key;
-import io.requery.ManyToOne;
-import io.requery.OneToMany;
-import io.requery.Persistable;
+import ru.codingworkshop.gymm.data.model.common.Model;
 
 /**
- * Created by Радик on 19.04.2017.
+ * Created by Радик on 04.06.2017.
  */
 
-@Entity
-public interface ActualExercise extends Persistable, Parcelable {
-    @Key
-    @Generated
-    long getId();
+public interface ActualExercise extends Model {
+    String getExerciseName();
+    void setExerciseName(@NonNull String name);
 
-    @ManyToOne
-    Exercise getExercise();
-    void setExercise(Exercise exercise);
+    long getActualTrainingId();
+    void setActualTrainingId(long actualTrainingId);
 
-    @ManyToOne
-    ActualTraining getActualTraining();
-
-    @OneToMany
-    List<ActualSet> getActualSets();
-    void setActualSets(List<? extends ActualSet> actualSets);
+    @Nullable Long getProgramExerciseId();
+    void setProgramExerciseId(Long programExerciseId);
 }

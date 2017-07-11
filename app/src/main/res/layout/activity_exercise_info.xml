@@ -111,7 +111,6 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="8dp"
-                    android:text="@{exercise.primaryMuscleGroup.name}"
                     android:textAppearance="@style/TextAppearance.AppCompat.Medium"
                     app:layout_constraintLeft_toLeftOf="@+id/exercise_info_activity_title"
                     app:layout_constraintTop_toBottomOf="@+id/exercise_info_activity_title"
@@ -122,8 +121,6 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="7dp"
-                    android:text="@{exercise.secondaryMuscleGroups}"
-                    android:visibility="@{exercise.secondaryMuscleGroups == null ? View.GONE : View.VISIBLE}"
                     app:layout_constraintLeft_toLeftOf="@+id/exercise_info_activity_main_muscle"
                     app:layout_constraintTop_toBottomOf="@+id/exercise_info_activity_main_muscle"
                     tools:text="Предплечья &#8226; Плечи" />
