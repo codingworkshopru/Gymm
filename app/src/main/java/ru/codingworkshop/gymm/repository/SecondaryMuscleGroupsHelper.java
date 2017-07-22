@@ -16,7 +16,8 @@ import ru.codingworkshop.gymm.data.entity.MuscleGroupEntity;
 import ru.codingworkshop.gymm.data.entity.SecondaryMuscleGroupLinkEntity;
 import ru.codingworkshop.gymm.data.model.Exercise;
 import ru.codingworkshop.gymm.data.model.MuscleGroup;
-import ru.codingworkshop.gymm.data.model.common.NamedModel;
+import ru.codingworkshop.gymm.data.model.common.Model;
+import ru.codingworkshop.gymm.data.model.common.Named;
 import ru.codingworkshop.gymm.db.dao.ExerciseDao;
 import ru.codingworkshop.gymm.db.dao.MuscleGroupDao;
 
@@ -76,10 +77,10 @@ final class SecondaryMuscleGroupsHelper {
         exerciseDao.createLinks(links);
     }
 
-    private static Map<String, Long> createNameIdMap(List<? extends NamedModel> entities) {
+    private static Map<String, Long> createNameIdMap(List<? extends Model> entities) {
         Map<String, Long> result = Maps.newHashMapWithExpectedSize(entities.size());
-        for (NamedModel entity : entities)
-            result.put(entity.getName(), entity.getId());
+        for (Model entity : entities)
+            result.put(((Named) entity).getName(), entity.getId());
         return result;
     }
 

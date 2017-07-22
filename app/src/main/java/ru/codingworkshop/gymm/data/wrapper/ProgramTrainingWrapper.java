@@ -1,15 +1,13 @@
 package ru.codingworkshop.gymm.data.wrapper;
 
 import android.arch.lifecycle.LiveData;
+import android.arch.lifecycle.Observer;
 import android.support.annotation.NonNull;
-import android.support.v7.util.DiffUtil;
-import android.support.v7.util.ListUpdateCallback;
+import android.support.annotation.Nullable;
 
 import com.google.common.base.Preconditions;
-import com.google.common.collect.Lists;
 
 import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
 
 import ru.codingworkshop.gymm.data.entity.ProgramExerciseEntity;
@@ -24,8 +22,7 @@ import ru.codingworkshop.gymm.repository.ProgramTrainingRepository;
 
 public class ProgramTrainingWrapper {
     private ProgramTraining programTraining;
-    private List<ProgramExercise> programExercises = Lists.newArrayList();
-    private ProgramExercise lastRemoved;
+    private SortableChildrenDelegate<ProgramExercise> childrenDelegate = new SortableChildrenDelegate<>();
 
     @SuppressWarnings("unused")
     private ProgramTrainingWrapper() {}
@@ -43,54 +40,32 @@ public class ProgramTrainingWrapper {
     }
 
     public List<ProgramExercise> getProgramExercises() {
-        return Collections.unmodifiableList(programExercises);
+        return childrenDelegate.getChildren();
     }
 
     public void setProgramExercises(Collection<? extends ProgramExercise> programExercises) {
-        this.programExercises = Lists.newArrayList(programExercises);
+        childrenDelegate.setChildren(programExercises);
     }
 
     public boolean hasProgramExercises() {
-        return !programExercises.isEmpty();
+        return childrenDelegate.hasChildren();
     }
 
     @Deprecated
     public void addProgramExercise(@NonNull ProgramExercise programExercise) {
-        programExercise.setSortOrder(programExercises.size());
-        programExercises.add(programExercise);
+        childrenDelegate.add(programExercise);
     }
 
     public void restoreLastRemoved() {
-        Preconditions.checkNotNull(lastRemoved);
-        insertProgramExercise(lastRemoved.getSortOrder(), lastRemoved);
+        childrenDelegate.restoreLastRemoved();
     }
 
     public void removeProgramExercise(@NonNull ProgramExercise programExercise) {
-        programExercises.remove(programExercise);
-        lastRemoved = programExercise;
-        updateSortOrders(programExercise.getSortOrder());
+        childrenDelegate.remove(programExercise);
     }
 
     public void moveProgramExercise(int from, int to) {
-        Preconditions.checkElementIndex(from, programExercises.size());
-        Preconditions.checkElementIndex(to, programExercises.size());
-        ProgramExercise exercise = programExercises.remove(from);
-        programExercises.add(to, exercise);
-        updateSortOrders(Math.min(from, to), Math.max(from, to));
-    }
-
-    private void insertProgramExercise(int position, ProgramExercise exercise) {
-        programExercises.add(position, exercise);
-        updateSortOrders(position);
-    }
-
-    private void updateSortOrders(int start) {
-        updateSortOrders(start, programExercises.size() - 1);
-    }
-
-    private void updateSortOrders(int start, int end) {
-        for (int i = start; i <= end; i++)
-            programExercises.get(i).setSortOrder(i);
+        childrenDelegate.move(from, to);
     }
 
     public void save(ProgramTrainingRepository repository) {
@@ -98,35 +73,19 @@ public class ProgramTrainingWrapper {
 
         repository.updateProgramTraining((ProgramTrainingEntity) programTraining);
 
-        repository.getProgramExercisesForTraining(programTraining).observeForever(oldExercises -> {
-            if (oldExercises != null && !oldExercises.isEmpty()) {
-                DiffUtil.DiffResult difference = DiffUtil.calculateDiff(new DiffIdCallback(oldExercises, programExercises));
-                List<ProgramExerciseEntity> toDelete = Lists.newLinkedList();
-                difference.dispatchUpdatesTo(new ListUpdateCallback() {
+        LiveData<List<ProgramExerciseEntity>> oldExercisesLive = repository.getProgramExercisesForTraining(programTraining);
 
-                    public void onRemoved(int position, int count) {
-                        toDelete.addAll(oldExercises.subList(position, position + count));
-                    }
+        ExercisesDiff diff = new ExercisesDiff((List<ProgramExerciseEntity>)(List<?>) childrenDelegate.getChildren()) {
+            @Override
+            public void difference(List<ProgramExerciseEntity> toDelete, List<ProgramExerciseEntity> toUpdate, List<ProgramExerciseEntity> toInsert) {
+                repository.updateProgramExercises(toUpdate);
+                repository.deleteProgramExercises(toDelete);
 
-                    public void onMoved(int fromPosition, int toPosition) {}
-                    public void onInserted(int position, int count) {}
-                    public void onChanged(int position, int count, Object payload) {}
-                });
-
-                if (!toDelete.isEmpty())
-                    repository.deleteProgramExercises(toDelete);
-
-                List<ProgramExerciseEntity> toUpdate = Lists.newLinkedList();
-                for (int i = 0; i < programExercises.size(); i++) {
-                    if (oldExercises.get(i).getId() != programExercises.get(i).getId()) {
-                        toUpdate.add((ProgramExerciseEntity) programExercises.get(i));
-                    }
-                }
-
-                if (!toUpdate.isEmpty())
-                    repository.updateProgramExercises(toUpdate);
+                oldExercisesLive.removeObserver(this);
             }
-        });
+        };
+
+        oldExercisesLive.observeForever(diff);
     }
 
     public static ProgramTrainingEntity createTraining() {
@@ -146,7 +105,7 @@ public class ProgramTrainingWrapper {
                 wrapper.setProgramTraining(training);
             }
         });
-        loader.addDependentSource(
+        loader.addDependentSource( // FIXME this may not work because of insertion above
                 draftingProgramTraining,
                 repository::getProgramExercisesForTraining,
                 ProgramTrainingWrapper::setProgramExercises
@@ -162,5 +121,24 @@ public class ProgramTrainingWrapper {
         loader.addSource(repository.getProgramExercisesForTraining(id), ProgramTrainingWrapper::setProgramExercises);
 
         return loader.load();
+    }
+
+    private static abstract class ExercisesDiff extends ChildrenDiff<ProgramExerciseEntity> implements Observer<List<ProgramExerciseEntity>> {
+
+        public ExercisesDiff(List<ProgramExerciseEntity> newChildren)
+        {
+            super(
+                    null,
+                    newChildren,
+                    (oldOne, newOne) -> oldOne.getId() == newOne.getId() ? 0 : 1,
+                    (oldOne, newOne) -> oldOne.getSortOrder() - newOne.getSortOrder()
+            );
+        }
+
+        @Override
+        public void onChanged(@Nullable List<ProgramExerciseEntity> programExerciseEntities) {
+            oldChildren = programExerciseEntities;
+            calculate();
+        }
     }
 }

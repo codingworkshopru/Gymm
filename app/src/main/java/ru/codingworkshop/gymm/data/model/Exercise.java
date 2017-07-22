@@ -4,13 +4,14 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
 import ru.codingworkshop.gymm.data.ExerciseDifficulty;
-import ru.codingworkshop.gymm.data.model.common.NamedModel;
+import ru.codingworkshop.gymm.data.model.common.Model;
+import ru.codingworkshop.gymm.data.model.common.Named;
 
 /**
  * Created by Радик on 22.05.2017.
  */
 
-public interface Exercise extends NamedModel {
+public interface Exercise extends Named, Model {
     ExerciseDifficulty getDifficulty();
     void setDifficulty(@NonNull ExerciseDifficulty difficulty);
 
