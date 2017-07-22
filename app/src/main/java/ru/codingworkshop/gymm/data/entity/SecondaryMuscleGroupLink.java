@@ -1,6 +1,5 @@
 package ru.codingworkshop.gymm.data.entity;
 
-import android.arch.persistence.room.ColumnInfo;
 import android.arch.persistence.room.Entity;
 import android.arch.persistence.room.ForeignKey;
 import android.arch.persistence.room.Index;
@@ -17,23 +16,23 @@ import static android.arch.persistence.room.ForeignKey.CASCADE;
         indices = { @Index("exerciseId"), @Index("muscleGroupId") },
         foreignKeys = {
                 @ForeignKey(
-                        entity = ExerciseEntity.class,
+                        entity = Exercise.class,
                         parentColumns = "id",
                         childColumns = "exerciseId",
                         onDelete = CASCADE,
                         onUpdate = CASCADE
                 ),
                 @ForeignKey(
-                        entity = MuscleGroupEntity.class,
+                        entity = MuscleGroup.class,
                         parentColumns = "id",
                         childColumns = "muscleGroupId"
         )
 })
-public class SecondaryMuscleGroupLinkEntity {
+public class SecondaryMuscleGroupLink {
     private long exerciseId;
     private long muscleGroupId;
 
-    public SecondaryMuscleGroupLinkEntity(long exerciseId, long muscleGroupId) {
+    public SecondaryMuscleGroupLink(long exerciseId, long muscleGroupId) {
         this.exerciseId = exerciseId;
         this.muscleGroupId = muscleGroupId;
     }

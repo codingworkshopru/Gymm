@@ -19,7 +19,7 @@ import com.google.common.eventbus.Subscribe;
 
 import java.util.concurrent.TimeUnit;
 
-import ru.codingworkshop.gymm.data.model.ProgramTraining;
+import ru.codingworkshop.gymm.data.entity.ProgramTraining;
 import ru.codingworkshop.gymm.ui.TrainingNotification;
 
 /**

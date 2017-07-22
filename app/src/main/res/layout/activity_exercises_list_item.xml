@@ -7,7 +7,7 @@
     <data>
         <variable
             name="exercise"
-            type="ru.codingworkshop.gymm.data.model.Exercise"/>
+            type="ru.codingworkshop.gymm.data.entity.Exercise"/>
     </data>
 
     <android.support.constraint.ConstraintLayout

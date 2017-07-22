@@ -2,8 +2,8 @@ package ru.codingworkshop.gymm.data.wrapper;
 
 import java.util.List;
 
-import ru.codingworkshop.gymm.data.entity.ProgramSetEntity;
-import ru.codingworkshop.gymm.data.model.Exercise;
+import ru.codingworkshop.gymm.data.entity.Exercise;
+import ru.codingworkshop.gymm.data.entity.ProgramSet;
 
 /**
  * Created by Радик on 13.07.2017.
@@ -11,7 +11,7 @@ import ru.codingworkshop.gymm.data.model.Exercise;
 
 public class ProgramExerciseWrapper {
     private Exercise exercise;
-    private List<ProgramSetEntity> programSets;
+    private List<ProgramSet> programSets;
 
     public Exercise getExercise() {
         return exercise;
@@ -21,11 +21,11 @@ public class ProgramExerciseWrapper {
         this.exercise = exercise;
     }
 
-    public List<ProgramSetEntity> getProgramSets() {
+    public List<ProgramSet> getProgramSets() {
         return programSets;
     }
 
-    public void setProgramSets(List<ProgramSetEntity> programSets) {
+    public void setProgramSets(List<ProgramSet> programSets) {
         this.programSets = programSets;
     }
 }

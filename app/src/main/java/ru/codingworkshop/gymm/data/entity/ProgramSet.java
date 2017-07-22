@@ -6,7 +6,8 @@ import android.arch.persistence.room.Index;
 import android.arch.persistence.room.PrimaryKey;
 import android.support.annotation.Nullable;
 
-import ru.codingworkshop.gymm.data.model.ProgramSet;
+import ru.codingworkshop.gymm.data.entity.common.Model;
+import ru.codingworkshop.gymm.data.entity.common.Sortable;
 
 import static android.arch.persistence.room.ForeignKey.CASCADE;
 
@@ -18,7 +19,7 @@ import static android.arch.persistence.room.ForeignKey.CASCADE;
         tableName = "ProgramSet",
         foreignKeys = {
                 @ForeignKey(
-                        entity = ProgramExerciseEntity.class,
+                        entity = ProgramExercise.class,
                         parentColumns = "id",
                         childColumns = "programExerciseId",
                         onDelete = CASCADE,
@@ -27,7 +28,7 @@ import static android.arch.persistence.room.ForeignKey.CASCADE;
         },
         indices = @Index("programExerciseId")
 )
-public class ProgramSetEntity implements ProgramSet {
+public class ProgramSet implements Model, Sortable {
     @PrimaryKey(autoGenerate = true)
     private long id;
     private long programExerciseId;
@@ -45,27 +46,22 @@ public class ProgramSetEntity implements ProgramSet {
         this.id = id;
     }
 
-    @Override
     public long getProgramExerciseId() {
         return programExerciseId;
     }
 
-    @Override
     public void setProgramExerciseId(long programExerciseId) {
         this.programExerciseId = programExerciseId;
     }
 
-    @Override
     public int getReps() {
         return reps;
     }
 
-    @Override
     public void setReps(int reps) {
         this.reps = reps;
     }
 
-    @Override
     public @Nullable Integer getSecondsForRest() {
         return secondsForRest;
     }

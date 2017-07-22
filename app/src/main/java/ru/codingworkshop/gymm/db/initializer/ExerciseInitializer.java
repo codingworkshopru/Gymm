@@ -15,7 +15,7 @@ import javax.inject.Inject;
 import dagger.Lazy;
 import ru.codingworkshop.gymm.R;
 import ru.codingworkshop.gymm.data.ExerciseDifficulty;
-import ru.codingworkshop.gymm.data.entity.ExerciseEntity;
+import ru.codingworkshop.gymm.data.entity.Exercise;
 import ru.codingworkshop.gymm.db.Converters;
 import ru.codingworkshop.gymm.repository.ExercisesRepository;
 
@@ -23,7 +23,7 @@ import ru.codingworkshop.gymm.repository.ExercisesRepository;
  * Created by Радик on 01.06.2017.
  */
 
-public class ExerciseInitializer extends EntityInitializer<List<ExerciseEntity>> {
+public class ExerciseInitializer extends EntityInitializer<List<Exercise>> {
     private Lazy<ExercisesRepository> exercisesRepository;
 
     @Inject
@@ -34,7 +34,7 @@ public class ExerciseInitializer extends EntityInitializer<List<ExerciseEntity>>
 
     @Override
     Type getType() {
-        return new TypeToken<List<ExerciseEntity>>(){}.getType();
+        return new TypeToken<List<Exercise>>(){}.getType();
     }
 
     @Override
@@ -59,7 +59,7 @@ public class ExerciseInitializer extends EntityInitializer<List<ExerciseEntity>>
     }
 
     @Override
-    void saveToDatabase(List<ExerciseEntity> exercises) {
+    void saveToDatabase(List<Exercise> exercises) {
         exercisesRepository.get().createWithSecondaryMuscleGroups(exercises);
     }
 }

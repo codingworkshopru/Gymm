@@ -1,4 +1,4 @@
-package ru.codingworkshop.gymm.data.model.common;
+package ru.codingworkshop.gymm.data.entity.common;
 
 import android.support.annotation.NonNull;
 

@@ -6,10 +6,10 @@
     <data>
         <variable
             name="program"
-            type="ru.codingworkshop.gymm.data.model.ProgramExercise"/>
+            type="ru.codingworkshop.gymm.data.entity.ProgramExercise"/>
         <variable
             name="actual"
-            type="ru.codingworkshop.gymm.data.model.ActualExercise"/>
+            type="ru.codingworkshop.gymm.data.entity.ActualExercise"/>
     </data>
 
     <android.support.constraint.ConstraintLayout

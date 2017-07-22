@@ -7,7 +7,7 @@ import java.util.List;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
-import ru.codingworkshop.gymm.data.entity.MuscleGroupEntity;
+import ru.codingworkshop.gymm.data.entity.MuscleGroup;
 import ru.codingworkshop.gymm.db.dao.MuscleGroupDao;
 
 /**
@@ -27,11 +27,11 @@ public final class MuscleGroupsRepository {
         return muscleGroupDao.getMuscleGroupsCount() == 0;
     }
 
-    public LiveData<List<MuscleGroupEntity>> getMuscleGroups() {
+    public LiveData<List<MuscleGroup>> getMuscleGroups() {
         return muscleGroupDao.getAllMuscleGroups();
     }
 
-    public void insertMuscleGroups(List<MuscleGroupEntity> muscleGroups) {
+    public void insertMuscleGroups(List<MuscleGroup> muscleGroups) {
         muscleGroupDao.insertMuscleGroups(muscleGroups);
     }
 }

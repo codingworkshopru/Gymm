@@ -9,9 +9,8 @@ import java.util.concurrent.Executor;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
-import ru.codingworkshop.gymm.data.entity.ExerciseEntity;
-import ru.codingworkshop.gymm.data.entity.MuscleGroupEntity;
-import ru.codingworkshop.gymm.data.model.Exercise;
+import ru.codingworkshop.gymm.data.entity.Exercise;
+import ru.codingworkshop.gymm.data.entity.MuscleGroup;
 import ru.codingworkshop.gymm.db.dao.ExerciseDao;
 import ru.codingworkshop.gymm.db.dao.MuscleGroupDao;
 
@@ -34,17 +33,17 @@ public final class ExercisesRepository {
 
     // createTraining
 
-    public void create(ExerciseEntity exercise, List<MuscleGroupEntity> secondaryMuscleGroups) {
+    public void create(Exercise exercise, List<MuscleGroup> secondaryMuscleGroups) {
         executor.execute(() -> {
             exerciseDao.insertExercise(exercise);
-            ExerciseEntity exerciseWithId = exerciseDao.getExerciseByName(exercise.getName());
+            Exercise exerciseWithId = exerciseDao.getExerciseByName(exercise.getName());
             helper.updateLinks(exerciseWithId, secondaryMuscleGroups);
         });
     }
 
     @WorkerThread
     // called from initializer
-    public void createWithSecondaryMuscleGroups(List<ExerciseEntity> exercises) {
+    public void createWithSecondaryMuscleGroups(List<Exercise> exercises) {
         helper.createExercises(exercises);
     }
 
@@ -54,21 +53,21 @@ public final class ExercisesRepository {
         return exerciseDao.getExercisesCount() == 0;
     }
 
-    public LiveData<List<ExerciseEntity>> getExercisesForMuscleGroup(long id) {
+    public LiveData<List<Exercise>> getExercisesForMuscleGroup(long id) {
         return exerciseDao.getExercisesForPrimaryMuscleGroup(id);
     }
 
-    public LiveData<ExerciseEntity> getExerciseById(long id) {
+    public LiveData<Exercise> getExerciseById(long id) {
         return exerciseDao.getExerciseById(id);
     }
 
-    public LiveData<List<MuscleGroupEntity>> getSecondaryMuscleGroupsForExercise(long id) {
+    public LiveData<List<MuscleGroup>> getSecondaryMuscleGroupsForExercise(long id) {
         return exerciseDao.getSecondaryMuscleGroupsForExercise(id);
     }
 
     // update
 
-    public void update(ExerciseEntity exercise, List<MuscleGroupEntity> secondaryMuscleGroups) {
+    public void update(Exercise exercise, List<MuscleGroup> secondaryMuscleGroups) {
         executor.execute(() -> {
             exerciseDao.updateExercise(exercise);
             helper.updateLinks(exercise, secondaryMuscleGroups);
@@ -78,6 +77,6 @@ public final class ExercisesRepository {
     // delete
 
     public void delete(Exercise exercise) {
-        executor.execute(() -> exerciseDao.deleteExercise((ExerciseEntity) exercise));
+        executor.execute(() -> exerciseDao.deleteExercise(exercise));
     }
 }

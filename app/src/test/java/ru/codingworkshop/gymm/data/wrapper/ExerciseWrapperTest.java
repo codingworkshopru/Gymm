@@ -17,10 +17,8 @@ import org.mockito.Mockito;
 import java.util.List;
 import java.util.Set;
 
-import ru.codingworkshop.gymm.data.entity.ExerciseEntity;
-import ru.codingworkshop.gymm.data.entity.MuscleGroupEntity;
-import ru.codingworkshop.gymm.data.model.Exercise;
-import ru.codingworkshop.gymm.data.model.MuscleGroup;
+import ru.codingworkshop.gymm.data.entity.Exercise;
+import ru.codingworkshop.gymm.data.entity.MuscleGroup;
 import ru.codingworkshop.gymm.db.dao.ExerciseDao;
 
 import static org.junit.Assert.assertEquals;
@@ -40,7 +38,7 @@ import static org.mockito.Mockito.when;
 @RunWith(JUnit4.class)
 public class ExerciseWrapperTest {
     private Exercise exercise;
-    private MutableLiveData<ExerciseEntity> liveExercise;
+    private MutableLiveData<Exercise> liveExercise;
     private ExerciseDao exerciseDao;
 
     @Rule
@@ -48,15 +46,15 @@ public class ExerciseWrapperTest {
 
     @Before
     public void init() {
-        exercise = Mockito.mock(ExerciseEntity.class);
+        exercise = Mockito.mock(Exercise.class);
         when(exercise.getName()).thenReturn("foo");
 
         liveExercise = new MutableLiveData<>();
-        liveExercise.setValue((ExerciseEntity) exercise);
+        liveExercise.setValue(exercise);
 
-        MutableLiveData<List<MuscleGroupEntity>> liveMuscleGroups = new MutableLiveData<>();
-        MuscleGroupEntity muscleGroupEntity = new MuscleGroupEntity("bar");
-        liveMuscleGroups.setValue(Lists.newArrayList(muscleGroupEntity));
+        MutableLiveData<List<MuscleGroup>> liveMuscleGroups = new MutableLiveData<>();
+        MuscleGroup muscleGroup = new MuscleGroup("bar");
+        liveMuscleGroups.setValue(Lists.newArrayList(muscleGroup));
 
         exerciseDao = mock(ExerciseDao.class);
         when(exerciseDao.getExerciseById(1)).thenReturn(liveExercise);
@@ -73,7 +71,7 @@ public class ExerciseWrapperTest {
                 wrapper.getSecondaryMuscleGroupsCount() == 1));
         verify(exerciseDao).getExerciseById(1);
         verify(exerciseDao).getSecondaryMuscleGroupsForExercise(1);
-        liveExercise.setValue(new ExerciseEntity());
+        liveExercise.setValue(new Exercise());
         verify(observer, times(2)).onChanged(any());
     }
 
@@ -86,7 +84,7 @@ public class ExerciseWrapperTest {
 
     @Test
     public void addition() {
-        MuscleGroup muscleGroup = new MuscleGroupEntity("bar");
+        MuscleGroup muscleGroup = new MuscleGroup("bar");
         ExerciseWrapper wrapper = new ExerciseWrapper(exercise);
         Set<MuscleGroup> muscleGroupSet = wrapper.getSecondaryMuscleGroups();
         wrapper.addSecondaryMuscleGroup(muscleGroup);
@@ -112,10 +110,10 @@ public class ExerciseWrapperTest {
 
     @Test
     public void deletion() {
-        MuscleGroup muscleGroup = new MuscleGroupEntity("foo");
+        MuscleGroup muscleGroup = new MuscleGroup("foo");
         ExerciseWrapper wrapper = new ExerciseWrapper(exercise);
         wrapper.addSecondaryMuscleGroup(muscleGroup);
-        wrapper.removeSecondaryMuscleGroup(new MuscleGroupEntity("foo"));
+        wrapper.removeSecondaryMuscleGroup(new MuscleGroup("foo"));
 
         assertFalse(wrapper.hasSecondaryMuscleGroups());
     }

@@ -8,8 +8,8 @@
 
     <data>
         <import type="android.view.View" />
-        <import type="ru.codingworkshop.gymm.data.model.MuscleGroup"/>
-        <variable name="exercise" type="ru.codingworkshop.gymm.data.model.Exercise"/>
+        <import type="ru.codingworkshop.gymm.data.entity.MuscleGroup"/>
+        <variable name="exercise" type="ru.codingworkshop.gymm.data.entity.Exercise"/>
     </data>
 
     <android.support.design.widget.CoordinatorLayout

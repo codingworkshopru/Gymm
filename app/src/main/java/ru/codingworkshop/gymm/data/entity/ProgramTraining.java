@@ -6,14 +6,15 @@ import android.arch.persistence.room.PrimaryKey;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
-import ru.codingworkshop.gymm.data.model.ProgramTraining;
+import ru.codingworkshop.gymm.data.entity.common.Model;
+import ru.codingworkshop.gymm.data.entity.common.Named;
 
 /**
  * Created by Радик on 04.06.2017.
  */
 
 @Entity(tableName = "ProgramTraining", indices = @Index(value = "name", unique = true))
-public class ProgramTrainingEntity implements ProgramTraining {
+public class ProgramTraining implements Model, Named {
     @PrimaryKey(autoGenerate = true)
     private long id;
     private String name;
@@ -40,22 +41,18 @@ public class ProgramTrainingEntity implements ProgramTraining {
         this.name = name;
     }
 
-    @Override
     public @Nullable Integer getWeekday() {
         return weekday;
     }
 
-    @Override
     public void setWeekday(Integer weekday) {
         this.weekday = weekday;
     }
 
-    @Override
     public boolean isDrafting() {
         return drafting;
     }
 
-    @Override
     public void setDrafting(boolean drafting) {
         this.drafting = drafting;
     }

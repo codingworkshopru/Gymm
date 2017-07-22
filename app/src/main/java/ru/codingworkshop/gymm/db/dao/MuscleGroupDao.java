@@ -7,7 +7,7 @@ import android.arch.persistence.room.Query;
 
 import java.util.List;
 
-import ru.codingworkshop.gymm.data.entity.MuscleGroupEntity;
+import ru.codingworkshop.gymm.data.entity.MuscleGroup;
 
 import static android.arch.persistence.room.OnConflictStrategy.FAIL;
 
@@ -18,17 +18,17 @@ import static android.arch.persistence.room.OnConflictStrategy.FAIL;
 @Dao
 public interface MuscleGroupDao {
     @Query("select * from MuscleGroup order by name")
-    LiveData<List<MuscleGroupEntity>> getAllMuscleGroups();
+    LiveData<List<MuscleGroup>> getAllMuscleGroups();
 
     @Query("select * from MuscleGroup order by name")
-    List<MuscleGroupEntity> getAllMuscleGroupsSync();
+    List<MuscleGroup> getAllMuscleGroupsSync();
 
     @Query("select count(*) from MuscleGroup")
     int getMuscleGroupsCount();
 
     @Query("select * from MuscleGroup where id = :id")
-    LiveData<MuscleGroupEntity> getMuscleGroupById(long id);
+    LiveData<MuscleGroup> getMuscleGroupById(long id);
 
     @Insert(onConflict = FAIL)
-    void insertMuscleGroups(List<MuscleGroupEntity> muscleGroups);
+    void insertMuscleGroups(List<MuscleGroup> muscleGroups);
 }

@@ -14,14 +14,11 @@ import java.util.concurrent.Executor;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
-import ru.codingworkshop.gymm.data.entity.ProgramExerciseEntity;
-import ru.codingworkshop.gymm.data.entity.ProgramSetEntity;
-import ru.codingworkshop.gymm.data.entity.ProgramTrainingEntity;
-import ru.codingworkshop.gymm.data.model.ProgramExercise;
-import ru.codingworkshop.gymm.data.model.ProgramSet;
-import ru.codingworkshop.gymm.data.model.ProgramTraining;
-import ru.codingworkshop.gymm.data.model.common.Model;
-import ru.codingworkshop.gymm.data.model.common.Named;
+import ru.codingworkshop.gymm.data.entity.ProgramExercise;
+import ru.codingworkshop.gymm.data.entity.ProgramSet;
+import ru.codingworkshop.gymm.data.entity.ProgramTraining;
+import ru.codingworkshop.gymm.data.entity.common.Model;
+import ru.codingworkshop.gymm.data.entity.common.Named;
 import ru.codingworkshop.gymm.db.dao.ProgramTrainingDao;
 import timber.log.Timber;
 
@@ -42,60 +39,60 @@ public class ProgramTrainingRepository {
         this.executor = executor;
     }
 
-    public LiveData<List<ProgramTrainingEntity>> getProgramTrainings() {
+    public LiveData<List<ProgramTraining>> getProgramTrainings() {
         return dao.getProgramTrainings();
     }
 
-    public LiveData<ProgramTrainingEntity> getProgramTrainingById(long id) {
+    public LiveData<ProgramTraining> getProgramTrainingById(long id) {
         return dao.getProgramTrainingById(id);
     }
 
-    public LiveData<ProgramTrainingEntity> getDraftingProgramTraining() {
+    public LiveData<ProgramTraining> getDraftingProgramTraining() {
         return dao.getDraftingProgramTraining();
     }
 
-    public void insertProgramTraining(@NonNull ProgramTrainingEntity programTrainingEntity) {
-        checkName(programTrainingEntity);
-        performInsert(dao::insertProgramTraining, programTrainingEntity);
+    public void insertProgramTraining(@NonNull ProgramTraining programTraining) {
+        checkName(programTraining);
+        performInsert(dao::insertProgramTraining, programTraining);
     }
 
-    public void deleteProgramTraining(@NonNull ProgramTrainingEntity programTrainingEntity) {
-        performDelete(dao::deleteProgramTraining, programTrainingEntity);
+    public void deleteProgramTraining(@NonNull ProgramTraining programTraining) {
+        performDelete(dao::deleteProgramTraining, programTraining);
     }
 
-    public void updateProgramTraining(@NonNull ProgramTrainingEntity programTrainingEntity) {
-        checkName(programTrainingEntity);
-        performUpdate(dao::updateProgramTraining, programTrainingEntity);
+    public void updateProgramTraining(@NonNull ProgramTraining programTraining) {
+        checkName(programTraining);
+        performUpdate(dao::updateProgramTraining, programTraining);
     }
 
-    public LiveData<List<ProgramExerciseEntity>> getProgramExercisesForTraining(@NonNull ProgramTraining programTraining) {
+    public LiveData<List<ProgramExercise>> getProgramExercisesForTraining(@NonNull ProgramTraining programTraining) {
         return dao.getProgramExercisesForTraining(programTraining.getId());
     }
 
-    public LiveData<List<ProgramExerciseEntity>> getProgramExercisesForTraining(long trainingId) {
+    public LiveData<List<ProgramExercise>> getProgramExercisesForTraining(long trainingId) {
         return dao.getProgramExercisesForTraining(trainingId);
     }
 
-    public LiveData<ProgramExerciseEntity> getProgramExerciseById(long id) {
+    public LiveData<ProgramExercise> getProgramExerciseById(long id) {
         return dao.getProgramExerciseById(id);
     }
 
-    public LiveData<ProgramExerciseEntity> getDraftingProgramExercise(@NonNull ProgramTraining training) {
+    public LiveData<ProgramExercise> getDraftingProgramExercise(@NonNull ProgramTraining training) {
         checkModelId(training);
         return dao.getDraftingProgramExercise(training.getId());
     }
 
-    public void insertProgramExercise(ProgramExerciseEntity programExerciseEntity) {
-        checkProgramExercise(programExerciseEntity);
-        performInsert(dao::insertProgramExercise, programExerciseEntity);
+    public void insertProgramExercise(ProgramExercise programExercise) {
+        checkProgramExercise(programExercise);
+        performInsert(dao::insertProgramExercise, programExercise);
     }
 
-    public void updateProgramExercise(ProgramExerciseEntity programExerciseEntity) {
-        checkProgramExercise(programExerciseEntity);
-        performUpdate(dao::updateProgramExercise, programExerciseEntity);
+    public void updateProgramExercise(ProgramExercise programExercise) {
+        checkProgramExercise(programExercise);
+        performUpdate(dao::updateProgramExercise, programExercise);
     }
 
-    public void updateProgramExercises(Collection<ProgramExerciseEntity> exerciseEntities) {
+    public void updateProgramExercises(Collection<ProgramExercise> exerciseEntities) {
         for (ProgramExercise exercise : exerciseEntities) {
             checkProgramExercise(exercise);
         }
@@ -107,28 +104,28 @@ public class ProgramTrainingRepository {
         Preconditions.checkArgument(isValidId(programExercise.getExerciseId()));
     }
 
-    public void deleteProgramExercise(ProgramExerciseEntity programExerciseEntity) {
-        performDelete(dao::deleteProgramExercise, programExerciseEntity);
+    public void deleteProgramExercise(ProgramExercise programExercise) {
+        performDelete(dao::deleteProgramExercise, programExercise);
     }
 
-    public void deleteProgramExercises(Collection<ProgramExerciseEntity> exerciseEntities) {
+    public void deleteProgramExercises(Collection<ProgramExercise> exerciseEntities) {
         performDelete(dao::deleteProgramExercises, exerciseEntities);
     }
 
-    public LiveData<List<ProgramSetEntity>> getProgramSetsForExercise(@NonNull ProgramExercise exercise) {
+    public LiveData<List<ProgramSet>> getProgramSetsForExercise(@NonNull ProgramExercise exercise) {
         return dao.getProgramSetsForExercise(exercise.getId());
     }
 
-    public LiveData<ProgramSetEntity> getProgramSetById(long id) {
+    public LiveData<ProgramSet> getProgramSetById(long id) {
         return dao.getProgramSetById(id);
     }
 
-    public void insertProgramSet(@NonNull ProgramSetEntity set) {
+    public void insertProgramSet(@NonNull ProgramSet set) {
         checkProgramSet(set);
         performInsert(dao::insertProgramSet, set);
     }
 
-    public void updateProgramSet(@NonNull ProgramSetEntity set) {
+    public void updateProgramSet(@NonNull ProgramSet set) {
         checkProgramSet(set);
         performUpdate(dao::updateProgramSet, set);
     }
@@ -138,7 +135,7 @@ public class ProgramTrainingRepository {
         Preconditions.checkArgument(isValidId(set.getProgramExerciseId()));
     }
 
-    public void deleteProgramSet(@NonNull ProgramSetEntity set) {
+    public void deleteProgramSet(@NonNull ProgramSet set) {
         performDelete(dao::deleteProgramSet, set);
     }
 

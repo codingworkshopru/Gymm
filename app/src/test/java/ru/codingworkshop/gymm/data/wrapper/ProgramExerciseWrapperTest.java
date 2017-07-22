@@ -6,8 +6,8 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
 
-import ru.codingworkshop.gymm.data.entity.ExerciseEntity;
-import ru.codingworkshop.gymm.data.entity.ProgramSetEntity;
+import ru.codingworkshop.gymm.data.entity.Exercise;
+import ru.codingworkshop.gymm.data.entity.ProgramSet;
 
 import static junit.framework.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
@@ -21,8 +21,8 @@ public class ProgramExerciseWrapperTest {
     @Test
     public void test() {
         ProgramExerciseWrapper wrapper = new ProgramExerciseWrapper();
-        wrapper.setExercise(new ExerciseEntity());
-        wrapper.setProgramSets(Lists.newArrayList(new ProgramSetEntity()));
+        wrapper.setExercise(new Exercise());
+        wrapper.setProgramSets(Lists.newArrayList(new ProgramSet()));
 
         assertNotNull(wrapper.getExercise());
         assertEquals(1, wrapper.getProgramSets().size());

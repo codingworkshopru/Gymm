@@ -14,9 +14,9 @@ import java.util.List;
 
 import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
-import ru.codingworkshop.gymm.data.entity.ProgramExerciseEntity;
-import ru.codingworkshop.gymm.data.entity.ProgramSetEntity;
-import ru.codingworkshop.gymm.data.entity.ProgramTrainingEntity;
+import ru.codingworkshop.gymm.data.entity.ProgramExercise;
+import ru.codingworkshop.gymm.data.entity.ProgramSet;
+import ru.codingworkshop.gymm.data.entity.ProgramTraining;
 import ru.codingworkshop.gymm.data.util.LiveDataUtil;
 import ru.codingworkshop.gymm.db.dao.ProgramTrainingDao;
 import ru.codingworkshop.gymm.util.LiveTest;
@@ -45,8 +45,8 @@ public class ProgramTrainingRepositoryTest {
 
     @Test
     public void queryProgramTrainings() {
-        ProgramTrainingEntity training = new ProgramTrainingEntity();
-        List<ProgramTrainingEntity> trainings = Lists.newArrayList(training);
+        ProgramTraining training = new ProgramTraining();
+        List<ProgramTraining> trainings = Lists.newArrayList(training);
         when(dao.getProgramTrainings()).thenReturn(LiveDataUtil.getLive(trainings));
 
         LiveTest.verifyLiveData(repository.getProgramTrainings(), result -> result != null && !result.isEmpty());
@@ -70,7 +70,7 @@ public class ProgramTrainingRepositoryTest {
 
     @Test
     public void insertProgramTraining() {
-        ProgramTrainingEntity trainingEntity = getProgramTraining(1, "foo", false).getValue();
+        ProgramTraining trainingEntity = getProgramTraining(1, "foo", false).getValue();
         when(dao.insertProgramTraining(trainingEntity)).thenReturn(1L);
 
         repository.insertProgramTraining(trainingEntity);
@@ -80,7 +80,7 @@ public class ProgramTrainingRepositoryTest {
 
     @Test(expected = IllegalStateException.class)
     public void insertionFailTest() {
-        ProgramTrainingEntity training = getProgramTraining(1, "foo", false).getValue();
+        ProgramTraining training = getProgramTraining(1, "foo", false).getValue();
         when(dao.insertProgramTraining(training)).thenReturn(-1L);
         repository.insertProgramTraining(training);
     }
@@ -88,7 +88,7 @@ public class ProgramTrainingRepositoryTest {
     @Test(expected = IllegalArgumentException.class)
     @Parameters(method = "getEmptyStringAndNull")
     public void insertProgramTrainingWithEmptyAndNullName(String name) {
-        ProgramTrainingEntity training = getProgramTraining(1, name, false).getValue();
+        ProgramTraining training = getProgramTraining(1, name, false).getValue();
         repository.insertProgramTraining(training);
     }
 
@@ -98,7 +98,7 @@ public class ProgramTrainingRepositoryTest {
 
     @Test
     public void deleteProgramTraining() {
-        ProgramTrainingEntity trainingEntity = getProgramTraining(1, "foo", false).getValue();
+        ProgramTraining trainingEntity = getProgramTraining(1, "foo", false).getValue();
         when(dao.deleteProgramTraining(trainingEntity)).thenReturn(1);
 
         repository.deleteProgramTraining(trainingEntity);
@@ -108,7 +108,7 @@ public class ProgramTrainingRepositoryTest {
 
     @Test
     public void updateProgramTraining() {
-        ProgramTrainingEntity trainingEntity = getProgramTraining(1, "foo", false).getValue();
+        ProgramTraining trainingEntity = getProgramTraining(1, "foo", false).getValue();
         when(dao.updateProgramTraining(trainingEntity)).thenReturn(1);
 
         trainingEntity.setName("bar");
@@ -121,14 +121,14 @@ public class ProgramTrainingRepositoryTest {
     @Test(expected = IllegalArgumentException.class)
     @Parameters(method = "getEmptyStringAndNull")
     public void updateProgramTrainingWithEmptyAndNullName(String name) {
-        ProgramTrainingEntity training = getProgramTraining(1, name, false).getValue();
+        ProgramTraining training = getProgramTraining(1, name, false).getValue();
         repository.updateProgramTraining(training);
     }
 
     @Test
     public void queryProgramExercisesForTraining() {
-        ProgramTrainingEntity programTraining = getProgramTraining(1, "foo", false).getValue();
-        LiveData<List<ProgramExerciseEntity>> list = LiveDataUtil.getLive(Lists.newArrayList(getProgramExercise(2, programTraining.getId(), false).getValue()));
+        ProgramTraining programTraining = getProgramTraining(1, "foo", false).getValue();
+        LiveData<List<ProgramExercise>> list = LiveDataUtil.getLive(Lists.newArrayList(getProgramExercise(2, programTraining.getId(), false).getValue()));
         when(dao.getProgramExercisesForTraining(1)).thenReturn(list);
 
         LiveTest.verifyLiveData(
@@ -141,8 +141,8 @@ public class ProgramTrainingRepositoryTest {
 
     @Test
     public void queryProgramExercisesForTrainingId() {
-        ProgramTrainingEntity programTraining = getProgramTraining(1, "foo", false).getValue();
-        LiveData<List<ProgramExerciseEntity>> list = LiveDataUtil.getLive(Lists.newArrayList(getProgramExercise(2, programTraining.getId(), false).getValue()));
+        ProgramTraining programTraining = getProgramTraining(1, "foo", false).getValue();
+        LiveData<List<ProgramExercise>> list = LiveDataUtil.getLive(Lists.newArrayList(getProgramExercise(2, programTraining.getId(), false).getValue()));
         when(dao.getProgramExercisesForTraining(1)).thenReturn(list);
 
         LiveTest.verifyLiveData(
@@ -163,7 +163,7 @@ public class ProgramTrainingRepositoryTest {
 
     @Test
     public void queryDraftingProgramExercise() {
-        ProgramTrainingEntity training = getProgramTraining(1, "foo", false).getValue();
+        ProgramTraining training = getProgramTraining(1, "foo", false).getValue();
         when(dao.getDraftingProgramExercise(1)).thenReturn(getProgramExercise(2, training.getId(), true));
 
         LiveTest.verifyLiveData(repository.getDraftingProgramExercise(training), returned -> returned.getId() == 2 && returned.isDrafting());
@@ -172,7 +172,7 @@ public class ProgramTrainingRepositoryTest {
 
     @Test
     public void insertProgramExercise() {
-        ProgramExerciseEntity exercise = getProgramExercise(2, 1, false).getValue();
+        ProgramExercise exercise = getProgramExercise(2, 1, false).getValue();
         exercise.setExerciseId(10);
         when(dao.insertProgramExercise(exercise)).thenReturn(1L);
 
@@ -183,16 +183,16 @@ public class ProgramTrainingRepositoryTest {
 
     @Test(expected = IllegalArgumentException.class)
     @Parameters(method = "invalidProgramExercises")
-    public void insertProgramExerciseWithoutProgramTrainingAndExercise(ProgramExerciseEntity exercise) {
+    public void insertProgramExerciseWithoutProgramTrainingAndExercise(ProgramExercise exercise) {
         repository.insertProgramExercise(exercise);
     }
 
-    private ProgramExerciseEntity[] invalidProgramExercises() {
-        ProgramExerciseEntity exercise = new ProgramExerciseEntity();
+    private ProgramExercise[] invalidProgramExercises() {
+        ProgramExercise exercise = new ProgramExercise();
         exercise.setExerciseId(10);
-        ProgramExerciseEntity exerciseWithoutExercise = new ProgramExerciseEntity();
+        ProgramExercise exerciseWithoutExercise = new ProgramExercise();
         exerciseWithoutExercise.setProgramTrainingId(1);
-        return new ProgramExerciseEntity[] {
+        return new ProgramExercise[] {
                 exercise,
                 exerciseWithoutExercise
         };
@@ -200,7 +200,7 @@ public class ProgramTrainingRepositoryTest {
 
     @Test
     public void updateProgramExercise() {
-        ProgramExerciseEntity exercise = getProgramExercise(2, 1, false).getValue();
+        ProgramExercise exercise = getProgramExercise(2, 1, false).getValue();
         exercise.setExerciseId(10);
         when(dao.updateProgramExercise(exercise)).thenReturn(1);
 
@@ -211,9 +211,9 @@ public class ProgramTrainingRepositoryTest {
 
     @Test
     public void updateProgramExercises() {
-        List<ProgramExerciseEntity> exercisesToUpdate = Lists.newArrayList();
+        List<ProgramExercise> exercisesToUpdate = Lists.newArrayList();
         for (long i = 2; i < 6; i++) {
-            ProgramExerciseEntity exercise = getProgramExercise(i, 1, false).getValue();
+            ProgramExercise exercise = getProgramExercise(i, 1, false).getValue();
             exercise.setExerciseId(10);
             exercisesToUpdate.add(exercise);
         }
@@ -227,13 +227,13 @@ public class ProgramTrainingRepositoryTest {
 
     @Test(expected = IllegalArgumentException.class)
     @Parameters(method = "invalidProgramExercises")
-    public void updateProgramExerciseWithoutProgramTrainingAndExercise(ProgramExerciseEntity exercise) {
+    public void updateProgramExerciseWithoutProgramTrainingAndExercise(ProgramExercise exercise) {
         repository.updateProgramExercise(exercise);
     }
 
     @Test
     public void deleteProgramExercise() {
-        ProgramExerciseEntity exercise = getProgramExercise(2, 1, false).getValue();
+        ProgramExercise exercise = getProgramExercise(2, 1, false).getValue();
         when(dao.deleteProgramExercise(exercise)).thenReturn(1);
 
         repository.deleteProgramExercise(exercise);
@@ -243,9 +243,9 @@ public class ProgramTrainingRepositoryTest {
 
     @Test
     public void deleteProgramExercises() {
-        List<ProgramExerciseEntity> exercisesToDelete = Lists.newArrayList();
+        List<ProgramExercise> exercisesToDelete = Lists.newArrayList();
         for (long i = 2; i < 6; i++) {
-            ProgramExerciseEntity exercise = getProgramExercise(i, 1, false).getValue();
+            ProgramExercise exercise = getProgramExercise(i, 1, false).getValue();
             exercise.setExerciseId(10);
             exercisesToDelete.add(exercise);
         }
@@ -259,9 +259,9 @@ public class ProgramTrainingRepositoryTest {
 
     @Test
     public void queryProgramSetsForExercise() {
-        ProgramExerciseEntity exercise = getProgramExercise(2, 1, false).getValue();
-        ProgramSetEntity set = getProgramSet(3, 2, 1).getValue();
-        LiveData<List<ProgramSetEntity>> list = LiveDataUtil.getLive(Lists.newArrayList(set));
+        ProgramExercise exercise = getProgramExercise(2, 1, false).getValue();
+        ProgramSet set = getProgramSet(3, 2, 1).getValue();
+        LiveData<List<ProgramSet>> list = LiveDataUtil.getLive(Lists.newArrayList(set));
 
         when(dao.getProgramSetsForExercise(exercise.getId())).thenReturn(list);
         LiveTest.verifyLiveData(
@@ -284,7 +284,7 @@ public class ProgramTrainingRepositoryTest {
 
     @Test
     public void insertProgramSet() {
-        ProgramSetEntity set = getProgramSet(3, 2, 1).getValue();
+        ProgramSet set = getProgramSet(3, 2, 1).getValue();
         when(dao.insertProgramSet(set)).thenReturn(set.getId());
 
         repository.insertProgramSet(set);
@@ -294,16 +294,16 @@ public class ProgramTrainingRepositoryTest {
 
     @Test(expected = IllegalArgumentException.class)
     @Parameters(method = "invalidProgramSets")
-    public void insertProgramSetWithZeroRepsAndWithoutExercise(ProgramSetEntity set) {
+    public void insertProgramSetWithZeroRepsAndWithoutExercise(ProgramSet set) {
         repository.insertProgramSet(set);
     }
 
-    private ProgramSetEntity[] invalidProgramSets() {
-        ProgramSetEntity setWithZeroReps = new ProgramSetEntity();
+    private ProgramSet[] invalidProgramSets() {
+        ProgramSet setWithZeroReps = new ProgramSet();
         setWithZeroReps.setProgramExerciseId(2);
-        ProgramSetEntity setWithoutExercise = new ProgramSetEntity();
+        ProgramSet setWithoutExercise = new ProgramSet();
         setWithoutExercise.setReps(1);
-        return new ProgramSetEntity[] {
+        return new ProgramSet[] {
                 setWithoutExercise,
                 setWithZeroReps
         };
@@ -311,7 +311,7 @@ public class ProgramTrainingRepositoryTest {
 
     @Test
     public void updateProgramSet() {
-        ProgramSetEntity set = getProgramSet(3, 2, 1).getValue();
+        ProgramSet set = getProgramSet(3, 2, 1).getValue();
         when(dao.updateProgramSet(set)).thenReturn(1);
 
         repository.updateProgramSet(set);
@@ -321,13 +321,13 @@ public class ProgramTrainingRepositoryTest {
 
     @Test(expected = IllegalArgumentException.class)
     @Parameters(method = "invalidProgramSets")
-    public void updateProgramSetWithZeroRepsAndWithoutExercise(ProgramSetEntity set) {
+    public void updateProgramSetWithZeroRepsAndWithoutExercise(ProgramSet set) {
         repository.updateProgramSet(set);
     }
 
     @Test
     public void deleteProgramSet() {
-        ProgramSetEntity set = getProgramSet(3, 2, 1).getValue();
+        ProgramSet set = getProgramSet(3, 2, 1).getValue();
         when(dao.deleteProgramSet(set)).thenReturn(1);
 
         repository.deleteProgramSet(set);
@@ -335,24 +335,24 @@ public class ProgramTrainingRepositoryTest {
         verify(dao).deleteProgramSet(set);
     }
 
-    private static LiveData<ProgramTrainingEntity> getProgramTraining(long id, String name, boolean drafting) {
-        ProgramTrainingEntity entity = new ProgramTrainingEntity();
+    private static LiveData<ProgramTraining> getProgramTraining(long id, String name, boolean drafting) {
+        ProgramTraining entity = new ProgramTraining();
         entity.setId(id);
         entity.setName(name);
         entity.setDrafting(drafting);
         return LiveDataUtil.getLive(entity);
     }
 
-    private static LiveData<ProgramExerciseEntity> getProgramExercise(long id, long programTrainingId, boolean drafting) {
-        ProgramExerciseEntity entity = new ProgramExerciseEntity();
+    private static LiveData<ProgramExercise> getProgramExercise(long id, long programTrainingId, boolean drafting) {
+        ProgramExercise entity = new ProgramExercise();
         entity.setId(id);
         entity.setProgramTrainingId(programTrainingId);
         entity.setDrafting(drafting);
         return LiveDataUtil.getLive(entity);
     }
 
-    private static LiveData<ProgramSetEntity> getProgramSet(long id, long programExerciseId, int reps) {
-        ProgramSetEntity set = new ProgramSetEntity();
+    private static LiveData<ProgramSet> getProgramSet(long id, long programExerciseId, int reps) {
+        ProgramSet set = new ProgramSet();
         set.setId(3);
         set.setProgramExerciseId(2);
         set.setReps(1);

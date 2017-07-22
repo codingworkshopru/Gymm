@@ -7,7 +7,7 @@
         <import type="android.view.View"/>
         <variable
             name="model"
-            type="ru.codingworkshop.gymm.data.model.ProgramSet"/>
+            type="ru.codingworkshop.gymm.data.entity.ProgramSet"/>
     </data>
 
     <android.support.constraint.ConstraintLayout

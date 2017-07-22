@@ -10,9 +10,9 @@ import android.arch.persistence.room.Update;
 import java.util.Collection;
 import java.util.List;
 
-import ru.codingworkshop.gymm.data.entity.ProgramExerciseEntity;
-import ru.codingworkshop.gymm.data.entity.ProgramSetEntity;
-import ru.codingworkshop.gymm.data.entity.ProgramTrainingEntity;
+import ru.codingworkshop.gymm.data.entity.ProgramExercise;
+import ru.codingworkshop.gymm.data.entity.ProgramSet;
+import ru.codingworkshop.gymm.data.entity.ProgramTraining;
 
 import static android.arch.persistence.room.OnConflictStrategy.FAIL;
 
@@ -23,65 +23,65 @@ import static android.arch.persistence.room.OnConflictStrategy.FAIL;
 @Dao
 public interface ProgramTrainingDao {
     @Query("select * from ProgramTraining")
-    LiveData<List<ProgramTrainingEntity>> getProgramTrainings();
+    LiveData<List<ProgramTraining>> getProgramTrainings();
 
     @Query("select * from ProgramTraining where id = :id")
-    LiveData<ProgramTrainingEntity> getProgramTrainingById(long id);
+    LiveData<ProgramTraining> getProgramTrainingById(long id);
 
     @Query("select * from ProgramTraining where drafting = 1 limit 1")
-    LiveData<ProgramTrainingEntity> getDraftingProgramTraining();
+    LiveData<ProgramTraining> getDraftingProgramTraining();
 
     @Insert(onConflict = FAIL)
-    long insertProgramTraining(ProgramTrainingEntity programTraining);
+    long insertProgramTraining(ProgramTraining programTraining);
 
     @Delete
-    int deleteProgramTraining(ProgramTrainingEntity programTraining);
+    int deleteProgramTraining(ProgramTraining programTraining);
 
     @Update(onConflict = FAIL)
-    int updateProgramTraining(ProgramTrainingEntity programTraining);
+    int updateProgramTraining(ProgramTraining programTraining);
 
     @Query("select * " +
             "from ProgramExercise " +
             "where programTrainingId = :programTrainingId " +
             "order by sortOrder")
-    LiveData<List<ProgramExerciseEntity>> getProgramExercisesForTraining(long programTrainingId);
+    LiveData<List<ProgramExercise>> getProgramExercisesForTraining(long programTrainingId);
 
     @Query("select * from ProgramExercise where id = :id")
-    LiveData<ProgramExerciseEntity> getProgramExerciseById(long id);
+    LiveData<ProgramExercise> getProgramExerciseById(long id);
 
     @Query("select * from ProgramExercise where drafting = 1 and programTrainingId = :programTrainingId limit 1")
-    LiveData<ProgramExerciseEntity> getDraftingProgramExercise(long programTrainingId);
+    LiveData<ProgramExercise> getDraftingProgramExercise(long programTrainingId);
 
     @Insert
-    long insertProgramExercise(ProgramExerciseEntity programExercise);
+    long insertProgramExercise(ProgramExercise programExercise);
 
     @Delete
-    int deleteProgramExercise(ProgramExerciseEntity programExercise);
+    int deleteProgramExercise(ProgramExercise programExercise);
 
     @Delete
-    int deleteProgramExercises(Collection<ProgramExerciseEntity> programExercises);
+    int deleteProgramExercises(Collection<ProgramExercise> programExercises);
 
     @Update
-    int updateProgramExercise(ProgramExerciseEntity programExercise);
+    int updateProgramExercise(ProgramExercise programExercise);
 
     @Update
-    int updateProgramExercises(Collection<ProgramExerciseEntity> programExercises);
+    int updateProgramExercises(Collection<ProgramExercise> programExercises);
 
     @Query("select * " +
             "from ProgramSet " +
             "where programExerciseId = :programExerciseId " +
             "order by sortOrder")
-    LiveData<List<ProgramSetEntity>> getProgramSetsForExercise(long programExerciseId);
+    LiveData<List<ProgramSet>> getProgramSetsForExercise(long programExerciseId);
 
     @Query("select * from ProgramSet where id = :id")
-    LiveData<ProgramSetEntity> getProgramSetById(long id);
+    LiveData<ProgramSet> getProgramSetById(long id);
 
     @Insert
-    long insertProgramSet(ProgramSetEntity programSet);
+    long insertProgramSet(ProgramSet programSet);
 
     @Delete
-    int deleteProgramSet(ProgramSetEntity programSet);
+    int deleteProgramSet(ProgramSet programSet);
 
     @Update
-    int updateProgramSet(ProgramSetEntity programSet);
+    int updateProgramSet(ProgramSet programSet);
 }

@@ -7,21 +7,22 @@ import android.support.annotation.NonNull;
 
 import com.google.common.base.Objects;
 
-import ru.codingworkshop.gymm.data.model.MuscleGroup;
+import ru.codingworkshop.gymm.data.entity.common.Model;
+import ru.codingworkshop.gymm.data.entity.common.Named;
 
 /**
  * Created by Радик on 22.05.2017.
  */
 
 @Entity(tableName = "MuscleGroup", indices = @Index(value = "name", unique = true))
-public class MuscleGroupEntity implements MuscleGroup {
+public class MuscleGroup implements Model, Named {
     @PrimaryKey(autoGenerate = true)
     private long id;
     private String name;
     private String mapColorRgb;
     private boolean isAnterior;
 
-    public MuscleGroupEntity(String name) {
+    public MuscleGroup(String name) {
         this.name = name;
     }
 
@@ -45,22 +46,18 @@ public class MuscleGroupEntity implements MuscleGroup {
         this.name = name;
     }
 
-    @Override
     public String getMapColorRgb() {
         return mapColorRgb;
     }
 
-    @Override
     public void setMapColorRgb(@NonNull String mapColorRgb) {
         this.mapColorRgb = mapColorRgb;
     }
 
-    @Override
     public boolean isAnterior() {
         return isAnterior;
     }
 
-    @Override
     public void setAnterior(boolean anterior) {
         isAnterior = anterior;
     }
@@ -69,7 +66,7 @@ public class MuscleGroupEntity implements MuscleGroup {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        MuscleGroupEntity that = (MuscleGroupEntity) o;
+        MuscleGroup that = (MuscleGroup) o;
         return id == that.id &&
                 Objects.equal(name, that.name);
     }

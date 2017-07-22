@@ -19,7 +19,6 @@ import java.util.Date;
 
 import ru.codingworkshop.gymm.R;
 
-import static android.databinding.DynamicUtil.safeUnbox;
 
 /**
  * Created by Радик on 11.05.2017.

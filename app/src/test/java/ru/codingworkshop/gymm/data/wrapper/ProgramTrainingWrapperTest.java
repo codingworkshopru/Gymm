@@ -14,11 +14,9 @@ import org.junit.runners.JUnit4;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import ru.codingworkshop.gymm.data.entity.ProgramExerciseEntity;
-import ru.codingworkshop.gymm.data.entity.ProgramTrainingEntity;
-import ru.codingworkshop.gymm.data.model.ProgramExercise;
-import ru.codingworkshop.gymm.data.model.ProgramTraining;
-import ru.codingworkshop.gymm.data.model.common.Sortable;
+import ru.codingworkshop.gymm.data.entity.ProgramExercise;
+import ru.codingworkshop.gymm.data.entity.ProgramTraining;
+import ru.codingworkshop.gymm.data.entity.common.Sortable;
 import ru.codingworkshop.gymm.data.util.LiveDataUtil;
 import ru.codingworkshop.gymm.repository.ProgramTrainingRepository;
 import ru.codingworkshop.gymm.util.LiveTest;
@@ -55,8 +53,8 @@ public class ProgramTrainingWrapperTest {
 
     @Test
     public void addAndRemove() {
-        ProgramTrainingWrapper wrapper = new ProgramTrainingWrapper(new ProgramTrainingEntity());
-        ProgramExerciseEntity programExercise = new ProgramExerciseEntity();
+        ProgramTrainingWrapper wrapper = new ProgramTrainingWrapper(new ProgramTraining());
+        ProgramExercise programExercise = new ProgramExercise();
         wrapper.addProgramExercise(programExercise);
 
         assertTrue(wrapper.hasProgramExercises());
@@ -68,9 +66,9 @@ public class ProgramTrainingWrapperTest {
 
     @Test
     public void lastRemoved() {
-        ProgramTrainingEntity training = createTraining(1L, "foo");
+        ProgramTraining training = createTraining(1L, "foo");
         ProgramTrainingWrapper wrapper = new ProgramTrainingWrapper(training);
-        List<ProgramExerciseEntity> exercises = createExercises(4);
+        List<ProgramExercise> exercises = createExercises(4);
         wrapper.setProgramExercises(exercises);
         wrapper.removeProgramExercise(exercises.get(0));
 
@@ -81,9 +79,9 @@ public class ProgramTrainingWrapperTest {
 
     @Test
     public void sortableTest() {
-        ProgramTrainingWrapper wrapper = new ProgramTrainingWrapper(new ProgramTrainingEntity());
+        ProgramTrainingWrapper wrapper = new ProgramTrainingWrapper(new ProgramTraining());
         checkOrder(wrapper.getProgramExercises());
-        List<ProgramExerciseEntity> exercises = createExercises(3);
+        List<ProgramExercise> exercises = createExercises(3);
 
         exercises.forEach(wrapper::addProgramExercise);
         checkOrder(wrapper.getProgramExercises());
@@ -102,7 +100,7 @@ public class ProgramTrainingWrapperTest {
             assertEquals(exercises.get(i), wrapper.getProgramExercises().get(i));
     }
 
-    private void removeAndCheck(ProgramTrainingWrapper wrapper, ProgramExerciseEntity entity) {
+    private void removeAndCheck(ProgramTrainingWrapper wrapper, ProgramExercise entity) {
         wrapper.removeProgramExercise(entity);
         checkOrder(wrapper.getProgramExercises());
     }
@@ -119,14 +117,14 @@ public class ProgramTrainingWrapperTest {
     public void testImmutability() {
         ProgramTrainingWrapper wrapper = new ProgramTrainingWrapper(createTraining(1L, "foo"));
         List<ProgramExercise> exercises = wrapper.getProgramExercises();
-        exercises.add(new ProgramExerciseEntity());
+        exercises.add(new ProgramExercise());
     }
 
     @Test
     public void loadDrafting() {
-        ProgramTrainingEntity training = createTraining(1L, "foo");
+        ProgramTraining training = createTraining(1L, "foo");
         training.setDrafting(true);
-        List<ProgramExerciseEntity> exercisesForProgram = createExercises(1);
+        List<ProgramExercise> exercisesForProgram = createExercises(1);
 
         when(repository.getDraftingProgramTraining()).thenReturn(LiveDataUtil.getLive(training));
         when(repository.getProgramExercisesForTraining(training)).thenReturn(LiveDataUtil.getLive(exercisesForProgram));
@@ -144,18 +142,18 @@ public class ProgramTrainingWrapperTest {
 
     @Test
     public void loadNonexistentDrafting() {
-        MutableLiveData<ProgramTrainingEntity> draftingTraining = new MutableLiveData<>();
+        MutableLiveData<ProgramTraining> draftingTraining = new MutableLiveData<>();
         draftingTraining.setValue(null);
         when(repository.getDraftingProgramTraining()).thenReturn(draftingTraining);
 
         when(repository.getProgramExercisesForTraining(null)).thenReturn(LiveDataUtil.getLive(Lists.newArrayList()));
 
-        ProgramTrainingEntity drafting = new ProgramTrainingEntity();
+        ProgramTraining drafting = new ProgramTraining();
         drafting.setDrafting(true);
         doAnswer((a) -> {
             draftingTraining.setValue(drafting);
             return null;
-        }).when(repository).insertProgramTraining(any(ProgramTrainingEntity.class));
+        }).when(repository).insertProgramTraining(any(ProgramTraining.class));
 
         LiveTest.verifyLiveData(
                 ProgramTrainingWrapper.createTraining(repository),
@@ -168,14 +166,14 @@ public class ProgramTrainingWrapperTest {
 
     @Test
     public void creationUsingStaticMethod() {
-        ProgramTrainingEntity training = ProgramTrainingWrapper.createTraining();
+        ProgramTraining training = ProgramTrainingWrapper.createTraining();
 
         assertTrue(training.isDrafting());
     }
 
     @Test
     public void loadUsingStaticMethod() {
-        ProgramTrainingEntity training = createTraining(1L, "foo");
+        ProgramTraining training = createTraining(1L, "foo");
         when(repository.getProgramTrainingById(1)).thenReturn(LiveDataUtil.getLive(training));
         when(repository.getProgramExercisesForTraining(1)).thenReturn(LiveDataUtil.getLive(createExercises(1)));
 
@@ -191,11 +189,11 @@ public class ProgramTrainingWrapperTest {
 
     @Test
     public void saveProgramTrainingWithUnchangedExercises() {
-        ProgramTrainingEntity training = createTraining(1L, "foo");
+        ProgramTraining training = createTraining(1L, "foo");
         training.setName("bar");
         ProgramTrainingWrapper wrapper = new ProgramTrainingWrapper(training);
 
-        List<ProgramExerciseEntity> oldExercises = createExercises(4);
+        List<ProgramExercise> oldExercises = createExercises(4);
         when(repository.getProgramExercisesForTraining(training)).thenReturn(LiveDataUtil.getLive(oldExercises));
 
         wrapper.setProgramExercises(Lists.newArrayList(oldExercises));
@@ -208,12 +206,12 @@ public class ProgramTrainingWrapperTest {
 
     @Test
     public void saveProgramTrainingExercises() {
-        ProgramTrainingEntity training = createTraining(1L, "foo");
+        ProgramTraining training = createTraining(1L, "foo");
         ProgramTrainingWrapper wrapper = new ProgramTrainingWrapper(training);
 
-        List<ProgramExerciseEntity> oldExercises = createExercises(10);
+        List<ProgramExercise> oldExercises = createExercises(10);
 
-        List<ProgramExerciseEntity> newExercises = createExercises(10);
+        List<ProgramExercise> newExercises = createExercises(10);
         newExercises.forEach(wrapper::addProgramExercise);
 
         when(repository.getProgramExercisesForTraining(training)).thenReturn(LiveDataUtil.getLive(oldExercises));
@@ -246,17 +244,17 @@ public class ProgramTrainingWrapperTest {
         ));
     }
 
-    private static ProgramTrainingEntity createTraining(long id, String name) {
-        ProgramTrainingEntity result = new ProgramTrainingEntity();
+    private static ProgramTraining createTraining(long id, String name) {
+        ProgramTraining result = new ProgramTraining();
         result.setId(id);
         result.setName(name);
         return result;
     }
 
-    private static List<ProgramExerciseEntity> createExercises(int count) {
-        List<ProgramExerciseEntity> exercises = Lists.newArrayListWithCapacity(count);
+    private static List<ProgramExercise> createExercises(int count) {
+        List<ProgramExercise> exercises = Lists.newArrayListWithCapacity(count);
         for (int i = 0; i < count; i++) {
-            ProgramExerciseEntity exercise = new ProgramExerciseEntity();
+            ProgramExercise exercise = new ProgramExercise();
             exercise.setId(2 + i);
             exercise.setSortOrder(i);
             exercises.add(exercise);

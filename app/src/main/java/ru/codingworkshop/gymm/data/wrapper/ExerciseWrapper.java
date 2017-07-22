@@ -12,9 +12,8 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
-import ru.codingworkshop.gymm.data.entity.ExerciseEntity;
-import ru.codingworkshop.gymm.data.model.Exercise;
-import ru.codingworkshop.gymm.data.model.MuscleGroup;
+import ru.codingworkshop.gymm.data.entity.Exercise;
+import ru.codingworkshop.gymm.data.entity.MuscleGroup;
 import ru.codingworkshop.gymm.db.dao.ExerciseDao;
 
 /**
@@ -76,7 +75,7 @@ public class ExerciseWrapper {
 
     public static LiveData<ExerciseWrapper> create() {
         MutableLiveData<ExerciseWrapper> liveWrapper = new MutableLiveData<>();
-        Exercise exercise = new ExerciseEntity();
+        Exercise exercise = new Exercise();
         ExerciseWrapper wrapper = new ExerciseWrapper(exercise);
         liveWrapper.setValue(wrapper);
         return liveWrapper;

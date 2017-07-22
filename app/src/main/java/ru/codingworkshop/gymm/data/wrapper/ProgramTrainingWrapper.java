@@ -10,10 +10,8 @@ import com.google.common.base.Preconditions;
 import java.util.Collection;
 import java.util.List;
 
-import ru.codingworkshop.gymm.data.entity.ProgramExerciseEntity;
-import ru.codingworkshop.gymm.data.entity.ProgramTrainingEntity;
-import ru.codingworkshop.gymm.data.model.ProgramExercise;
-import ru.codingworkshop.gymm.data.model.ProgramTraining;
+import ru.codingworkshop.gymm.data.entity.ProgramExercise;
+import ru.codingworkshop.gymm.data.entity.ProgramTraining;
 import ru.codingworkshop.gymm.repository.ProgramTrainingRepository;
 
 /**
@@ -71,13 +69,13 @@ public class ProgramTrainingWrapper {
     public void save(ProgramTrainingRepository repository) {
         Preconditions.checkState(hasProgramExercises(), "Must have children");
 
-        repository.updateProgramTraining((ProgramTrainingEntity) programTraining);
+        repository.updateProgramTraining(programTraining);
 
-        LiveData<List<ProgramExerciseEntity>> oldExercisesLive = repository.getProgramExercisesForTraining(programTraining);
+        LiveData<List<ProgramExercise>> oldExercisesLive = repository.getProgramExercisesForTraining(programTraining);
 
-        ExercisesDiff diff = new ExercisesDiff((List<ProgramExerciseEntity>)(List<?>) childrenDelegate.getChildren()) {
+        ExercisesDiff diff = new ExercisesDiff(childrenDelegate.getChildren()) {
             @Override
-            public void difference(List<ProgramExerciseEntity> toDelete, List<ProgramExerciseEntity> toUpdate, List<ProgramExerciseEntity> toInsert) {
+            public void difference(List<ProgramExercise> toDelete, List<ProgramExercise> toUpdate, List<ProgramExercise> toInsert) {
                 repository.updateProgramExercises(toUpdate);
                 repository.deleteProgramExercises(toDelete);
 
@@ -88,8 +86,8 @@ public class ProgramTrainingWrapper {
         oldExercisesLive.observeForever(diff);
     }
 
-    public static ProgramTrainingEntity createTraining() {
-        ProgramTrainingEntity programTraining = new ProgramTrainingEntity();
+    public static ProgramTraining createTraining() {
+        ProgramTraining programTraining = new ProgramTraining();
         programTraining.setDrafting(true);
         return programTraining;
     }
@@ -97,7 +95,7 @@ public class ProgramTrainingWrapper {
     public static LiveData<ProgramTrainingWrapper> createTraining(ProgramTrainingRepository repository) {
         Loader<ProgramTrainingWrapper> loader = new Loader<>(ProgramTrainingWrapper.class);
 
-        LiveData<ProgramTrainingEntity> draftingProgramTraining = repository.getDraftingProgramTraining();
+        LiveData<ProgramTraining> draftingProgramTraining = repository.getDraftingProgramTraining();
         loader.addSource(draftingProgramTraining, (wrapper, training) -> {
             if (training == null) {
                 repository.insertProgramTraining(createTraining());
@@ -123,9 +121,9 @@ public class ProgramTrainingWrapper {
         return loader.load();
     }
 
-    private static abstract class ExercisesDiff extends ChildrenDiff<ProgramExerciseEntity> implements Observer<List<ProgramExerciseEntity>> {
+    private static abstract class ExercisesDiff extends ChildrenDiff<ProgramExercise> implements Observer<List<ProgramExercise>> {
 
-        public ExercisesDiff(List<ProgramExerciseEntity> newChildren)
+        public ExercisesDiff(List<ProgramExercise> newChildren)
         {
             super(
                     null,
@@ -136,7 +134,7 @@ public class ProgramTrainingWrapper {
         }
 
         @Override
-        public void onChanged(@Nullable List<ProgramExerciseEntity> programExerciseEntities) {
+        public void onChanged(@Nullable List<ProgramExercise> programExerciseEntities) {
             oldChildren = programExerciseEntities;
             calculate();
         }

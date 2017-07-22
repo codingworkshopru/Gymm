@@ -5,7 +5,8 @@ import android.arch.persistence.room.ForeignKey;
 import android.arch.persistence.room.Index;
 import android.arch.persistence.room.PrimaryKey;
 
-import ru.codingworkshop.gymm.data.model.ProgramExercise;
+import ru.codingworkshop.gymm.data.entity.common.Model;
+import ru.codingworkshop.gymm.data.entity.common.Sortable;
 
 import static android.arch.persistence.room.ForeignKey.CASCADE;
 
@@ -17,14 +18,14 @@ import static android.arch.persistence.room.ForeignKey.CASCADE;
         tableName = "ProgramExercise",
         foreignKeys = {
                 @ForeignKey(
-                        entity = ProgramTrainingEntity.class,
+                        entity = ProgramTraining.class,
                         parentColumns = "id",
                         childColumns = "programTrainingId",
                         onDelete = CASCADE,
                         onUpdate = CASCADE
                 ),
                 @ForeignKey(
-                        entity = ExerciseEntity.class,
+                        entity = Exercise.class,
                         parentColumns = "id",
                         childColumns = "exerciseId",
                         onDelete = CASCADE,
@@ -36,7 +37,7 @@ import static android.arch.persistence.room.ForeignKey.CASCADE;
                 @Index("exerciseId")
         }
 )
-public class ProgramExerciseEntity implements ProgramExercise {
+public class ProgramExercise implements Model, Sortable {
     @PrimaryKey(autoGenerate = true)
     private long id;
     private long programTrainingId;
@@ -54,22 +55,18 @@ public class ProgramExerciseEntity implements ProgramExercise {
         this.id = id;
     }
 
-    @Override
     public long getProgramTrainingId() {
         return programTrainingId;
     }
 
-    @Override
     public void setProgramTrainingId(long programTrainingId) {
         this.programTrainingId = programTrainingId;
     }
 
-    @Override
     public long getExerciseId() {
         return exerciseId;
     }
 
-    @Override
     public void setExerciseId(long exerciseId) {
         this.exerciseId = exerciseId;
     }
@@ -84,12 +81,10 @@ public class ProgramExerciseEntity implements ProgramExercise {
         this.sortOrder = sortOrder;
     }
 
-    @Override
     public boolean isDrafting() {
         return drafting;
     }
 
-    @Override
     public void setDrafting(boolean drafting) {
         this.drafting = drafting;
     }

@@ -1,4 +1,4 @@
-package ru.codingworkshop.gymm.data.model.common;
+package ru.codingworkshop.gymm.data.entity.common;
 
 /**
  * Created by Радик on 05.06.2017.

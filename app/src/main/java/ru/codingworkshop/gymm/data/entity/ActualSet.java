@@ -1,7 +1,5 @@
 package ru.codingworkshop.gymm.data.entity;
 
-import android.arch.persistence.room.ColumnInfo;
-import android.arch.persistence.room.Delete;
 import android.arch.persistence.room.Entity;
 import android.arch.persistence.room.ForeignKey;
 import android.arch.persistence.room.Index;
@@ -9,7 +7,7 @@ import android.arch.persistence.room.PrimaryKey;
 
 import javax.annotation.Nullable;
 
-import ru.codingworkshop.gymm.data.model.ActualSet;
+import ru.codingworkshop.gymm.data.entity.common.Model;
 
 import static android.arch.persistence.room.ForeignKey.CASCADE;
 
@@ -21,7 +19,7 @@ import static android.arch.persistence.room.ForeignKey.CASCADE;
         tableName = "ActualSet",
         foreignKeys = {
                 @ForeignKey(
-                        entity = ActualExerciseEntity.class,
+                        entity = ActualExercise.class,
                         parentColumns = "id",
                         childColumns = "actualExerciseId",
                         onDelete = CASCADE,
@@ -30,7 +28,7 @@ import static android.arch.persistence.room.ForeignKey.CASCADE;
         },
         indices = @Index("actualExerciseId")
 )
-public class ActualSetEntity implements ActualSet {
+public class ActualSet implements Model {
     @PrimaryKey(autoGenerate = true)
     private long id;
     private long actualExerciseId;
@@ -47,32 +45,26 @@ public class ActualSetEntity implements ActualSet {
         this.id = id;
     }
 
-    @Override
     public long getActualExerciseId() {
         return actualExerciseId;
     }
 
-    @Override
     public void setActualExerciseId(long actualExerciseId) {
         this.actualExerciseId = actualExerciseId;
     }
 
-    @Override
     public int getReps() {
         return reps;
     }
 
-    @Override
     public void setReps(int reps) {
         this.reps = reps;
     }
 
-    @Override
     public @Nullable Double getWeight() {
         return weight;
     }
 
-    @Override
     public void setWeight(Double weight) {
         this.weight = weight;
     }

@@ -1,20 +1,15 @@
 package ru.codingworkshop.gymm.data.wrapper;
 
-import android.support.v7.util.DiffUtil;
-import android.support.v7.util.ListUpdateCallback;
-
 import com.google.common.collect.Lists;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import ru.codingworkshop.gymm.data.model.ProgramExercise;
-import ru.codingworkshop.gymm.data.model.common.Model;
+import ru.codingworkshop.gymm.data.entity.ProgramExercise;
 
 import static junit.framework.Assert.assertFalse;
 import static junit.framework.Assert.assertTrue;

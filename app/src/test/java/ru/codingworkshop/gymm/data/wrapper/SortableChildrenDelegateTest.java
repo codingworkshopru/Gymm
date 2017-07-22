@@ -11,7 +11,7 @@ import java.util.List;
 
 import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
-import ru.codingworkshop.gymm.data.model.common.Sortable;
+import ru.codingworkshop.gymm.data.entity.common.Sortable;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;

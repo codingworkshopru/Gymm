@@ -7,7 +7,7 @@
         <import type="android.view.View" />
         <variable
             name="training"
-            type="ru.codingworkshop.gymm.data.model.ProgramTraining" />
+            type="ru.codingworkshop.gymm.data.entity.ProgramTraining" />
     </data>
     <android.support.design.widget.CoordinatorLayout
         android:layout_width="match_parent"

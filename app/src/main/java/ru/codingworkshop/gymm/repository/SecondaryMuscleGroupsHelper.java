@@ -11,13 +11,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import ru.codingworkshop.gymm.data.entity.ExerciseEntity;
-import ru.codingworkshop.gymm.data.entity.MuscleGroupEntity;
-import ru.codingworkshop.gymm.data.entity.SecondaryMuscleGroupLinkEntity;
-import ru.codingworkshop.gymm.data.model.Exercise;
-import ru.codingworkshop.gymm.data.model.MuscleGroup;
-import ru.codingworkshop.gymm.data.model.common.Model;
-import ru.codingworkshop.gymm.data.model.common.Named;
+import ru.codingworkshop.gymm.data.entity.Exercise;
+import ru.codingworkshop.gymm.data.entity.MuscleGroup;
+import ru.codingworkshop.gymm.data.entity.SecondaryMuscleGroupLink;
+import ru.codingworkshop.gymm.data.entity.common.Model;
+import ru.codingworkshop.gymm.data.entity.common.Named;
 import ru.codingworkshop.gymm.db.dao.ExerciseDao;
 import ru.codingworkshop.gymm.db.dao.MuscleGroupDao;
 
@@ -36,37 +34,37 @@ final class SecondaryMuscleGroupsHelper {
         this.muscleGroupDao = muscleGroupDao;
     }
 
-    void updateLinks(ExerciseEntity exercise, List<MuscleGroupEntity> secondaryMuscleGroups) {
+    void updateLinks(Exercise exercise, List<MuscleGroup> secondaryMuscleGroups) {
         long exerciseId = exercise.getId();
         if (exerciseId == 0)
             throw new RuntimeException("Exercise doesn't exist: " + exercise.getName());
 
-        List<SecondaryMuscleGroupLinkEntity> oldLinksList =
+        List<SecondaryMuscleGroupLink> oldLinksList =
                 exerciseDao.getSecondaryMuscleGroupLinkSync(exerciseId);
-        List<SecondaryMuscleGroupLinkEntity> newLinksList =
+        List<SecondaryMuscleGroupLink> newLinksList =
                 createLinkInstances(exercise, secondaryMuscleGroups);
 
-        Set<SecondaryMuscleGroupLinkEntity> oldLinks = Sets.newHashSet(oldLinksList);
-        Set<SecondaryMuscleGroupLinkEntity> newLinks = Sets.newHashSet(newLinksList);
+        Set<SecondaryMuscleGroupLink> oldLinks = Sets.newHashSet(oldLinksList);
+        Set<SecondaryMuscleGroupLink> newLinks = Sets.newHashSet(newLinksList);
 
         exerciseDao.createLinks(Lists.newArrayList(Sets.difference(newLinks, oldLinks)));
         exerciseDao.deleteLinks(Lists.newArrayList(Sets.difference(oldLinks, newLinks)));
     }
 
-    void createExercises(List<ExerciseEntity> exercises) {
+    void createExercises(List<Exercise> exercises) {
         Map<String, Long> nameIdMuscleGroupsMap = createNameIdMap(muscleGroupDao.getAllMuscleGroupsSync());
-        for (ExerciseEntity exercise : exercises)
+        for (Exercise exercise : exercises)
             exercise.setPrimaryMuscleGroupId(nameIdMuscleGroupsMap.get(exercise.primaryMuscle));
         exerciseDao.insertExercises(exercises);
 
         Map<String, Long> nameIdExercisesMap = createNameIdMap(exerciseDao.getAllExercisesSync());
 
-        List<SecondaryMuscleGroupLinkEntity> links = new LinkedList<>();
-        for (ExerciseEntity exercise : exercises) {
+        List<SecondaryMuscleGroupLink> links = new LinkedList<>();
+        for (Exercise exercise : exercises) {
             if (exercise.secondaryMuscles == null) continue;
             links.addAll(
                     Lists.transform(exercise.secondaryMuscles, (name) ->
-                            new SecondaryMuscleGroupLinkEntity(
+                            new SecondaryMuscleGroupLink(
                                     nameIdExercisesMap.get(exercise.getName()),
                                     nameIdMuscleGroupsMap.get(name)
                             )
@@ -84,10 +82,10 @@ final class SecondaryMuscleGroupsHelper {
         return result;
     }
 
-    private static List<SecondaryMuscleGroupLinkEntity> createLinkInstances(Exercise e, List<? extends MuscleGroup> muscleGroups) {
+    private static List<SecondaryMuscleGroupLink> createLinkInstances(Exercise e, List<? extends MuscleGroup> muscleGroups) {
         return Lists.transform(
                 muscleGroups,
-                (mg) -> new SecondaryMuscleGroupLinkEntity(e.getId(), mg.getId())
+                (mg) -> new SecondaryMuscleGroupLink(e.getId(), mg.getId())
         );
     }
 }

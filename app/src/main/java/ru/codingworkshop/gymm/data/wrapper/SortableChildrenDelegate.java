@@ -9,7 +9,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
-import ru.codingworkshop.gymm.data.model.common.Sortable;
+import ru.codingworkshop.gymm.data.entity.common.Sortable;
 
 /**
  * Created by Радик on 13.07.2017.

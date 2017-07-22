@@ -3,15 +3,15 @@ package ru.codingworkshop.gymm.db;
 import android.arch.persistence.room.Database;
 import android.arch.persistence.room.RoomDatabase;
 
-import ru.codingworkshop.gymm.data.entity.ActualExerciseEntity;
-import ru.codingworkshop.gymm.data.entity.ActualSetEntity;
-import ru.codingworkshop.gymm.data.entity.ActualTrainingEntity;
-import ru.codingworkshop.gymm.data.entity.ExerciseEntity;
-import ru.codingworkshop.gymm.data.entity.MuscleGroupEntity;
-import ru.codingworkshop.gymm.data.entity.ProgramExerciseEntity;
-import ru.codingworkshop.gymm.data.entity.ProgramSetEntity;
-import ru.codingworkshop.gymm.data.entity.ProgramTrainingEntity;
-import ru.codingworkshop.gymm.data.entity.SecondaryMuscleGroupLinkEntity;
+import ru.codingworkshop.gymm.data.entity.ActualExercise;
+import ru.codingworkshop.gymm.data.entity.ActualSet;
+import ru.codingworkshop.gymm.data.entity.ActualTraining;
+import ru.codingworkshop.gymm.data.entity.Exercise;
+import ru.codingworkshop.gymm.data.entity.MuscleGroup;
+import ru.codingworkshop.gymm.data.entity.ProgramExercise;
+import ru.codingworkshop.gymm.data.entity.ProgramSet;
+import ru.codingworkshop.gymm.data.entity.ProgramTraining;
+import ru.codingworkshop.gymm.data.entity.SecondaryMuscleGroupLink;
 import ru.codingworkshop.gymm.db.dao.ActualTrainingDao;
 import ru.codingworkshop.gymm.db.dao.ExerciseDao;
 import ru.codingworkshop.gymm.db.dao.MuscleGroupDao;
@@ -24,15 +24,15 @@ import ru.codingworkshop.gymm.db.dao.ProgramTrainingDao;
 @Database(
         version = 1,
         entities = {
-                ActualTrainingEntity.class,
-                ActualExerciseEntity.class,
-                ActualSetEntity.class,
-                ExerciseEntity.class,
-                MuscleGroupEntity.class,
-                ProgramTrainingEntity.class,
-                ProgramExerciseEntity.class,
-                ProgramSetEntity.class,
-                SecondaryMuscleGroupLinkEntity.class
+                ActualTraining.class,
+                ActualExercise.class,
+                ActualSet.class,
+                Exercise.class,
+                MuscleGroup.class,
+                ProgramTraining.class,
+                ProgramExercise.class,
+                ProgramSet.class,
+                SecondaryMuscleGroupLink.class
         },
         exportSchema = false
 )
