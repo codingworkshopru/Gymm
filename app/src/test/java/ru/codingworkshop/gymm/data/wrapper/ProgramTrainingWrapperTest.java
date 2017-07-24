@@ -16,14 +16,19 @@ import java.util.stream.Collectors;
 
 import ru.codingworkshop.gymm.data.entity.ProgramExercise;
 import ru.codingworkshop.gymm.data.entity.ProgramTraining;
-import ru.codingworkshop.gymm.data.entity.common.Sortable;
 import ru.codingworkshop.gymm.data.util.LiveDataUtil;
 import ru.codingworkshop.gymm.repository.ProgramTrainingRepository;
 import ru.codingworkshop.gymm.util.LiveTest;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.argThat;
+import static org.mockito.Mockito.doAnswer;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 /**
  * Created by Радик on 20.06.2017.
@@ -49,75 +54,6 @@ public class ProgramTrainingWrapperTest {
 
         assertEquals("foo", wrapper.getProgramTraining().getName());
         assertEquals(1, wrapper.getProgramExercises().size());
-    }
-
-    @Test
-    public void addAndRemove() {
-        ProgramTrainingWrapper wrapper = new ProgramTrainingWrapper(new ProgramTraining());
-        ProgramExercise programExercise = new ProgramExercise();
-        wrapper.addProgramExercise(programExercise);
-
-        assertTrue(wrapper.hasProgramExercises());
-
-        wrapper.removeProgramExercise(programExercise);
-
-        assertFalse(wrapper.hasProgramExercises());
-    }
-
-    @Test
-    public void lastRemoved() {
-        ProgramTraining training = createTraining(1L, "foo");
-        ProgramTrainingWrapper wrapper = new ProgramTrainingWrapper(training);
-        List<ProgramExercise> exercises = createExercises(4);
-        wrapper.setProgramExercises(exercises);
-        wrapper.removeProgramExercise(exercises.get(0));
-
-        wrapper.restoreLastRemoved();
-        checkOrder(wrapper.getProgramExercises());
-        assertTrue(exercises.equals(wrapper.getProgramExercises()));
-    }
-
-    @Test
-    public void sortableTest() {
-        ProgramTrainingWrapper wrapper = new ProgramTrainingWrapper(new ProgramTraining());
-        checkOrder(wrapper.getProgramExercises());
-        List<ProgramExercise> exercises = createExercises(3);
-
-        exercises.forEach(wrapper::addProgramExercise);
-        checkOrder(wrapper.getProgramExercises());
-
-        exercises.forEach(exercise -> removeAndCheck(wrapper, exercise));
-        assertFalse(wrapper.hasProgramExercises());
-
-        Lists.reverse(exercises).forEach(wrapper::addProgramExercise);
-
-        wrapper.moveProgramExercise(2, 1);
-        checkOrder(wrapper.getProgramExercises());
-        wrapper.moveProgramExercise(0, 2);
-        checkOrder(wrapper.getProgramExercises());
-
-        for (int i = 0; i < exercises.size(); i++)
-            assertEquals(exercises.get(i), wrapper.getProgramExercises().get(i));
-    }
-
-    private void removeAndCheck(ProgramTrainingWrapper wrapper, ProgramExercise entity) {
-        wrapper.removeProgramExercise(entity);
-        checkOrder(wrapper.getProgramExercises());
-    }
-
-    private void checkOrder(List<? extends Sortable> sorted) {
-        if (sorted.isEmpty()) return;
-
-        for (int i = 0; i < sorted.size(); i++)
-            if (sorted.get(i).getSortOrder() != i)
-                fail("sort orders incorrect");
-    }
-
-    @Test(expected = UnsupportedOperationException.class)
-    public void testImmutability() {
-        ProgramTrainingWrapper wrapper = new ProgramTrainingWrapper(createTraining(1L, "foo"));
-        List<ProgramExercise> exercises = wrapper.getProgramExercises();
-        exercises.add(new ProgramExercise());
     }
 
     @Test
@@ -194,13 +130,13 @@ public class ProgramTrainingWrapperTest {
         ProgramTrainingWrapper wrapper = new ProgramTrainingWrapper(training);
 
         List<ProgramExercise> oldExercises = createExercises(4);
-        when(repository.getProgramExercisesForTraining(training)).thenReturn(LiveDataUtil.getLive(oldExercises));
+        when(repository.getProgramExercisesForTraining(1L)).thenReturn(LiveDataUtil.getLive(oldExercises));
 
         wrapper.setProgramExercises(Lists.newArrayList(oldExercises));
 
         wrapper.save(repository);
 
-        verify(repository).getProgramExercisesForTraining(training);
+        verify(repository).getProgramExercisesForTraining(1L);
         verify(repository).updateProgramTraining(training);
     }
 
@@ -214,7 +150,7 @@ public class ProgramTrainingWrapperTest {
         List<ProgramExercise> newExercises = createExercises(10);
         newExercises.forEach(wrapper::addProgramExercise);
 
-        when(repository.getProgramExercisesForTraining(training)).thenReturn(LiveDataUtil.getLive(oldExercises));
+        when(repository.getProgramExercisesForTraining(1L)).thenReturn(LiveDataUtil.getLive(oldExercises));
 
         Lists.newArrayList(0, 1, 5, 9).forEach(index -> wrapper.removeProgramExercise(newExercises.get(index)));
 
@@ -234,7 +170,7 @@ public class ProgramTrainingWrapperTest {
             8 3 2 6 7 4                 - after move from 5 to 0
          */
 
-        verify(repository).getProgramExercisesForTraining(training);
+        verify(repository).getProgramExercisesForTraining(1L);
         verify(repository).updateProgramTraining(training);
         verify(repository).deleteProgramExercises(argThat(
                 toDelete -> toDelete.containsAll(Lists.newArrayList(0,1,5,9).stream().map(oldExercises::get).collect(Collectors.toList()))

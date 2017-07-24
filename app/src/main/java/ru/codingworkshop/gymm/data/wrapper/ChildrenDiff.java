@@ -26,29 +26,28 @@ public abstract class ChildrenDiff<T> {
     }
 
     public void calculate() {
-        if (oldChildren == null || newChildren == null)
-            return;
+        if (oldChildren != null && newChildren != null) {
+            List<T> toDelete = Lists.newArrayList();
+            List<T> toUpdate = Lists.newArrayList();
+            List<T> toInsert = Lists.newArrayList();
 
-        List<T> toDelete = Lists.newArrayList();
-        List<T> toUpdate = Lists.newArrayList();
-        List<T> toInsert = Lists.newArrayList();
-
-        for (T oldChild : oldChildren) {
-            if (Collections2.filter(newChildren, newChild -> elementsAreSame.compare(oldChild, newChild) == 0).isEmpty()) {
-                toDelete.add(oldChild);
+            for (T oldChild : oldChildren) {
+                if (Collections2.filter(newChildren, newChild -> elementsAreSame.compare(oldChild, newChild) == 0).isEmpty()) {
+                    toDelete.add(oldChild);
+                }
             }
-        }
 
-        for (T newChild : newChildren) {
-            Collection<T> theSameOldChild = Collections2.filter(oldChildren, oldChild -> elementsAreSame.compare(oldChild, newChild) == 0);
-            if (theSameOldChild.isEmpty()) {
-                toInsert.add(newChild);
-            } else if (contentsAreEqual.compare(Iterables.getFirst(theSameOldChild, null), newChild) != 0) {
-                toUpdate.add(newChild);
+            for (T newChild : newChildren) {
+                Collection<T> theSameOldChild = Collections2.filter(oldChildren, oldChild -> elementsAreSame.compare(oldChild, newChild) == 0);
+                if (theSameOldChild.isEmpty()) {
+                    toInsert.add(newChild);
+                } else if (contentsAreEqual.compare(Iterables.getFirst(theSameOldChild, null), newChild) != 0) {
+                    toUpdate.add(newChild);
+                }
             }
-        }
 
-        difference(toDelete, toUpdate, toInsert);
+            difference(toDelete, toUpdate, toInsert);
+        }
     }
 
     public abstract void difference(List<T> toDelete, List<T> toUpdate, List<T> toInsert);

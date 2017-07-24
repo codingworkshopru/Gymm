@@ -67,7 +67,7 @@ public class ExerciseWrapper {
     }
 
     public static LiveData<ExerciseWrapper> load(long id, ExerciseDao exerciseDao) {
-        Loader<ExerciseWrapper> loader = new Loader<>(ExerciseWrapper.class);
+        Loader<ExerciseWrapper> loader = new Loader<>(ExerciseWrapper::new);
         loader.addSource(exerciseDao.getExerciseById(id), ExerciseWrapper::setExercise);
         loader.addSource(exerciseDao.getSecondaryMuscleGroupsForExercise(id), ExerciseWrapper::setSecondaryMuscleGroups);
         return loader.load();

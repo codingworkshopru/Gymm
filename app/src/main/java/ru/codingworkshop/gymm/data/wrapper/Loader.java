@@ -3,9 +3,11 @@ package ru.codingworkshop.gymm.data.wrapper;
 import android.arch.core.util.Function;
 import android.arch.lifecycle.LiveData;
 import android.arch.lifecycle.MediatorLiveData;
+import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.Transformations;
+import android.support.annotation.Nullable;
 
-import java.lang.reflect.Constructor;
+import com.google.common.base.Supplier;
 
 import ru.codingworkshop.gymm.data.util.BiConsumer;
 
@@ -19,27 +21,29 @@ public class Loader<Wrapper> {
     private boolean initialized;
     private int countdown;
 
-    public Loader(Class<Wrapper> wrapperClass) {
+    public Loader(Supplier<Wrapper> wrapperSupplier) {
         liveWrapper = new MediatorLiveData<>();
-        wrapper = instantiateWrapper(wrapperClass);
-    }
-
-    private Wrapper instantiateWrapper(Class<Wrapper> wrapperClass) {
-        try {
-            Constructor<Wrapper> constructor = wrapperClass.getDeclaredConstructor();
-            constructor.setAccessible(true);
-            return constructor.newInstance();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-        return null;
+        wrapper = wrapperSupplier.get();
     }
 
     public <T> void addSource(LiveData<T> source, BiConsumer<Wrapper, T> resultSetter) {
+        addSource(source, loaded -> resultSetter.accept(wrapper, loaded));
+    }
+
+    public <T> void addSource(LiveData<T> source, BiConsumer<Wrapper, T> resultSetter, Runnable ifNullReturned) {
+        addSource(source, loaded -> {
+            if (loaded != null) {
+                resultSetter.accept(wrapper, loaded);
+            } else {
+                ifNullReturned.run();
+            }
+        });
+    }
+
+    private <T> void addSource(LiveData<T> source, Observer<T> observer) {
         countdown++;
         liveWrapper.addSource(source, loaded -> {
-            resultSetter.accept(wrapper, loaded);
+            observer.onChanged(loaded);
             afterSourceLoaded();
         });
     }
@@ -48,7 +52,9 @@ public class Loader<Wrapper> {
         countdown++;
         LiveData<F> l = Transformations.switchMap(dependency, sourceGetter);
         liveWrapper.addSource(l, loaded -> {
-            resultSetter.accept(wrapper, loaded);
+            if (loaded != null) { // not set null value
+                resultSetter.accept(wrapper, loaded);
+            }
             afterSourceLoaded();
         });
     }

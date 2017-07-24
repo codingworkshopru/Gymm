@@ -12,6 +12,7 @@ import java.util.List;
 
 import ru.codingworkshop.gymm.data.entity.ProgramExercise;
 import ru.codingworkshop.gymm.data.entity.ProgramTraining;
+import ru.codingworkshop.gymm.data.entity.common.Model;
 import ru.codingworkshop.gymm.repository.ProgramTrainingRepository;
 
 /**
@@ -22,7 +23,6 @@ public class ProgramTrainingWrapper {
     private ProgramTraining programTraining;
     private SortableChildrenDelegate<ProgramExercise> childrenDelegate = new SortableChildrenDelegate<>();
 
-    @SuppressWarnings("unused")
     private ProgramTrainingWrapper() {}
 
     ProgramTrainingWrapper(@NonNull ProgramTraining programTraining) {
@@ -33,7 +33,7 @@ public class ProgramTrainingWrapper {
         return programTraining;
     }
 
-    public void setProgramTraining(ProgramTraining programTraining) {
+    public void setProgramTraining(@NonNull ProgramTraining programTraining) {
         this.programTraining = programTraining;
     }
 
@@ -41,7 +41,7 @@ public class ProgramTrainingWrapper {
         return childrenDelegate.getChildren();
     }
 
-    public void setProgramExercises(Collection<? extends ProgramExercise> programExercises) {
+    public void setProgramExercises(Collection<ProgramExercise> programExercises) {
         childrenDelegate.setChildren(programExercises);
     }
 
@@ -54,10 +54,6 @@ public class ProgramTrainingWrapper {
         childrenDelegate.add(programExercise);
     }
 
-    public void restoreLastRemoved() {
-        childrenDelegate.restoreLastRemoved();
-    }
-
     public void removeProgramExercise(@NonNull ProgramExercise programExercise) {
         childrenDelegate.remove(programExercise);
     }
@@ -66,24 +62,11 @@ public class ProgramTrainingWrapper {
         childrenDelegate.move(from, to);
     }
 
-    public void save(ProgramTrainingRepository repository) {
+    public void save(@NonNull ProgramTrainingRepository repository) {
         Preconditions.checkState(hasProgramExercises(), "Must have children");
 
         repository.updateProgramTraining(programTraining);
-
-        LiveData<List<ProgramExercise>> oldExercisesLive = repository.getProgramExercisesForTraining(programTraining);
-
-        ExercisesDiff diff = new ExercisesDiff(childrenDelegate.getChildren()) {
-            @Override
-            public void difference(List<ProgramExercise> toDelete, List<ProgramExercise> toUpdate, List<ProgramExercise> toInsert) {
-                repository.updateProgramExercises(toUpdate);
-                repository.deleteProgramExercises(toDelete);
-
-                oldExercisesLive.removeObserver(this);
-            }
-        };
-
-        oldExercisesLive.observeForever(diff);
+        new ExercisesSaver(repository, programTraining, childrenDelegate.getChildren());
     }
 
     public static ProgramTraining createTraining() {
@@ -93,16 +76,15 @@ public class ProgramTrainingWrapper {
     }
 
     public static LiveData<ProgramTrainingWrapper> createTraining(ProgramTrainingRepository repository) {
-        Loader<ProgramTrainingWrapper> loader = new Loader<>(ProgramTrainingWrapper.class);
+        Loader<ProgramTrainingWrapper> loader = new Loader<>(ProgramTrainingWrapper::new);
 
         LiveData<ProgramTraining> draftingProgramTraining = repository.getDraftingProgramTraining();
-        loader.addSource(draftingProgramTraining, (wrapper, training) -> {
-            if (training == null) {
-                repository.insertProgramTraining(createTraining());
-            } else {
-                wrapper.setProgramTraining(training);
-            }
-        });
+        loader.addSource(
+                draftingProgramTraining,
+                ProgramTrainingWrapper::setProgramTraining,
+                () -> repository.insertProgramTraining(createTraining())
+        );
+
         loader.addDependentSource( // FIXME this may not work because of insertion above
                 draftingProgramTraining,
                 repository::getProgramExercisesForTraining,
@@ -113,24 +95,38 @@ public class ProgramTrainingWrapper {
     }
 
     public static LiveData<ProgramTrainingWrapper> load(long id, ProgramTrainingRepository repository) {
-        Loader<ProgramTrainingWrapper> loader = new Loader<>(ProgramTrainingWrapper.class);
+        Loader<ProgramTrainingWrapper> loader = new Loader<>(ProgramTrainingWrapper::new);
 
-        loader.addSource(repository.getProgramTrainingById(id), ProgramTrainingWrapper::setProgramTraining);
+        loader.addSource(repository.getProgramTrainingById(id),  ProgramTrainingWrapper::setProgramTraining);
         loader.addSource(repository.getProgramExercisesForTraining(id), ProgramTrainingWrapper::setProgramExercises);
 
         return loader.load();
     }
 
-    private static abstract class ExercisesDiff extends ChildrenDiff<ProgramExercise> implements Observer<List<ProgramExercise>> {
+    private static class ExercisesSaver extends ChildrenDiff<ProgramExercise> implements Observer<List<ProgramExercise>> {
+        private ProgramTrainingRepository repository;
+        private LiveData<List<ProgramExercise>> oldExercisesLive;
 
-        public ExercisesDiff(List<ProgramExercise> newChildren)
-        {
+        public ExercisesSaver(ProgramTrainingRepository repository, Model parent, List<ProgramExercise> newChildren) {
             super(
                     null,
                     newChildren,
                     (oldOne, newOne) -> oldOne.getId() == newOne.getId() ? 0 : 1,
                     (oldOne, newOne) -> oldOne.getSortOrder() - newOne.getSortOrder()
             );
+
+            this.repository = repository;
+
+            oldExercisesLive = repository.getProgramExercisesForTraining(parent.getId());
+            oldExercisesLive.observeForever(this);
+        }
+
+        @Override
+        public void difference(List<ProgramExercise> toDelete, List<ProgramExercise> toUpdate, List<ProgramExercise> toInsert) {
+            repository.updateProgramExercises(toUpdate);
+            repository.deleteProgramExercises(toDelete);
+
+            oldExercisesLive.removeObserver(this);
         }
 
         @Override

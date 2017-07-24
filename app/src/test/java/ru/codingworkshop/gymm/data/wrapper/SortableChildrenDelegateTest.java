@@ -68,6 +68,13 @@ public class SortableChildrenDelegateTest {
         assertSortOrder(delegate);
     }
 
+    @Test(expected = UnsupportedOperationException.class)
+    public void testImmutability() {
+        SortableChildrenDelegate<Sortable> delegate = new SortableChildrenDelegate<>();
+        delegate.getChildren().add(mock(Sortable.class));
+
+    }
+
     @Test(expected = IllegalArgumentException.class)
     public void absentDeletionTest() {
         SortableChildrenDelegate<Sortable> delegate = new SortableChildrenDelegate<>(fill(Lists.newArrayList(3,2,1,0)));
