@@ -21,6 +21,7 @@ import ru.codingworkshop.gymm.repository.ProgramTrainingRepository;
 import ru.codingworkshop.gymm.util.LiveTest;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.argThat;
@@ -57,6 +58,17 @@ public class ProgramTrainingWrapperTest {
     }
 
     @Test
+    public void restoreRemoved() {
+        ProgramTrainingWrapper wrapper = new ProgramTrainingWrapper(createTraining(1L, "foo"));
+        ProgramExercise exercise = createExercises(1).get(0);
+        wrapper.addProgramExercise(exercise);
+        wrapper.removeProgramExercise(exercise);
+        assertFalse(wrapper.hasProgramExercises());
+        wrapper.restoreLastRemoved();
+        assertTrue(wrapper.hasProgramExercises());
+    }
+
+    @Test
     public void loadDrafting() {
         ProgramTraining training = createTraining(1L, "foo");
         training.setDrafting(true);
@@ -82,12 +94,8 @@ public class ProgramTrainingWrapperTest {
         draftingTraining.setValue(null);
         when(repository.getDraftingProgramTraining()).thenReturn(draftingTraining);
 
-        when(repository.getProgramExercisesForTraining(null)).thenReturn(LiveDataUtil.getLive(Lists.newArrayList()));
-
-        ProgramTraining drafting = new ProgramTraining();
-        drafting.setDrafting(true);
         doAnswer((a) -> {
-            draftingTraining.setValue(drafting);
+            draftingTraining.setValue(ProgramTrainingWrapper.createTraining());
             return null;
         }).when(repository).insertProgramTraining(any(ProgramTraining.class));
 
@@ -97,6 +105,7 @@ public class ProgramTrainingWrapperTest {
         );
 
         verify(repository).getDraftingProgramTraining();
+        verify(repository).insertProgramTraining(any(ProgramTraining.class));
         verify(repository, never()).getProgramExercisesForTraining(null);
     }
 

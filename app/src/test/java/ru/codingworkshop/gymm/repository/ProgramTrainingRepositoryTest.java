@@ -11,6 +11,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 
 import java.util.List;
+import java.util.function.Predicate;
 
 import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
@@ -22,6 +23,7 @@ import ru.codingworkshop.gymm.db.dao.ProgramTrainingDao;
 import ru.codingworkshop.gymm.util.LiveTest;
 
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -163,11 +165,13 @@ public class ProgramTrainingRepositoryTest {
 
     @Test
     public void queryDraftingProgramExercise() {
-        ProgramTraining training = getProgramTraining(1, "foo", false).getValue();
-        when(dao.getDraftingProgramExercise(1)).thenReturn(getProgramExercise(2, training.getId(), true));
+        ProgramTraining training = getProgramTraining(1L, "foo", false).getValue();
+        when(dao.getDraftingProgramExercise(1L)).thenReturn(getProgramExercise(2, training.getId(), true));
 
-        LiveTest.verifyLiveData(repository.getDraftingProgramExercise(training), returned -> returned.getId() == 2 && returned.isDrafting());
-        verify(dao).getDraftingProgramExercise(1);
+        Predicate<ProgramExercise> check = returned -> returned.getId() == 2 && returned.isDrafting();
+        LiveTest.verifyLiveData(repository.getDraftingProgramExercise(training), check);
+        LiveTest.verifyLiveData(repository.getDraftingProgramExercise(1L), check);
+        verify(dao, times(2)).getDraftingProgramExercise(1L);
     }
 
     @Test
@@ -266,6 +270,24 @@ public class ProgramTrainingRepositoryTest {
         when(dao.getProgramSetsForExercise(exercise.getId())).thenReturn(list);
         LiveTest.verifyLiveData(
                 repository.getProgramSetsForExercise(exercise),
+                returned -> !returned.isEmpty()
+                        && returned.get(0).getId() == 3
+                        && returned.get(0).getProgramExerciseId() == 2
+                        && returned.get(0).getReps() == 1
+        );
+
+        verify(dao).getProgramSetsForExercise(2);
+    }
+
+    @Test
+    public void queryProgramSetsForExerciseId() {
+        ProgramExercise exercise = getProgramExercise(2, 1, false).getValue();
+        ProgramSet set = getProgramSet(3, 2, 1).getValue();
+        LiveData<List<ProgramSet>> list = LiveDataUtil.getLive(Lists.newArrayList(set));
+
+        when(dao.getProgramSetsForExercise(exercise.getId())).thenReturn(list);
+        LiveTest.verifyLiveData(
+                repository.getProgramSetsForExercise(exercise.getId()),
                 returned -> !returned.isEmpty()
                         && returned.get(0).getId() == 3
                         && returned.get(0).getProgramExerciseId() == 2

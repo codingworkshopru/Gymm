@@ -5,7 +5,6 @@ import android.arch.lifecycle.LiveData;
 import android.arch.lifecycle.MediatorLiveData;
 import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.Transformations;
-import android.support.annotation.Nullable;
 
 import com.google.common.base.Supplier;
 
@@ -26,6 +25,10 @@ public class Loader<Wrapper> {
         wrapper = wrapperSupplier.get();
     }
 
+    public LiveData<Wrapper> load() {
+        return liveWrapper;
+    }
+
     public <T> void addSource(LiveData<T> source, BiConsumer<Wrapper, T> resultSetter) {
         addSource(source, loaded -> resultSetter.accept(wrapper, loaded));
     }
@@ -40,27 +43,21 @@ public class Loader<Wrapper> {
         });
     }
 
+    public <T, F> void addDependentSource(LiveData<T> dependency, Function<T, LiveData<F>> sourceGetter, BiConsumer<Wrapper, F> resultSetter) {
+        LiveData<F> l = Transformations.switchMap(dependency, sourceGetter);
+        addSource(l, loaded -> {
+            if (loaded != null) { // not set null value
+                resultSetter.accept(wrapper, loaded);
+            }
+        });
+    }
+
     private <T> void addSource(LiveData<T> source, Observer<T> observer) {
         countdown++;
         liveWrapper.addSource(source, loaded -> {
             observer.onChanged(loaded);
             afterSourceLoaded();
         });
-    }
-
-    public <T, F> void addDependentSource(LiveData<T> dependency, Function<T, LiveData<F>> sourceGetter, BiConsumer<Wrapper, F> resultSetter) {
-        countdown++;
-        LiveData<F> l = Transformations.switchMap(dependency, sourceGetter);
-        liveWrapper.addSource(l, loaded -> {
-            if (loaded != null) { // not set null value
-                resultSetter.accept(wrapper, loaded);
-            }
-            afterSourceLoaded();
-        });
-    }
-
-    public LiveData<Wrapper> load() {
-        return liveWrapper;
     }
 
     private void afterSourceLoaded() {

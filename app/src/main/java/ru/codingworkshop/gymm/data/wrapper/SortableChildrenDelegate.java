@@ -38,9 +38,7 @@ public class SortableChildrenDelegate<C extends Sortable> {
     }
 
     public void remove(@NonNull C child) {
-        if (!children.remove(child)) {
-            throw new IllegalArgumentException("The child doesn't exists here");
-        }
+        Preconditions.checkArgument(children.remove(child), "The child doesn't exists here");
         lastRemoved = child;
         updateSortOrders(child.getSortOrder());
     }
@@ -57,7 +55,7 @@ public class SortableChildrenDelegate<C extends Sortable> {
 
     private void insert(int position, C element) {
         children.add(position, element);
-        updateSortOrders(position);
+        updateSortOrders(position + 1);
     }
 
     public void setChildren(@NonNull Collection<? extends C> children) {

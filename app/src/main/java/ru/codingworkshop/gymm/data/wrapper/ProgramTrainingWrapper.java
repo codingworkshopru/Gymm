@@ -62,6 +62,10 @@ public class ProgramTrainingWrapper {
         childrenDelegate.move(from, to);
     }
 
+    public void restoreLastRemoved() {
+        childrenDelegate.restoreLastRemoved();
+    }
+
     public void save(@NonNull ProgramTrainingRepository repository) {
         Preconditions.checkState(hasProgramExercises(), "Must have children");
 

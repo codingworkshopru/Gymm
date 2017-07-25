@@ -17,7 +17,6 @@ import javax.inject.Singleton;
 import ru.codingworkshop.gymm.data.entity.ProgramExercise;
 import ru.codingworkshop.gymm.data.entity.ProgramSet;
 import ru.codingworkshop.gymm.data.entity.ProgramTraining;
-import ru.codingworkshop.gymm.data.entity.common.Model;
 import ru.codingworkshop.gymm.data.entity.common.Named;
 import ru.codingworkshop.gymm.db.dao.ProgramTrainingDao;
 import timber.log.Timber;
@@ -66,7 +65,7 @@ public class ProgramTrainingRepository {
     }
 
     public LiveData<List<ProgramExercise>> getProgramExercisesForTraining(@NonNull ProgramTraining programTraining) {
-        return dao.getProgramExercisesForTraining(programTraining.getId());
+        return getProgramExercisesForTraining(programTraining.getId());
     }
 
     public LiveData<List<ProgramExercise>> getProgramExercisesForTraining(long trainingId) {
@@ -78,8 +77,12 @@ public class ProgramTrainingRepository {
     }
 
     public LiveData<ProgramExercise> getDraftingProgramExercise(@NonNull ProgramTraining training) {
-        checkModelId(training);
-        return dao.getDraftingProgramExercise(training.getId());
+        return getDraftingProgramExercise(training.getId());
+    }
+
+    public LiveData<ProgramExercise> getDraftingProgramExercise(long programTrainingId) {
+        isValidId(programTrainingId);
+        return dao.getDraftingProgramExercise(programTrainingId);
     }
 
     public void insertProgramExercise(ProgramExercise programExercise) {
@@ -113,7 +116,11 @@ public class ProgramTrainingRepository {
     }
 
     public LiveData<List<ProgramSet>> getProgramSetsForExercise(@NonNull ProgramExercise exercise) {
-        return dao.getProgramSetsForExercise(exercise.getId());
+        return getProgramSetsForExercise(exercise.getId());
+    }
+
+    public LiveData<List<ProgramSet>> getProgramSetsForExercise(long id) {
+        return dao.getProgramSetsForExercise(id);
     }
 
     public LiveData<ProgramSet> getProgramSetById(long id) {
@@ -175,10 +182,6 @@ public class ProgramTrainingRepository {
 
     private void checkName(@NonNull Named named) {
         Preconditions.checkArgument(named.getName() != null && !named.getName().isEmpty());
-    }
-
-    private void checkModelId(Model model) {
-        Preconditions.checkArgument(isValidId(model.getId()));
     }
 
     private boolean isValidId(long id) {

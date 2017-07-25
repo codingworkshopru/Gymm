@@ -19,7 +19,7 @@ import ru.codingworkshop.gymm.db.dao.MuscleGroupDao;
  */
 
 @Singleton
-public final class ExercisesRepository {
+public class ExercisesRepository {
     private final ExerciseDao exerciseDao;
     private final SecondaryMuscleGroupsHelper helper;
     private final Executor executor;

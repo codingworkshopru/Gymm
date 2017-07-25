@@ -26,6 +26,24 @@ import static org.mockito.Mockito.when;
 
 @RunWith(JUnitParamsRunner.class)
 public class SortableChildrenDelegateTest {
+    private static final class SimpleSortable implements Sortable {
+        private int sortOrder = 0;
+
+        public SimpleSortable(int sortOrder) {
+            this.sortOrder = sortOrder;
+        }
+
+        @Override
+        public int getSortOrder() {
+            return sortOrder;
+        }
+
+        @Override
+        public void setSortOrder(int sortOrder) {
+            this.sortOrder = sortOrder;
+        }
+    }
+
     @Test
     public void additionTest() {
         SortableChildrenDelegate<Sortable> delegate = new SortableChildrenDelegate<>();
@@ -51,17 +69,8 @@ public class SortableChildrenDelegateTest {
 
     @Test
     @Parameters({"2", "0", "4"})
-    public void deletionTest(int index) {
+    public void removeTest(int index) {
         SortableChildrenDelegate<Sortable> delegate = new SortableChildrenDelegate<>(fill(Lists.newArrayList(2,0,3,4,1)));
-
-        for (int i = index + 1; i < delegate.getChildren().size(); i++) {
-            Sortable s = delegate.getChildren().get(i);
-            Answer<Object> answer = invocation -> {
-                when(s.getSortOrder()).thenReturn((int) invocation.getArguments()[0]);
-                return null;
-            };
-            doAnswer(answer).when(s).setSortOrder(i - 1);
-        }
 
         delegate.remove(index);
 
@@ -72,7 +81,17 @@ public class SortableChildrenDelegateTest {
     public void testImmutability() {
         SortableChildrenDelegate<Sortable> delegate = new SortableChildrenDelegate<>();
         delegate.getChildren().add(mock(Sortable.class));
+    }
 
+    @Test
+    public void changeDelegateAndCheckChildrenList() {
+        SortableChildrenDelegate<Sortable> delegate = new SortableChildrenDelegate<>();
+        List<Sortable> children = delegate.getChildren();
+
+        delegate.add(mock(Sortable.class));
+        assertEquals(1, children.size());
+        delegate.remove(0);
+        assertEquals(0, children.size());
     }
 
     @Test(expected = IllegalArgumentException.class)
@@ -83,13 +102,13 @@ public class SortableChildrenDelegateTest {
 
     @Test
     public void restoreLastRemovedTest() {
-        SortableChildrenDelegate<Sortable> delegate = new SortableChildrenDelegate<>(fill(Lists.newArrayList(3,2,1,0)));
-        Sortable s = mock(Sortable.class);
-        doAnswer(invocation -> {when(s.getSortOrder()).thenReturn(4); return null;}).when(s).setSortOrder(4);
-        delegate.add(s);
-        delegate.remove(s);
+        List<Sortable> sortables = fill(Lists.newArrayList(0,1,2,3));
+        SortableChildrenDelegate<Sortable> delegate = new SortableChildrenDelegate<>(sortables);
+
+        Sortable toRemove = sortables.get(2);
+        delegate.remove(toRemove);
         delegate.restoreLastRemoved();
-        assertEquals(s, delegate.getChildren().get(4));
+        assertEquals(toRemove, delegate.getChildren().get(2));
         assertSortOrder(delegate);
     }
 
@@ -115,8 +134,7 @@ public class SortableChildrenDelegateTest {
     private List<Sortable> fill(List<Integer> orders) {
         List<Sortable> children = Lists.newLinkedList();
         orders.forEach(n -> {
-            Sortable s = mock(Sortable.class);
-            when(s.getSortOrder()).thenReturn(n);
+            SimpleSortable s = new SimpleSortable(n);
             children.add(s);
         });
         return children;
