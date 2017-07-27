@@ -5,6 +5,7 @@ import android.arch.persistence.room.Dao;
 import android.arch.persistence.room.Insert;
 import android.arch.persistence.room.Query;
 
+import java.util.Collection;
 import java.util.List;
 
 import ru.codingworkshop.gymm.data.entity.MuscleGroup;
@@ -26,9 +27,6 @@ public interface MuscleGroupDao {
     @Query("select count(*) from MuscleGroup")
     int getMuscleGroupsCount();
 
-    @Query("select * from MuscleGroup where id = :id")
-    LiveData<MuscleGroup> getMuscleGroupById(long id);
-
     @Insert(onConflict = FAIL)
-    void insertMuscleGroups(List<MuscleGroup> muscleGroups);
+    void insertMuscleGroups(Collection<MuscleGroup> muscleGroups);
 }

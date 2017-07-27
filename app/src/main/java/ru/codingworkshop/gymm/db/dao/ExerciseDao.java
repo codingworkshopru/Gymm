@@ -24,20 +24,11 @@ public interface ExerciseDao {
     @Query("select * from exercise")
     LiveData<List<Exercise>> getAllExercises();
 
-    @Query("select * from exercise")
-    List<Exercise> getAllExercisesSync();
-
     @Query("select * from exercise where primaryMuscleGroupId = :id")
     LiveData<List<Exercise>> getExercisesForPrimaryMuscleGroup(long id);
 
     @Query("select * from exercise where id = :id")
     LiveData<Exercise> getExerciseById(long id);
-
-    @Query("select * from exercise where name = :name")
-    Exercise getExerciseByName(String name);
-
-    @Query("select * from exercise where id = :id")
-    Exercise getExerciseByIdSync(long id);
 
     @Query("select count(*) from exercise")
     int getExercisesCount();
@@ -58,24 +49,9 @@ public interface ExerciseDao {
     )
     LiveData<List<MuscleGroup>> getSecondaryMuscleGroupsForExercise(long exerciseId);
 
-    @Query("select * from SecondaryMuscleGroupLink where exerciseId = :exerciseId ")
-    List<SecondaryMuscleGroupLink> getSecondaryMuscleGroupLinkSync(long exerciseId);
-
     @Insert(onConflict = FAIL)
-    void insertExercises(List<Exercise> entities);
-
-    @Insert(onConflict = FAIL)
-    void insertExercise(Exercise exercise);
-
-    @Update(onConflict = FAIL)
-    void updateExercise(Exercise exercise);
-
-    @Delete
-    void deleteExercise(Exercise exercise);
+    List<Long> insertExercises(List<Exercise> entities);
 
     @Insert(onConflict = FAIL)
     void createLinks(List<SecondaryMuscleGroupLink> links);
-
-    @Delete
-    void deleteLinks(List<SecondaryMuscleGroupLink> link);
 }

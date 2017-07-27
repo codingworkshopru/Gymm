@@ -2,6 +2,7 @@ package ru.codingworkshop.gymm.repository;
 
 import android.arch.lifecycle.LiveData;
 
+import java.util.Collection;
 import java.util.List;
 
 import javax.inject.Inject;
@@ -31,7 +32,7 @@ public final class MuscleGroupsRepository {
         return muscleGroupDao.getAllMuscleGroups();
     }
 
-    public void insertMuscleGroups(List<MuscleGroup> muscleGroups) {
+    public void insertMuscleGroups(Collection<MuscleGroup> muscleGroups) {
         muscleGroupDao.insertMuscleGroups(muscleGroups);
     }
 }
