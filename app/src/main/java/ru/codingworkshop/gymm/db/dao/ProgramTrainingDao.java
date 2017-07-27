@@ -79,9 +79,18 @@ public interface ProgramTrainingDao {
     @Insert
     long insertProgramSet(ProgramSet programSet);
 
+    @Insert
+    List<Long> insertProgramSets(Collection<ProgramSet> programSets);
+
     @Delete
     int deleteProgramSet(ProgramSet programSet);
 
+    @Delete
+    int deleteProgramSets(Collection<ProgramSet> programSets);
+
     @Update
     int updateProgramSet(ProgramSet programSet);
+
+    @Update
+    int updateProgramSets(Collection<ProgramSet> programSets);
 }

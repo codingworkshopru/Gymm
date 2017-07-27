@@ -6,13 +6,13 @@ import android.arch.lifecycle.MutableLiveData;
 
 import com.google.common.collect.Lists;
 
+import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
 
 import java.util.List;
-import java.util.Objects;
 
 import ru.codingworkshop.gymm.data.entity.Exercise;
 import ru.codingworkshop.gymm.data.entity.ProgramExercise;
@@ -27,6 +27,7 @@ import static junit.framework.Assert.assertFalse;
 import static junit.framework.Assert.assertNotNull;
 import static junit.framework.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
@@ -41,6 +42,18 @@ import static org.mockito.Mockito.when;
 public class ProgramExerciseWrapperTest {
     @Rule
     public InstantTaskExecutorRule instantTaskExecutorRule = new InstantTaskExecutorRule();
+
+    private ExercisesRepository exercisesRepository;
+
+    @Before
+    public void init() {
+        Exercise exercise = new Exercise();
+        exercise.setId(100L);
+        exercise.setName("foobar");
+
+        exercisesRepository = mock(ExercisesRepository.class);
+        when(exercisesRepository.getExerciseById(100L)).thenReturn(LiveDataUtil.getLive(exercise));
+    }
 
     @Test
     public void settingWrappedValues() {
@@ -57,6 +70,7 @@ public class ProgramExerciseWrapperTest {
     @Test
     public void creationProgramExercise() {
         ProgramExercise exercise = ProgramExerciseWrapper.createProgramExercise(1L);
+        assertEquals(0, exercise.getExerciseId());
         assertTrue(exercise.isDrafting());
         assertEquals(1L, exercise.getProgramTrainingId());
     }
@@ -101,37 +115,49 @@ public class ProgramExerciseWrapperTest {
         ProgramTrainingRepository repository = mock(ProgramTrainingRepository.class);
         when(repository.getDraftingProgramExercise(1L)).thenReturn(liveProgramExercise);
 
+        when(exercisesRepository.getExerciseById(0L)).thenReturn(LiveDataUtil.getLive(null));
+
         doAnswer(invocation -> {
             liveProgramExercise.setValue(ProgramExerciseWrapper.createProgramExercise(1L));
             return null;
         }).when(repository).insertProgramExercise(any(ProgramExercise.class));
 
-        LiveData<ProgramExerciseWrapper> wrapper = ProgramExerciseWrapper.createProgramExercise(repository, 1L);
-        LiveTest.verifyLiveData(wrapper, w -> w.getProgramExercise().isDrafting() && w.getProgramExercise().getProgramTrainingId() == 1L);
+        LiveData<ProgramExerciseWrapper> wrapper = ProgramExerciseWrapper.createProgramExercise(repository, exercisesRepository, 1L);
+        LiveTest.verifyLiveData(
+                wrapper,
+                w -> w.getProgramExercise().isDrafting()
+                        && w.getProgramExercise().getProgramTrainingId() == 1L
+                        && w.getExercise() == null
+        );
 
         verify(repository).getDraftingProgramExercise(1L);
         verify(repository).insertProgramExercise(any(ProgramExercise.class));
-        verify(repository, never()).getProgramSetsForExercise(2L);
+        verify(exercisesRepository).getExerciseById(0L);
+        verify(repository).getProgramSetsForExercise(liveProgramExercise.getValue());
     }
 
     @Test
     public void loadDrafting() {
-        LiveData<ProgramExercise> draftingExercise = LiveDataUtil.getLive(ProgramExerciseWrapper.createProgramExercise(1L));
-        draftingExercise.getValue().setId(2L);
+        LiveData<ProgramExercise> draftingExercise = LiveDataUtil.getLive(createExercise());
+        draftingExercise.getValue().setDrafting(true);
         LiveData<List<ProgramSet>> sets = LiveDataUtil.getLive(createSets(10));
 
         ProgramTrainingRepository repository = mock(ProgramTrainingRepository.class);
         when(repository.getDraftingProgramExercise(1L)).thenReturn(draftingExercise);
         when(repository.getProgramSetsForExercise(draftingExercise.getValue())).thenReturn(sets);
 
+        LiveData<ProgramExerciseWrapper> liveWrapper = ProgramExerciseWrapper.createProgramExercise(repository, exercisesRepository, 1L);
+
         LiveTest.verifyLiveData(
-                ProgramExerciseWrapper.createProgramExercise(repository, 1L),
+                liveWrapper,
                 wrapper -> wrapper.getProgramExercise().getProgramTrainingId() == 1L
                         && wrapper.getProgramExercise().getId() == 2L
                         && wrapper.getProgramExercise().isDrafting()
                         && wrapper.getProgramSets().size() == 10
+                        && wrapper.getExercise().getId() == 100L
         );
 
+        verify(exercisesRepository).getExerciseById(100L);
         verify(repository).getDraftingProgramExercise(1L);
         verify(repository).getProgramSetsForExercise(draftingExercise.getValue());
         verify(repository, never()).insertProgramExercise(any());
@@ -139,12 +165,6 @@ public class ProgramExerciseWrapperTest {
 
     @Test
     public void load() {
-        Exercise exercise = new Exercise();
-        exercise.setId(100L);
-
-        ExercisesRepository exercisesRepository = mock(ExercisesRepository.class);
-        when(exercisesRepository.getExerciseById(100L)).thenReturn(LiveDataUtil.getLive(exercise));
-
         LiveData<ProgramExercise> loadedExercise = LiveDataUtil.getLive(createExercise());
         LiveData<List<ProgramSet>> sets = LiveDataUtil.getLive(createSets(10));
 
@@ -170,10 +190,30 @@ public class ProgramExerciseWrapperTest {
 
     @Test
     public void saveAll() {
-        ProgramTrainingRepository repository = mock(ProgramTrainingRepository.class);
         ProgramExerciseWrapper wrapper = new ProgramExerciseWrapper();
-        wrapper.setProgramExercise(createExercise());
-        wrapper.setProgramSets(createSets(10));
+
+        ProgramExercise programExercise = createExercise();
+        wrapper.setProgramExercise(programExercise);
+
+        List<ProgramSet> oldSets = createSets(10);
+        List<ProgramSet> newSets = Lists.newArrayList(oldSets);
+        newSets.removeIf(set -> set.getId() % 2 == 0);
+        ProgramSet newSet = new ProgramSet();
+        newSet.setId(51L);
+        newSets.add(newSet);
+        wrapper.setProgramSets(newSets);
+
+        wrapper.move(2, 4);
+
+        ProgramTrainingRepository repository = mock(ProgramTrainingRepository.class);
+        when(repository.getProgramSetsForExercise(programExercise)).thenReturn(LiveDataUtil.getLive(oldSets));
+        wrapper.save(repository);
+
+        verify(repository).getProgramSetsForExercise(programExercise);
+        verify(repository).updateProgramExercise(programExercise);
+        verify(repository).insertProgramSets(argThat(sets -> sets.size() == 1 && sets.stream().findFirst().get() == newSet));
+        verify(repository).deleteProgramSets(argThat(sets -> sets.stream().allMatch(set -> set.getId() % 2 == 0)));
+        verify(repository).updateProgramSets(argThat(sets -> sets.stream().allMatch(set -> set.getId() >= 2 && set.getId() <= 4)));
     }
 
     private ProgramExercise createExercise() {

@@ -1,8 +1,9 @@
 package ru.codingworkshop.gymm.data.wrapper;
 
-import android.arch.core.util.Function;
 import android.arch.lifecycle.LiveData;
 import android.support.annotation.NonNull;
+
+import com.google.common.base.Preconditions;
 
 import java.util.Collection;
 import java.util.List;
@@ -70,6 +71,30 @@ public class ProgramExerciseWrapper {
         childrenDelegate.restoreLastRemoved();
     }
 
+    public void save(@NonNull ProgramTrainingRepository repository) {
+        Preconditions.checkState(hasProgramSets(), "Must have children");
+
+        repository.updateProgramExercise(programExercise);
+        ChildrenSaver<ProgramSet> saver = new ChildrenSaver<ProgramSet>(repository.getProgramSetsForExercise(programExercise), getProgramSets()) {
+            @Override
+            public void update(List<ProgramSet> toUpdate) {
+                repository.updateProgramSets(toUpdate);
+            }
+
+            @Override
+            public void delete(List<ProgramSet> toDelete) {
+                repository.deleteProgramSets(toDelete);
+            }
+
+            @Override
+            public void insert(List<ProgramSet> toInsert) {
+                repository.insertProgramSets(toInsert);
+            }
+        };
+
+        saver.save();
+    }
+
     public static ProgramExercise createProgramExercise(long programTrainingId) {
         ProgramExercise programExercise = new ProgramExercise();
         programExercise.setProgramTrainingId(programTrainingId);
@@ -77,7 +102,7 @@ public class ProgramExerciseWrapper {
         return programExercise;
     }
 
-    public static LiveData<ProgramExerciseWrapper> createProgramExercise(ProgramTrainingRepository repository, long programTrainingId) {
+    public static LiveData<ProgramExerciseWrapper> createProgramExercise(ProgramTrainingRepository repository, ExercisesRepository exercisesRepository, long programTrainingId) {
         Loader<ProgramExerciseWrapper> loader = new Loader<>(ProgramExerciseWrapper::new);
 
         LiveData<ProgramExercise> draftingProgramExercise = repository.getDraftingProgramExercise(programTrainingId);
@@ -85,6 +110,12 @@ public class ProgramExerciseWrapper {
                 draftingProgramExercise,
                 ProgramExerciseWrapper::setProgramExercise,
                 () -> repository.insertProgramExercise(createProgramExercise(programTrainingId))
+        );
+
+        loader.addDependentSource(
+                draftingProgramExercise,
+                programExercise -> exercisesRepository.getExerciseById(programExercise.getExerciseId()),
+                ProgramExerciseWrapper::setExercise
         );
 
         loader.addDependentSource(

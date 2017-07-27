@@ -12,6 +12,7 @@ import org.junit.runner.RunWith;
 
 import java.util.List;
 import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
@@ -215,12 +216,11 @@ public class ProgramTrainingRepositoryTest {
 
     @Test
     public void updateProgramExercises() {
-        List<ProgramExercise> exercisesToUpdate = Lists.newArrayList();
-        for (long i = 2; i < 6; i++) {
-            ProgramExercise exercise = getProgramExercise(i, 1, false).getValue();
+        List<ProgramExercise> exercisesToUpdate = Lists.newArrayList(2,3,4,5).stream().map(id -> {
+            ProgramExercise exercise = getProgramExercise(id, 1, false).getValue();
             exercise.setExerciseId(10);
-            exercisesToUpdate.add(exercise);
-        }
+            return exercise;
+        }).collect(Collectors.toList());
 
         when(dao.updateProgramExercises(exercisesToUpdate)).thenReturn(exercisesToUpdate.size());
 
@@ -247,12 +247,11 @@ public class ProgramTrainingRepositoryTest {
 
     @Test
     public void deleteProgramExercises() {
-        List<ProgramExercise> exercisesToDelete = Lists.newArrayList();
-        for (long i = 2; i < 6; i++) {
-            ProgramExercise exercise = getProgramExercise(i, 1, false).getValue();
+        List<ProgramExercise> exercisesToDelete = Lists.newArrayList(2,3,4,5).stream().map(id -> {
+            ProgramExercise exercise = getProgramExercise(id, 1, false).getValue();
             exercise.setExerciseId(10);
-            exercisesToDelete.add(exercise);
-        }
+            return exercise;
+        }).collect(Collectors.toList());
 
         when(dao.deleteProgramExercises(exercisesToDelete)).thenReturn(exercisesToDelete.size());
 
@@ -306,12 +305,25 @@ public class ProgramTrainingRepositoryTest {
 
     @Test
     public void insertProgramSet() {
-        ProgramSet set = getProgramSet(3, 2, 1).getValue();
+        ProgramSet set = getProgramSet(3L, 2L, 1).getValue();
         when(dao.insertProgramSet(set)).thenReturn(set.getId());
 
         repository.insertProgramSet(set);
 
         verify(dao).insertProgramSet(set);
+    }
+
+    @Test
+    public void insertProgramSets() {
+        List<Long> setIds = Lists.newArrayList(1L, 2L, 3L);
+        List<ProgramSet> sets = setIds.stream().map(
+                id -> getProgramSet(id, 2L, id.intValue() * 10).getValue()
+        ).collect(Collectors.toList());
+        when(dao.insertProgramSets(sets)).thenReturn(setIds);
+
+        repository.insertProgramSets(sets);
+
+        verify(dao).insertProgramSets(sets);
     }
 
     @Test(expected = IllegalArgumentException.class)
@@ -341,6 +353,19 @@ public class ProgramTrainingRepositoryTest {
         verify(dao).updateProgramSet(set);
     }
 
+    @Test
+    public void updateProgramSets() {
+        List<Long> setIds = Lists.newArrayList(1L, 2L, 3L);
+        List<ProgramSet> sets = setIds.stream().map(
+                id -> getProgramSet(id, 2L, id.intValue() * 10).getValue()
+        ).collect(Collectors.toList());
+        when(dao.updateProgramSets(sets)).thenReturn(3);
+
+        repository.updateProgramSets(sets);
+
+        verify(dao).updateProgramSets(sets);
+    }
+
     @Test(expected = IllegalArgumentException.class)
     @Parameters(method = "invalidProgramSets")
     public void updateProgramSetWithZeroRepsAndWithoutExercise(ProgramSet set) {
@@ -355,6 +380,19 @@ public class ProgramTrainingRepositoryTest {
         repository.deleteProgramSet(set);
 
         verify(dao).deleteProgramSet(set);
+    }
+
+    @Test
+    public void deleteProgramSets() {
+        List<Long> setIds = Lists.newArrayList(1L, 2L, 3L);
+        List<ProgramSet> sets = setIds.stream().map(
+                id -> getProgramSet(id, 2L, id.intValue() * 10).getValue()
+        ).collect(Collectors.toList());
+        when(dao.deleteProgramSets(sets)).thenReturn(3);
+
+        repository.deleteProgramSets(sets);
+
+        verify(dao).deleteProgramSets(sets);
     }
 
     private static LiveData<ProgramTraining> getProgramTraining(long id, String name, boolean drafting) {

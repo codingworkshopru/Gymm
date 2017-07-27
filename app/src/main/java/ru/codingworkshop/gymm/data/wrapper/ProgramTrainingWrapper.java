@@ -70,7 +70,23 @@ public class ProgramTrainingWrapper {
         Preconditions.checkState(hasProgramExercises(), "Must have children");
 
         repository.updateProgramTraining(programTraining);
-        new ExercisesSaver(repository, programTraining, childrenDelegate.getChildren());
+        ChildrenSaver<ProgramExercise> saver = new ChildrenSaver<ProgramExercise>(repository.getProgramExercisesForTraining(programTraining), getProgramExercises()) {
+            @Override
+            public void update(List<ProgramExercise> toUpdate) {
+                repository.updateProgramExercises(toUpdate);
+            }
+
+            @Override
+            public void delete(List<ProgramExercise> toDelete) {
+                repository.deleteProgramExercises(toDelete);
+            }
+
+            @Override
+            public void insert(List<ProgramExercise> toInsert) {
+            }
+        };
+
+        saver.save();
     }
 
     public static ProgramTraining createTraining() {
@@ -105,38 +121,5 @@ public class ProgramTrainingWrapper {
         loader.addSource(repository.getProgramExercisesForTraining(id), ProgramTrainingWrapper::setProgramExercises);
 
         return loader.load();
-    }
-
-    private static class ExercisesSaver extends ChildrenDiff<ProgramExercise> implements Observer<List<ProgramExercise>> {
-        private ProgramTrainingRepository repository;
-        private LiveData<List<ProgramExercise>> oldExercisesLive;
-
-        public ExercisesSaver(ProgramTrainingRepository repository, Model parent, List<ProgramExercise> newChildren) {
-            super(
-                    null,
-                    newChildren,
-                    (oldOne, newOne) -> oldOne.getId() == newOne.getId() ? 0 : 1,
-                    (oldOne, newOne) -> oldOne.getSortOrder() - newOne.getSortOrder()
-            );
-
-            this.repository = repository;
-
-            oldExercisesLive = repository.getProgramExercisesForTraining(parent.getId());
-            oldExercisesLive.observeForever(this);
-        }
-
-        @Override
-        public void difference(List<ProgramExercise> toDelete, List<ProgramExercise> toUpdate, List<ProgramExercise> toInsert) {
-            repository.updateProgramExercises(toUpdate);
-            repository.deleteProgramExercises(toDelete);
-
-            oldExercisesLive.removeObserver(this);
-        }
-
-        @Override
-        public void onChanged(@Nullable List<ProgramExercise> programExerciseEntities) {
-            oldChildren = programExerciseEntities;
-            calculate();
-        }
     }
 }

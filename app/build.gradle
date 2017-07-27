@@ -41,7 +41,7 @@ ext {
     timber = "4.5.1"
 
     espresso = "2.2.2"
-    mockito = "2.8.9"
+    mockito = "2.8.47"
     junit = "4.12"
     junit_params = "1.1.0"
 }

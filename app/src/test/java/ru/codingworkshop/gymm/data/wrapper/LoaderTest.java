@@ -26,25 +26,34 @@ import static org.mockito.Mockito.verify;
 public class LoaderTest {
     private static final class SimpleWrapper {
         private Long number;
-        private String anotherValue;
+        private String string;
+        private Boolean bool;
 
         private SimpleWrapper() {
         }
 
-        void setWrappedValue(Long myNumber) {
+        void setLong(Long myNumber) {
             number = myNumber;
         }
 
-        Long getWrappedValue() {
+        Long getLong() {
             return number;
         }
 
-        void setAnotherValue(String value) {
-            anotherValue = value;
+        void setString(String value) {
+            string = value;
         }
 
-        String getAnotherValue() {
-            return anotherValue;
+        String getString() {
+            return string;
+        }
+
+        public void setBool(Boolean bool) {
+            this.bool = bool;
+        }
+
+        public Boolean getBool() {
+            return bool;
         }
     }
 
@@ -56,79 +65,90 @@ public class LoaderTest {
         Loader<SimpleWrapper> loader = new Loader<>(SimpleWrapper::new);
         MutableLiveData<Long> liveData = new MutableLiveData<>();
         liveData.setValue(1L);
-        loader.addSource(liveData, SimpleWrapper::setWrappedValue);
+        loader.addSource(liveData, SimpleWrapper::setLong);
         LiveData<SimpleWrapper> resultWrapper = loader.load();
 
         Observer<SimpleWrapper> observer = mock(Observer.class);
         resultWrapper.observeForever(observer);
-        verify(observer).onChanged(argThat(returned -> returned.getWrappedValue() == 1L));
+        verify(observer).onChanged(argThat(returned -> returned.getLong() == 1L));
 
         liveData.setValue(2L);
-        verify(observer, times(2)).onChanged(argThat(returned -> returned.getWrappedValue() == 2L));
+        verify(observer, times(2)).onChanged(argThat(returned -> returned.getLong() == 2L));
     }
 
     @Test
     public void runIfSourceIsNull() {
-        Loader<SimpleWrapper> loader = new Loader<>(SimpleWrapper::new);
-        LiveData<SimpleWrapper> liveWrapper = loader.load();
         MutableLiveData<Long> longData = new MutableLiveData<>();
-        Runnable runnable = mock(Runnable.class);
-        longData.setValue(1L);
-
-        loader.addSource(longData, SimpleWrapper::setWrappedValue, runnable);
-        LiveTest.verifyLiveData(liveWrapper, w -> w.getWrappedValue() == 1L);
-
         longData.setValue(null);
-        LiveTest.verifyLiveData(liveWrapper, w -> w.getWrappedValue() == 1L);
+
+        MutableLiveData<String> stringData = new MutableLiveData<>();
+        stringData.setValue("foo");
+
+        Loader<SimpleWrapper> loader = new Loader<>(SimpleWrapper::new);
+        Runnable runnable = mock(Runnable.class);
+        loader.addSource(longData, SimpleWrapper::setLong, runnable);
+        loader.addDependentSource(longData, l -> getLiveString("foo" + l), SimpleWrapper::setString);
+        loader.addDependentSource(longData, l -> {
+            MutableLiveData<Boolean> boolData = new MutableLiveData<>();
+            boolData.setValue(l == null);
+            return boolData;
+        }, SimpleWrapper::setBool);
+
+        LiveData<SimpleWrapper> liveWrapper = loader.load();
+        LiveTest.verifyLiveData(liveWrapper, w -> w.getLong() == null);
 
         verify(runnable).run();
     }
 
     @Test
     public void loadValuesToWrapperConsistently() {
-        Loader<SimpleWrapper> loader = new Loader<>(SimpleWrapper::new);
         MutableLiveData<Long> liveLong = new MutableLiveData<>();
         liveLong.setValue(1L);
 
-        loader.addSource(liveLong, SimpleWrapper::setWrappedValue);
-        loader.addDependentSource(liveLong, this::getStringWithLong, SimpleWrapper::setAnotherValue);
+        Loader<SimpleWrapper> loader = new Loader<>(SimpleWrapper::new);
+        loader.addSource(liveLong, SimpleWrapper::setLong);
+        loader.addDependentSource(liveLong, l -> getLiveString("foo" + l), SimpleWrapper::setString);
+        loader.addDependentSource(liveLong, l -> {
+            MutableLiveData<Boolean> liveBool = new MutableLiveData<>();
+            liveBool.setValue(l == 1L);
+            return liveBool;
+        }, SimpleWrapper::setBool);
 
         Observer<SimpleWrapper> observer = mock(Observer.class);
         loader.load().observeForever(observer);
-        verify(observer, times(1)).onChanged(argThat(
-                wrapper -> wrapper.getWrappedValue() == 1L
-                        && wrapper.getAnotherValue().equals("foo1")
+        verify(observer).onChanged(argThat(
+                wrapper -> wrapper.getLong() == 1L
+                        && wrapper.getString().equals("foo1")
+                        && wrapper.getBool()
         ));
 
         liveLong.setValue(2L);
 
-        verify(observer, times(3)).onChanged(argThat(
-                wrapper -> wrapper.getWrappedValue() == 2L
-                        && wrapper.getAnotherValue().equals("foo2")
+        verify(observer, times(4)).onChanged(argThat(
+                wrapper -> wrapper.getLong() == 2L
+                        && wrapper.getString().equals("foo2")
+                        && !wrapper.getBool()
         ));
     }
 
     @Test
     public void loadingNullValueFromDependentSource() {
-        Loader<SimpleWrapper> loader = new Loader<>(SimpleWrapper::new);
         MutableLiveData<Long> liveLong = new MutableLiveData<>();
-        MutableLiveData<String> liveString = new MutableLiveData<>();
         liveLong.setValue(1L);
+
+        MutableLiveData<String> liveString = new MutableLiveData<>();
         liveString.setValue("foo");
 
-        loader.addSource(liveLong, SimpleWrapper::setWrappedValue);
-        loader.addDependentSource(liveLong, (l) -> liveString, SimpleWrapper::setAnotherValue);
+        Loader<SimpleWrapper> loader = new Loader<>(SimpleWrapper::new);
+        loader.addSource(liveLong, SimpleWrapper::setLong);
+        loader.addDependentSource(liveLong, l -> liveString, SimpleWrapper::setString);
 
         LiveData<SimpleWrapper> liveWrapper = loader.load();
-        LiveTest.verifyLiveData(liveWrapper, wrapper -> wrapper.getAnotherValue().equals("foo"));
+        LiveTest.verifyLiveData(liveWrapper, wrapper -> wrapper.getString().equals("foo"));
 
         liveLong.setValue(2L);
 
-        LiveTest.verifyLiveData(liveWrapper, wrapper -> wrapper.getAnotherValue().equals("foo"));
-    }
-
-    private LiveData<String> getStringWithLong(long number) {
-        return getLiveString("foo" + number);
+        LiveTest.verifyLiveData(liveWrapper, wrapper -> wrapper.getString().equals("foo"));
     }
 
     private LiveData<String> getLiveString(@Nullable String value) {

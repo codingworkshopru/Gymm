@@ -28,6 +28,7 @@ import static ru.codingworkshop.gymm.db.GymmDatabase.INVALID_ID;
  */
 
 @Singleton
+@SuppressWarnings("Guava")
 public class ProgramTrainingRepository {
     private final ProgramTrainingDao dao;
     private final Executor executor;
@@ -132,9 +133,24 @@ public class ProgramTrainingRepository {
         performInsert(dao::insertProgramSet, set);
     }
 
+    public void insertProgramSets(@NonNull Collection<ProgramSet> sets) {
+        for (ProgramSet set : sets) {
+            checkProgramSet(set);
+        }
+
+        performInsert(dao::insertProgramSets, sets);
+    }
+
     public void updateProgramSet(@NonNull ProgramSet set) {
         checkProgramSet(set);
         performUpdate(dao::updateProgramSet, set);
+    }
+
+    public void updateProgramSets(@NonNull Collection<ProgramSet> sets) {
+        for (ProgramSet set : sets) {
+            checkProgramSet(set);
+        }
+        performUpdate(dao::updateProgramSets, sets);
     }
 
     private void checkProgramSet(@NonNull ProgramSet set) {
@@ -146,8 +162,22 @@ public class ProgramTrainingRepository {
         performDelete(dao::deleteProgramSet, set);
     }
 
+    public void deleteProgramSets(@NonNull Collection<ProgramSet> sets) {
+        performDelete(dao::deleteProgramSets, sets);
+    }
+
     private <F> void performInsert(Function<F, Long> insert, F entity) {
         executor.execute(() -> checkInsertion(insert.apply(entity)));
+    }
+
+    private <F> void performInsert(Function<Collection<F>, List<Long>> insert, Collection<F> entities) {
+        if (entities.isEmpty()) return;
+        executor.execute(() -> {
+            List<Long> ids = insert.apply(entities);
+            for (long id : ids) {
+                checkInsertion(id);
+            }
+        });
     }
 
     private <F> void performDelete(Function<F, Integer> delete, F entity) {

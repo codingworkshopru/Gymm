@@ -139,13 +139,13 @@ public class ProgramTrainingWrapperTest {
         ProgramTrainingWrapper wrapper = new ProgramTrainingWrapper(training);
 
         List<ProgramExercise> oldExercises = createExercises(4);
-        when(repository.getProgramExercisesForTraining(1L)).thenReturn(LiveDataUtil.getLive(oldExercises));
+        when(repository.getProgramExercisesForTraining(training)).thenReturn(LiveDataUtil.getLive(oldExercises));
 
         wrapper.setProgramExercises(Lists.newArrayList(oldExercises));
 
         wrapper.save(repository);
 
-        verify(repository).getProgramExercisesForTraining(1L);
+        verify(repository).getProgramExercisesForTraining(training);
         verify(repository).updateProgramTraining(training);
     }
 
@@ -159,7 +159,7 @@ public class ProgramTrainingWrapperTest {
         List<ProgramExercise> newExercises = createExercises(10);
         newExercises.forEach(wrapper::addProgramExercise);
 
-        when(repository.getProgramExercisesForTraining(1L)).thenReturn(LiveDataUtil.getLive(oldExercises));
+        when(repository.getProgramExercisesForTraining(training)).thenReturn(LiveDataUtil.getLive(oldExercises));
 
         Lists.newArrayList(0, 1, 5, 9).forEach(index -> wrapper.removeProgramExercise(newExercises.get(index)));
 
@@ -179,7 +179,7 @@ public class ProgramTrainingWrapperTest {
             8 3 2 6 7 4                 - after move from 5 to 0
          */
 
-        verify(repository).getProgramExercisesForTraining(1L);
+        verify(repository).getProgramExercisesForTraining(training);
         verify(repository).updateProgramTraining(training);
         verify(repository).deleteProgramExercises(argThat(
                 toDelete -> toDelete.containsAll(Lists.newArrayList(0,1,5,9).stream().map(oldExercises::get).collect(Collectors.toList()))

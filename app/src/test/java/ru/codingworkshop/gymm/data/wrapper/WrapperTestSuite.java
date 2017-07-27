@@ -9,7 +9,7 @@ import org.junit.runners.Suite;
 
 @RunWith(Suite.class)
 @Suite.SuiteClasses({
-        ChildrenDiffTest.class,
+        ChildrenSaverTest.class,
         ExerciseWrapperTest.class,
         LoaderTest.class,
         ProgramExerciseWrapperTest.class,
@@ -17,5 +17,5 @@ import org.junit.runners.Suite;
         SortableChildrenDelegateTest.class
 })
 public class WrapperTestSuite {
-    // container class
+    // useless class
 }
