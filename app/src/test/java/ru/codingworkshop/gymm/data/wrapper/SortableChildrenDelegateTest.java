@@ -4,7 +4,6 @@ import com.google.common.collect.Lists;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.stubbing.Answer;
 
 import java.util.Collection;
 import java.util.List;
@@ -12,11 +11,11 @@ import java.util.List;
 import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
 import ru.codingworkshop.gymm.data.entity.common.Sortable;
+import ru.codingworkshop.gymm.util.SimpleModel;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
-import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -26,23 +25,6 @@ import static org.mockito.Mockito.when;
 
 @RunWith(JUnitParamsRunner.class)
 public class SortableChildrenDelegateTest {
-    private static final class SimpleSortable implements Sortable {
-        private int sortOrder = 0;
-
-        public SimpleSortable(int sortOrder) {
-            this.sortOrder = sortOrder;
-        }
-
-        @Override
-        public int getSortOrder() {
-            return sortOrder;
-        }
-
-        @Override
-        public void setSortOrder(int sortOrder) {
-            this.sortOrder = sortOrder;
-        }
-    }
 
     @Test
     public void additionTest() {
@@ -134,7 +116,7 @@ public class SortableChildrenDelegateTest {
     private List<Sortable> fill(List<Integer> orders) {
         List<Sortable> children = Lists.newLinkedList();
         orders.forEach(n -> {
-            SimpleSortable s = new SimpleSortable(n);
+            SimpleModel s = new SimpleModel(n, n);
             children.add(s);
         });
         return children;

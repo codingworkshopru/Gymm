@@ -13,9 +13,8 @@ import org.junit.runners.JUnit4;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import ru.codingworkshop.gymm.data.entity.common.Model;
-import ru.codingworkshop.gymm.data.entity.common.Sortable;
 import ru.codingworkshop.gymm.data.util.LiveDataUtil;
+import ru.codingworkshop.gymm.util.SimpleModel;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -33,27 +32,27 @@ public class ChildrenSaverTest {
 
     @Test
     public void simpleSave() {
-        List<SimpleSortable> oldChildren = Lists.newArrayList(1L, 2L, 3L).stream().map(id -> new SimpleSortable(id, id.intValue())).collect(Collectors.toList());
-        List<SimpleSortable> newChildren = Lists.newArrayList(2L, 3L, 4L).stream().map(id -> new SimpleSortable(id, id.intValue())).collect(Collectors.toList());
+        List<SimpleModel> oldChildren = Lists.newArrayList(1L, 2L, 3L).stream().map(id -> new SimpleModel(id, id.intValue())).collect(Collectors.toList());
+        List<SimpleModel> newChildren = Lists.newArrayList(2L, 3L, 4L).stream().map(id -> new SimpleModel(id, id.intValue())).collect(Collectors.toList());
         newChildren.get(1).setSortOrder(10);
 
-        LiveData<List<SimpleSortable>> oldChildrenLive = LiveDataUtil.getLive(oldChildren);
+        LiveData<List<SimpleModel>> oldChildrenLive = LiveDataUtil.getLive(oldChildren);
 
-        ChildrenSaver<SimpleSortable> saver = new ChildrenSaver<SimpleSortable>(oldChildrenLive, newChildren) {
+        ChildrenSaver<SimpleModel> saver = new ChildrenSaver<SimpleModel>(oldChildrenLive, newChildren) {
             @Override
-            public void update(List<SimpleSortable> toUpdate) {
+            public void update(List<SimpleModel> toUpdate) {
                 assertEquals(1, toUpdate.size());
                 assertEquals(3L, toUpdate.get(0).getId());
             }
 
             @Override
-            public void delete(List<SimpleSortable> toDelete) {
+            public void delete(List<SimpleModel> toDelete) {
                 assertEquals(1, toDelete.size());
                 assertEquals(1L, toDelete.get(0).getId());
             }
 
             @Override
-            public void insert(List<SimpleSortable> toInsert) {
+            public void insert(List<SimpleModel> toInsert) {
                 assertEquals(1, toInsert.size());
                 assertEquals(4L, toInsert.get(0).getId());
             }
@@ -66,22 +65,22 @@ public class ChildrenSaverTest {
 
     @Test
     public void saveWhenOnlyNew() {
-        LiveData<List<SimpleSortable>> oldChildrenLive = LiveDataUtil.getLive(Lists.newArrayList());
-        List<SimpleSortable> newChildren = Lists.newArrayList(1L, 2L, 3L).stream().map(id -> new SimpleSortable(id, id.intValue())).collect(Collectors.toList());
+        LiveData<List<SimpleModel>> oldChildrenLive = LiveDataUtil.getLive(Lists.newArrayList());
+        List<SimpleModel> newChildren = Lists.newArrayList(1L, 2L, 3L).stream().map(id -> new SimpleModel(id, id.intValue())).collect(Collectors.toList());
 
-        ChildrenSaver<SimpleSortable> saver = new ChildrenSaver<SimpleSortable>(oldChildrenLive, newChildren) {
+        ChildrenSaver<SimpleModel> saver = new ChildrenSaver<SimpleModel>(oldChildrenLive, newChildren) {
             @Override
-            public void update(List<SimpleSortable> toUpdate) {
+            public void update(List<SimpleModel> toUpdate) {
                 assertTrue(toUpdate.isEmpty());
             }
 
             @Override
-            public void delete(List<SimpleSortable> toDelete) {
+            public void delete(List<SimpleModel> toDelete) {
                 assertTrue(toDelete.isEmpty());
             }
 
             @Override
-            public void insert(List<SimpleSortable> toInsert) {
+            public void insert(List<SimpleModel> toInsert) {
                 assertEquals(newChildren, toInsert);
             }
         };
@@ -91,23 +90,23 @@ public class ChildrenSaverTest {
 
     @Test
     public void saveWhenOnlyOld() {
-        List<SimpleSortable> oldChildren = Lists.newArrayList(1L, 2L, 3L).stream().map(id -> new SimpleSortable(id, id.intValue())).collect(Collectors.toList());
-        LiveData<List<SimpleSortable>> oldChildrenLive = LiveDataUtil.getLive(oldChildren);
-        List<SimpleSortable> newChildren = Lists.newArrayList();
+        List<SimpleModel> oldChildren = Lists.newArrayList(1L, 2L, 3L).stream().map(id -> new SimpleModel(id, id.intValue())).collect(Collectors.toList());
+        LiveData<List<SimpleModel>> oldChildrenLive = LiveDataUtil.getLive(oldChildren);
+        List<SimpleModel> newChildren = Lists.newArrayList();
 
-        ChildrenSaver<SimpleSortable> saver = new ChildrenSaver<SimpleSortable>(oldChildrenLive, newChildren) {
+        ChildrenSaver<SimpleModel> saver = new ChildrenSaver<SimpleModel>(oldChildrenLive, newChildren) {
             @Override
-            public void update(List<SimpleSortable> toUpdate) {
+            public void update(List<SimpleModel> toUpdate) {
                 assertTrue(toUpdate.isEmpty());
             }
 
             @Override
-            public void delete(List<SimpleSortable> toDelete) {
+            public void delete(List<SimpleModel> toDelete) {
                 assertEquals(oldChildren, toDelete);
             }
 
             @Override
-            public void insert(List<SimpleSortable> toInsert) {
+            public void insert(List<SimpleModel> toInsert) {
                 assertTrue(toInsert.isEmpty());
             }
         };
@@ -117,23 +116,23 @@ public class ChildrenSaverTest {
 
     @Test
     public void saveWhenOnlyUpdated() {
-        List<SimpleSortable> oldChildren = Lists.newArrayList(1L, 2L, 3L).stream().map(id -> new SimpleSortable(id, id.intValue())).collect(Collectors.toList());
-        LiveData<List<SimpleSortable>> oldChildrenLive = LiveDataUtil.getLive(oldChildren);
-        List<SimpleSortable> newChildren = Lists.newArrayList(1L, 2L, 3L).stream().map(id -> new SimpleSortable(id, id.intValue() + 1)).collect(Collectors.toList());
+        List<SimpleModel> oldChildren = Lists.newArrayList(1L, 2L, 3L).stream().map(id -> new SimpleModel(id, id.intValue())).collect(Collectors.toList());
+        LiveData<List<SimpleModel>> oldChildrenLive = LiveDataUtil.getLive(oldChildren);
+        List<SimpleModel> newChildren = Lists.newArrayList(1L, 2L, 3L).stream().map(id -> new SimpleModel(id, id.intValue() + 1)).collect(Collectors.toList());
 
-        ChildrenSaver<SimpleSortable> saver = new ChildrenSaver<SimpleSortable>(oldChildrenLive, newChildren) {
+        ChildrenSaver<SimpleModel> saver = new ChildrenSaver<SimpleModel>(oldChildrenLive, newChildren) {
             @Override
-            public void update(List<SimpleSortable> toUpdate) {
+            public void update(List<SimpleModel> toUpdate) {
                 assertEquals(newChildren, toUpdate);
             }
 
             @Override
-            public void delete(List<SimpleSortable> toDelete) {
+            public void delete(List<SimpleModel> toDelete) {
                 assertTrue(toDelete.isEmpty());
             }
 
             @Override
-            public void insert(List<SimpleSortable> toInsert) {
+            public void insert(List<SimpleModel> toInsert) {
                 assertTrue(toInsert.isEmpty());
             }
         };
@@ -141,33 +140,4 @@ public class ChildrenSaverTest {
         saver.save();
     }
 
-    private static final class SimpleSortable implements Model, Sortable {
-        private long id;
-        private int sortOrder;
-
-        private SimpleSortable(long id, int sortOrder) {
-            this.id = id;
-            this.sortOrder = sortOrder;
-        }
-
-        @Override
-        public long getId() {
-            return id;
-        }
-
-        @Override
-        public void setId(long id) {
-            this.id = id;
-        }
-
-        @Override
-        public int getSortOrder() {
-            return sortOrder;
-        }
-
-        @Override
-        public void setSortOrder(int sortOrder) {
-            this.sortOrder = sortOrder;
-        }
-    }
 }

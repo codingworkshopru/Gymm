@@ -3,9 +3,7 @@ package ru.codingworkshop.gymm.repository;
 import android.arch.lifecycle.LiveData;
 import android.support.annotation.NonNull;
 
-import com.google.common.base.Function;
 import com.google.common.base.Preconditions;
-import com.google.common.collect.Iterables;
 
 import java.util.Collection;
 import java.util.List;
@@ -19,7 +17,6 @@ import ru.codingworkshop.gymm.data.entity.ProgramSet;
 import ru.codingworkshop.gymm.data.entity.ProgramTraining;
 import ru.codingworkshop.gymm.data.entity.common.Named;
 import ru.codingworkshop.gymm.db.dao.ProgramTrainingDao;
-import timber.log.Timber;
 
 import static ru.codingworkshop.gymm.db.GymmDatabase.INVALID_ID;
 
@@ -29,14 +26,13 @@ import static ru.codingworkshop.gymm.db.GymmDatabase.INVALID_ID;
 
 @Singleton
 @SuppressWarnings("Guava")
-public class ProgramTrainingRepository {
+public class ProgramTrainingRepository extends BaseRepository {
     private final ProgramTrainingDao dao;
-    private final Executor executor;
 
     @Inject
     public ProgramTrainingRepository(ProgramTrainingDao dao, Executor executor) {
+        super(executor);
         this.dao = dao;
-        this.executor = executor;
     }
 
     public LiveData<List<ProgramTraining>> getProgramTrainings() {
@@ -52,17 +48,15 @@ public class ProgramTrainingRepository {
     }
 
     public void insertProgramTraining(@NonNull ProgramTraining programTraining) {
-        checkName(programTraining);
-        performInsert(dao::insertProgramTraining, programTraining);
+        insert(programTraining, dao::insertProgramTraining, ProgramTrainingRepository::checkName);
     }
 
     public void deleteProgramTraining(@NonNull ProgramTraining programTraining) {
-        performDelete(dao::deleteProgramTraining, programTraining);
+        delete(programTraining, dao::deleteProgramTraining);
     }
 
     public void updateProgramTraining(@NonNull ProgramTraining programTraining) {
-        checkName(programTraining);
-        performUpdate(dao::updateProgramTraining, programTraining);
+        update(programTraining, dao::updateProgramTraining, ProgramTrainingRepository::checkName);
     }
 
     public LiveData<List<ProgramExercise>> getProgramExercisesForTraining(@NonNull ProgramTraining programTraining) {
@@ -87,33 +81,28 @@ public class ProgramTrainingRepository {
     }
 
     public void insertProgramExercise(ProgramExercise programExercise) {
-        checkProgramExercise(programExercise);
-        performInsert(dao::insertProgramExercise, programExercise);
+        insert(programExercise, dao::insertProgramExercise, ProgramTrainingRepository::checkProgramExercise);
     }
 
     public void updateProgramExercise(ProgramExercise programExercise) {
-        checkProgramExercise(programExercise);
-        performUpdate(dao::updateProgramExercise, programExercise);
+        update(programExercise, dao::updateProgramExercise, ProgramTrainingRepository::checkProgramExercise);
     }
 
     public void updateProgramExercises(Collection<ProgramExercise> exerciseEntities) {
-        for (ProgramExercise exercise : exerciseEntities) {
-            checkProgramExercise(exercise);
-        }
-        performUpdate(dao::updateProgramExercises, exerciseEntities);
+        update(exerciseEntities, dao::updateProgramExercises, ProgramTrainingRepository::checkProgramExercise);
     }
 
-    private void checkProgramExercise(ProgramExercise programExercise) {
+    private static void checkProgramExercise(ProgramExercise programExercise) {
         Preconditions.checkArgument(isValidId(programExercise.getProgramTrainingId()));
         Preconditions.checkArgument(isValidId(programExercise.getExerciseId()));
     }
 
     public void deleteProgramExercise(ProgramExercise programExercise) {
-        performDelete(dao::deleteProgramExercise, programExercise);
+        delete(programExercise, dao::deleteProgramExercise);
     }
 
     public void deleteProgramExercises(Collection<ProgramExercise> exerciseEntities) {
-        performDelete(dao::deleteProgramExercises, exerciseEntities);
+        delete(exerciseEntities, dao::deleteProgramExercises);
     }
 
     public LiveData<List<ProgramSet>> getProgramSetsForExercise(@NonNull ProgramExercise exercise) {
@@ -129,92 +118,39 @@ public class ProgramTrainingRepository {
     }
 
     public void insertProgramSet(@NonNull ProgramSet set) {
-        checkProgramSet(set);
-        performInsert(dao::insertProgramSet, set);
+        insert(set, dao::insertProgramSet, ProgramTrainingRepository::checkProgramSet);
     }
 
     public void insertProgramSets(@NonNull Collection<ProgramSet> sets) {
-        for (ProgramSet set : sets) {
-            checkProgramSet(set);
-        }
-
-        performInsert(dao::insertProgramSets, sets);
+        insert(sets, dao::insertProgramSets, ProgramTrainingRepository::checkProgramSet);
     }
 
     public void updateProgramSet(@NonNull ProgramSet set) {
-        checkProgramSet(set);
-        performUpdate(dao::updateProgramSet, set);
+        update(set, dao::updateProgramSet, ProgramTrainingRepository::checkProgramSet);
     }
 
     public void updateProgramSets(@NonNull Collection<ProgramSet> sets) {
-        for (ProgramSet set : sets) {
-            checkProgramSet(set);
-        }
-        performUpdate(dao::updateProgramSets, sets);
+        update(sets, dao::updateProgramSets, ProgramTrainingRepository::checkProgramSet);
     }
 
-    private void checkProgramSet(@NonNull ProgramSet set) {
+    private static void checkProgramSet(@NonNull ProgramSet set) {
         Preconditions.checkArgument(set.getReps() != 0);
         Preconditions.checkArgument(isValidId(set.getProgramExerciseId()));
     }
 
     public void deleteProgramSet(@NonNull ProgramSet set) {
-        performDelete(dao::deleteProgramSet, set);
+        delete(set, dao::deleteProgramSet);
     }
 
     public void deleteProgramSets(@NonNull Collection<ProgramSet> sets) {
-        performDelete(dao::deleteProgramSets, sets);
+        delete(sets, dao::deleteProgramSets);
     }
 
-    private <F> void performInsert(Function<F, Long> insert, F entity) {
-        executor.execute(() -> checkInsertion(insert.apply(entity)));
-    }
-
-    private <F> void performInsert(Function<Collection<F>, List<Long>> insert, Collection<F> entities) {
-        if (entities.isEmpty()) return;
-        executor.execute(() -> {
-            List<Long> ids = insert.apply(entities);
-            for (long id : ids) {
-                checkInsertion(id);
-            }
-        });
-    }
-
-    private <F> void performDelete(Function<F, Integer> delete, F entity) {
-        perform(delete, entity, entity.getClass(), "delete");
-    }
-
-    private <F> void performDelete(Function<Collection<F>, Integer> delete, Collection<F> entities) {
-        if (entities.isEmpty()) return;
-        perform(delete, entities, Iterables.getFirst(entities, null).getClass(), "delete");
-    }
-
-    private <F> void performUpdate(Function<F, Integer> update, F entity) {
-        perform(update, entity, entity.getClass(), "update");
-    }
-
-    private <F> void performUpdate(Function<Collection<F>, Integer> update, Collection<F> entities) {
-        if (entities.isEmpty()) return;
-        perform(update, entities, Iterables.getFirst(entities, null).getClass(), "update");
-    }
-
-    private <F> void perform(Function<F, Integer> operation, F operand, Class<?> cl, String operationName) {
-        executor.execute(() -> {
-            int rowsAffected = operation.apply(operand);
-            Timber.i("%d rows %sd in %s", rowsAffected, operationName, cl.getSimpleName());
-        });
-    }
-
-    private long checkInsertion(long rowId) {
-        Preconditions.checkState(rowId != -1);
-        return rowId;
-    }
-
-    private void checkName(@NonNull Named named) {
+    private static void checkName(@NonNull Named named) {
         Preconditions.checkArgument(named.getName() != null && !named.getName().isEmpty());
     }
 
-    private boolean isValidId(long id) {
+    private static boolean isValidId(long id) {
         return id != INVALID_ID;
     }
 }
