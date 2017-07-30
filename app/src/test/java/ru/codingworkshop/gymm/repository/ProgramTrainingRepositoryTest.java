@@ -297,6 +297,19 @@ public class ProgramTrainingRepositoryTest {
     }
 
     @Test
+    public void queryProgramSetsForTrainingId() {
+        List<Long> ids = Lists.newArrayList(23L, 24L, 25L, 26L, 27L, 38L, 39L);
+        List<ProgramSet> sets = ids.stream().map(id -> getProgramSet(id, id / 10, id.intValue()).getValue()).collect(Collectors.toList());
+
+        when(dao.getProgramSetsForTraining(1L)).thenReturn(LiveDataUtil.getLive(sets));
+
+        LiveData<List<ProgramSet>> liveSets = repository.getProgramSetsForTraining(1L);
+        LiveTest.verifyLiveData(liveSets, returnedSets -> sets == returnedSets);
+
+        verify(dao).getProgramSetsForTraining(1L);
+    }
+
+    @Test
     public void queryProgramSetById() {
         when(dao.getProgramSetById(3)).thenReturn(getProgramSet(3, 2, 1));
         LiveTest.verifyLiveData(repository.getProgramSetById(3), returned -> returned.getId() == 3 && returned.getReps() == 1);
@@ -413,9 +426,9 @@ public class ProgramTrainingRepositoryTest {
 
     private static LiveData<ProgramSet> getProgramSet(long id, long programExerciseId, int reps) {
         ProgramSet set = new ProgramSet();
-        set.setId(3);
-        set.setProgramExerciseId(2);
-        set.setReps(1);
+        set.setId(id);
+        set.setProgramExerciseId(programExerciseId);
+        set.setReps(reps);
         return LiveDataUtil.getLive(set);
     }
 }

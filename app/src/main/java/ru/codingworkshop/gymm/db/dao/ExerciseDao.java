@@ -2,10 +2,8 @@ package ru.codingworkshop.gymm.db.dao;
 
 import android.arch.lifecycle.LiveData;
 import android.arch.persistence.room.Dao;
-import android.arch.persistence.room.Delete;
 import android.arch.persistence.room.Insert;
 import android.arch.persistence.room.Query;
-import android.arch.persistence.room.Update;
 
 import java.util.List;
 
@@ -48,6 +46,14 @@ public interface ExerciseDao {
                     "order by mg.name"
     )
     LiveData<List<MuscleGroup>> getSecondaryMuscleGroupsForExercise(long exerciseId);
+
+    @Query(
+            "select distinct e.* from Exercise as e " +
+                    "join ProgramExercise pe on pe.exerciseId = e.id " +
+                    "where pe.programTrainingId = :programTrainingId " +
+                    "order by pe.sortOrder"
+    )
+    LiveData<List<Exercise>> getExercisesForProgramTraining(long programTrainingId);
 
     @Insert(onConflict = FAIL)
     List<Long> insertExercises(List<Exercise> entities);

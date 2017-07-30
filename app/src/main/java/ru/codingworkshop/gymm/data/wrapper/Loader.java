@@ -44,9 +44,9 @@ public class Loader<Wrapper> {
     }
 
     public <T, F> void addDependentSource(LiveData<T> dependency, Function<T, LiveData<F>> sourceGetter, BiConsumer<Wrapper, F> resultSetter) {
-        LiveData<F> l = Transformations.switchMap(dependency, sourceGetter);
-        addSource(l, loaded -> {
-            if (loaded != null) { // not set null value
+        LiveData<F> transformed = Transformations.switchMap(dependency, sourceGetter);
+        addSource(transformed, loaded -> {
+            if (loaded != null) {
                 resultSetter.accept(wrapper, loaded);
             }
         });

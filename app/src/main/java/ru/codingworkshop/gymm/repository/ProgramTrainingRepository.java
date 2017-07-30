@@ -113,6 +113,10 @@ public class ProgramTrainingRepository extends BaseRepository {
         return dao.getProgramSetsForExercise(id);
     }
 
+    public LiveData<List<ProgramSet>> getProgramSetsForTraining(long trainingId) {
+        return dao.getProgramSetsForTraining(trainingId);
+    }
+
     public LiveData<ProgramSet> getProgramSetById(long id) {
         return dao.getProgramSetById(id);
     }

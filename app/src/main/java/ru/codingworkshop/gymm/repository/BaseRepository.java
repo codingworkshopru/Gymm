@@ -1,11 +1,18 @@
 package ru.codingworkshop.gymm.repository;
 
+import android.arch.lifecycle.LiveData;
+import android.arch.lifecycle.MutableLiveData;
+import android.os.AsyncTask;
+import android.support.annotation.VisibleForTesting;
+import android.support.annotation.WorkerThread;
+
 import com.google.common.base.Function;
 import com.google.common.base.Preconditions;
 
 import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.Executor;
+import java.util.function.LongSupplier;
 
 import ru.codingworkshop.gymm.data.util.Consumer;
 
@@ -16,28 +23,35 @@ import ru.codingworkshop.gymm.data.util.Consumer;
 @SuppressWarnings("Guava")
 class BaseRepository {
     private Executor executor;
+    @VisibleForTesting InsertWithIdAsyncTask asyncTask = new InsertWithIdAsyncTask();
 
-    public BaseRepository(Executor executor) {
+    BaseRepository(Executor executor) {
         this.executor = executor;
     }
 
-    public <T> void insert(T entity, Function<T, Long> insert, Consumer<T> check) {
+    <T> LiveData<Long> insertAndGetId(T entity, Function<T, Long> insert, Consumer<T> check) {
+        LongSupplier insertOperation = () -> performSync(entity, insert, BaseRepository::checkInsertion, check);
+        asyncTask.execute(insertOperation);
+        return asyncTask.getLiveId();
+    }
+
+    <T> void insert(T entity, Function<T, Long> insert, Consumer<T> check) {
         perform(entity, insert, BaseRepository::checkInsertion, check);
     }
 
-    public <T> void insert(Collection<T> entities, Function<Collection<T>, List<Long>> insert, Consumer<T> check) {
+    <T> void insert(Collection<T> entities, Function<Collection<T>, List<Long>> insert, Consumer<T> check) {
         performForCollection(entities, insert, BaseRepository::checkInsertions, check);
     }
 
-    public <T> void update(T entity, Function<T, Integer> update, Consumer<T> check) {
+    <T> void update(T entity, Function<T, Integer> update, Consumer<T> check) {
         perform(entity, update, null, check);
     }
 
-    public <T> void update(Collection<T> entities, Function<Collection<T>, Integer> update, Consumer<T> check) {
+    <T> void update(Collection<T> entities, Function<Collection<T>, Integer> update, Consumer<T> check) {
         performForCollection(entities, update, null, check);
     }
 
-    public <T> void delete(T entity, Function<T, Integer> delete) {
+    <T> void delete(T entity, Function<T, Integer> delete) {
         perform(entity, delete, null, null);
     }
 
@@ -46,18 +60,24 @@ class BaseRepository {
     }
 
     private <T, F> void perform(T entity, Function<T, F> operation, Consumer<F> after, Consumer<T> before) {
+        executor.execute(() -> performSync(entity, operation, after, before));
+    }
+
+    @WorkerThread
+    private <T, F> F performSync(T entity, Function<T, F> operation, Consumer<F> after, Consumer<T> before) {
         Preconditions.checkNotNull(operation);
         Preconditions.checkNotNull(entity);
 
         if (before != null) {
             before.accept(entity);
         }
-        executor.execute(() -> {
-            F f = operation.apply(entity);
-            if (after != null) {
-                after.accept(f);
-            }
-        });
+
+        F f = operation.apply(entity);
+        if (after != null) {
+            after.accept(f);
+        }
+
+        return f;
     }
 
     private static void checkInsertions(List<Long> ids) {
@@ -72,6 +92,26 @@ class BaseRepository {
     private static <T> void applyToEach(Collection<T> collection, Consumer<T> consumer) {
         for (T element : collection) {
             consumer.accept(element);
+        }
+    }
+
+    static class InsertWithIdAsyncTask extends AsyncTask<LongSupplier, Void, Long> {
+
+        private MutableLiveData<Long> liveId;
+
+        @Override
+        protected Long doInBackground(LongSupplier[] suppliers) {
+            return suppliers[0].getAsLong();
+        }
+
+        @Override
+        protected void onPostExecute(Long id) {
+            liveId = new MutableLiveData<>();
+            liveId.setValue(id);
+        }
+
+        public LiveData<Long> getLiveId() {
+            return liveId;
         }
     }
 }

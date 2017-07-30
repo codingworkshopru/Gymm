@@ -73,6 +73,13 @@ public interface ProgramTrainingDao {
             "order by sortOrder")
     LiveData<List<ProgramSet>> getProgramSetsForExercise(long programExerciseId);
 
+    @Query("select ps.* " +
+            "from ProgramSet ps " +
+            "join ProgramExercise pe on pe.id = ps.programExerciseId " +
+            "where pe.programTrainingId = :programTrainingId " +
+            "order by pe.sortOrder, ps.sortOrder")
+    LiveData<List<ProgramSet>> getProgramSetsForTraining(long programTrainingId);
+
     @Query("select * from ProgramSet where id = :id")
     LiveData<ProgramSet> getProgramSetById(long id);
 

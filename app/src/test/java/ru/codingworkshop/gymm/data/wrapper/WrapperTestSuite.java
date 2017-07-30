@@ -9,12 +9,13 @@ import org.junit.runners.Suite;
 
 @RunWith(Suite.class)
 @Suite.SuiteClasses({
-        ChildrenSaverTest.class,
-        ExerciseWrapperTest.class,
         LoaderTest.class,
+        ChildrenSaverTest.class,
+        SortableChildrenDelegateTest.class,
+        ExerciseWrapperTest.class,
         ProgramExerciseWrapperTest.class,
         ProgramTrainingWrapperTest.class,
-        SortableChildrenDelegateTest.class
+        ActualTrainingWrapperTest.class
 })
 public class WrapperTestSuite {
     // useless class

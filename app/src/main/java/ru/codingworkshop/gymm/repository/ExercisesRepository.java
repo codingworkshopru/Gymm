@@ -49,4 +49,8 @@ public class ExercisesRepository {
     public LiveData<List<MuscleGroup>> getSecondaryMuscleGroupsForExercise(long exerciseId) {
         return exerciseDao.getSecondaryMuscleGroupsForExercise(exerciseId);
     }
+
+    public LiveData<List<Exercise>> getExercisesForProgramTraining(long programTrainingId) {
+        return exerciseDao.getExercisesForProgramTraining(programTrainingId);
+    }
 }

@@ -1,22 +1,26 @@
 package ru.codingworkshop.gymm.data.wrapper;
 
 import android.arch.core.executor.testing.InstantTaskExecutorRule;
+import android.arch.lifecycle.LiveData;
 import android.arch.lifecycle.MutableLiveData;
 
 import com.google.common.collect.Lists;
 
-import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.junit.runners.JUnit4;
+import org.mockito.Mock;
+import org.mockito.junit.MockitoJUnitRunner;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
+import ru.codingworkshop.gymm.data.entity.Exercise;
 import ru.codingworkshop.gymm.data.entity.ProgramExercise;
+import ru.codingworkshop.gymm.data.entity.ProgramSet;
 import ru.codingworkshop.gymm.data.entity.ProgramTraining;
 import ru.codingworkshop.gymm.data.util.LiveDataUtil;
+import ru.codingworkshop.gymm.repository.ExercisesRepository;
 import ru.codingworkshop.gymm.repository.ProgramTrainingRepository;
 import ru.codingworkshop.gymm.util.LiveTest;
 
@@ -35,17 +39,12 @@ import static org.mockito.Mockito.when;
  * Created by Радик on 20.06.2017.
  */
 
-@RunWith(JUnit4.class)
+@RunWith(MockitoJUnitRunner.class)
 public class ProgramTrainingWrapperTest {
     @Rule
     public InstantTaskExecutorRule instantTaskExecutorRule = new InstantTaskExecutorRule();
 
-    private ProgramTrainingRepository repository;
-
-    @Before
-    public void init() {
-        repository = mock(ProgramTrainingRepository.class);
-    }
+    @Mock private ProgramTrainingRepository repository;
 
     @Test
     public void creation() {
@@ -133,6 +132,49 @@ public class ProgramTrainingWrapperTest {
     }
 
     @Test
+    public void loadWithWrappedProgramExercises() {
+        ProgramTraining training = createTraining(1L, "foo");
+        List<ProgramExercise> programExercises = createExercises(10);
+        List<Exercise> exercises = Lists.newArrayList(100L, 101L).stream().map(id -> {Exercise e = new Exercise(); e.setId(id); e.setName(id%10==0?"bar":"baz");return e;}).collect(Collectors.toList());
+        programExercises.forEach(ex -> ex.setExerciseId(exercises.get(ex.getId()%2==0?0:1).getId()));
+        List<ProgramSet> sets = Lists.newArrayList();
+        programExercises.forEach(programExercise -> {
+            for (int i = 0; i < programExercise.getId() - 1; i++) {
+                ProgramSet set = new ProgramSet();
+                set.setId(programExercise.getId() * 10 + i);
+                set.setSortOrder(i);
+                set.setProgramExerciseId(programExercise.getId());
+                sets.add(set);
+            }
+        });
+
+        ExercisesRepository exercisesRepository = mock(ExercisesRepository.class);
+        when(exercisesRepository.getExercisesForProgramTraining(1L)).thenReturn(LiveDataUtil.getLive(exercises));
+
+        when(repository.getProgramTrainingById(1L)).thenReturn(LiveDataUtil.getLive(training));
+        when(repository.getProgramExercisesForTraining(1L)).thenReturn(LiveDataUtil.getLive(programExercises));
+        when(repository.getProgramSetsForTraining(1L)).thenReturn(LiveDataUtil.getLive(sets));
+
+        LiveData<ProgramTrainingWrapper> liveWrapper = ProgramTrainingWrapper.loadWithWrappedProgramExercises(1L, repository, exercisesRepository);
+        LiveTest.verifyLiveData(
+                liveWrapper,
+                wrapper -> {
+                    assertEquals(training, wrapper.getProgramTraining());
+                    assertEquals(programExercises, wrapper.getProgramExercises());
+                    assertEquals(10, wrapper.getExerciseWrappers().size());
+                    assertEquals(sets, wrapper.getExerciseWrappers().stream().flatMap(w -> w.getProgramSets().stream()).collect(Collectors.toList()));
+                    assertEquals(exercises, wrapper.getExerciseWrappers().stream().map(ProgramExerciseWrapper::getExercise).distinct().sorted((a,b) -> (int)(a.getId()-b.getId())).collect(Collectors.toList()));
+                    
+                    return true;
+                }
+        );
+
+        verify(repository).getProgramTrainingById(1L);
+        verify(repository).getProgramExercisesForTraining(1L);
+        verify(repository).getProgramSetsForTraining(1L);
+    }
+
+    @Test
     public void saveProgramTrainingWithUnchangedExercises() {
         ProgramTraining training = createTraining(1L, "foo");
         training.setName("bar");
@@ -201,6 +243,7 @@ public class ProgramTrainingWrapperTest {
         for (int i = 0; i < count; i++) {
             ProgramExercise exercise = new ProgramExercise();
             exercise.setId(2 + i);
+            exercise.setProgramTrainingId(1L);
             exercise.setSortOrder(i);
             exercises.add(exercise);
         }

@@ -1,8 +1,11 @@
 package ru.codingworkshop.gymm.repository;
 
+import android.arch.core.executor.testing.InstantTaskExecutorRule;
+
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
 
+import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
@@ -11,10 +14,15 @@ import org.mockito.junit.MockitoJUnitRunner;
 import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.Executor;
+import java.util.function.LongSupplier;
 import java.util.stream.Collectors;
 
+import ru.codingworkshop.gymm.data.util.LiveDataUtil;
+import ru.codingworkshop.gymm.util.LiveTest;
 import ru.codingworkshop.gymm.util.SimpleModel;
 
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -24,6 +32,8 @@ import static org.mockito.Mockito.when;
 
 @RunWith(MockitoJUnitRunner.class)
 public class BaseRepositoryTest {
+    @Rule public InstantTaskExecutorRule instantTaskExecutorRule = new InstantTaskExecutorRule();
+
     @Mock private DummyDao<SimpleModel> dao;
     private Executor executor = Runnable::run;
     private BaseRepository repository = new BaseRepository(executor);
@@ -67,6 +77,26 @@ public class BaseRepositoryTest {
         List<SimpleModel> ms = createModels("foo", "bar", "baz");
         when(dao.insert(ms)).thenReturn(Lists.newArrayList(-1L, 1L, 2L));
         repository.insert(ms, dao::insert, BaseRepositoryTest::checkName);
+    }
+
+    @Test
+    public void insertAndGetId() throws InterruptedException {
+        SimpleModel model = new SimpleModel(0L, "foo");
+
+        when(dao.insert(model)).thenReturn(1L);
+
+        repository.asyncTask = mock(BaseRepository.InsertWithIdAsyncTask.class);
+
+        when(repository.asyncTask.execute(any(LongSupplier.class))).then(invocation -> {
+            LongSupplier insert = (LongSupplier) invocation.getArguments()[0];
+            Long resultId = insert.getAsLong();
+            when(repository.asyncTask.getLiveId()).thenReturn(LiveDataUtil.getLive(resultId));
+            return null;
+        });
+        repository.insertAndGetId(model, dao::insert, BaseRepositoryTest::checkName);
+
+        LiveTest.verifyLiveData(repository.asyncTask.getLiveId(), id -> id == 1L);
+        verify(dao).insert(model);
     }
 
     @Test

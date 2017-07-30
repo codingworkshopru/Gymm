@@ -61,7 +61,7 @@ public class ExercisesRepositoryTest {
     }
 
     @Test
-    public void gettinDataTest() {
+    public void gettingDataTest() {
         ExercisesRepository repository = new ExercisesRepository(exerciseDao, muscleGroupDao);
 
         repository.getExerciseById(1L);
@@ -72,5 +72,8 @@ public class ExercisesRepositoryTest {
 
         repository.getSecondaryMuscleGroupsForExercise(3L);
         verify(exerciseDao).getSecondaryMuscleGroupsForExercise(3L);
+
+        repository.getExercisesForProgramTraining(1L);
+        verify(exerciseDao).getExercisesForProgramTraining(1L);
     }
 }

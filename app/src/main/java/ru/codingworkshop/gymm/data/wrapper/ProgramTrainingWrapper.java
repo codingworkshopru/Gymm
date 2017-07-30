@@ -1,18 +1,23 @@
 package ru.codingworkshop.gymm.data.wrapper;
 
 import android.arch.lifecycle.LiveData;
-import android.arch.lifecycle.Observer;
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 
 import com.google.common.base.Preconditions;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
+import com.google.common.collect.Multimap;
+import com.google.common.collect.Multimaps;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 
+import ru.codingworkshop.gymm.data.entity.Exercise;
 import ru.codingworkshop.gymm.data.entity.ProgramExercise;
+import ru.codingworkshop.gymm.data.entity.ProgramSet;
 import ru.codingworkshop.gymm.data.entity.ProgramTraining;
-import ru.codingworkshop.gymm.data.entity.common.Model;
+import ru.codingworkshop.gymm.repository.ExercisesRepository;
 import ru.codingworkshop.gymm.repository.ProgramTrainingRepository;
 
 /**
@@ -22,6 +27,7 @@ import ru.codingworkshop.gymm.repository.ProgramTrainingRepository;
 public class ProgramTrainingWrapper {
     private ProgramTraining programTraining;
     private SortableChildrenDelegate<ProgramExercise> childrenDelegate = new SortableChildrenDelegate<>();
+    private List<ProgramExerciseWrapper> exerciseWrappers = Lists.newArrayList();
 
     private ProgramTrainingWrapper() {}
 
@@ -44,6 +50,35 @@ public class ProgramTrainingWrapper {
     public void setProgramExercises(Collection<ProgramExercise> programExercises) {
         childrenDelegate.setChildren(programExercises);
     }
+
+    // Wrapped children zone
+
+    public List<ProgramExerciseWrapper> getExerciseWrappers() {
+        return exerciseWrappers;
+    }
+
+    public void setProgramSets(List<ProgramSet> programSets) {
+        Preconditions.checkArgument(!programSets.isEmpty());
+        Preconditions.checkState(hasProgramExercises());
+
+        Multimap<Long, ProgramSet> exerciseIdToSets = Multimaps.index(programSets, ProgramSet::getProgramExerciseId);
+        for (ProgramExercise exercise : getProgramExercises()) {
+            ProgramExerciseWrapper wrapper = new ProgramExerciseWrapper();
+            wrapper.setProgramExercise(exercise);
+            wrapper.setProgramSets(exerciseIdToSets.get(exercise.getId()));
+            exerciseWrappers.add(wrapper);
+        }
+    }
+
+    private void setExercises(List<Exercise> exercises) {
+        Map<Long, Exercise> idExerciseMap = Maps.uniqueIndex(exercises, Exercise::getId);
+
+        for (ProgramExerciseWrapper w : getExerciseWrappers()) {
+            w.setExercise(idExerciseMap.get(w.getProgramExercise().getExerciseId()));
+        }
+    }
+
+    // end of wrapped children zone
 
     public boolean hasProgramExercises() {
         return childrenDelegate.hasChildren();
@@ -119,6 +154,23 @@ public class ProgramTrainingWrapper {
 
         loader.addSource(repository.getProgramTrainingById(id),  ProgramTrainingWrapper::setProgramTraining);
         loader.addSource(repository.getProgramExercisesForTraining(id), ProgramTrainingWrapper::setProgramExercises);
+
+        return loader.load();
+    }
+
+
+    public static LiveData<ProgramTrainingWrapper> loadWithWrappedProgramExercises(long programTrainingId, ProgramTrainingRepository repository, ExercisesRepository exercisesRepository) {
+        Loader<ProgramTrainingWrapper> loader = new Loader<>(ProgramTrainingWrapper::new);
+
+        loader.addSource(repository.getProgramTrainingById(programTrainingId), ProgramTrainingWrapper::setProgramTraining);
+
+        LiveData<List<ProgramExercise>> programExercisesForTraining = repository.getProgramExercisesForTraining(programTrainingId);
+        loader.addSource(programExercisesForTraining, ProgramTrainingWrapper::setProgramExercises);
+
+        LiveData<List<ProgramSet>> liveSets = repository.getProgramSetsForTraining(programTrainingId);
+        loader.addDependentSource(programExercisesForTraining, unused -> liveSets, ProgramTrainingWrapper::setProgramSets);
+
+        loader.addDependentSource(liveSets, unused -> exercisesRepository.getExercisesForProgramTraining(programTrainingId), ProgramTrainingWrapper::setExercises);
 
         return loader.load();
     }

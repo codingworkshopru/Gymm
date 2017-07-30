@@ -10,10 +10,11 @@ import org.junit.runners.Suite;
 @RunWith(Suite.class)
 @Suite.SuiteClasses({
         BaseRepositoryTest.class,
+        ExercisesRepositoryTest.class,
         MuscleGroupRepositoryTest.class,
         ProgramTrainingRepositoryTest.class,
-        ExercisesRepositoryTest.class,
-        SecondaryMuscleGroupsHelperTest.class
+        SecondaryMuscleGroupsHelperTest.class,
+        ActualTrainingRepositoryTest.class
 })
 public class RepositoryTestSuite {
 }

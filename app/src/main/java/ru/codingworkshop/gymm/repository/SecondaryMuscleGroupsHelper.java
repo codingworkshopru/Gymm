@@ -2,9 +2,11 @@ package ru.codingworkshop.gymm.repository;
 
 import android.support.annotation.WorkerThread;
 
+import com.google.common.base.Function;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 
+import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -31,7 +33,7 @@ final class SecondaryMuscleGroupsHelper {
 
     @WorkerThread
     void createExercises(List<Exercise> exercises) {
-        Map<String, Long> nameIdMuscleGroupsMap = createNameIdMap(muscleGroupDao.getAllMuscleGroupsSync());
+        Map<String, Long> nameIdMuscleGroupsMap = createMap(muscleGroupDao.getAllMuscleGroupsSync(), Named::getName, Model::getId);
         for (Exercise exercise : exercises)
             exercise.setPrimaryMuscleGroupId(nameIdMuscleGroupsMap.get(exercise.primaryMuscle));
         List<Long> ids = exerciseDao.insertExercises(exercises);
@@ -43,7 +45,7 @@ final class SecondaryMuscleGroupsHelper {
             exerciseIterator.next().setId(idIterator.next());
         }
 
-        Map<String, Long> nameIdExercisesMap = createNameIdMap(exercises);
+        Map<String, Long> nameIdExercisesMap = createMap(exercises, Named::getName, Model::getId);
 
         List<SecondaryMuscleGroupLink> links = Lists.newLinkedList();
         for (Exercise exercise : exercises) {
@@ -61,10 +63,11 @@ final class SecondaryMuscleGroupsHelper {
         exerciseDao.createLinks(links);
     }
 
-    private static Map<String, Long> createNameIdMap(List<? extends Model> entities) {
-        Map<String, Long> result = Maps.newHashMapWithExpectedSize(entities.size());
-        for (Model entity : entities)
-            result.put(((Named) entity).getName(), entity.getId());
+    private static <K, V, T> Map<K, V> createMap(Collection<T> collection, Function<T, K> keyExtractor, Function<T, V> valueExtractor) {
+        Map<K, V> result = Maps.newHashMapWithExpectedSize(collection.size());
+        for (T entry : collection) {
+            result.put(keyExtractor.apply(entry), valueExtractor.apply(entry));
+        }
         return result;
     }
 }
