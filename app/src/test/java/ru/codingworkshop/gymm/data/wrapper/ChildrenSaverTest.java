@@ -11,9 +11,9 @@ import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 import ru.codingworkshop.gymm.data.util.LiveDataUtil;
+import ru.codingworkshop.gymm.util.ModelsFixture;
 import ru.codingworkshop.gymm.util.SimpleModel;
 
 import static org.junit.Assert.assertEquals;
@@ -32,8 +32,8 @@ public class ChildrenSaverTest {
 
     @Test
     public void simpleSave() {
-        List<SimpleModel> oldChildren = Lists.newArrayList(1L, 2L, 3L).stream().map(id -> new SimpleModel(id, id.intValue())).collect(Collectors.toList());
-        List<SimpleModel> newChildren = Lists.newArrayList(2L, 3L, 4L).stream().map(id -> new SimpleModel(id, id.intValue())).collect(Collectors.toList());
+        List<SimpleModel> oldChildren = ModelsFixture.createSimpleModels(1L, 2L, 3L);
+        List<SimpleModel> newChildren = ModelsFixture.createSimpleModels(2L, 3L, 4L);
         newChildren.get(1).setSortOrder(10);
 
         LiveData<List<SimpleModel>> oldChildrenLive = LiveDataUtil.getLive(oldChildren);
@@ -66,7 +66,7 @@ public class ChildrenSaverTest {
     @Test
     public void saveWhenOnlyNew() {
         LiveData<List<SimpleModel>> oldChildrenLive = LiveDataUtil.getLive(Lists.newArrayList());
-        List<SimpleModel> newChildren = Lists.newArrayList(1L, 2L, 3L).stream().map(id -> new SimpleModel(id, id.intValue())).collect(Collectors.toList());
+        List<SimpleModel> newChildren = ModelsFixture.createSimpleModels(1L, 2L, 3L);
 
         ChildrenSaver<SimpleModel> saver = new ChildrenSaver<SimpleModel>(oldChildrenLive, newChildren) {
             @Override
@@ -90,7 +90,7 @@ public class ChildrenSaverTest {
 
     @Test
     public void saveWhenOnlyOld() {
-        List<SimpleModel> oldChildren = Lists.newArrayList(1L, 2L, 3L).stream().map(id -> new SimpleModel(id, id.intValue())).collect(Collectors.toList());
+        List<SimpleModel> oldChildren = ModelsFixture.createSimpleModels(1L, 2L, 3L);
         LiveData<List<SimpleModel>> oldChildrenLive = LiveDataUtil.getLive(oldChildren);
         List<SimpleModel> newChildren = Lists.newArrayList();
 
@@ -116,9 +116,10 @@ public class ChildrenSaverTest {
 
     @Test
     public void saveWhenOnlyUpdated() {
-        List<SimpleModel> oldChildren = Lists.newArrayList(1L, 2L, 3L).stream().map(id -> new SimpleModel(id, id.intValue())).collect(Collectors.toList());
+        List<SimpleModel> oldChildren = ModelsFixture.createSimpleModels(1L, 2L, 3L);
         LiveData<List<SimpleModel>> oldChildrenLive = LiveDataUtil.getLive(oldChildren);
-        List<SimpleModel> newChildren = Lists.newArrayList(1L, 2L, 3L).stream().map(id -> new SimpleModel(id, id.intValue() + 1)).collect(Collectors.toList());
+        List<SimpleModel> newChildren = ModelsFixture.createSimpleModels(1L, 2L, 3L);
+        newChildren.forEach(m -> m.setSortOrder(m.getSortOrder()+1));
 
         ChildrenSaver<SimpleModel> saver = new ChildrenSaver<SimpleModel>(oldChildrenLive, newChildren) {
             @Override

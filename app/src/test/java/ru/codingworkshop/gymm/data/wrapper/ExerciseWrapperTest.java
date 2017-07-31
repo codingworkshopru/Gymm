@@ -12,7 +12,6 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
-import org.mockito.Mockito;
 
 import java.util.List;
 import java.util.Set;
@@ -20,6 +19,7 @@ import java.util.Set;
 import ru.codingworkshop.gymm.data.entity.Exercise;
 import ru.codingworkshop.gymm.data.entity.MuscleGroup;
 import ru.codingworkshop.gymm.db.dao.ExerciseDao;
+import ru.codingworkshop.gymm.util.ModelsFixture;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -46,14 +46,13 @@ public class ExerciseWrapperTest {
 
     @Before
     public void init() {
-        exercise = Mockito.mock(Exercise.class);
-        when(exercise.getName()).thenReturn("foo");
+        exercise = ModelsFixture.createExercise(33L, "foo");
 
         liveExercise = new MutableLiveData<>();
         liveExercise.setValue(exercise);
 
         MutableLiveData<List<MuscleGroup>> liveMuscleGroups = new MutableLiveData<>();
-        MuscleGroup muscleGroup = new MuscleGroup("bar");
+        MuscleGroup muscleGroup = ModelsFixture.createMuscleGroup(1, "bar");
         liveMuscleGroups.setValue(Lists.newArrayList(muscleGroup));
 
         exerciseDao = mock(ExerciseDao.class);

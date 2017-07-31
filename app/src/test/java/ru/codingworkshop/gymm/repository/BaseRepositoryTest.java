@@ -11,14 +11,14 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 
-import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.Executor;
 import java.util.function.LongSupplier;
-import java.util.stream.Collectors;
 
 import ru.codingworkshop.gymm.data.util.LiveDataUtil;
+import ru.codingworkshop.gymm.util.DummyDao;
 import ru.codingworkshop.gymm.util.LiveTest;
+import ru.codingworkshop.gymm.util.ModelsFixture;
 import ru.codingworkshop.gymm.util.SimpleModel;
 
 import static org.mockito.ArgumentMatchers.any;
@@ -41,7 +41,7 @@ public class BaseRepositoryTest {
     @Test
     public void insertTest() {
         SimpleModel model = new SimpleModel(1L, "foo");
-        List<SimpleModel> models = createModels("foo", "bar", "baz");
+        List<SimpleModel> models = ModelsFixture.createSimpleModels("foo", "bar", "baz");
 
         when(dao.insert(model)).thenReturn(1L);
         when(dao.insert(models)).thenReturn(Lists.newArrayList(1L));
@@ -68,13 +68,13 @@ public class BaseRepositoryTest {
 
     @Test(expected = IllegalArgumentException.class)
     public void insertCollectionWithoutNameTest() {
-        List<SimpleModel> models = createModels("foo", null, "bar");
+        List<SimpleModel> models = ModelsFixture.createSimpleModels("foo", null, "bar");
         repository.insert(Lists.newArrayList(models), dao::insert, BaseRepositoryTest::checkName);
     }
 
     @Test(expected = IllegalStateException.class)
     public void insertCollectionFailTest() {
-        List<SimpleModel> ms = createModels("foo", "bar", "baz");
+        List<SimpleModel> ms = ModelsFixture.createSimpleModels("foo", "bar", "baz");
         when(dao.insert(ms)).thenReturn(Lists.newArrayList(-1L, 1L, 2L));
         repository.insert(ms, dao::insert, BaseRepositoryTest::checkName);
     }
@@ -102,7 +102,7 @@ public class BaseRepositoryTest {
     @Test
     public void updateTest() {
         SimpleModel model = new SimpleModel(1L, "foo");
-        List<SimpleModel> models = createModels("foo", "bar", "baz");
+        List<SimpleModel> models = ModelsFixture.createSimpleModels("foo", "bar", "baz");
 
         when(dao.update(model)).thenReturn(1);
         when(dao.update(models)).thenReturn(3);
@@ -122,14 +122,14 @@ public class BaseRepositoryTest {
 
     @Test(expected = IllegalArgumentException.class)
     public void updateCollectionWithoutName() {
-        List<SimpleModel> models = createModels("foo", "bar", null);
+        List<SimpleModel> models = ModelsFixture.createSimpleModels("foo", "bar", null);
         repository.update(models, dao::update, BaseRepositoryTest::checkName);
     }
 
     @Test
     public void deleteTest() {
         SimpleModel model = new SimpleModel(1L, "foo");
-        List<SimpleModel> models = createModels("foo", "bar", "baz");
+        List<SimpleModel> models = ModelsFixture.createSimpleModels("foo", "bar", "baz");
 
         when(dao.delete(model)).thenReturn(1);
         when(dao.delete(models)).thenReturn(3);
@@ -141,25 +141,8 @@ public class BaseRepositoryTest {
         verify(dao).delete(models);
     }
 
-    private static List<SimpleModel> createModels(String... names) {
-        List<String> namesList = Lists.newArrayList(names);
-        return namesList.stream().map(
-                name -> new SimpleModel(namesList.contains(name) ? namesList.indexOf(name) + 1L : -1L, name)
-        ).collect(Collectors.toList());
-    }
-
     private static void checkName(SimpleModel m) {
         Preconditions.checkArgument(m.getName() != null, "Model must be named");
     }
 
-    public interface DummyDao<T> {
-        Long insert(T t);
-        List<Long> insert(Collection<T> tt);
-
-        int update(T t);
-        int update(Collection<T> t);
-
-        int delete(T t);
-        int delete(Collection<T> t);
-    }
 }

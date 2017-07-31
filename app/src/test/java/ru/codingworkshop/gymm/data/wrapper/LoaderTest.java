@@ -12,6 +12,7 @@ import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
 
 import ru.codingworkshop.gymm.util.LiveTest;
+import ru.codingworkshop.gymm.util.SimpleWrapper;
 
 import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.Mockito.mock;
@@ -24,38 +25,6 @@ import static org.mockito.Mockito.verify;
 
 @RunWith(JUnit4.class)
 public class LoaderTest {
-    private static final class SimpleWrapper {
-        private Long number;
-        private String string;
-        private Boolean bool;
-
-        private SimpleWrapper() {
-        }
-
-        void setLong(Long myNumber) {
-            number = myNumber;
-        }
-
-        Long getLong() {
-            return number;
-        }
-
-        void setString(String value) {
-            string = value;
-        }
-
-        String getString() {
-            return string;
-        }
-
-        public void setBool(Boolean bool) {
-            this.bool = bool;
-        }
-
-        public Boolean getBool() {
-            return bool;
-        }
-    }
 
     @Rule
     public InstantTaskExecutorRule instantTaskExecutorRule = new InstantTaskExecutorRule();

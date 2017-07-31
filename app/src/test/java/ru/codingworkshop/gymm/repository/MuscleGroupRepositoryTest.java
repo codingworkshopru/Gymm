@@ -3,8 +3,6 @@ package ru.codingworkshop.gymm.repository;
 import android.arch.core.executor.testing.InstantTaskExecutorRule;
 import android.arch.lifecycle.LiveData;
 
-import com.google.common.collect.Lists;
-
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -12,11 +10,10 @@ import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 import ru.codingworkshop.gymm.data.entity.MuscleGroup;
-import ru.codingworkshop.gymm.data.util.LiveDataUtil;
 import ru.codingworkshop.gymm.db.dao.MuscleGroupDao;
+import ru.codingworkshop.gymm.util.ModelsFixture;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -44,8 +41,7 @@ public class MuscleGroupRepositoryTest {
 
     @Test
     public void getMuscleGroups() {
-        List<MuscleGroup> groups = Lists.newArrayList(1L, 2L, 3L).stream().map(id -> createMuscleGroup(id, "foo" + id)).collect(Collectors.toList());
-        LiveData<List<MuscleGroup>> liveGroups = LiveDataUtil.getLive(groups);
+        LiveData<List<MuscleGroup>> liveGroups = ModelsFixture.createLiveMuscleGroups(1L, 2L, 3L);
 
         when(dao.getAllMuscleGroups()).thenReturn(liveGroups);
 
@@ -71,14 +67,8 @@ public class MuscleGroupRepositoryTest {
     @Test
     public void insertionTest() {
         MuscleGroupsRepository repository = new MuscleGroupsRepository(dao);
-        List<MuscleGroup> muscleGroups = Lists.newArrayList(createMuscleGroup(1L, "foo"));
+        List<MuscleGroup> muscleGroups = ModelsFixture.createMuscleGroups(1L, 2L);
         repository.insertMuscleGroups(muscleGroups);
         verify(dao).insertMuscleGroups(muscleGroups);
-    }
-
-    private MuscleGroup createMuscleGroup(long id, String name) {
-        MuscleGroup muscleGroup = new MuscleGroup(name);
-        muscleGroup.setId(id);
-        return muscleGroup;
     }
 }

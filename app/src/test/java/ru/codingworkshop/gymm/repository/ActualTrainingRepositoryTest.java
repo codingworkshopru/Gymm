@@ -16,6 +16,7 @@ import ru.codingworkshop.gymm.data.entity.ActualTraining;
 import ru.codingworkshop.gymm.data.util.LiveDataUtil;
 import ru.codingworkshop.gymm.db.dao.ActualTrainingDao;
 import ru.codingworkshop.gymm.util.LiveTest;
+import ru.codingworkshop.gymm.util.ModelsFixture;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.argThat;
@@ -43,8 +44,7 @@ public class ActualTrainingRepositoryTest {
 
     @Test
     public void insertActualTraining() {
-        ActualTraining training = new ActualTraining();
-        training.setProgramTrainingId(1L);
+        ActualTraining training = ModelsFixture.createActualTraining(0L, 1L);
         when(dao.insertActualTraining(training)).thenReturn(11L);
         repository.asyncTask = mock(BaseRepository.InsertWithIdAsyncTask.class);
         when(repository.asyncTask.execute(any(LongSupplier.class))).then(invocation -> {
@@ -59,13 +59,7 @@ public class ActualTrainingRepositoryTest {
 
     @Test
     public void getActualTrainingById() {
-        ActualTraining training = new ActualTraining();
-        training.setProgramTrainingId(1L);
-        training.setId(11L);
-
-        when(dao.getActualTrainingById(1L)).thenReturn(LiveDataUtil.getLive(training));
-        LiveTest.verifyLiveData(repository.getActualTrainingById(1L), tr -> tr == training);
-
+        repository.getActualTrainingById(1L);
         verify(dao).getActualTrainingById(1L);
     }
 }

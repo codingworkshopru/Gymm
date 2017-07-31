@@ -2,20 +2,18 @@ package ru.codingworkshop.gymm.data.wrapper;
 
 import android.arch.lifecycle.LiveData;
 
-import java.util.List;
-
 import ru.codingworkshop.gymm.data.entity.ActualTraining;
-import ru.codingworkshop.gymm.data.entity.Exercise;
 import ru.codingworkshop.gymm.repository.ActualTrainingRepository;
 import ru.codingworkshop.gymm.repository.ExercisesRepository;
+import ru.codingworkshop.gymm.repository.ProgramTrainingRepository;
 
 /**
  * Created by Радик on 29.07.2017.
  */
 
 public class ActualTrainingWrapper {
-    private List<Exercise> exercises;
     private ActualTraining actualTraining;
+    private ProgramTrainingWrapper programTrainingWrapper;
 
     public ActualTraining getActualTraining() {
         return actualTraining;
@@ -25,12 +23,12 @@ public class ActualTrainingWrapper {
         this.actualTraining = actualTraining;
     }
 
-    public List<Exercise> getExercises() {
-        return exercises;
+    public ProgramTrainingWrapper getProgramTrainingWrapper() {
+        return programTrainingWrapper;
     }
 
-    public void setExercises(List<Exercise> exercises) {
-        this.exercises = exercises;
+    public void setProgramTrainingWrapper(ProgramTrainingWrapper programTrainingWrapper) {
+        this.programTrainingWrapper = programTrainingWrapper;
     }
 
     public static ActualTraining createActualTraining(long programTrainingId) {
@@ -39,13 +37,26 @@ public class ActualTrainingWrapper {
         return training;
     }
 
-    public static LiveData<ActualTrainingWrapper> create(ActualTrainingRepository repository, ExercisesRepository exercisesRepository, long programTrainingId) {
+    public static LiveData<ActualTrainingWrapper> create(
+            long programTrainingId,
+            ActualTrainingRepository repository,
+            ProgramTrainingRepository programTrainingRepository,
+            ExercisesRepository exercisesRepository) {
         Loader<ActualTrainingWrapper> loader = new Loader<>(ActualTrainingWrapper::new);
-        ActualTraining training = createActualTraining(programTrainingId);
 
-        loader.addSource(exercisesRepository.getExercisesForProgramTraining(programTrainingId), ActualTrainingWrapper::setExercises);
+        loader.addSource(
+                ProgramTrainingWrapper.loadWithWrappedProgramExercises(programTrainingId, programTrainingRepository, exercisesRepository),
+                ActualTrainingWrapper::setProgramTrainingWrapper
+        );
+        ActualTraining training = createActualTraining(programTrainingId);
         loader.addDependentSource(repository.insertActualTraining(training), repository::getActualTrainingById, ActualTrainingWrapper::setActualTraining);
 
+        return loader.load();
+    }
+
+    public static LiveData<ActualTrainingWrapper> load(long actualTrainingId, ActualTrainingRepository actualTrainingRepository) {
+        Loader<ActualTrainingWrapper> loader = new Loader<>(ActualTrainingWrapper::new);
+        loader.addSource(actualTrainingRepository.getActualTrainingById(actualTrainingId), ActualTrainingWrapper::setActualTraining);
         return loader.load();
     }
 }

@@ -76,7 +76,7 @@ public class ProgramTrainingRepository extends BaseRepository {
     }
 
     public LiveData<ProgramExercise> getDraftingProgramExercise(long programTrainingId) {
-        isValidId(programTrainingId);
+        Preconditions.checkArgument(isValidId(programTrainingId));
         return dao.getDraftingProgramExercise(programTrainingId);
     }
 
