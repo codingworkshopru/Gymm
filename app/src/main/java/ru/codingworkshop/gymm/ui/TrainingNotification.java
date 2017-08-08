@@ -45,7 +45,7 @@ public final class TrainingNotification {
 //        Intent actualTrainingIntent = new Intent(context, ActualTrainingActivity.class);
 //        actualTrainingIntent.putExtra(ProgramTrainingActivity.PROGRAM_TRAINING_ID, id);
 //
-//        TaskStackBuilder stackBuilder = TaskStackBuilder.createTraining(context)
+//        TaskStackBuilder stackBuilder = TaskStackBuilder.programTrainingInstance(context)
 //                .addParentStack(ActualTrainingActivity.class)
 //                .addNextIntent(actualTrainingIntent);
 

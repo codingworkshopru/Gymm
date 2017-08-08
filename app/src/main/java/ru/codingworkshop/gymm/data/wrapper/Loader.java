@@ -20,9 +20,13 @@ public class Loader<Wrapper> {
     private boolean initialized;
     private int countdown;
 
-    public Loader(Supplier<Wrapper> wrapperSupplier) {
+    public Loader(Wrapper wrapper) {
         liveWrapper = new MediatorLiveData<>();
-        wrapper = wrapperSupplier.get();
+        this.wrapper = wrapper;
+    }
+
+    public Loader(Supplier<Wrapper> wrapperSupplier) {
+        this(wrapperSupplier.get());
     }
 
     public LiveData<Wrapper> load() {

@@ -1,9 +1,11 @@
 package ru.codingworkshop.gymm.util;
 
+import ru.codingworkshop.gymm.data.wrapper.BaseWrapper;
+
 /**
  * Created by Радик on 31.07.2017 as part of the Gymm project.
  */
-public final class SimpleWrapper {
+public final class SimpleWrapper extends BaseWrapper<Long, SimpleModel> {
     private Long number;
     private String string;
     private Boolean bool;
@@ -11,20 +13,14 @@ public final class SimpleWrapper {
     public SimpleWrapper() {
     }
 
-    public void setLong(Long myNumber) {
-        number = myNumber;
+    @Override
+    protected void saveRoot() {
+
     }
 
-    public Long getLong() {
-        return number;
-    }
+    @Override
+    protected void saveChildren() {
 
-    public void setString(String value) {
-        string = value;
-    }
-
-    public String getString() {
-        return string;
     }
 
     public void setBool(Boolean bool) {

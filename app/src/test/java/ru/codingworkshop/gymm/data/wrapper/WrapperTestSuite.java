@@ -10,6 +10,7 @@ import org.junit.runners.Suite;
 @RunWith(Suite.class)
 @Suite.SuiteClasses({
         LoaderTest.class,
+        BaseLoaderTest.class,
         ChildrenSaverTest.class,
         SortableChildrenDelegateTest.class,
         ExerciseWrapperTest.class,

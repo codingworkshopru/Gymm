@@ -15,12 +15,9 @@ import org.mockito.junit.MockitoJUnitRunner;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import ru.codingworkshop.gymm.data.entity.Exercise;
 import ru.codingworkshop.gymm.data.entity.ProgramExercise;
-import ru.codingworkshop.gymm.data.entity.ProgramSet;
 import ru.codingworkshop.gymm.data.entity.ProgramTraining;
 import ru.codingworkshop.gymm.data.util.LiveDataUtil;
-import ru.codingworkshop.gymm.repository.ExercisesRepository;
 import ru.codingworkshop.gymm.repository.ProgramTrainingRepository;
 import ru.codingworkshop.gymm.util.LiveTest;
 import ru.codingworkshop.gymm.util.ModelsFixture;
@@ -31,7 +28,6 @@ import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.argThat;
 import static org.mockito.Mockito.doAnswer;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -50,22 +46,22 @@ public class ProgramTrainingWrapperTest {
     @Test
     public void creation() {
         ProgramTraining training = ModelsFixture.createProgramTraining(1L, "foo");
-        ProgramTrainingWrapper wrapper = new ProgramTrainingWrapper(training);
-        wrapper.setProgramExercises(ModelsFixture.createProgramExercises(1));
+        ProgramTrainingWrapper wrapper = new ProgramTrainingWrapper(training, repository);
+        wrapper.setChildren(ModelsFixture.createProgramExercises(1));
 
-        assertEquals("foo", wrapper.getProgramTraining().getName());
-        assertEquals(1, wrapper.getProgramExercises().size());
+        assertEquals("foo", wrapper.getRoot().getName());
+        assertEquals(1, wrapper.getChildren().size());
     }
 
     @Test
     public void restoreRemoved() {
-        ProgramTrainingWrapper wrapper = new ProgramTrainingWrapper(ModelsFixture.createProgramTraining(1L, "foo"));
+        ProgramTrainingWrapper wrapper = new ProgramTrainingWrapper(ModelsFixture.createProgramTraining(1L, "foo"), repository);
         ProgramExercise exercise = ModelsFixture.createProgramExercise(2L, 1L, 100L, false);
-        wrapper.addProgramExercise(exercise);
-        wrapper.removeProgramExercise(exercise);
-        assertFalse(wrapper.hasProgramExercises());
+        wrapper.setChildren(Lists.newArrayList(exercise));
+        wrapper.removeChild(exercise);
+        assertFalse(wrapper.hasChildren());
         wrapper.restoreLastRemoved();
-        assertTrue(wrapper.hasProgramExercises());
+        assertTrue(wrapper.hasChildren());
     }
 
     @Test
@@ -78,10 +74,10 @@ public class ProgramTrainingWrapperTest {
         when(repository.getProgramExercisesForTraining(training)).thenReturn(LiveDataUtil.getLive(exercisesForProgram));
 
         LiveTest.verifyLiveData(
-                ProgramTrainingWrapper.createTraining(repository),
-                wrapper -> wrapper.getProgramTraining().getId() == 1
-                        && wrapper.getProgramTraining().isDrafting()
-                        && wrapper.hasProgramExercises()
+                new ProgramTrainingWrapper(repository).createTraining(),
+                wrapper -> wrapper.getRoot().getId() == 1
+                        && wrapper.getRoot().isDrafting()
+                        && wrapper.hasChildren()
         );
 
         verify(repository).getProgramExercisesForTraining(training);
@@ -95,13 +91,13 @@ public class ProgramTrainingWrapperTest {
         when(repository.getDraftingProgramTraining()).thenReturn(draftingTraining);
 
         doAnswer((a) -> {
-            draftingTraining.setValue(ProgramTrainingWrapper.createTraining());
+            draftingTraining.setValue(ProgramTrainingWrapper.programTrainingInstance());
             return null;
         }).when(repository).insertProgramTraining(any(ProgramTraining.class));
 
         LiveTest.verifyLiveData(
-                ProgramTrainingWrapper.createTraining(repository),
-                wrapper -> wrapper.getProgramTraining().isDrafting() && !wrapper.hasProgramExercises()
+                new ProgramTrainingWrapper(repository).createTraining(),
+                wrapper -> wrapper.getRoot().isDrafting() && !wrapper.hasChildren()
         );
 
         verify(repository).getDraftingProgramTraining();
@@ -111,21 +107,21 @@ public class ProgramTrainingWrapperTest {
 
     @Test
     public void creationUsingStaticMethod() {
-        ProgramTraining training = ProgramTrainingWrapper.createTraining();
+        ProgramTraining training = ProgramTrainingWrapper.programTrainingInstance();
 
         assertTrue(training.isDrafting());
     }
 
     @Test
-    public void loadUsingStaticMethod() {
+    public void load() {
         LiveData<ProgramTraining> training = ModelsFixture.createLiveProgramTraining(1L, "foo", false);
         when(repository.getProgramTrainingById(1)).thenReturn(training);
         when(repository.getProgramExercisesForTraining(1)).thenReturn(LiveDataUtil.getLive(ModelsFixture.createProgramExercises(1)));
 
         LiveTest.verifyLiveData(
-                ProgramTrainingWrapper.load(1, repository),
-                wrapper -> wrapper.hasProgramExercises()
-                        && wrapper.getProgramTraining().getName().equals("foo")
+                new ProgramTrainingWrapper(repository).load(1),
+                wrapper -> wrapper.hasChildren()
+                        && wrapper.getRoot().getName().equals("foo")
         );
 
         verify(repository).getProgramTrainingById(1);
@@ -133,57 +129,16 @@ public class ProgramTrainingWrapperTest {
     }
 
     @Test
-    public void loadWithWrappedProgramExercises() {
-        ProgramTraining training = ModelsFixture.createProgramTraining(1L, "foo");
-        List<ProgramExercise> programExercises = ModelsFixture.createProgramExercises(10);
-        List<Exercise> exercises = ModelsFixture.createExercises("bar", "baz");
-        programExercises.forEach(ex -> ex.setExerciseId(exercises.get(ex.getId()%2==0?0:1).getId()));
-        List<ProgramSet> sets = Lists.newArrayList();
-        programExercises.forEach(programExercise -> {
-            for (int i = 0; i < programExercise.getId() - 1; i++) {
-                ProgramSet set = ModelsFixture.createProgramSet(programExercise.getId() * 10 + i, programExercise.getId(), i);
-                set.setSortOrder(i);
-                sets.add(set);
-            }
-        });
-
-        ExercisesRepository exercisesRepository = mock(ExercisesRepository.class);
-        when(exercisesRepository.getExercisesForProgramTraining(1L)).thenReturn(LiveDataUtil.getLive(exercises));
-
-        when(repository.getProgramTrainingById(1L)).thenReturn(LiveDataUtil.getLive(training));
-        when(repository.getProgramExercisesForTraining(1L)).thenReturn(LiveDataUtil.getLive(programExercises));
-        when(repository.getProgramSetsForTraining(1L)).thenReturn(LiveDataUtil.getLive(sets));
-
-        LiveData<ProgramTrainingWrapper> liveWrapper = ProgramTrainingWrapper.loadWithWrappedProgramExercises(1L, repository, exercisesRepository);
-        LiveTest.verifyLiveData(
-                liveWrapper,
-                wrapper -> {
-                    assertEquals(training, wrapper.getProgramTraining());
-                    assertEquals(programExercises, wrapper.getProgramExercises());
-                    assertEquals(10, wrapper.getExerciseWrappers().size());
-                    assertEquals(sets, wrapper.getExerciseWrappers().stream().flatMap(w -> w.getProgramSets().stream()).collect(Collectors.toList()));
-                    assertEquals(exercises, wrapper.getExerciseWrappers().stream().map(ProgramExerciseWrapper::getExercise).distinct().sorted((a,b) -> (int)(a.getId()-b.getId())).collect(Collectors.toList()));
-                    
-                    return true;
-                }
-        );
-
-        verify(repository).getProgramTrainingById(1L);
-        verify(repository).getProgramExercisesForTraining(1L);
-        verify(repository).getProgramSetsForTraining(1L);
-    }
-
-    @Test
     public void saveProgramTrainingWithUnchangedExercises() {
         ProgramTraining training = ModelsFixture.createProgramTraining(1L, "foo");
-        ProgramTrainingWrapper wrapper = new ProgramTrainingWrapper(training);
+        ProgramTrainingWrapper wrapper = new ProgramTrainingWrapper(training, repository);
 
         List<ProgramExercise> oldExercises = ModelsFixture.createProgramExercises(4);
         when(repository.getProgramExercisesForTraining(training)).thenReturn(LiveDataUtil.getLive(oldExercises));
 
-        wrapper.setProgramExercises(oldExercises);
+        wrapper.setChildren(oldExercises);
 
-        wrapper.save(repository);
+        wrapper.save();
 
         verify(repository).getProgramExercisesForTraining(training);
         verify(repository).updateProgramTraining(training);
@@ -192,22 +147,22 @@ public class ProgramTrainingWrapperTest {
     @Test
     public void saveProgramTrainingExercises() {
         ProgramTraining training = ModelsFixture.createProgramTraining(1L, "foo");
-        ProgramTrainingWrapper wrapper = new ProgramTrainingWrapper(training);
+        ProgramTrainingWrapper wrapper = new ProgramTrainingWrapper(training, repository);
 
         List<ProgramExercise> oldExercises = ModelsFixture.createProgramExercises(10);
 
         List<ProgramExercise> newExercises = ModelsFixture.createProgramExercises(10);
-        wrapper.setProgramExercises(newExercises);
+        wrapper.setChildren(newExercises);
 
         when(repository.getProgramExercisesForTraining(training)).thenReturn(LiveDataUtil.getLive(oldExercises));
 
-        Lists.newArrayList(0, 1, 5, 9).forEach(index -> wrapper.removeProgramExercise(newExercises.get(index)));
+        Lists.newArrayList(0, 1, 5, 9).forEach(index -> wrapper.removeChild(newExercises.get(index)));
 
-        wrapper.moveProgramExercise(5, 0);
-        wrapper.moveProgramExercise(3, 5);
-        wrapper.moveProgramExercise(1, 2);
+        wrapper.move(5, 0);
+        wrapper.move(3, 5);
+        wrapper.move(1, 2);
 
-        wrapper.save(repository);
+        wrapper.save();
 
         /* verify actions
             0 1 2 3 4 5 6 7 8 9         - source

@@ -45,30 +45,34 @@ public class ProgramExerciseWrapperTest {
     public InstantTaskExecutorRule instantTaskExecutorRule = new InstantTaskExecutorRule();
 
     private ExercisesRepository exercisesRepository;
+    private ProgramTrainingRepository repository;
+    private ProgramExerciseWrapper wrapper;
 
     @Before
     public void init() {
         Exercise exercise = ModelsFixture.createExercise(100L, "foobar");
+        repository = mock(ProgramTrainingRepository.class);
 
         exercisesRepository = mock(ExercisesRepository.class);
         when(exercisesRepository.getExerciseById(100L)).thenReturn(LiveDataUtil.getLive(exercise));
+
+        wrapper = new ProgramExerciseWrapper(repository, exercisesRepository);
     }
 
     @Test
     public void settingWrappedValues() {
-        ProgramExerciseWrapper wrapper = new ProgramExerciseWrapper();
-        wrapper.setProgramExercise(ModelsFixture.createProgramExercise(2L, 1L, 33L, false));
-        wrapper.setProgramSets(ModelsFixture.createProgramSets(10));
+        wrapper.setRoot(ModelsFixture.createProgramExercise(2L, 1L, 33L, false));
+        wrapper.setChildren(ModelsFixture.createProgramSets(10));
         wrapper.setExercise(ModelsFixture.createExercise(1, "foo"));
 
         assertNotNull(wrapper.getExercise());
-        assertNotNull(wrapper.getProgramExercise());
-        assertEquals(10, wrapper.getProgramSets().size());
+        assertNotNull(wrapper.getRoot());
+        assertEquals(10, wrapper.getChildren().size());
     }
 
     @Test
     public void creationProgramExercise() {
-        ProgramExercise exercise = ProgramExerciseWrapper.createProgramExercise(1L);
+        ProgramExercise exercise = ProgramExerciseWrapper.programExerciseInstance(1L);
         assertEquals(0, exercise.getExerciseId());
         assertTrue(exercise.isDrafting());
         assertEquals(1L, exercise.getProgramTrainingId());
@@ -76,34 +80,33 @@ public class ProgramExerciseWrapperTest {
 
     @Test
     public void childrenTest() {
-        ProgramExerciseWrapper wrapper = new ProgramExerciseWrapper();
-        assertFalse(wrapper.hasProgramSets());
+        assertFalse(wrapper.hasChildren());
 
         // add
         ProgramSet set = ModelsFixture.createProgramSets(1).get(0);
-        wrapper.addProgramSet(set);
-        assertEquals(set, wrapper.getProgramSets().get(0));
+        wrapper.addChild(set);
+        assertEquals(set, wrapper.getChildren().get(0));
 
         // remove
-        wrapper.removeProgramSet(set);
-        assertFalse(wrapper.hasProgramSets());
-        wrapper.addProgramSet(set);
-        assertTrue(wrapper.hasProgramSets());
-        wrapper.removeProgramSet(0);
-        assertFalse(wrapper.hasProgramSets());
+        wrapper.removeChild(set);
+        assertFalse(wrapper.hasChildren());
+        wrapper.addChild(set);
+        assertTrue(wrapper.hasChildren());
+        wrapper.removeChild(0);
+        assertFalse(wrapper.hasChildren());
 
         // move
         List<ProgramSet> sets = ModelsFixture.createProgramSets(10);
-        wrapper.setProgramSets(sets);
+        wrapper.setChildren(sets);
         wrapper.move(3, 7);
-        assertEquals(sets.get(3), wrapper.getProgramSets().get(7));
+        assertEquals(sets.get(3), wrapper.getChildren().get(7));
 
         // restore
-        ProgramSet toRemove = wrapper.getProgramSets().get(8);
-        wrapper.removeProgramSet(8);
-        assertEquals(9, wrapper.getProgramSets().size());
+        ProgramSet toRemove = wrapper.getChildren().get(8);
+        wrapper.removeChild(8);
+        assertEquals(9, wrapper.getChildren().size());
         wrapper.restoreLastRemoved();
-        assertEquals(toRemove, wrapper.getProgramSets().get(8));
+        assertEquals(toRemove, wrapper.getChildren().get(8));
     }
 
     @Test
@@ -111,21 +114,20 @@ public class ProgramExerciseWrapperTest {
         MutableLiveData<ProgramExercise> liveProgramExercise = new MutableLiveData<>();
         liveProgramExercise.setValue(null);
 
-        ProgramTrainingRepository repository = mock(ProgramTrainingRepository.class);
         when(repository.getDraftingProgramExercise(1L)).thenReturn(liveProgramExercise);
 
         when(exercisesRepository.getExerciseById(0L)).thenReturn(LiveDataUtil.getLive(null));
 
         doAnswer(invocation -> {
-            liveProgramExercise.setValue(ProgramExerciseWrapper.createProgramExercise(1L));
+            liveProgramExercise.setValue(ProgramExerciseWrapper.programExerciseInstance(1L));
             return null;
         }).when(repository).insertProgramExercise(any(ProgramExercise.class));
 
-        LiveData<ProgramExerciseWrapper> wrapper = ProgramExerciseWrapper.createProgramExercise(repository, exercisesRepository, 1L);
+        LiveData<ProgramExerciseWrapper> liveWrapper = wrapper.createProgramExercise(1L);
         LiveTest.verifyLiveData(
-                wrapper,
-                w -> w.getProgramExercise().isDrafting()
-                        && w.getProgramExercise().getProgramTrainingId() == 1L
+                liveWrapper,
+                w -> w.getRoot().isDrafting()
+                        && w.getRoot().getProgramTrainingId() == 1L
                         && w.getExercise() == null
         );
 
@@ -141,19 +143,18 @@ public class ProgramExerciseWrapperTest {
         draftingExercise.getValue().setDrafting(true);
         LiveData<List<ProgramSet>> sets = LiveDataUtil.getLive(ModelsFixture.createProgramSets(10));
 
-        ProgramTrainingRepository repository = mock(ProgramTrainingRepository.class);
         when(repository.getDraftingProgramExercise(1L)).thenReturn(draftingExercise);
         when(repository.getProgramSetsForExercise(draftingExercise.getValue())).thenReturn(sets);
 
-        LiveData<ProgramExerciseWrapper> liveWrapper = ProgramExerciseWrapper.createProgramExercise(repository, exercisesRepository, 1L);
+        LiveData<ProgramExerciseWrapper> liveWrapper = wrapper.createProgramExercise(1L);
 
         LiveTest.verifyLiveData(
                 liveWrapper,
-                wrapper -> wrapper.getProgramExercise().getProgramTrainingId() == 1L
-                        && wrapper.getProgramExercise().getId() == 2L
-                        && wrapper.getProgramExercise().isDrafting()
-                        && wrapper.getProgramSets().size() == 10
-                        && wrapper.getExercise().getId() == 100L
+                w -> w.getRoot().getProgramTrainingId() == 1L
+                        && w.getRoot().getId() == 2L
+                        && w.getRoot().isDrafting()
+                        && w.getChildren().size() == 10
+                        && w.getExercise().getId() == 100L
         );
 
         verify(exercisesRepository).getExerciseById(100L);
@@ -167,45 +168,41 @@ public class ProgramExerciseWrapperTest {
         LiveData<ProgramExercise> loadedExercise = LiveDataUtil.getLive(ModelsFixture.createProgramExercise(2L, 1L, 100L, false));
         LiveData<List<ProgramSet>> sets = ModelsFixture.createLiveProgramSets(10);
 
-        ProgramTrainingRepository programRepository = mock(ProgramTrainingRepository.class);
-        when(programRepository.getProgramExerciseById(2L)).thenReturn(loadedExercise);
-        when(programRepository.getProgramSetsForExercise(2L)).thenReturn(sets);
+        when(repository.getProgramExerciseById(2L)).thenReturn(loadedExercise);
+        when(repository.getProgramSetsForExercise(2L)).thenReturn(sets);
 
-        LiveData<ProgramExerciseWrapper> liveWrapper = ProgramExerciseWrapper.load(programRepository, exercisesRepository, 2L);
+        LiveData<ProgramExerciseWrapper> liveWrapper = wrapper.load(2L);
 
         LiveTest.verifyLiveData(
                 liveWrapper,
-                wrapper -> wrapper.getProgramExercise().getProgramTrainingId() == 1L
-                        && wrapper.getProgramExercise().getId() == 2L
-                        && !wrapper.getProgramExercise().isDrafting()
-                        && wrapper.getProgramSets().size() == 10
+                wrapper -> wrapper.getRoot().getProgramTrainingId() == 1L
+                        && wrapper.getRoot().getId() == 2L
+                        && !wrapper.getRoot().isDrafting()
+                        && wrapper.getChildren().size() == 10
                         && wrapper.getExercise().getId() == 100L
         );
 
         verify(exercisesRepository).getExerciseById(100L);
-        verify(programRepository).getProgramExerciseById(2L);
-        verify(programRepository).getProgramSetsForExercise(2L);
+        verify(repository).getProgramExerciseById(2L);
+        verify(repository).getProgramSetsForExercise(2L);
     }
 
     @Test
     public void saveAll() {
-        ProgramExerciseWrapper wrapper = new ProgramExerciseWrapper();
-
         ProgramExercise programExercise = ModelsFixture.createProgramExercise(2L, 1L, 33L, false);
-        wrapper.setProgramExercise(programExercise);
+        wrapper.setRoot(programExercise);
 
         List<ProgramSet> oldSets = ModelsFixture.createProgramSets(10);
         List<ProgramSet> newSets = Lists.newArrayList(oldSets);
         newSets.removeIf(set -> set.getId() % 2 == 0);
         ProgramSet newSet = ModelsFixture.createProgramSet(51L, 2L, 3);
         newSets.add(newSet);
-        wrapper.setProgramSets(newSets);
+        wrapper.setChildren(newSets);
 
         wrapper.move(2, 4);
 
-        ProgramTrainingRepository repository = mock(ProgramTrainingRepository.class);
         when(repository.getProgramSetsForExercise(programExercise)).thenReturn(LiveDataUtil.getLive(oldSets));
-        wrapper.save(repository);
+        wrapper.save();
 
         verify(repository).getProgramSetsForExercise(programExercise);
         verify(repository).updateProgramExercise(programExercise);
