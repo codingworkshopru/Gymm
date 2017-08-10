@@ -68,6 +68,10 @@ public class ModelsFixture {
         return entity;
     }
 
+    public static LiveData<List<ProgramExercise>> createLiveProgramExercises(int count) {
+        return LiveDataUtil.getLive(createProgramExercises(count));
+    }
+
     public static List<ProgramExercise> createProgramExercises(int count) {
         List<ProgramExercise> exercises = Lists.newArrayListWithCapacity(count);
         for (int i = 0; i < count; i++) {
@@ -114,15 +118,17 @@ public class ModelsFixture {
     }
 
     public static ActualTraining createActualTraining(long id, long programTrainingId) {
-        ActualTraining training = new ActualTraining();
+        ActualTraining training = new ActualTraining(programTrainingId, new Date());
         training.setId(id);
-        training.setProgramTrainingId(programTrainingId);
-        training.setStartTime(new Date());
         return training;
     }
 
     public static LiveData<Exercise> createLiveExercise(long id, String name) {
         return LiveDataUtil.getLive(createExercise(id, name));
+    }
+
+    public static LiveData<List<Exercise>> createLiveExercises(String... exerciseNames) {
+        return LiveDataUtil.getLive(createExercises(exerciseNames));
     }
 
     public static List<Exercise> createExercises(String... exerciseNames) {

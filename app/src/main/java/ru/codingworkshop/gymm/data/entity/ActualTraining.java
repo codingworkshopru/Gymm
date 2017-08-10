@@ -10,6 +10,7 @@ import android.support.annotation.Nullable;
 
 import java.util.Date;
 
+import ru.codingworkshop.gymm.data.entity.common.Model;
 import ru.codingworkshop.gymm.db.Converters;
 
 import static android.arch.persistence.room.ForeignKey.CASCADE;
@@ -33,17 +34,24 @@ import static android.arch.persistence.room.ForeignKey.SET_NULL;
         indices = @Index("programTrainingId")
 )
 @TypeConverters(Converters.class)
-public class ActualTraining {
+public class ActualTraining implements Model {
     @PrimaryKey(autoGenerate = true)
     private long id;
     private Date startTime;
     private Date finishTime;
     private Long programTrainingId;
 
+    public ActualTraining(long programTrainingId, @NonNull Date startTime) {
+        this.programTrainingId = programTrainingId;
+        this.startTime = startTime;
+    }
+
+    @Override
     public long getId() {
         return id;
     }
 
+    @Override
     public void setId(long id) {
         this.id = id;
     }

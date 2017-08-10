@@ -2,10 +2,10 @@ package ru.codingworkshop.gymm.repository;
 
 import android.arch.lifecycle.LiveData;
 import android.support.annotation.NonNull;
+import android.support.annotation.VisibleForTesting;
 
 import com.google.common.base.Preconditions;
 
-import java.util.Date;
 import java.util.concurrent.Executor;
 
 import javax.inject.Inject;
@@ -26,13 +26,18 @@ public class ActualTrainingRepository extends BaseRepository {
         this.dao = dao;
     }
 
+    @VisibleForTesting
+    ActualTrainingRepository(Executor executor, ATask aTask, ActualTrainingDao dao) {
+        super(executor, aTask);
+        this.dao = dao;
+    }
+
     public LiveData<ActualTraining> getActualTrainingById(long actualTrainingId) {
         return dao.getActualTrainingById(actualTrainingId);
     }
 
     public LiveData<Long> insertActualTraining(@NonNull ActualTraining actualTraining) {
-        actualTraining.setStartTime(new Date());
-        return insertAndGetId(actualTraining, dao::insertActualTraining, ActualTrainingRepository::checkActualTraining);
+        return insert(actualTraining, dao::insertActualTraining, ActualTrainingRepository::checkActualTraining);
     }
 
     private static void checkActualTraining(@NonNull ActualTraining actualTraining) {

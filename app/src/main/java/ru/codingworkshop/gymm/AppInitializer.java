@@ -1,6 +1,5 @@
 package ru.codingworkshop.gymm;
 
-import android.annotation.SuppressLint;
 import android.arch.lifecycle.MutableLiveData;
 import android.os.AsyncTask;
 
@@ -30,7 +29,6 @@ public class AppInitializer implements Initializer {
         return initialized;
     }
 
-    @SuppressLint("StaticFieldLeak")
     @Override
     public void initialize() {
         new AsyncTask<Void, Void, Void>() {
