@@ -18,8 +18,6 @@ import ru.codingworkshop.gymm.data.entity.ProgramTraining;
 import ru.codingworkshop.gymm.data.entity.common.Named;
 import ru.codingworkshop.gymm.db.dao.ProgramTrainingDao;
 
-import static ru.codingworkshop.gymm.db.GymmDatabase.INVALID_ID;
-
 /**
  * Created by Радик on 21.06.2017.
  */
@@ -152,9 +150,5 @@ public class ProgramTrainingRepository extends BaseRepository {
 
     private static void checkName(@NonNull Named named) {
         Preconditions.checkArgument(named.getName() != null && !named.getName().isEmpty());
-    }
-
-    private static boolean isValidId(long id) {
-        return id != INVALID_ID;
     }
 }

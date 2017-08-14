@@ -5,6 +5,11 @@ import android.arch.persistence.room.Dao;
 import android.arch.persistence.room.Insert;
 import android.arch.persistence.room.Query;
 
+import java.util.Collection;
+import java.util.List;
+
+import ru.codingworkshop.gymm.data.entity.ActualExercise;
+import ru.codingworkshop.gymm.data.entity.ActualSet;
 import ru.codingworkshop.gymm.data.entity.ActualTraining;
 
 /**
@@ -18,4 +23,22 @@ public interface ActualTrainingDao {
 
     @Insert
     Long insertActualTraining(ActualTraining actualTraining);
+
+    @Insert
+    List<Long> insertActualExercises(Collection<ActualExercise> actualExercises);
+
+    @Insert
+    Long insertActualSet(ActualSet actualSet);
+
+    @Query("select * " +
+            "from ActualExercise " +
+            "where actualTrainingId = :actualTrainingId")
+    LiveData<List<ActualExercise>> getActualExercisesForActualTraining(long actualTrainingId);
+
+    @Query("select aset.* " +
+            "from ActualSet aset " +
+            "join ActualExercise ae on ae.id = aset.actualExerciseId " +
+            "where ae.actualTrainingId = :actualTrainingId " +
+            "order by ae.id, aset.id")
+    LiveData<List<ActualSet>> getActualSetsForActualTraining(long actualTrainingId);
 }

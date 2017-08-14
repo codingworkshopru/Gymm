@@ -210,5 +210,4 @@ public class ProgramExerciseWrapperTest {
         verify(repository).deleteProgramSets(argThat(sets -> sets.stream().allMatch(set -> set.getId() % 2 == 0)));
         verify(repository).updateProgramSets(argThat(sets -> sets.stream().allMatch(set -> set.getId() >= 2 && set.getId() <= 4)));
     }
-
 }

@@ -1,23 +1,32 @@
 package ru.codingworkshop.gymm.data.wrapper;
 
 import android.arch.lifecycle.LiveData;
+import android.arch.lifecycle.Observer;
 import android.support.annotation.NonNull;
+import android.support.annotation.VisibleForTesting;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableListMultimap;
+import com.google.common.collect.ListMultimap;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Multimaps;
 
+import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.TreeMap;
 
+import ru.codingworkshop.gymm.data.entity.ActualExercise;
+import ru.codingworkshop.gymm.data.entity.ActualSet;
 import ru.codingworkshop.gymm.data.entity.ActualTraining;
 import ru.codingworkshop.gymm.data.entity.Exercise;
 import ru.codingworkshop.gymm.data.entity.ProgramExercise;
 import ru.codingworkshop.gymm.data.entity.ProgramSet;
 import ru.codingworkshop.gymm.data.entity.ProgramTraining;
+import ru.codingworkshop.gymm.data.entity.common.Model;
+import ru.codingworkshop.gymm.db.GymmDatabase;
 import ru.codingworkshop.gymm.repository.ActualTrainingRepository;
 import ru.codingworkshop.gymm.repository.ExercisesRepository;
 import ru.codingworkshop.gymm.repository.ProgramTrainingRepository;
@@ -36,7 +45,10 @@ class ActualTrainingWrapper {
     private ImmutableListMultimap<Long, ProgramSet> programSets;
 
     private Map<Long, Exercise> exercises;
+
     private ActualTraining actualTraining;
+    private Map<Long, ActualExercise> actualExercises;
+    private ListMultimap<Long, ActualSet> actualSets;
 
     public ActualTrainingWrapper(ActualTrainingRepository actualTrainingRepository, ProgramTrainingRepository programTrainingRepository, ExercisesRepository exercisesRepository) {
         this.actualTrainingRepository = actualTrainingRepository;
@@ -58,9 +70,14 @@ class ActualTrainingWrapper {
     }
 
     public void setProgramExercises(@NonNull List<ProgramExercise> programExercises) {
-        Preconditions.checkNotNull(programExercises, "Trying to set null as program exercises");
-        Preconditions.checkArgument(!programExercises.isEmpty(), "Trying to set empty program exercises");
+        checkCollection(programExercises);
         this.programExercises = programExercises;
+    }
+
+    @VisibleForTesting
+    void checkCollection(Collection collection) {
+        Preconditions.checkNotNull(collection, "Collection is null");
+        Preconditions.checkArgument(!collection.isEmpty(), "Collection is empty");
     }
 
     public List<Exercise> getExercises() {
@@ -68,8 +85,7 @@ class ActualTrainingWrapper {
     }
 
     public void setExercises(@NonNull List<Exercise> exercises) {
-        Preconditions.checkNotNull(exercises, "Trying to set null as exercises");
-        Preconditions.checkArgument(!exercises.isEmpty(), "Trying to set empty exercises");
+        checkCollection(exercises);
         this.exercises = Maps.uniqueIndex(exercises, Exercise::getId);
     }
 
@@ -78,8 +94,7 @@ class ActualTrainingWrapper {
     }
 
     public void setProgramSets(@NonNull List<ProgramSet> programSets) {
-        Preconditions.checkNotNull(programSets, "Trying to set null as program sets");
-        Preconditions.checkArgument(!programSets.isEmpty(), "Trying to set empty program sets");
+        checkCollection(programSets);
         this.programSets = Multimaps.index(programSets, ProgramSet::getProgramExerciseId);
     }
 
@@ -97,13 +112,63 @@ class ActualTrainingWrapper {
         return exercises.get(programExercise.getExerciseId());
     }
 
-    public LiveData<ActualTrainingWrapper> load(long programTrainingId) {
-        Loader<ActualTrainingWrapper> loader = new Loader<>(this);
+    public List<ActualExercise> getActualExercises() {
+        return Lists.newArrayList(actualExercises.values());
+    }
 
+    public void setActualExercises(@NonNull List<ActualExercise> actualExercises) {
+        checkCollection(actualExercises);
+        checkCollection(programExercises);
+        Map<Long, ProgramExercise> programExerciseMap = Maps.uniqueIndex(programExercises, Model::getId);
+        this.actualExercises = new TreeMap<>(
+            (ex1, ex2) -> programExerciseMap.get(ex1).getSortOrder() - programExerciseMap.get(ex2).getSortOrder()
+        );
+        this.actualExercises.putAll(Maps.uniqueIndex(actualExercises, ActualExercise::getProgramExerciseId));
+    }
+
+    public ActualTraining getActualTraining() {
+        return actualTraining;
+    }
+
+    public void setActualTraining(@NonNull ActualTraining actualTraining) {
+        Preconditions.checkNotNull(actualTraining, "Trying to set null as actual training");
+        this.actualTraining = actualTraining;
+    }
+
+    public LiveData<ActualTrainingWrapper> create(long programTrainingId) {
+        actualTraining = new ActualTraining(programTrainingId, new Date());
+        actualTrainingRepository.insertActualTraining(actualTraining);
+
+        Loader<ActualTrainingWrapper> loader = new Loader<>(this);
         loadTrainingProgram(loader, programTrainingId);
         loadExercises(loader, programTrainingId);
 
-        return loader.load();
+        LiveData<ActualTrainingWrapper> liveWrapper = loader.load();
+
+        List<Observer<ActualTrainingWrapper>> containerForObserver = Lists.newArrayListWithCapacity(1);
+        Observer<ActualTrainingWrapper> observer = wrapper -> {
+            if (wrapper != null) {
+                createActualExercises();
+                liveWrapper.removeObserver(containerForObserver.get(0));
+            }
+        };
+        containerForObserver.add(observer);
+        liveWrapper.observeForever(observer);
+
+        return liveWrapper;
+    }
+
+    private void createActualExercises() {
+        Preconditions.checkState(programExercises != null && !programExercises.isEmpty());
+
+        List<ActualExercise> actualExercises = Lists.newArrayListWithCapacity(programExercises.size());
+        for (ProgramExercise programExercise : programExercises) {
+            String exerciseName = getExerciseForProgramExercise(programExercise).getName();
+            ActualExercise actualExercise = new ActualExercise(exerciseName, actualTraining.getId(), programExercise.getId());
+            actualExercises.add(actualExercise);
+        }
+        actualTrainingRepository.insertActualExercises(actualExercises);
+        setActualExercises(actualExercises);
     }
 
     private void loadTrainingProgram(Loader<ActualTrainingWrapper> loader, long programTrainingId) {
@@ -116,25 +181,53 @@ class ActualTrainingWrapper {
         loader.addSource(exercisesRepository.getExercisesForProgramTraining(programTrainingId), ActualTrainingWrapper::setExercises);
     }
 
-    public ActualTraining getActualTraining() {
-        return actualTraining;
+    public void createActualSet(@NonNull ActualExercise actualExercise, int reps, double weight) {
+        checkActualExercise(actualExercise);
+        if (actualSets == null) {
+            actualSets = newEmptyListMultimap();
+        }
+        ActualSet actualSet = new ActualSet(actualExercise.getId(), reps);
+        actualSet.setWeight(weight);
+        actualSets.put(actualExercise.getId(), actualSet);
+        actualTrainingRepository.insertActualSet(actualSet);
     }
 
-    public void setActualTraining(@NonNull ActualTraining actualTraining) {
-        Preconditions.checkNotNull(actualTraining, "Trying to set null as actual training");
-        this.actualTraining = actualTraining;
+    @NonNull
+    private <T,F> ListMultimap<T, F> newEmptyListMultimap() {
+        return Multimaps.newListMultimap(Maps.newHashMap(), Lists::newLinkedList);
     }
 
+    public List<ActualSet> getActualSets(@NonNull ActualExercise actualExercise) {
+        checkActualExercise(actualExercise);
+        return actualSets.get(actualExercise.getId());
+    }
 
-    public LiveData<ActualTrainingWrapper> create(long programTrainingId) {
-        actualTraining = new ActualTraining(programTrainingId, new Date());
+    public void setActualSets(List<ActualSet> actualSets) {
+        checkCollection(actualSets);
+        this.actualSets = newEmptyListMultimap();
+        for (ActualSet set : actualSets) {
+            this.actualSets.put(set.getActualExerciseId(), set);
+        }
+    }
 
-        Loader<ActualTrainingWrapper> loader = new Loader<>(this);
-        actualTrainingRepository.insertActualTraining(actualTraining);
+    private void checkActualExercise(@NonNull ActualExercise actualExercise) {
+        Preconditions.checkNotNull(actualExercise, "Actual exercise instance is null");
+        Preconditions.checkArgument(actualExercise.getId() != GymmDatabase.INVALID_ID, "Actual exercise instance's id is invalid");
+    }
 
-        loadTrainingProgram(loader, programTrainingId);
+    public LiveData<ActualTrainingWrapper> load(long actualTrainingId) {
+        final Loader<ActualTrainingWrapper> loader = new Loader<>(this);
 
-        loadExercises(loader, programTrainingId);
+        LiveData<ActualTraining> actualTraining = actualTrainingRepository.getActualTrainingById(actualTrainingId);
+        loader.addSource(actualTraining, ActualTrainingWrapper::setActualTraining);
+        loader.addSource(actualTrainingRepository.getActualSetsForActualTraining(actualTrainingId), ActualTrainingWrapper::setActualSets);
+        loader.addDependentSource(actualTraining, at -> programTrainingRepository.getProgramTrainingById(at.getProgramTrainingId()), ActualTrainingWrapper::setProgramTraining);
+        loader.addDependentSource(actualTraining, at -> programTrainingRepository.getProgramExercisesForTraining(at.getProgramTrainingId()), (w, programExercises) -> {
+            w.setProgramExercises(programExercises);
+            loader.addSource(actualTrainingRepository.getActualExercisesForActualTraining(actualTrainingId), ActualTrainingWrapper::setActualExercises);
+
+        });
+        loader.addDependentSource(actualTraining, at -> programTrainingRepository.getProgramSetsForTraining(at.getProgramTrainingId()), ActualTrainingWrapper::setProgramSets);
 
         return loader.load();
     }

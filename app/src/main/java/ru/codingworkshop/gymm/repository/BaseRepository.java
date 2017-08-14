@@ -19,6 +19,8 @@ import ru.codingworkshop.gymm.data.util.BiConsumer;
 import ru.codingworkshop.gymm.data.util.Consumer;
 import ru.codingworkshop.gymm.data.util.LongSupplier;
 
+import static ru.codingworkshop.gymm.db.GymmDatabase.INVALID_ID;
+
 /**
  * Created by Радик on 28.07.2017.
  */
@@ -38,9 +40,17 @@ class BaseRepository {
         this.aTask = aTask;
     }
 
-    <T extends Model> LiveData<Long> insert(T entity, Function<T, Long> insert, Consumer<T> check) {
+    static boolean isValidId(long id) {
+        return id != INVALID_ID;
+    }
+
+    <T extends Model> LiveData<Long> insertWithResult(T entity, Function<T, Long> insert, Consumer<T> check) {
         aTask.run(() -> performSync(entity, insert, BaseRepository::afterInsertion, check));
         return aTask.getLiveResult();
+    }
+
+    <T extends Model> void insert(T entity, Function<T, Long> insert, Consumer<T> check) {
+        perform(entity, insert, BaseRepository::afterInsertion, check);
     }
 
     <T extends Model> void insert(Collection<T> entities, Function<Collection<T>, List<Long>> insert, Consumer<T> check) {

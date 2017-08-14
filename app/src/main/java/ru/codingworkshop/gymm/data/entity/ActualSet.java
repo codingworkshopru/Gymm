@@ -35,6 +35,11 @@ public class ActualSet implements Model {
     private int reps;
     private double weight;
 
+    public ActualSet(long actualExerciseId, int reps) {
+        this.actualExerciseId = actualExerciseId;
+        this.reps = reps;
+    }
+
     @Override
     public long getId() {
         return id;

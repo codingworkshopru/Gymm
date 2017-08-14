@@ -77,7 +77,7 @@ public class BaseRepositoryTest {
     public void asyncInsertTest() {
         SimpleModel model = new SimpleModel(0L, "foo");
         when(dao.insert(model)).thenReturn(2L);
-        LiveData<Long> liveId = repository.insert(model, dao::insert, BaseRepositoryTest::checkName);
+        LiveData<Long> liveId = repository.insertWithResult(model, dao::insert, BaseRepositoryTest::checkName);
         LiveTest.verifyLiveData(liveId, id -> id == 2L);
         verify(dao).insert(model);
     }

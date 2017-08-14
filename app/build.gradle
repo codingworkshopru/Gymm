@@ -29,12 +29,12 @@ android {
 }
 
 ext {
-    support = "26.0.0"
+    support = "26.0.1"
     constraint = "1.0.2"
     arch = "1.0.0-alpha8"
 
     gson = "2.8.1"
-    guava = "22.0-android"
+    guava = "23.0-android"
     dagger = "2.11"
     picasso = "2.5.2"
     leakcanary = "1.5.1"

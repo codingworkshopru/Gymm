@@ -1,7 +1,8 @@
 package ru.codingworkshop.gymm.repository;
 
 import android.arch.core.executor.testing.InstantTaskExecutorRule;
-import android.arch.lifecycle.LiveData;
+
+import com.google.common.collect.Lists;
 
 import org.junit.Before;
 import org.junit.Rule;
@@ -10,14 +11,19 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 
+import java.util.Collection;
+import java.util.List;
 import java.util.concurrent.Executor;
+import java.util.stream.Collectors;
 
+import ru.codingworkshop.gymm.data.entity.ActualExercise;
+import ru.codingworkshop.gymm.data.entity.ActualSet;
 import ru.codingworkshop.gymm.data.entity.ActualTraining;
-import ru.codingworkshop.gymm.data.util.LiveDataUtil;
+import ru.codingworkshop.gymm.data.entity.common.Model;
 import ru.codingworkshop.gymm.db.dao.ActualTrainingDao;
-import ru.codingworkshop.gymm.util.LiveTest;
 import ru.codingworkshop.gymm.util.ModelsFixture;
 
+import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -40,17 +46,49 @@ public class ActualTrainingRepositoryTest {
         repository = new ActualTrainingRepository(executor, asyncTask, dao);
     }
 
+    // TODO add instrumented tests for async task
+
     @Test
     public void insertActualTraining() {
-        when(asyncTask.getLiveResult()).thenReturn(LiveDataUtil.getLive(1L));
         ActualTraining training = ModelsFixture.createActualTraining(0L, 1L);
-        LiveData<Long> liveId = repository.insertActualTraining(training);
-        LiveTest.verifyLiveData(liveId, id -> id == 1L);
+        when(dao.insertActualTraining(training)).thenReturn(11L);
+        repository.insertActualTraining(training);
+        verify(dao).insertActualTraining(training);
     }
 
     @Test
     public void getActualTrainingById() {
         repository.getActualTrainingById(1L);
         verify(dao).getActualTrainingById(1L);
+    }
+
+    @Test
+    public void insertActualExercises() {
+        List<Long> ids = Lists.newArrayList(1002L, 1003L, 1004L);
+        Collection<ActualExercise> actualExercises = ModelsFixture.createActualExercises(ids.toArray(new Long[]{}));
+        when(dao.insertActualExercises(actualExercises)).thenReturn(ids);
+        repository.insertActualExercises(actualExercises);
+        assertEquals(ids, actualExercises.stream().map(Model::getId).collect(Collectors.toList()));
+        verify(dao).insertActualExercises(actualExercises);
+    }
+
+    @Test
+    public void getActualExercisesForActualTraining() {
+        repository.getActualExercisesForActualTraining(1000L);
+        verify(dao).getActualExercisesForActualTraining(1000L);
+    }
+
+    @Test
+    public void insertActualSet() {
+        ActualSet actualSet = ModelsFixture.createActualSet(1003L, 1002L, 7);
+        when(dao.insertActualSet(actualSet)).thenReturn(1003L);
+        repository.insertActualSet(actualSet);
+        verify(dao).insertActualSet(actualSet);
+    }
+
+    @Test
+    public void getActualSetsForActualTraining() {
+        repository.getActualSetsForActualTraining(1000L);
+        verify(dao).getActualSetsForActualTraining(1000L);
     }
 }
