@@ -5,9 +5,6 @@ import android.arch.persistence.room.ForeignKey;
 import android.arch.persistence.room.Index;
 import android.arch.persistence.room.PrimaryKey;
 
-import ru.codingworkshop.gymm.data.entity.common.Model;
-import ru.codingworkshop.gymm.data.entity.common.Sortable;
-
 import static android.arch.persistence.room.ForeignKey.CASCADE;
 
 /**
@@ -37,7 +34,7 @@ import static android.arch.persistence.room.ForeignKey.CASCADE;
                 @Index("exerciseId")
         }
 )
-public class ProgramExercise implements Model, Sortable {
+public class ProgramExercise implements ProgramExerciseInterface {
     @PrimaryKey(autoGenerate = true)
     private long id;
     private long programTrainingId;
@@ -81,10 +78,12 @@ public class ProgramExercise implements Model, Sortable {
         this.sortOrder = sortOrder;
     }
 
+    @Override
     public boolean isDrafting() {
         return drafting;
     }
 
+    @Override
     public void setDrafting(boolean drafting) {
         this.drafting = drafting;
     }
