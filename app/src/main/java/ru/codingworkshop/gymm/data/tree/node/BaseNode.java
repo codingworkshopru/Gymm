@@ -9,7 +9,7 @@ import ru.codingworkshop.gymm.data.tree.holder.ParentHolder;
  * Created by Радик on 14.08.2017 as part of the Gymm project.
  */
 
-abstract class BaseNode<P,C> implements ParentHolder<P>, ChildrenHolder<C> {
+public abstract class BaseNode<P,C> implements ParentHolder<P>, ChildrenHolder<C> {
     private P parent;
     private ChildrenHolder<C> childrenDelegate;
 
