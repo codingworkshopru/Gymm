@@ -65,7 +65,7 @@ public class ProgramTrainingRepositoryTest {
     }
 
     @Test
-    public void insertProgramTraining() { // TODO training name must be unique; write feature to throw exception up from dao (insert, update)
+    public void insertProgramTraining() { // TODO training name must be unique; write feature to throw exception up from dao (insertChildren, updateChildren)
         ProgramTraining trainingEntity = ModelsFixture.createProgramTraining(0L, "foo");
         when(dao.insertProgramTraining(trainingEntity)).thenReturn(1L);
         repository.insertProgramTraining(trainingEntity);

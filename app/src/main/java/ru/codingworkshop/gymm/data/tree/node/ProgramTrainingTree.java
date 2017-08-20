@@ -1,15 +1,13 @@
 package ru.codingworkshop.gymm.data.tree.node;
 
-import ru.codingworkshop.gymm.data.entity.ProgramExerciseInterface;
-import ru.codingworkshop.gymm.data.entity.ProgramTraining;
-import ru.codingworkshop.gymm.data.tree.holder.ChildrenHolder;
+import java.util.List;
+
+import ru.codingworkshop.gymm.data.entity.ProgramExercise;
 
 /**
- * Created by Радик on 15.08.2017 as part of the Gymm project.
+ * Created by Радик on 17.08.2017 as part of the Gymm project.
  */
 
-public abstract class ProgramTrainingTree extends BaseNode<ProgramTraining, ProgramExerciseInterface> {
-    public ProgramTrainingTree(ChildrenHolder<ProgramExerciseInterface> childrenDelegate) {
-        super(childrenDelegate);
-    }
+public interface ProgramTrainingTree {
+    void setProgramExercises(List<ProgramExercise> programExercises);
 }

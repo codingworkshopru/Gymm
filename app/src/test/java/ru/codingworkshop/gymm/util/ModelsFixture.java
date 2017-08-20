@@ -5,7 +5,6 @@ import android.arch.lifecycle.LiveData;
 import com.google.common.collect.Lists;
 
 import java.util.Arrays;
-import java.util.Date;
 import java.util.List;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -125,7 +124,7 @@ public class ModelsFixture {
     }
 
     public static ActualTraining createActualTraining(long id, long programTrainingId) {
-        ActualTraining training = new ActualTraining(programTrainingId, new Date());
+        ActualTraining training = new ActualTraining(programTrainingId);
         training.setId(id);
         return training;
     }

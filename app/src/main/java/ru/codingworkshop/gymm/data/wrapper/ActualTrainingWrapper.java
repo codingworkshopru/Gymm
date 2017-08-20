@@ -13,7 +13,6 @@ import com.google.common.collect.Maps;
 import com.google.common.collect.Multimaps;
 
 import java.util.Collection;
-import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
@@ -136,7 +135,7 @@ class ActualTrainingWrapper {
     }
 
     public LiveData<ActualTrainingWrapper> create(long programTrainingId) {
-        actualTraining = new ActualTraining(programTrainingId, new Date());
+        actualTraining = new ActualTraining(programTrainingId);
         actualTrainingRepository.insertActualTraining(actualTraining);
 
         Loader<ActualTrainingWrapper> loader = new Loader<>(this);

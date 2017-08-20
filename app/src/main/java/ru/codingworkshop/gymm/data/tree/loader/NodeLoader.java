@@ -28,8 +28,8 @@ public abstract class NodeLoader<P, C> {
         Preconditions.checkNotNull(children, "Live children is not set");
 
         SetAndRemove setAndRemove = new SetAndRemove();
-        setAndRemove.ok(getParent(), getNode()::setParent);
-        setAndRemove.ok(getChildren(), getNode()::setChildren);
+        setAndRemove.ok(getParent(), node::setParent);
+        setAndRemove.ok(getChildren(), node::setChildren);
         loadAdditional(setAndRemove);
 
         return setAndRemove.getLoaded();

@@ -17,7 +17,7 @@ public abstract class BaseNode<P,C> implements ParentHolder<P>, ChildrenHolder<C
         this.childrenDelegate = childrenDelegate;
     }
 
-    protected ChildrenHolder<C> getChildrenDelegate() {
+    public ChildrenHolder<C> getChildrenDelegate() {
         return childrenDelegate;
     }
 
@@ -37,7 +37,7 @@ public abstract class BaseNode<P,C> implements ParentHolder<P>, ChildrenHolder<C
     }
 
     @Override
-    public void setChildren(List<? extends C> children) {
+    public void setChildren(List<C> children) {
         this.childrenDelegate.setChildren(children);
     }
 

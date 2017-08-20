@@ -23,12 +23,12 @@ public final class ProgramExerciseLoader extends NodeLoader<ProgramExercise, Pro
     }
 
     public void setLiveExerciseGetter(@NonNull Function<Long, LiveData<Exercise>> liveExerciseGetter) {
+        Preconditions.checkNotNull(liveExerciseGetter, "Exercise getter must be not null");
         this.liveExerciseGetter = liveExerciseGetter;
     }
 
     @Override
     void loadAdditional(SetAndRemove setAndRemove) {
-        Preconditions.checkNotNull(liveExerciseGetter, "Exercise getter must be not null");
         LiveData<Exercise> liveExercise = Transformations.switchMap(getParent(), pe -> liveExerciseGetter.apply(pe.getExerciseId()));
         ProgramExerciseNode node = (ProgramExerciseNode) getNode();
         setAndRemove.ok(liveExercise, node::setExercise);

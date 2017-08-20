@@ -15,25 +15,27 @@ import java.util.List;
 import java.util.Map;
 
 import ru.codingworkshop.gymm.data.entity.Exercise;
+import ru.codingworkshop.gymm.data.entity.ProgramExercise;
 import ru.codingworkshop.gymm.data.entity.ProgramExerciseInterface;
 import ru.codingworkshop.gymm.data.entity.ProgramSet;
 import ru.codingworkshop.gymm.data.entity.ProgramTraining;
+import ru.codingworkshop.gymm.data.tree.node.AbstractProgramTrainingTree;
+import ru.codingworkshop.gymm.data.tree.node.BaseNode;
 import ru.codingworkshop.gymm.data.tree.node.ProgramExerciseNode;
-import ru.codingworkshop.gymm.data.tree.node.ProgramTrainingTree;
 
 /**
  * Created by Радик on 16.08.2017 as part of the Gymm project.
  */
 
-public class ProgramTrainingTreeLoader extends NodeLoader<ProgramTraining, ProgramExerciseInterface> {
+public class ProgramTrainingTreeLoader extends NodeLoader<ProgramTraining, ProgramExercise> {
     private LiveData<List<ProgramSet>> liveProgramSets;
     private LiveData<List<Exercise>> liveExercises;
 
     private Multimap<Long, ProgramSet> programSetsMultimap; // can be moved to tree itself with setters
-    private Map<Long, Exercise> exercisesMap; // save as multimap with sets
+    private Map<Long, Exercise> exercisesMap; // same as multimap with sets
 
-    public ProgramTrainingTreeLoader(@NonNull ProgramTrainingTree node) {
-        super(node);
+    public ProgramTrainingTreeLoader(@NonNull AbstractProgramTrainingTree tree) {
+        super(new ProgramTrainingTreeAdapter(tree));
     }
 
     @Override
@@ -42,9 +44,11 @@ public class ProgramTrainingTreeLoader extends NodeLoader<ProgramTraining, Progr
 
         loaded.observeForever(new Observer<Boolean>() {
             @Override
-            public void onChanged(@Nullable Boolean aBoolean) {
-                buildChildNodes();
-                loaded.removeObserver(this);
+            public void onChanged(@Nullable Boolean ldd) {
+                if (ldd != null && ldd) {
+                    buildChildNodes();
+                    loaded.removeObserver(this);
+                }
             }
         });
 
@@ -81,5 +85,24 @@ public class ProgramTrainingTreeLoader extends NodeLoader<ProgramTraining, Progr
 
     private void setExercises(List<Exercise> exercises) {
         this.exercisesMap = Maps.uniqueIndex(exercises, Exercise::getId);
+    }
+
+    private static final class ProgramTrainingTreeAdapter extends BaseNode<ProgramTraining, ProgramExercise> {
+        private AbstractProgramTrainingTree tree;
+
+        public ProgramTrainingTreeAdapter(AbstractProgramTrainingTree tree) {
+            super(null);
+            this.tree = tree;
+        }
+
+        @Override
+        public void setParent(ProgramTraining parent) {
+            tree.setParent(parent);
+        }
+
+        @Override
+        public void setChildren(List<ProgramExercise> children) {
+            tree.setProgramExercises(children);
+        }
     }
 }

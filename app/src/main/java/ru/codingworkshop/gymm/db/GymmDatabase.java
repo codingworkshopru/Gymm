@@ -2,6 +2,9 @@ package ru.codingworkshop.gymm.db;
 
 import android.arch.persistence.room.Database;
 import android.arch.persistence.room.RoomDatabase;
+import android.support.annotation.NonNull;
+
+import com.google.common.base.Preconditions;
 
 import ru.codingworkshop.gymm.data.entity.ActualExercise;
 import ru.codingworkshop.gymm.data.entity.ActualSet;
@@ -12,6 +15,7 @@ import ru.codingworkshop.gymm.data.entity.ProgramExercise;
 import ru.codingworkshop.gymm.data.entity.ProgramSet;
 import ru.codingworkshop.gymm.data.entity.ProgramTraining;
 import ru.codingworkshop.gymm.data.entity.SecondaryMuscleGroupLink;
+import ru.codingworkshop.gymm.data.entity.common.Model;
 import ru.codingworkshop.gymm.db.dao.ActualTrainingDao;
 import ru.codingworkshop.gymm.db.dao.ExerciseDao;
 import ru.codingworkshop.gymm.db.dao.MuscleGroupDao;
@@ -38,6 +42,16 @@ import ru.codingworkshop.gymm.db.dao.ProgramTrainingDao;
 )
 public abstract class GymmDatabase extends RoomDatabase {
     public static final long INVALID_ID = 0;
+
+    public static boolean isValidId(long id) {
+        return id != INVALID_ID;
+    }
+
+    public static boolean isValidId(@NonNull Model model) {
+        Preconditions.checkNotNull(model);
+        return isValidId(model.getId());
+    }
+
     public abstract ActualTrainingDao getActualTrainingDao();
     public abstract ExerciseDao getExerciseDao();
     public abstract MuscleGroupDao getMuscleGroupDao();

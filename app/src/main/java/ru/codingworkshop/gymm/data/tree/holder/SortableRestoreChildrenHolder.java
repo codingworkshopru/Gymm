@@ -31,7 +31,7 @@ public class SortableRestoreChildrenHolder<C extends Sortable> implements Childr
     }
 
     @Override
-    public void setChildren(List<? extends C> children) {
+    public void setChildren(List<C> children) {
         this.children = Lists.newLinkedList(children);
         Collections.sort(this.children, (a, b) -> a.getSortOrder() - b.getSortOrder());
     }

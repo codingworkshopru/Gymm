@@ -5,18 +5,14 @@ import com.google.common.collect.Lists;
 import java.util.List;
 
 /**
- * Created by Радик on 14.08.2017 as part of the Gymm project.
+ * Created by Радик on 18.08.2017 as part of the Gymm project.
  */
 
 public class SimpleChildrenHolder<C> implements ChildrenHolder<C> {
     private List<C> children;
 
-    public SimpleChildrenHolder() {
-        this.children = Lists.newArrayList();
-    }
-
     @Override
-    public void setChildren(List<? extends C> children) {
+    public void setChildren(List<C> children) {
         this.children = Lists.newArrayList(children);
     }
 

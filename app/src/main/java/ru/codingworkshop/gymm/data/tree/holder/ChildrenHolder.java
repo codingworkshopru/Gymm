@@ -7,7 +7,7 @@ import java.util.List;
  */
 
 public interface ChildrenHolder<C> {
-    void setChildren(List<? extends C> children);
+    void setChildren(List<C> children);
 
     List<C> getChildren();
 

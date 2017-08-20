@@ -17,6 +17,8 @@ import ru.codingworkshop.gymm.data.entity.ActualSet;
 import ru.codingworkshop.gymm.data.entity.ActualTraining;
 import ru.codingworkshop.gymm.db.dao.ActualTrainingDao;
 
+import static ru.codingworkshop.gymm.db.GymmDatabase.isValidId;
+
 /**
  * Created by Радик on 29.07.2017.
  */

@@ -18,6 +18,8 @@ import ru.codingworkshop.gymm.data.entity.ProgramTraining;
 import ru.codingworkshop.gymm.data.entity.common.Named;
 import ru.codingworkshop.gymm.db.dao.ProgramTrainingDao;
 
+import static ru.codingworkshop.gymm.db.GymmDatabase.isValidId;
+
 /**
  * Created by Радик on 21.06.2017.
  */

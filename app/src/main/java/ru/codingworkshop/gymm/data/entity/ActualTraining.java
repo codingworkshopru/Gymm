@@ -41,9 +41,9 @@ public class ActualTraining implements Model {
     private Date finishTime;
     private Long programTrainingId;
 
-    public ActualTraining(long programTrainingId, @NonNull Date startTime) {
+    public ActualTraining(long programTrainingId) {
         this.programTrainingId = programTrainingId;
-        this.startTime = startTime;
+        this.startTime = new Date();
     }
 
     @Override

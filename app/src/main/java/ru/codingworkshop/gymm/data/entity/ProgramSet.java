@@ -6,6 +6,8 @@ import android.arch.persistence.room.Index;
 import android.arch.persistence.room.PrimaryKey;
 import android.support.annotation.Nullable;
 
+import com.google.common.base.Objects;
+
 import ru.codingworkshop.gymm.data.entity.common.Model;
 import ru.codingworkshop.gymm.data.entity.common.Sortable;
 
@@ -78,5 +80,22 @@ public class ProgramSet implements Model, Sortable {
     @Override
     public void setSortOrder(int sortOrder) {
         this.sortOrder = sortOrder;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        ProgramSet that = (ProgramSet) o;
+        return id == that.id &&
+                programExerciseId == that.programExerciseId &&
+                reps == that.reps &&
+                secondsForRest == that.secondsForRest &&
+                sortOrder == that.sortOrder;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hashCode(id, programExerciseId, reps, secondsForRest, sortOrder);
     }
 }
