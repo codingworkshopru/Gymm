@@ -8,36 +8,22 @@ import java.util.List;
  * Created by Радик on 18.08.2017 as part of the Gymm project.
  */
 
-public class SimpleChildrenHolder<C> implements ChildrenHolder<C> {
-    private List<C> children;
+public class SimpleChildrenHolder<C> extends ListChildrenHolder<C> {
+    public SimpleChildrenHolder() {
+        super();
+    }
 
-    @Override
-    public void setChildren(List<C> children) {
-        this.children = Lists.newArrayList(children);
+    public SimpleChildrenHolder(List<C> children) {
+        super(children);
     }
 
     @Override
-    public List<C> getChildren() {
-        return children;
+    List<C> createList() {
+        return Lists.newArrayList();
     }
 
     @Override
-    public void addChild(C child) {
-        children.add(child);
-    }
-
-    @Override
-    public void removeChild(C child) {
-        children.remove(child);
-    }
-
-    @Override
-    public void removeChild(int index) {
-        children.remove(index);
-    }
-
-    @Override
-    public void moveChild(int from, int to) {
-        children.add(to, children.remove(from));
+    List<C> createList(List<C> children) {
+        return Lists.newArrayList(children);
     }
 }

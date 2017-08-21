@@ -31,7 +31,7 @@ android {
 ext {
     support = "26.0.1"
     constraint = "1.0.2"
-    arch = "1.0.0-alpha8"
+    arch = "1.0.0-alpha9"
 
     gson = "2.8.1"
     guava = "23.0-android"

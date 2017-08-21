@@ -77,24 +77,15 @@ public class ModelsFixture {
     public static List<ProgramExercise> createProgramExercises(int count) {
         List<ProgramExercise> exercises = Lists.newArrayListWithCapacity(count);
         for (int i = 0; i < count; i++) {
-            ProgramExercise programExercise = createProgramExercise(i + 2, 1L, i, false);
+            ProgramExercise programExercise = createProgramExercise(i + 2, 1L, i + 100, false);
             programExercise.setSortOrder(i);
             exercises.add(programExercise);
         }
         return exercises;
     }
 
-    public static ProgramSet createProgramSet(long id, long programExerciseId, int reps) {
-        ProgramSet set = new ProgramSet();
-        set.setId(id);
-        set.setProgramExerciseId(programExerciseId);
-        set.setReps(reps);
-        return set;
-    }
-
-    public static LiveData<ProgramSet> createLiveProgramSet(long id, long programExerciseId, int reps) {
-
-        return LiveDataUtil.getLive(createProgramSet(id, programExerciseId, reps));
+    public static LiveData<List<ProgramSet>> createLiveProgramSets(int count) {
+        return LiveDataUtil.getLive(createProgramSets(count));
     }
 
     public static List<ProgramSet> createProgramSets(int count) {
@@ -108,8 +99,16 @@ public class ModelsFixture {
         return result;
     }
 
-    public static LiveData<List<ProgramSet>> createLiveProgramSets(int count) {
-        return LiveDataUtil.getLive(createProgramSets(count));
+    public static LiveData<ProgramSet> createLiveProgramSet(long id, long programExerciseId, int reps) {
+        return LiveDataUtil.getLive(createProgramSet(id, programExerciseId, reps));
+    }
+
+    public static ProgramSet createProgramSet(long id, long programExerciseId, int reps) {
+        ProgramSet set = new ProgramSet();
+        set.setId(id);
+        set.setProgramExerciseId(programExerciseId);
+        set.setReps(reps);
+        return set;
     }
 
     public static Exercise createExercise(long id, String name) {

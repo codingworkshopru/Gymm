@@ -13,16 +13,20 @@ import ru.codingworkshop.gymm.data.tree.ChildRestore;
  * Created by Радик on 14.08.2017 as part of the Gymm project.
  */
 
-public class SortableRestoreChildrenHolder<C extends Sortable> implements ChildrenHolder<C>, ChildRestore {
-    private List<C> children;
+public class SortableRestoreChildrenHolder<C extends Sortable> extends ListChildrenHolder<C> implements ChildRestore {
     private C lastRemoved;
 
     public SortableRestoreChildrenHolder() {
-        children = Lists.newArrayList();
+        super();
     }
 
     public SortableRestoreChildrenHolder(List<C> children) {
-        this.children = children;
+        super(children);
+    }
+
+    @Override
+    List<C> createList() {
+        return Lists.newLinkedList();
     }
 
     @Override
@@ -32,22 +36,26 @@ public class SortableRestoreChildrenHolder<C extends Sortable> implements Childr
 
     @Override
     public void setChildren(List<C> children) {
-        this.children = Lists.newLinkedList(children);
+        super.setChildren(children);
         Collections.sort(this.children, (a, b) -> a.getSortOrder() - b.getSortOrder());
+    }
+
+    @Override
+    List<C> createList(List<C> children) {
+        return Lists.newLinkedList(children);
     }
 
     @Override
     public void addChild(C child) {
         child.setSortOrder(children.size());
-        children.add(child);
+        super.addChild(child);
     }
 
     @Override
     public void removeChild(C child) {
-        Preconditions.checkArgument(children.remove(child), "The child doesn't exists here");
+        super.removeChild(child);
         lastRemoved = child;
         updateSortOrders(child.getSortOrder());
-        children.remove(child);
     }
 
     private void updateSortOrders(int start) {
@@ -73,10 +81,7 @@ public class SortableRestoreChildrenHolder<C extends Sortable> implements Childr
 
     @Override
     public void moveChild(int from, int to) {
-        Preconditions.checkElementIndex(from, children.size());
-        Preconditions.checkElementIndex(to, children.size());
-        C child = children.remove(from);
-        children.add(to, child);
+        super.moveChild(from, to);
         updateSortOrders(Math.min(from, to), Math.max(from, to));
     }
 

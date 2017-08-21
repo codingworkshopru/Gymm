@@ -1,9 +1,5 @@
 package ru.codingworkshop.gymm.data.tree.node;
 
-import com.google.common.collect.Lists;
-
-import java.util.List;
-
 import ru.codingworkshop.gymm.data.entity.ProgramExercise;
 import ru.codingworkshop.gymm.data.tree.holder.ImmutableChildrenHolder;
 
@@ -17,7 +13,7 @@ public class ImmutableProgramTrainingTree extends AbstractProgramTrainingTree {
     }
 
     @Override
-    public void setProgramExercises(List<ProgramExercise> programExercises) {
-        super.setChildren(Lists.transform(programExercises, ImmutableProgramExerciseNode::new));
+    public ProgramExerciseNode createChildNode(ProgramExercise programExercise) {
+        return new ImmutableProgramExerciseNode(programExercise);
     }
 }

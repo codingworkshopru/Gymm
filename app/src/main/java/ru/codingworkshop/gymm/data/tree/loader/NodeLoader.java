@@ -19,13 +19,12 @@ public abstract class NodeLoader<P, C> {
     private LiveData<List<C>> children;
 
     public NodeLoader(@NonNull BaseNode<P, C> node) {
-        Preconditions.checkNotNull(node, "Node must be not null");
-        this.node = node;
+        this.node = Preconditions.checkNotNull(node, "Node must be not null");
     }
 
     public LiveData<Boolean> load() {
-        Preconditions.checkNotNull(parent, "Live parent is not set");
-        Preconditions.checkNotNull(children, "Live children is not set");
+        Preconditions.checkNotNull(getParent(), "Live parent must be set");
+        Preconditions.checkNotNull(getChildren(), "Live children must be set");
 
         SetAndRemove setAndRemove = new SetAndRemove();
         setAndRemove.ok(getParent(), node::setParent);
@@ -39,9 +38,7 @@ public abstract class NodeLoader<P, C> {
         return node;
     }
 
-    void loadAdditional(SetAndRemove setAndRemove) {
-
-    }
+    abstract void loadAdditional(SetAndRemove setAndRemove);
 
     public LiveData<P> getParent() {
         return parent;

@@ -1,10 +1,9 @@
 package ru.codingworkshop.gymm.data.tree.loader;
 
 import android.arch.lifecycle.LiveData;
+import android.arch.lifecycle.MediatorLiveData;
 import android.arch.lifecycle.MutableLiveData;
-import android.arch.lifecycle.Observer;
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 
 import ru.codingworkshop.gymm.data.util.Consumer;
 
@@ -13,28 +12,20 @@ import ru.codingworkshop.gymm.data.util.Consumer;
  */
 public final class SetAndRemove {
     private int countdown;
-    private MutableLiveData<Boolean> loaded = new MutableLiveData<>();
+    private MediatorLiveData<Boolean> liveLoaded = new MediatorLiveData<>();
 
-    public SetAndRemove() {
-        loaded.setValue(false);
-    }
-
-    public <T> void ok(@NonNull LiveData<T> liveData, @NonNull Consumer<T> consumer) {
+    public <T> void ok(@NonNull LiveData<T> source, @NonNull Consumer<T> consumer) {
         countdown++;
-        Observer<T> observer = new Observer<T>() {
-            @Override
-            public void onChanged(@Nullable T t) {
-                consumer.accept(t);
-                liveData.removeObserver(this);
-                if (--countdown == 0) {
-                    loaded.setValue(true);
-                }
+        liveLoaded.addSource(source, t -> {
+            liveLoaded.removeSource(source);
+            consumer.accept(t);
+            if (--countdown == 0) {
+                liveLoaded.setValue(true);
             }
-        };
-        liveData.observeForever(observer);
+        });
     }
 
     public MutableLiveData<Boolean> getLoaded() {
-        return loaded;
+        return liveLoaded;
     }
 }
