@@ -23,8 +23,10 @@ public final class ProgramExerciseLoader extends NodeLoader<ProgramExercise, Pro
     }
 
     public void setLiveExerciseGetter(@NonNull Function<Long, LiveData<Exercise>> liveExerciseGetter) {
-        Preconditions.checkNotNull(liveExerciseGetter, "Exercise getter must be not null");
-        this.liveExerciseGetter = liveExerciseGetter;
+        this.liveExerciseGetter = Preconditions.checkNotNull(
+                liveExerciseGetter,
+                "Exercise getter must be not null"
+        );
     }
 
     @Override

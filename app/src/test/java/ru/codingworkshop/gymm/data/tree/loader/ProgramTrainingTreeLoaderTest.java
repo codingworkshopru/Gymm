@@ -6,8 +6,8 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 
-import ru.codingworkshop.gymm.data.tree.node.AbstractProgramTrainingTree;
 import ru.codingworkshop.gymm.data.tree.node.ImmutableProgramTrainingTree;
+import ru.codingworkshop.gymm.data.tree.node.ProgramTrainingTree;
 import ru.codingworkshop.gymm.util.LiveTest;
 import ru.codingworkshop.gymm.util.ModelsFixture;
 
@@ -20,7 +20,7 @@ public class ProgramTrainingTreeLoaderTest {
     @Rule
     public InstantTaskExecutorRule instantTaskExecutorRule = new InstantTaskExecutorRule();
 
-    private AbstractProgramTrainingTree tree;
+    private ProgramTrainingTree tree;
     private ProgramTrainingTreeLoader loader;
 
     @Before
@@ -30,7 +30,7 @@ public class ProgramTrainingTreeLoaderTest {
 
         loader.setParent(ModelsFixture.createLiveProgramTraining(1L, "foo", false));
         loader.setChildren(ModelsFixture.createLiveProgramExercises(1));
-        loader.setLiveProgramSets(ModelsFixture.createLiveProgramSets(3));
+        loader.setGrandchildren(ModelsFixture.createLiveProgramSets(3));
         loader.setLiveExercises(ModelsFixture.createLiveExercises("bar", "baz"));
     }
 

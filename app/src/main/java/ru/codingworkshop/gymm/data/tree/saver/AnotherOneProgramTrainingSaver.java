@@ -9,9 +9,9 @@ import java.util.List;
 
 import ru.codingworkshop.gymm.data.entity.ProgramExercise;
 import ru.codingworkshop.gymm.data.entity.ProgramTraining;
-import ru.codingworkshop.gymm.data.tree.node.AbstractProgramTrainingTree;
 import ru.codingworkshop.gymm.data.tree.node.BaseNode;
 import ru.codingworkshop.gymm.data.tree.node.ProgramExerciseNode;
+import ru.codingworkshop.gymm.data.tree.node.ProgramTrainingTree;
 import ru.codingworkshop.gymm.repository.ProgramTrainingRepository;
 
 /**
@@ -19,10 +19,10 @@ import ru.codingworkshop.gymm.repository.ProgramTrainingRepository;
  */
 
 public class AnotherOneProgramTrainingSaver implements Saver {
-    private AbstractProgramTrainingTree tree;
+    private ProgramTrainingTree tree;
     private ProgramTrainingRepository repository;
 
-    public AnotherOneProgramTrainingSaver(AbstractProgramTrainingTree tree, ProgramTrainingRepository repository) {
+    public AnotherOneProgramTrainingSaver(ProgramTrainingTree tree, ProgramTrainingRepository repository) {
         this.tree = tree;
         this.repository = repository;
     }

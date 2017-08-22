@@ -18,7 +18,6 @@ public class ActualExerciseNode extends BaseNode<ActualExercise, ActualSet> {
     public ActualExerciseNode(ActualExercise parent) {
         this();
         setParent(parent);
-
     }
 
     public ProgramExerciseNode getProgramExerciseNode() {

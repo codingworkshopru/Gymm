@@ -8,9 +8,9 @@ import org.mockito.junit.MockitoJUnitRunner;
 
 import ru.codingworkshop.gymm.data.entity.ProgramExercise;
 import ru.codingworkshop.gymm.data.entity.ProgramTraining;
-import ru.codingworkshop.gymm.data.tree.node.AbstractProgramTrainingTree;
 import ru.codingworkshop.gymm.data.tree.node.ImmutableProgramExerciseNode;
 import ru.codingworkshop.gymm.data.tree.node.ProgramExerciseNode;
+import ru.codingworkshop.gymm.data.tree.node.ProgramTrainingTree;
 import ru.codingworkshop.gymm.util.ModelsFixture;
 
 import static junit.framework.Assert.assertEquals;
@@ -25,7 +25,7 @@ import static org.mockito.Mockito.verify;
 
 @RunWith(MockitoJUnitRunner.class)
 public class ProgramTrainingTreeAdapterTest {
-    @Mock private AbstractProgramTrainingTree tree;
+    @Mock private ProgramTrainingTree tree;
     private ProgramTrainingTreeAdapter adapter;
 
     @Before
@@ -48,7 +48,7 @@ public class ProgramTrainingTreeAdapterTest {
         }).when(tree).createChildNode(any());
 
         adapter.setChildren(ModelsFixture.createProgramExercises(1));
-        adapter.setProgramSets(ModelsFixture.createProgramSets(3));
+        adapter.setGrandchildren(ModelsFixture.createProgramSets(3));
         adapter.setExercises(ModelsFixture.createExercises("foobar"));
         adapter.build();
 

@@ -1,7 +1,11 @@
 package ru.codingworkshop.gymm.data.tree.holder;
 
+import android.support.annotation.NonNull;
+
 import java.util.Collections;
 import java.util.List;
+
+import ru.codingworkshop.gymm.data.tree.Preconditions2;
 
 /**
  * Created by Радик on 14.08.2017 as part of the Gymm project.
@@ -22,12 +26,9 @@ public class ImmutableChildrenHolder<C> extends ListChildrenHolder<C> {
     }
 
     @Override
-    public void setChildren(List<C> children) {
-        if (getChildren() == null || getChildren().isEmpty()) {
-            super.setChildren(children);
-        } else {
-            throw new UnsupportedOperationException();
-        }
+    public void setChildren(@NonNull List<C> children) {
+        Preconditions2.checkIsNull(getChildren());
+        super.setChildren(children);
     }
 
     @Override

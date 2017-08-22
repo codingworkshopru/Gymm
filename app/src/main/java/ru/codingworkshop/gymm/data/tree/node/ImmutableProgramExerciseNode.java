@@ -1,6 +1,8 @@
 package ru.codingworkshop.gymm.data.tree.node;
 
+import ru.codingworkshop.gymm.data.entity.Exercise;
 import ru.codingworkshop.gymm.data.entity.ProgramExercise;
+import ru.codingworkshop.gymm.data.tree.Preconditions2;
 import ru.codingworkshop.gymm.data.tree.holder.ImmutableChildrenHolder;
 
 /**
@@ -14,6 +16,43 @@ public class ImmutableProgramExerciseNode extends ProgramExerciseNode {
 
     public ImmutableProgramExerciseNode(ProgramExercise programExercise) {
         this();
-        setParent(programExercise);
+        super.setParent(programExercise);
+    }
+
+    @Override
+    public void setParent(ProgramExercise parent) {
+        Preconditions2.checkIsNull(getParent());
+        super.setParent(parent);
+    }
+
+    @Override
+    public void setExercise(Exercise exercise) {
+        Preconditions2.checkIsNull(getExercise());
+        super.setExercise(exercise);
+    }
+
+    @Override
+    public void setSortOrder(int sortOrder) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public void setId(long id) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public void setDrafting(boolean drafting) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public void setProgramTrainingId(long programTrainingId) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public void setExerciseId(long exerciseId) {
+        throw new UnsupportedOperationException();
     }
 }

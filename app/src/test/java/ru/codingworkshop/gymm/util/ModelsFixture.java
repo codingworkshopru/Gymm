@@ -134,6 +134,10 @@ public class ModelsFixture {
         return actualExercise;
     }
 
+    public static LiveData<List<ActualExercise>> createLiveActualExercises(Long... ids) {
+        return LiveDataUtil.getLive(createActualExercises(ids));
+    }
+
     public static List<ActualExercise> createActualExercises(Long... ids) {
         return createByIds(
                 id -> {

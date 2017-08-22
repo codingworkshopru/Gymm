@@ -1,8 +1,8 @@
 package ru.codingworkshop.gymm.data.tree.node;
 
+import org.junit.Before;
 import org.junit.Test;
 
-import ru.codingworkshop.gymm.data.entity.ProgramExercise;
 import ru.codingworkshop.gymm.data.tree.holder.ImmutableChildrenHolder;
 import ru.codingworkshop.gymm.util.ModelsFixture;
 
@@ -13,15 +13,58 @@ import static org.junit.Assert.assertEquals;
  */
 public class ImmutableProgramExerciseNodeTest {
 
+    private ImmutableProgramExerciseNode node;
+
+    @Before
+    public void setUp() throws Exception {
+        node = new ImmutableProgramExerciseNode();
+    }
+
     @Test
     public void construction() throws Exception {
-        ImmutableProgramExerciseNode node = new ImmutableProgramExerciseNode();
+        node = new ImmutableProgramExerciseNode();
         assertImmutableChildrenDelegate(node);
 
-        final ProgramExercise programExercise = ModelsFixture.createProgramExercise(2L, 1L, 100L, false);
-        node = new ImmutableProgramExerciseNode(programExercise);
+        node = new ImmutableProgramExerciseNode(ModelsFixture.createProgramExercise(2L, 1L, 100L, false));
+        assertEquals(2L, node.getParent().getId());
         assertImmutableChildrenDelegate(node);
-        assertEquals(programExercise, node.getParent());
+    }
+
+    @Test
+    public void setExercise() {
+        node.setExercise(ModelsFixture.createExercise(1L, "foo"));
+        assertEquals("foo", node.getExercise().getName());
+    }
+
+    @Test
+    public void setParent() throws Exception {
+        node.setParent(ModelsFixture.createProgramExercise(2L, 1L, 100L, false));
+        assertEquals(2L, node.getParent().getId());
+    }
+
+    @Test(expected = UnsupportedOperationException.class)
+    public void setSortOrder() {
+        node.setSortOrder(1);
+    }
+
+    @Test(expected = UnsupportedOperationException.class)
+    public void setId() {
+        node.setId(1L);
+    }
+
+    @Test(expected = UnsupportedOperationException.class)
+    public void setDrafting() {
+        node.setDrafting(true);
+    }
+
+    @Test(expected = UnsupportedOperationException.class)
+    public void setProgramTrainingId() {
+        node.setProgramTrainingId(1L);
+    }
+
+    @Test(expected = UnsupportedOperationException.class)
+    public void setExerciseId() {
+        node.setExerciseId(1L);
     }
 
     private void assertImmutableChildrenDelegate(ProgramExerciseNode node) {

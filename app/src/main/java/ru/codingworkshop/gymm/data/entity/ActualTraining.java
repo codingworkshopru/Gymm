@@ -39,6 +39,7 @@ public class ActualTraining implements Model {
     private long id;
     private Date startTime;
     private Date finishTime;
+    private String comment;
     private Long programTrainingId;
 
     public ActualTraining(long programTrainingId) {
@@ -70,6 +71,14 @@ public class ActualTraining implements Model {
 
     public void setFinishTime(Date finishTime) {
         this.finishTime = finishTime;
+    }
+
+    public String getComment() {
+        return comment;
+    }
+
+    public void setComment(String comment) {
+        this.comment = comment;
     }
 
     public @Nullable Long getProgramTrainingId() {

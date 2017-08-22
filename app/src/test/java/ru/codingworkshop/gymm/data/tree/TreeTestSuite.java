@@ -16,7 +16,8 @@ import ru.codingworkshop.gymm.data.tree.node.NodeTestSuite;
         HolderTestSuite.class,
         LoaderTestSuite.class,
         NodeTestSuite.class,
-        ChildRestoreAdapterTest.class
+        ChildRestoreAdapterTest.class,
+        Preconditions2Test.class
 })
 public class TreeTestSuite {
 }

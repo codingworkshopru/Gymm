@@ -14,6 +14,8 @@ import org.junit.runners.Suite;
         ProgramExerciseLoaderTest.class,
         ProgramTrainingTreeLoaderTest.class,
         ProgramTrainingTreeAdapterTest.class,
+        ActualTrainingTreeLoaderTest.class,
+        ActualTrainingTreeAdapterTest.class,
         ExerciseLoaderTest.class
 })
 public class LoaderTestSuite {

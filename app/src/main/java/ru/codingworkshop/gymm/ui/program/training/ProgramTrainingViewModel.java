@@ -6,8 +6,8 @@ import android.arch.lifecycle.ViewModel;
 import javax.inject.Inject;
 
 import ru.codingworkshop.gymm.data.tree.loader.ProgramTrainingTreeLoader;
-import ru.codingworkshop.gymm.data.tree.node.AbstractProgramTrainingTree;
 import ru.codingworkshop.gymm.data.tree.node.MutableProgramTrainingTree;
+import ru.codingworkshop.gymm.data.tree.node.ProgramTrainingTree;
 import ru.codingworkshop.gymm.repository.ExercisesRepository;
 import ru.codingworkshop.gymm.repository.ProgramTrainingRepository;
 
@@ -26,12 +26,12 @@ class ProgramTrainingViewModel extends ViewModel {
     }
 
     public LiveData<Boolean> init(long programTrainingId) {
-        AbstractProgramTrainingTree tree = new MutableProgramTrainingTree();
+        ProgramTrainingTree tree = new MutableProgramTrainingTree();
 
         ProgramTrainingTreeLoader loader = new ProgramTrainingTreeLoader(tree);
         loader.setParent(repository.getProgramTrainingById(programTrainingId));
         loader.setChildren(repository.getProgramExercisesForTraining(programTrainingId));
-        loader.setLiveProgramSets(repository.getProgramSetsForTraining(programTrainingId));
+        loader.setGrandchildren(repository.getProgramSetsForTraining(programTrainingId));
         loader.setLiveExercises(exercisesRepository.getExercisesForProgramTraining(programTrainingId));
 
         return loader.load();
