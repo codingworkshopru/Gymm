@@ -29,4 +29,13 @@ public interface MuscleGroupDao {
 
     @Insert(onConflict = FAIL)
     void insertMuscleGroups(Collection<MuscleGroup> muscleGroups);
+
+    @Query("select * from MuscleGroup where id = :muscleGroupId")
+    LiveData<MuscleGroup> getMuscleGroupById(long muscleGroupId);
+
+    @Query("select mg.* from MuscleGroup as mg " +
+                    "join SecondaryMuscleGroupLink as l on l.muscleGroupId = mg.id " +
+                    "where l.exerciseId = :exerciseId " +
+                    "order by mg.name")
+    LiveData<List<MuscleGroup>> getSecondaryMuscleGroupsForExercise(long exerciseId);
 }

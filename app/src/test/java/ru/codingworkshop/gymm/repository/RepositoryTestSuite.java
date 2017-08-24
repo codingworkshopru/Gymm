@@ -11,7 +11,7 @@ import org.junit.runners.Suite;
 @Suite.SuiteClasses({
         BaseRepositoryTest.class,
         ExercisesRepositoryTest.class,
-        MuscleGroupRepositoryTest.class,
+        MuscleGroupsRepositoryTest.class,
         ProgramTrainingRepositoryTest.class,
         SecondaryMuscleGroupsHelperTest.class,
         ActualTrainingRepositoryTest.class

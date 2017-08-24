@@ -5,9 +5,9 @@ import android.support.annotation.NonNull;
 
 import com.google.common.base.Preconditions;
 
-import java.util.List;
-
 import ru.codingworkshop.gymm.data.entity.common.Model;
+import ru.codingworkshop.gymm.data.tree.loader.adapter.TreeAdapter;
+import ru.codingworkshop.gymm.data.tree.loader.datasource.TreeDataSource;
 
 /**
  * Created by Радик on 22.08.2017 as part of the Gymm project.
@@ -15,12 +15,13 @@ import ru.codingworkshop.gymm.data.entity.common.Model;
 
 public class TreeLoader<P,C extends Model,GC> extends NodeLoader<P,C> {
     private TreeAdapter<P,C,GC> adapter;
-    private LiveData<List<GC>> grandchildren;
+    private TreeDataSource<P,C,GC> dataSource;
     private LiveData<Boolean> loaded;
 
-    public TreeLoader(@NonNull TreeAdapter<P,C,GC> tree) {
-        super(tree);
+    public TreeLoader(@NonNull TreeAdapter<P,C,GC> tree, @NonNull TreeDataSource<P,C,GC> dataSource) {
+        super(tree, dataSource);
         this.adapter = Preconditions.checkNotNull(tree);
+        this.dataSource = Preconditions.checkNotNull(dataSource);
     }
 
     @Override
@@ -38,10 +39,6 @@ public class TreeLoader<P,C extends Model,GC> extends NodeLoader<P,C> {
 
     @Override
     void loadAdditional(SetAndRemove setAndRemove) {
-        setAndRemove.ok(grandchildren, adapter::setGrandchildren);
-    }
-
-    public void setGrandchildren(@NonNull LiveData<List<GC>> grandchildren) {
-        this.grandchildren = Preconditions.checkNotNull(grandchildren);
+        setAndRemove.ok(dataSource.getGrandchildren(), adapter::setGrandchildren);
     }
 }

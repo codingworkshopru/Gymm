@@ -1,16 +1,12 @@
 package ru.codingworkshop.gymm.data.tree.loader;
 
-import android.arch.lifecycle.LiveData;
 import android.support.annotation.NonNull;
 
-import com.google.common.base.Preconditions;
-
-import java.util.List;
-
-import ru.codingworkshop.gymm.data.entity.Exercise;
 import ru.codingworkshop.gymm.data.entity.ProgramExercise;
 import ru.codingworkshop.gymm.data.entity.ProgramSet;
 import ru.codingworkshop.gymm.data.entity.ProgramTraining;
+import ru.codingworkshop.gymm.data.tree.loader.adapter.ProgramTrainingTreeAdapter;
+import ru.codingworkshop.gymm.data.tree.loader.datasource.ProgramTrainingDataSource;
 import ru.codingworkshop.gymm.data.tree.node.ProgramTrainingTree;
 
 /**
@@ -18,21 +14,17 @@ import ru.codingworkshop.gymm.data.tree.node.ProgramTrainingTree;
  */
 
 public class ProgramTrainingTreeLoader extends TreeLoader<ProgramTraining, ProgramExercise, ProgramSet> {
-    private LiveData<List<Exercise>> liveExercises;
-    private ProgramTrainingTreeAdapter treeAdapter;
+    private ProgramTrainingDataSource dataSource;
 
-    public ProgramTrainingTreeLoader(@NonNull ProgramTrainingTree tree) {
-        super(new ProgramTrainingTreeAdapter(tree));
-        treeAdapter = (ProgramTrainingTreeAdapter) getNode();
+    public ProgramTrainingTreeLoader(@NonNull ProgramTrainingTree tree, @NonNull ProgramTrainingDataSource dataSource) {
+        super(new ProgramTrainingTreeAdapter(tree), dataSource);
+        this.dataSource = dataSource;
     }
 
     @Override
     void loadAdditional(SetAndRemove setAndRemove) {
         super.loadAdditional(setAndRemove);
-        setAndRemove.ok(liveExercises, treeAdapter::setExercises);
-    }
-
-    public void setLiveExercises(@NonNull LiveData<List<Exercise>> exercises) {
-        this.liveExercises = Preconditions.checkNotNull(exercises);
+        ProgramTrainingTreeAdapter adapter = (ProgramTrainingTreeAdapter) getNode();
+        setAndRemove.ok(dataSource.getExercises(), adapter::setExercises);
     }
 }

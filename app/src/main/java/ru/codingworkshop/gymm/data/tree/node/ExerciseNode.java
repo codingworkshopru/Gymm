@@ -9,7 +9,17 @@ import ru.codingworkshop.gymm.data.tree.holder.ImmutableChildrenHolder;
  */
 
 public class ExerciseNode extends BaseNode<Exercise, MuscleGroup> {
+    private MuscleGroup primaryMuscleGroup;
+
     public ExerciseNode() {
         super(new ImmutableChildrenHolder<>());
+    }
+
+    public MuscleGroup getPrimaryMuscleGroup() {
+        return primaryMuscleGroup;
+    }
+
+    public void setPrimaryMuscleGroup(MuscleGroup primaryMuscleGroup) {
+        this.primaryMuscleGroup = primaryMuscleGroup;
     }
 }

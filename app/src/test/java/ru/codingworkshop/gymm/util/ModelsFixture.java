@@ -58,7 +58,7 @@ public class ModelsFixture {
     }
 
     public static LiveData<ProgramExercise> createLiveProgramExercise(long id, long programTrainingId, boolean drafting) {
-        return LiveDataUtil.getLive(createProgramExercise(id, programTrainingId, 0, drafting));
+        return LiveDataUtil.getLive(createProgramExercise(id, programTrainingId, 100L, drafting));
     }
 
     public static ProgramExercise createProgramExercise(long id, long programTrainingId, long exerciseId, boolean drafting) {
@@ -111,13 +111,6 @@ public class ModelsFixture {
         return set;
     }
 
-    public static Exercise createExercise(long id, String name) {
-        Exercise exercise = new Exercise();
-        exercise.setId(id);
-        exercise.setName(name);
-        return exercise;
-    }
-
     public static LiveData<ActualTraining> createLiveActualTraining(long id, long programTrainingId) {
         return LiveDataUtil.getLive(createActualTraining(id, programTrainingId));
     }
@@ -165,6 +158,13 @@ public class ModelsFixture {
         return LiveDataUtil.getLive(createExercise(id, name));
     }
 
+    public static Exercise createExercise(long id, String name) {
+        Exercise exercise = new Exercise();
+        exercise.setId(id);
+        exercise.setName(name);
+        return exercise;
+    }
+
     public static LiveData<List<Exercise>> createLiveExercises(String... exerciseNames) {
         return LiveDataUtil.getLive(createExercises(exerciseNames));
     }
@@ -179,6 +179,10 @@ public class ModelsFixture {
 
     public static List<MuscleGroup> createMuscleGroups(Long... muscleGroupIds) {
         return createByIds(id -> createMuscleGroup(id, "muscle group " + id), muscleGroupIds);
+    }
+
+    public static LiveData<MuscleGroup> createLiveMuscleGroup(long id, String name) {
+        return LiveDataUtil.getLive(createMuscleGroup(id, name));
     }
 
     public static MuscleGroup createMuscleGroup(long id, String name) {

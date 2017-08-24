@@ -8,6 +8,7 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 
+import ru.codingworkshop.gymm.data.tree.loader.datasource.NodeDataSource;
 import ru.codingworkshop.gymm.data.util.LiveDataUtil;
 import ru.codingworkshop.gymm.util.LiveTest;
 import ru.codingworkshop.gymm.util.SimpleNode;
@@ -21,6 +22,7 @@ import static junit.framework.Assert.assertEquals;
 public class NodeLoaderTest {
     private SimpleNode node;
     private NodeLoader<Long, String> loader;
+    private NodeDataSource<Long, String> dataSource;
 
     @Rule
     public InstantTaskExecutorRule instantTaskExecutorRule = new InstantTaskExecutorRule();
@@ -28,14 +30,17 @@ public class NodeLoaderTest {
     @Before
     public void setUp() throws Exception {
         node = new SimpleNode();
-        loader = new NodeLoader<Long, String>(node) {
+        dataSource = new NodeDataSource<Long, String>() {{
+            setParent(LiveDataUtil.getLive(1L));
+            setChildren(LiveDataUtil.getLive(Lists.newArrayList("foo", "bar")));
+        }};
+
+        loader = new NodeLoader<Long, String>(node, dataSource) {
             @Override
             void loadAdditional(SetAndRemove setAndRemove) {
                 setAndRemove.ok(LiveDataUtil.getLive(-5), node::setAdditional);
             }
         };
-        loader.setParent(LiveDataUtil.getLive(1L));
-        loader.setChildren(LiveDataUtil.getLive(Lists.newArrayList("foo", "bar")));
     }
 
 

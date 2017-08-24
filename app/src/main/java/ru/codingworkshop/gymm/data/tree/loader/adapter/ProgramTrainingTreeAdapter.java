@@ -1,4 +1,4 @@
-package ru.codingworkshop.gymm.data.tree.loader;
+package ru.codingworkshop.gymm.data.tree.loader.adapter;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
@@ -18,7 +18,7 @@ import ru.codingworkshop.gymm.data.tree.node.ProgramTrainingTree;
  * Created by Радик on 21.08.2017 as part of the Gymm project.
  */
 
-class ProgramTrainingTreeAdapter extends TreeAdapter<ProgramTraining, ProgramExercise, ProgramSet> {
+public class ProgramTrainingTreeAdapter extends TreeAdapter<ProgramTraining, ProgramExercise, ProgramSet> {
     private Map<Long, Exercise> exercisesMap;
     ProgramTrainingTree tree;
 
@@ -27,7 +27,7 @@ class ProgramTrainingTreeAdapter extends TreeAdapter<ProgramTraining, ProgramExe
         this.tree = tree;
     }
 
-    void setExercises(List<Exercise> exercises) {
+    public void setExercises(List<Exercise> exercises) {
         this.exercisesMap = Maps.uniqueIndex(exercises, Exercise::getId);
     }
 

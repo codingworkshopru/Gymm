@@ -8,7 +8,6 @@ import android.arch.persistence.room.Query;
 import java.util.List;
 
 import ru.codingworkshop.gymm.data.entity.Exercise;
-import ru.codingworkshop.gymm.data.entity.MuscleGroup;
 import ru.codingworkshop.gymm.data.entity.SecondaryMuscleGroupLink;
 
 import static android.arch.persistence.room.OnConflictStrategy.FAIL;
@@ -38,14 +37,6 @@ public interface ExerciseDao {
                     "order by e.name"
     )
     LiveData<List<Exercise>> getExercisesForSecondaryMuscleGroup(long muscleGroupId);
-
-    @Query(
-            "select mg.* from MuscleGroup as mg " +
-                    "join SecondaryMuscleGroupLink as l on l.muscleGroupId = mg.id " +
-                    "where l.exerciseId = :exerciseId " +
-                    "order by mg.name"
-    )
-    LiveData<List<MuscleGroup>> getSecondaryMuscleGroupsForExercise(long exerciseId);
 
     @Query(
             "select distinct e.* from Exercise as e " +

@@ -15,6 +15,7 @@ import java.util.Set;
 import ru.codingworkshop.gymm.data.entity.Exercise;
 import ru.codingworkshop.gymm.data.entity.MuscleGroup;
 import ru.codingworkshop.gymm.db.dao.ExerciseDao;
+import ru.codingworkshop.gymm.db.dao.MuscleGroupDao;
 
 /**
  * Created by Радик on 19.06.2017.
@@ -66,10 +67,10 @@ public class ExerciseWrapper {
         secondaryMuscleGroups.remove(muscleGroup);
     }
 
-    public static LiveData<ExerciseWrapper> load(long id, ExerciseDao exerciseDao) {
+    public static LiveData<ExerciseWrapper> load(long id, ExerciseDao exerciseDao, MuscleGroupDao muscleGroupDao) {
         Loader<ExerciseWrapper> loader = new Loader<>(ExerciseWrapper::new);
         loader.addSource(exerciseDao.getExerciseById(id), ExerciseWrapper::setExercise);
-        loader.addSource(exerciseDao.getSecondaryMuscleGroupsForExercise(id), ExerciseWrapper::setSecondaryMuscleGroups);
+        loader.addSource(muscleGroupDao.getSecondaryMuscleGroupsForExercise(id), ExerciseWrapper::setSecondaryMuscleGroups);
         return loader.load();
     }
 

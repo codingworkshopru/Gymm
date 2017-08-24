@@ -1,4 +1,4 @@
-package ru.codingworkshop.gymm.data.tree.loader;
+package ru.codingworkshop.gymm.data.tree.loader.adapter;
 
 import android.support.annotation.NonNull;
 

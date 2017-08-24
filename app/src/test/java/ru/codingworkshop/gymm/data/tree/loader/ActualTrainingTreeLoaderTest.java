@@ -10,6 +10,8 @@ import org.mockito.junit.MockitoJUnitRunner;
 
 import java.util.stream.Collectors;
 
+import ru.codingworkshop.gymm.data.tree.loader.adapter.ActualTrainingTreeAdapter;
+import ru.codingworkshop.gymm.data.tree.loader.datasource.ActualTrainingDataSource;
 import ru.codingworkshop.gymm.data.tree.node.ActualTrainingTree;
 import ru.codingworkshop.gymm.data.tree.node.ImmutableProgramTrainingTree;
 import ru.codingworkshop.gymm.data.tree.node.ProgramExerciseNode;
@@ -18,6 +20,8 @@ import ru.codingworkshop.gymm.util.LiveTest;
 import ru.codingworkshop.gymm.util.ModelsFixture;
 
 import static junit.framework.Assert.assertEquals;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 /**
  * Created by Радик on 22.08.2017 as part of the Gymm project.
@@ -47,10 +51,11 @@ public class ActualTrainingTreeLoaderTest {
     @Test
     public void load() throws Exception {
         ActualTrainingTreeAdapter adapter = new ActualTrainingTreeAdapter(tree, programTree);
-        ActualTrainingTreeLoader loader = new ActualTrainingTreeLoader(adapter);
-        loader.setParent(ModelsFixture.createLiveActualTraining(11L, 1L));
-        loader.setChildren(ModelsFixture.createLiveActualExercises(12L));
-        loader.setGrandchildren(ModelsFixture.createLiveActualSets(12L, 13L));
+        ActualTrainingDataSource dataSource = mock(ActualTrainingDataSource.class);
+        when(dataSource.getParent()).thenReturn(ModelsFixture.createLiveActualTraining(11L, 1L));
+        when(dataSource.getChildren()).thenReturn(ModelsFixture.createLiveActualExercises(12L));
+        when(dataSource.getGrandchildren()).thenReturn(ModelsFixture.createLiveActualSets(12L, 13L));
+        ActualTrainingTreeLoader loader = new ActualTrainingTreeLoader(adapter, dataSource);
 
         LiveTest.verifyLiveData(loader.load(), b -> b);
 

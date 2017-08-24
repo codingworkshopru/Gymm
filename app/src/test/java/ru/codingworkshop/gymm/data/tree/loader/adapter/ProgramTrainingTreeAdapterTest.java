@@ -1,4 +1,4 @@
-package ru.codingworkshop.gymm.data.tree.loader;
+package ru.codingworkshop.gymm.data.tree.loader.adapter;
 
 import org.junit.Before;
 import org.junit.Test;

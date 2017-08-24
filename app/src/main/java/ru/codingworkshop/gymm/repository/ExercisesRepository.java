@@ -9,7 +9,6 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 
 import ru.codingworkshop.gymm.data.entity.Exercise;
-import ru.codingworkshop.gymm.data.entity.MuscleGroup;
 import ru.codingworkshop.gymm.db.dao.ExerciseDao;
 import ru.codingworkshop.gymm.db.dao.MuscleGroupDao;
 
@@ -44,10 +43,6 @@ public class ExercisesRepository {
 
     public LiveData<Exercise> getExerciseById(long id) {
         return exerciseDao.getExerciseById(id);
-    }
-
-    public LiveData<List<MuscleGroup>> getSecondaryMuscleGroupsForExercise(long exerciseId) {
-        return exerciseDao.getSecondaryMuscleGroupsForExercise(exerciseId);
     }
 
     public LiveData<List<Exercise>> getExercisesForProgramTraining(long programTrainingId) {

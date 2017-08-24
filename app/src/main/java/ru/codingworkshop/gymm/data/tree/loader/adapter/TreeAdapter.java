@@ -1,4 +1,4 @@
-package ru.codingworkshop.gymm.data.tree.loader;
+package ru.codingworkshop.gymm.data.tree.loader.adapter;
 
 import android.support.annotation.NonNull;
 
@@ -16,7 +16,7 @@ import ru.codingworkshop.gymm.data.tree.node.BaseNode;
 /**
  * Created by Радик on 22.08.2017 as part of the Gymm project.
  */
-abstract class TreeAdapter<P, C extends Model, GC> extends BaseNode<P, C> {
+public abstract class TreeAdapter<P, C extends Model, GC> extends BaseNode<P, C> {
     private BaseNode<P, ? extends BaseNode<C, GC>> tree;
     private List<C> children;
     private Multimap<Long, GC> grandchildrenMultimap;

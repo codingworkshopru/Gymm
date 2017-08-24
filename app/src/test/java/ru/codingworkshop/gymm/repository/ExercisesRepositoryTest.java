@@ -4,6 +4,7 @@ import android.arch.core.executor.testing.InstantTaskExecutorRule;
 
 import com.google.common.collect.Lists;
 
+import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -32,12 +33,18 @@ public class ExercisesRepositoryTest {
     @Mock private ExerciseDao exerciseDao;
     @Mock private MuscleGroupDao muscleGroupDao;
 
+    private ExercisesRepository repository;
+
     @Rule
     public InstantTaskExecutorRule instantTaskExecutorRule = new InstantTaskExecutorRule();
 
+    @Before
+    public void setUp() throws Exception {
+        repository = new ExercisesRepository(exerciseDao, muscleGroupDao);
+    }
+
     @Test
     public void createWithSecondaryMuscleGroupsTest() {
-        ExercisesRepository repository = new ExercisesRepository(exerciseDao, muscleGroupDao);
         List<Exercise> exercises = Lists.newArrayList();
 
         repository.createWithSecondaryMuscleGroups(exercises);
@@ -49,8 +56,6 @@ public class ExercisesRepositoryTest {
 
     @Test
     public void emptinessTest() {
-        ExercisesRepository repository = new ExercisesRepository(exerciseDao, muscleGroupDao);
-
         when(exerciseDao.getExercisesCount()).thenReturn(0);
         assertTrue(repository.isEmpty());
 
@@ -62,16 +67,11 @@ public class ExercisesRepositoryTest {
 
     @Test
     public void gettingDataTest() {
-        ExercisesRepository repository = new ExercisesRepository(exerciseDao, muscleGroupDao);
-
         repository.getExerciseById(1L);
         verify(exerciseDao).getExerciseById(1L);
 
         repository.getExercisesForMuscleGroup(2L);
         verify(exerciseDao).getExercisesForPrimaryMuscleGroup(2L);
-
-        repository.getSecondaryMuscleGroupsForExercise(3L);
-        verify(exerciseDao).getSecondaryMuscleGroupsForExercise(3L);
 
         repository.getExercisesForProgramTraining(1L);
         verify(exerciseDao).getExercisesForProgramTraining(1L);

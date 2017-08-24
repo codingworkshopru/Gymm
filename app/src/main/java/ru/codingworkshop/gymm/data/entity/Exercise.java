@@ -43,6 +43,7 @@ public class Exercise implements Model, Named {
     private String variations;
     private String caution;
 
+    // TODO move to separate helper class
     // fields for creating muscle groups <-> exercise links by DB initializer (with Gson)
     @Ignore
     public String primaryMuscle;

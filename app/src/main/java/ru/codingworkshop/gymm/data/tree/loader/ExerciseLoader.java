@@ -4,6 +4,7 @@ import android.support.annotation.NonNull;
 
 import ru.codingworkshop.gymm.data.entity.Exercise;
 import ru.codingworkshop.gymm.data.entity.MuscleGroup;
+import ru.codingworkshop.gymm.data.tree.loader.datasource.ExerciseDataSource;
 import ru.codingworkshop.gymm.data.tree.node.ExerciseNode;
 
 /**
@@ -11,10 +12,18 @@ import ru.codingworkshop.gymm.data.tree.node.ExerciseNode;
  */
 
 public class ExerciseLoader extends NodeLoader<Exercise, MuscleGroup> {
-    public ExerciseLoader(@NonNull ExerciseNode node) {
-        super(node);
+    private ExerciseDataSource dataSource;
+
+    public ExerciseLoader(@NonNull ExerciseNode node, @NonNull ExerciseDataSource dataSource) {
+        super(node, dataSource);
+        this.dataSource = dataSource;
     }
 
     @Override
-    void loadAdditional(SetAndRemove setAndRemove) {}
+    void loadAdditional(SetAndRemove setAndRemove) {
+        setAndRemove.ok(dataSource.getPrimaryMuscleGroup(), muscleGroup -> {
+            final ExerciseNode node = (ExerciseNode) getNode();
+            node.setPrimaryMuscleGroup(muscleGroup);
+        });
+    }
 }

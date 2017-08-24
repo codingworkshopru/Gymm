@@ -16,23 +16,31 @@ import ru.codingworkshop.gymm.db.dao.MuscleGroupDao;
  */
 
 @Singleton
-public final class MuscleGroupsRepository {
-    private MuscleGroupDao muscleGroupDao;
+public class MuscleGroupsRepository {
+    private MuscleGroupDao dao;
 
     @Inject
     MuscleGroupsRepository(MuscleGroupDao muscleGroupDao) {
-        this.muscleGroupDao = muscleGroupDao;
+        this.dao = muscleGroupDao;
     }
 
     public boolean isEmpty() {
-        return muscleGroupDao.getMuscleGroupsCount() == 0;
+        return dao.getMuscleGroupsCount() == 0;
     }
 
     public LiveData<List<MuscleGroup>> getMuscleGroups() {
-        return muscleGroupDao.getAllMuscleGroups();
+        return dao.getAllMuscleGroups();
     }
 
     public void insertMuscleGroups(Collection<MuscleGroup> muscleGroups) {
-        muscleGroupDao.insertMuscleGroups(muscleGroups);
+        dao.insertMuscleGroups(muscleGroups);
+    }
+
+    public LiveData<MuscleGroup> getMuscleGroupById(long muscleGroupId) {
+        return dao.getMuscleGroupById(muscleGroupId);
+    }
+
+    public LiveData<List<MuscleGroup>> getSecondaryMuscleGroupsForExercise(long exerciseId) {
+        return dao.getSecondaryMuscleGroupsForExercise(exerciseId);
     }
 }

@@ -11,7 +11,8 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.junit.runners.JUnit4;
+import org.mockito.Mock;
+import org.mockito.junit.MockitoJUnitRunner;
 
 import java.util.List;
 import java.util.Set;
@@ -19,6 +20,7 @@ import java.util.Set;
 import ru.codingworkshop.gymm.data.entity.Exercise;
 import ru.codingworkshop.gymm.data.entity.MuscleGroup;
 import ru.codingworkshop.gymm.db.dao.ExerciseDao;
+import ru.codingworkshop.gymm.db.dao.MuscleGroupDao;
 import ru.codingworkshop.gymm.util.ModelsFixture;
 
 import static org.junit.Assert.assertEquals;
@@ -35,11 +37,12 @@ import static org.mockito.Mockito.when;
  * Created by Радик on 19.06.2017.
  */
 
-@RunWith(JUnit4.class)
+@RunWith(MockitoJUnitRunner.class)
 public class ExerciseWrapperTest {
     private Exercise exercise;
     private MutableLiveData<Exercise> liveExercise;
-    private ExerciseDao exerciseDao;
+    @Mock private ExerciseDao exerciseDao;
+    @Mock private MuscleGroupDao muscleGroupDao;
 
     @Rule
     public InstantTaskExecutorRule instantTaskExecutorRule = new InstantTaskExecutorRule();
@@ -57,19 +60,19 @@ public class ExerciseWrapperTest {
 
         exerciseDao = mock(ExerciseDao.class);
         when(exerciseDao.getExerciseById(1)).thenReturn(liveExercise);
-        when(exerciseDao.getSecondaryMuscleGroupsForExercise(1)).thenReturn(liveMuscleGroups);
+        when(muscleGroupDao.getSecondaryMuscleGroupsForExercise(1)).thenReturn(liveMuscleGroups);
     }
 
     @Test
     public void loadExercise() {
-        LiveData<ExerciseWrapper> liveWrapper = ExerciseWrapper.load(1, exerciseDao);
+        LiveData<ExerciseWrapper> liveWrapper = ExerciseWrapper.load(1, exerciseDao, muscleGroupDao);
         Observer<ExerciseWrapper> observer = mock(Observer.class);
         liveWrapper.observeForever(observer);
         verify(observer).onChanged(argThat(wrapper ->
             wrapper.getExercise().getName().equals("foo") &&
                 wrapper.getSecondaryMuscleGroupsCount() == 1));
         verify(exerciseDao).getExerciseById(1);
-        verify(exerciseDao).getSecondaryMuscleGroupsForExercise(1);
+        verify(muscleGroupDao).getSecondaryMuscleGroupsForExercise(1);
         liveExercise.setValue(new Exercise());
         verify(observer, times(2)).onChanged(any());
     }
