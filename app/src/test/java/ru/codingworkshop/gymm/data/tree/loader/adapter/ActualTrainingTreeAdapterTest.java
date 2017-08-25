@@ -6,7 +6,7 @@ import org.junit.Test;
 
 import ru.codingworkshop.gymm.data.tree.node.ActualTrainingTree;
 import ru.codingworkshop.gymm.data.tree.node.ImmutableProgramTrainingTree;
-import ru.codingworkshop.gymm.util.ModelsFixture;
+import ru.codingworkshop.gymm.util.Models;
 
 import static junit.framework.Assert.assertEquals;
 
@@ -18,18 +18,18 @@ public class ActualTrainingTreeAdapterTest {
     public void build() throws Exception {
         ImmutableProgramTrainingTree programTrainingTree = new ImmutableProgramTrainingTree();
         ProgramTrainingTreeAdapter programTrainingTreeAdapter = new ProgramTrainingTreeAdapter(programTrainingTree);
-        programTrainingTreeAdapter.setParent(ModelsFixture.createProgramTraining(1L, "foo"));
-        programTrainingTreeAdapter.setChildren(ModelsFixture.createProgramExercises(1));
-        programTrainingTreeAdapter.setGrandchildren(ModelsFixture.createProgramSets(1));
-        programTrainingTreeAdapter.setExercises(ModelsFixture.createExercises("bar"));
+        programTrainingTreeAdapter.setParent(Models.createProgramTraining(1L, "foo"));
+        programTrainingTreeAdapter.setChildren(Models.createProgramExercises(1));
+        programTrainingTreeAdapter.setGrandchildren(Models.createProgramSets(1));
+        programTrainingTreeAdapter.setExercises(Models.createExercises("bar"));
         programTrainingTreeAdapter.build();
 
         ActualTrainingTree tree = new ActualTrainingTree();
         ActualTrainingTreeAdapter adapter = new ActualTrainingTreeAdapter(tree, programTrainingTree);
 
-        adapter.setChildren(ModelsFixture.createActualExercises(12L));
-        adapter.setGrandchildren(ModelsFixture.createActualSets(12L, 13L, 14L));
-        adapter.setParent(ModelsFixture.createActualTraining(11L, 1L));
+        adapter.setChildren(Models.createActualExercises(12L));
+        adapter.setGrandchildren(Models.createActualSets(12L, 13L, 14L));
+        adapter.setParent(Models.createActualTraining(11L, 1L));
 
         adapter.build();
 

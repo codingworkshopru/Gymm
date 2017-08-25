@@ -4,7 +4,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import ru.codingworkshop.gymm.data.entity.ProgramTraining;
-import ru.codingworkshop.gymm.util.ModelsFixture;
+import ru.codingworkshop.gymm.util.Models;
 
 import static org.junit.Assert.assertEquals;
 
@@ -21,7 +21,7 @@ public class ActualTrainingTreeTest {
 
     @Test
     public void programTrainingAccessors() throws Exception {
-        final ProgramTraining programTraining = ModelsFixture.createProgramTraining(1L, "foo");
+        final ProgramTraining programTraining = Models.createProgramTraining(1L, "foo");
         tree.setProgramTraining(programTraining);
         assertEquals(programTraining, tree.getProgramTraining());
     }

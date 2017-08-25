@@ -21,7 +21,7 @@ import ru.codingworkshop.gymm.data.entity.Exercise;
 import ru.codingworkshop.gymm.data.entity.MuscleGroup;
 import ru.codingworkshop.gymm.db.dao.ExerciseDao;
 import ru.codingworkshop.gymm.db.dao.MuscleGroupDao;
-import ru.codingworkshop.gymm.util.ModelsFixture;
+import ru.codingworkshop.gymm.util.Models;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -49,13 +49,13 @@ public class ExerciseWrapperTest {
 
     @Before
     public void init() {
-        exercise = ModelsFixture.createExercise(33L, "foo");
+        exercise = Models.createExercise(33L, "foo");
 
         liveExercise = new MutableLiveData<>();
         liveExercise.setValue(exercise);
 
         MutableLiveData<List<MuscleGroup>> liveMuscleGroups = new MutableLiveData<>();
-        MuscleGroup muscleGroup = ModelsFixture.createMuscleGroup(1, "bar");
+        MuscleGroup muscleGroup = Models.createMuscleGroup(1, "bar");
         liveMuscleGroups.setValue(Lists.newArrayList(muscleGroup));
 
         exerciseDao = mock(ExerciseDao.class);

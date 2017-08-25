@@ -47,6 +47,7 @@ public class ProgramTrainingRepository extends BaseRepository {
         return dao.getDraftingProgramTraining();
     }
 
+    //TODO inserted must be drafting
     public void insertProgramTraining(@NonNull ProgramTraining programTraining) {
         insert(programTraining, dao::insertProgramTraining, ProgramTrainingRepository::checkName);
     }
@@ -80,6 +81,7 @@ public class ProgramTrainingRepository extends BaseRepository {
         return dao.getDraftingProgramExercise(programTrainingId);
     }
 
+    //TODO inserted must be drafting
     public void insertProgramExercise(ProgramExercise programExercise) {
         insert(programExercise, dao::insertProgramExercise, ProgramTrainingRepository::checkProgramExercise);
     }

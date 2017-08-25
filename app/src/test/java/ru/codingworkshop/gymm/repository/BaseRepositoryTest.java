@@ -22,7 +22,7 @@ import ru.codingworkshop.gymm.data.util.LiveDataUtil;
 import ru.codingworkshop.gymm.data.util.LongSupplier;
 import ru.codingworkshop.gymm.util.DummyDao;
 import ru.codingworkshop.gymm.util.LiveTest;
-import ru.codingworkshop.gymm.util.ModelsFixture;
+import ru.codingworkshop.gymm.util.Models;
 import ru.codingworkshop.gymm.util.SimpleModel;
 
 import static org.junit.Assert.assertEquals;
@@ -57,7 +57,7 @@ public class BaseRepositoryTest {
     @Test
     public void insertTest() {
         SimpleModel model = new SimpleModel(0L, "foo");
-        List<SimpleModel> models = ModelsFixture.createSimpleModels(0L, 0L, 0L);
+        List<SimpleModel> models = Models.createSimpleModels(0L, 0L, 0L);
 
         when(dao.insert(model)).thenReturn(1L);
         final ArrayList<Long> ids = Lists.newArrayList(1L, 2L, 3L);
@@ -97,13 +97,13 @@ public class BaseRepositoryTest {
 
     @Test(expected = IllegalArgumentException.class)
     public void insertCollectionWithoutNameTest() {
-        List<SimpleModel> models = ModelsFixture.createSimpleModels("foo", null, "bar");
+        List<SimpleModel> models = Models.createSimpleModels("foo", null, "bar");
         repository.insert(Lists.newArrayList(models), dao::insert, BaseRepositoryTest::checkName);
     }
 
     @Test(expected = IllegalStateException.class)
     public void insertCollectionFailTest() {
-        List<SimpleModel> ms = ModelsFixture.createSimpleModels("foo", "bar", "baz");
+        List<SimpleModel> ms = Models.createSimpleModels("foo", "bar", "baz");
         when(dao.insert(ms)).thenReturn(Lists.newArrayList(-1L, 1L, 2L));
         repository.insert(ms, dao::insert, BaseRepositoryTest::checkName);
     }
@@ -111,7 +111,7 @@ public class BaseRepositoryTest {
     @Test
     public void updateTest() {
         SimpleModel model = new SimpleModel(1L, "foo");
-        List<SimpleModel> models = ModelsFixture.createSimpleModels("foo", "bar", "baz");
+        List<SimpleModel> models = Models.createSimpleModels("foo", "bar", "baz");
 
         when(dao.update(model)).thenReturn(1);
         when(dao.update(models)).thenReturn(3);
@@ -131,14 +131,14 @@ public class BaseRepositoryTest {
 
     @Test(expected = IllegalArgumentException.class)
     public void updateCollectionWithoutName() {
-        List<SimpleModel> models = ModelsFixture.createSimpleModels("foo", "bar", null);
+        List<SimpleModel> models = Models.createSimpleModels("foo", "bar", null);
         repository.update(models, dao::update, BaseRepositoryTest::checkName);
     }
 
     @Test
     public void deleteTest() {
         SimpleModel model = new SimpleModel(1L, "foo");
-        List<SimpleModel> models = ModelsFixture.createSimpleModels("foo", "bar", "baz");
+        List<SimpleModel> models = Models.createSimpleModels("foo", "bar", "baz");
 
         when(dao.delete(model)).thenReturn(1);
         when(dao.delete(models)).thenReturn(3);

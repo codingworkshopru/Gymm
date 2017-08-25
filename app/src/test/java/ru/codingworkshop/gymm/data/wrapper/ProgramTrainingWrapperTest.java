@@ -20,7 +20,7 @@ import ru.codingworkshop.gymm.data.entity.ProgramTraining;
 import ru.codingworkshop.gymm.data.util.LiveDataUtil;
 import ru.codingworkshop.gymm.repository.ProgramTrainingRepository;
 import ru.codingworkshop.gymm.util.LiveTest;
-import ru.codingworkshop.gymm.util.ModelsFixture;
+import ru.codingworkshop.gymm.util.Models;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -45,9 +45,9 @@ public class ProgramTrainingWrapperTest {
 
     @Test
     public void creation() {
-        ProgramTraining training = ModelsFixture.createProgramTraining(1L, "foo");
+        ProgramTraining training = Models.createProgramTraining(1L, "foo");
         ProgramTrainingWrapper wrapper = new ProgramTrainingWrapper(training, repository);
-        wrapper.setChildren(ModelsFixture.createProgramExercises(1));
+        wrapper.setChildren(Models.createProgramExercises(1));
 
         assertEquals("foo", wrapper.getRoot().getName());
         assertEquals(1, wrapper.getChildren().size());
@@ -55,8 +55,8 @@ public class ProgramTrainingWrapperTest {
 
     @Test
     public void restoreRemoved() {
-        ProgramTrainingWrapper wrapper = new ProgramTrainingWrapper(ModelsFixture.createProgramTraining(1L, "foo"), repository);
-        ProgramExercise exercise = ModelsFixture.createProgramExercise(2L, 1L, 100L, false);
+        ProgramTrainingWrapper wrapper = new ProgramTrainingWrapper(Models.createProgramTraining(1L, "foo"), repository);
+        ProgramExercise exercise = Models.createProgramExercise(2L, 1L, 100L, false);
         wrapper.setChildren(Lists.newArrayList(exercise));
         wrapper.removeChild(exercise);
         assertFalse(wrapper.hasChildren());
@@ -66,9 +66,9 @@ public class ProgramTrainingWrapperTest {
 
     @Test
     public void loadDrafting() {
-        ProgramTraining training = ModelsFixture.createProgramTraining(1L, "foo");
+        ProgramTraining training = Models.createProgramTraining(1L, "foo");
         training.setDrafting(true);
-        List<ProgramExercise> exercisesForProgram = ModelsFixture.createProgramExercises(1);
+        List<ProgramExercise> exercisesForProgram = Models.createProgramExercises(1);
 
         when(repository.getDraftingProgramTraining()).thenReturn(LiveDataUtil.getLive(training));
         when(repository.getProgramExercisesForTraining(training)).thenReturn(LiveDataUtil.getLive(exercisesForProgram));
@@ -114,9 +114,9 @@ public class ProgramTrainingWrapperTest {
 
     @Test
     public void load() {
-        LiveData<ProgramTraining> training = ModelsFixture.createLiveProgramTraining(1L, "foo", false);
+        LiveData<ProgramTraining> training = Models.createLiveProgramTraining(1L, "foo", false);
         when(repository.getProgramTrainingById(1)).thenReturn(training);
-        when(repository.getProgramExercisesForTraining(1)).thenReturn(LiveDataUtil.getLive(ModelsFixture.createProgramExercises(1)));
+        when(repository.getProgramExercisesForTraining(1)).thenReturn(LiveDataUtil.getLive(Models.createProgramExercises(1)));
 
         LiveTest.verifyLiveData(
                 new ProgramTrainingWrapper(repository).load(1),
@@ -130,10 +130,10 @@ public class ProgramTrainingWrapperTest {
 
     @Test
     public void saveProgramTrainingWithUnchangedExercises() {
-        ProgramTraining training = ModelsFixture.createProgramTraining(1L, "foo");
+        ProgramTraining training = Models.createProgramTraining(1L, "foo");
         ProgramTrainingWrapper wrapper = new ProgramTrainingWrapper(training, repository);
 
-        List<ProgramExercise> oldExercises = ModelsFixture.createProgramExercises(4);
+        List<ProgramExercise> oldExercises = Models.createProgramExercises(4);
         when(repository.getProgramExercisesForTraining(training)).thenReturn(LiveDataUtil.getLive(oldExercises));
 
         wrapper.setChildren(oldExercises);
@@ -146,12 +146,12 @@ public class ProgramTrainingWrapperTest {
 
     @Test
     public void saveProgramTrainingExercises() {
-        ProgramTraining training = ModelsFixture.createProgramTraining(1L, "foo");
+        ProgramTraining training = Models.createProgramTraining(1L, "foo");
         ProgramTrainingWrapper wrapper = new ProgramTrainingWrapper(training, repository);
 
-        List<ProgramExercise> oldExercises = ModelsFixture.createProgramExercises(10);
+        List<ProgramExercise> oldExercises = Models.createProgramExercises(10);
 
-        List<ProgramExercise> newExercises = ModelsFixture.createProgramExercises(10);
+        List<ProgramExercise> newExercises = Models.createProgramExercises(10);
         wrapper.setChildren(newExercises);
 
         when(repository.getProgramExercisesForTraining(training)).thenReturn(LiveDataUtil.getLive(oldExercises));

@@ -15,7 +15,7 @@ import java.util.stream.Collectors;
 
 import ru.codingworkshop.gymm.data.util.LiveDataUtil;
 import ru.codingworkshop.gymm.util.LiveTest;
-import ru.codingworkshop.gymm.util.ModelsFixture;
+import ru.codingworkshop.gymm.util.Models;
 import ru.codingworkshop.gymm.util.SimpleModel;
 import ru.codingworkshop.gymm.util.SimpleWrapper;
 
@@ -60,7 +60,7 @@ public class BaseLoaderTest {
 
             @Override
             protected LiveData<List<SimpleModel>> getLiveChildren() {
-                return LiveDataUtil.getLive(ModelsFixture.createSimpleModels("foo", "bar", "baz"));
+                return LiveDataUtil.getLive(Models.createSimpleModels("foo", "bar", "baz"));
             }
         };
 
@@ -84,7 +84,7 @@ public class BaseLoaderTest {
 
             @Override
             protected LiveData<List<SimpleModel>> getLiveChildren(Long root) {
-                return LiveDataUtil.getLive(ModelsFixture.createSimpleModels("foo" + root, "bar" + root, "baz" + root));
+                return LiveDataUtil.getLive(Models.createSimpleModels("foo" + root, "bar" + root, "baz" + root));
             }
         };
 
@@ -113,7 +113,7 @@ public class BaseLoaderTest {
 
             @Override
             protected LiveData<List<SimpleModel>> getLiveChildren() {
-                return LiveDataUtil.getLive(ModelsFixture.createSimpleModels("foo", "bar"));
+                return LiveDataUtil.getLive(Models.createSimpleModels("foo", "bar"));
             }
         };
 

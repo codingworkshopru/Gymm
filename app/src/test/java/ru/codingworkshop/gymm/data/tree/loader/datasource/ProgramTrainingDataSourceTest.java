@@ -17,7 +17,7 @@ import ru.codingworkshop.gymm.data.entity.ProgramSet;
 import ru.codingworkshop.gymm.data.entity.ProgramTraining;
 import ru.codingworkshop.gymm.repository.ExercisesRepository;
 import ru.codingworkshop.gymm.repository.ProgramTrainingRepository;
-import ru.codingworkshop.gymm.util.ModelsFixture;
+import ru.codingworkshop.gymm.util.Models;
 
 import static junit.framework.Assert.assertEquals;
 import static org.mockito.Mockito.when;
@@ -36,10 +36,10 @@ public class ProgramTrainingDataSourceTest {
 
     @Test
     public void test() throws Exception {
-        final LiveData<ProgramTraining> liveProgramTraining = ModelsFixture.createLiveProgramTraining(1L, "foo", false);
-        final LiveData<List<ProgramExercise>> liveProgramExercises = ModelsFixture.createLiveProgramExercises(1);
-        final LiveData<List<ProgramSet>> liveProgramSets = ModelsFixture.createLiveProgramSets(1);
-        final LiveData<List<Exercise>> liveExercises = ModelsFixture.createLiveExercises("foobar", "baz");
+        final LiveData<ProgramTraining> liveProgramTraining = Models.createLiveProgramTraining(1L, "foo", false);
+        final LiveData<List<ProgramExercise>> liveProgramExercises = Models.createLiveProgramExercises(1);
+        final LiveData<List<ProgramSet>> liveProgramSets = Models.createLiveProgramSets(1);
+        final LiveData<List<Exercise>> liveExercises = Models.createLiveExercises("foobar", "baz");
 
         when(repository.getProgramTrainingById(1L)).thenReturn(liveProgramTraining);
         when(repository.getProgramExercisesForTraining(1L)).thenReturn(liveProgramExercises);

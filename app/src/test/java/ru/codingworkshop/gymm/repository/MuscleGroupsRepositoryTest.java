@@ -14,7 +14,7 @@ import java.util.List;
 
 import ru.codingworkshop.gymm.data.entity.MuscleGroup;
 import ru.codingworkshop.gymm.db.dao.MuscleGroupDao;
-import ru.codingworkshop.gymm.util.ModelsFixture;
+import ru.codingworkshop.gymm.util.Models;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -52,7 +52,7 @@ public class MuscleGroupsRepositoryTest {
 
     @Test
     public void getMuscleGroups() throws Exception {
-        final LiveData<List<MuscleGroup>> liveMuscleGroups = ModelsFixture.createLiveMuscleGroups(1L);
+        final LiveData<List<MuscleGroup>> liveMuscleGroups = Models.createLiveMuscleGroups(1L);
         when(dao.getAllMuscleGroups()).thenReturn(liveMuscleGroups);
         assertEquals(liveMuscleGroups, repository.getMuscleGroups());
         verify(dao).getAllMuscleGroups();
@@ -60,14 +60,14 @@ public class MuscleGroupsRepositoryTest {
 
     @Test
     public void insertMuscleGroups() throws Exception {
-        final List<MuscleGroup> muscleGroups = ModelsFixture.createMuscleGroups(1L);
+        final List<MuscleGroup> muscleGroups = Models.createMuscleGroups(1L);
         repository.insertMuscleGroups(muscleGroups);
         verify(dao).insertMuscleGroups(muscleGroups);
     }
 
     @Test
     public void getMuscleGroupById() throws Exception {
-        final LiveData<MuscleGroup> muscleGroup = ModelsFixture.createLiveMuscleGroup(1L, "foo");
+        final LiveData<MuscleGroup> muscleGroup = Models.createLiveMuscleGroup(1L, "foo");
         when(dao.getMuscleGroupById(1L)).thenReturn(muscleGroup);
         assertEquals(muscleGroup, repository.getMuscleGroupById(1L));
         verify(dao).getMuscleGroupById(1L);
@@ -75,7 +75,7 @@ public class MuscleGroupsRepositoryTest {
 
     @Test
     public void getSecondaryMuscleGroupsForExercise() throws Exception {
-        final LiveData<List<MuscleGroup>> liveMuscleGroups = ModelsFixture.createLiveMuscleGroups(2L);
+        final LiveData<List<MuscleGroup>> liveMuscleGroups = Models.createLiveMuscleGroups(2L);
         when(dao.getSecondaryMuscleGroupsForExercise(1L)).thenReturn(liveMuscleGroups);
         assertEquals(liveMuscleGroups, repository.getSecondaryMuscleGroupsForExercise(1L));
         verify(dao).getSecondaryMuscleGroupsForExercise(1L);

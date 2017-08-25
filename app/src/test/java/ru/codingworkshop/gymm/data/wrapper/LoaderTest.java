@@ -18,7 +18,7 @@ import java.util.stream.Collectors;
 
 import ru.codingworkshop.gymm.data.util.LiveDataUtil;
 import ru.codingworkshop.gymm.util.LiveTest;
-import ru.codingworkshop.gymm.util.ModelsFixture;
+import ru.codingworkshop.gymm.util.Models;
 import ru.codingworkshop.gymm.util.SimpleModel;
 import ru.codingworkshop.gymm.util.SimpleWrapper;
 
@@ -67,7 +67,7 @@ public class LoaderTest {
         Loader<SimpleWrapper> loader = new Loader<>(SimpleWrapper::new);
         Runnable runnable = mock(Runnable.class);
         loader.addSource(longData, SimpleWrapper::setRoot, runnable);
-        loader.addDependentSource(longData, l -> LiveDataUtil.getLive(ModelsFixture.createSimpleModels("bar", "baz")), SimpleWrapper::setChildren);
+        loader.addDependentSource(longData, l -> LiveDataUtil.getLive(Models.createSimpleModels("bar", "baz")), SimpleWrapper::setChildren);
 
         LiveData<SimpleWrapper> liveWrapper = loader.load();
         LiveTest.verifyLiveData(liveWrapper, w -> w.getRoot() == null);
@@ -133,6 +133,6 @@ public class LoaderTest {
     }
 
     private LiveData<List<SimpleModel>> getLiveChildren(@Nullable Long value) {
-        return LiveDataUtil.getLive(ModelsFixture.createSimpleModels("foo" + value, "bar" + value, "baz" + value));
+        return LiveDataUtil.getLive(Models.createSimpleModels("foo" + value, "bar" + value, "baz" + value));
     }
 }

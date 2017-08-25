@@ -8,7 +8,7 @@ import org.junit.Test;
 import ru.codingworkshop.gymm.data.tree.loader.datasource.ExerciseDataSource;
 import ru.codingworkshop.gymm.data.tree.node.ExerciseNode;
 import ru.codingworkshop.gymm.util.LiveTest;
-import ru.codingworkshop.gymm.util.ModelsFixture;
+import ru.codingworkshop.gymm.util.Models;
 
 import static junit.framework.Assert.assertEquals;
 import static org.mockito.Mockito.mock;
@@ -25,9 +25,9 @@ public class ExerciseLoaderTest {
     @Test
     public void load() throws Exception {
         ExerciseDataSource dataSource = mock(ExerciseDataSource.class);
-        when(dataSource.getParent()).thenReturn(ModelsFixture.createLiveExercise(100L, "foo"));
-        when(dataSource.getChildren()).thenReturn(ModelsFixture.createLiveMuscleGroups(200L));
-        when(dataSource.getPrimaryMuscleGroup()).thenReturn(ModelsFixture.createLiveMuscleGroup(201L, "bar"));
+        when(dataSource.getParent()).thenReturn(Models.createLiveExercise(100L, "foo"));
+        when(dataSource.getChildren()).thenReturn(Models.createLiveMuscleGroups(200L));
+        when(dataSource.getPrimaryMuscleGroup()).thenReturn(Models.createLiveMuscleGroup(201L, "bar"));
 
         ExerciseNode node = new ExerciseNode();
         ExerciseLoader loader = new ExerciseLoader(node, dataSource);

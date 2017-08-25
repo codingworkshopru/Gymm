@@ -31,7 +31,7 @@ import ru.codingworkshop.gymm.repository.ActualTrainingRepository;
 import ru.codingworkshop.gymm.repository.ExercisesRepository;
 import ru.codingworkshop.gymm.repository.ProgramTrainingRepository;
 import ru.codingworkshop.gymm.util.LiveTest;
-import ru.codingworkshop.gymm.util.ModelsFixture;
+import ru.codingworkshop.gymm.util.Models;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
@@ -63,7 +63,7 @@ public class ActualTrainingWrapperTest {
 
     @Test
     public void programTrainingGetAndSet() {
-        ProgramTraining training = ModelsFixture.createProgramTraining(1L, "foo");
+        ProgramTraining training = Models.createProgramTraining(1L, "foo");
         wrapper.setProgramTraining(training);
         assertEquals(training, wrapper.getProgramTraining());
     }
@@ -75,7 +75,7 @@ public class ActualTrainingWrapperTest {
 
     @Test
     public void programExercisesSetAndGet() {
-        List<ProgramExercise> programExercises = ModelsFixture.createProgramExercises(10);
+        List<ProgramExercise> programExercises = Models.createProgramExercises(10);
         wrapper.setProgramExercises(programExercises);
         assertEquals(programExercises, wrapper.getProgramExercises());
     }
@@ -92,7 +92,7 @@ public class ActualTrainingWrapperTest {
 
     @Test
     public void exercisesSetAndGet() {
-        List<Exercise> exercises = ModelsFixture.createExercises("foo", "bar", "baz");
+        List<Exercise> exercises = Models.createExercises("foo", "bar", "baz");
         wrapper.setExercises(exercises);
         assertEquals(exercises, wrapper.getExercises());
     }
@@ -109,7 +109,7 @@ public class ActualTrainingWrapperTest {
 
     @Test
     public void programSetsSetAndGet() {
-        List<ProgramSet> sets = ModelsFixture.createProgramSets(10);
+        List<ProgramSet> sets = Models.createProgramSets(10);
         wrapper.setProgramSets(sets);
         assertEquals(sets, wrapper.getProgramSets());
     }
@@ -126,8 +126,8 @@ public class ActualTrainingWrapperTest {
 
     @Test
     public void getProgramSetsForProgramExercise() {
-        ProgramExercise exercise = ModelsFixture.createProgramExercise(2L, 1L, 100L, false);
-        List<ProgramSet> sets = ModelsFixture.createProgramSets(9);
+        ProgramExercise exercise = Models.createProgramExercise(2L, 1L, 100L, false);
+        List<ProgramSet> sets = Models.createProgramSets(9);
         wrapper.setProgramExercises(Lists.newArrayList(exercise));
         wrapper.setProgramSets(sets);
         assertEquals(sets, wrapper.getProgramSetsForExercise(exercise));
@@ -141,8 +141,8 @@ public class ActualTrainingWrapperTest {
 
     @Test
     public void getExerciseForProgramExercise() {
-        ProgramExercise programExercise = ModelsFixture.createProgramExercise(2L, 1L, 100L, false);
-        Exercise exercise = ModelsFixture.createExercise(100L, "foo");
+        ProgramExercise programExercise = Models.createProgramExercise(2L, 1L, 100L, false);
+        Exercise exercise = Models.createExercise(100L, "foo");
         wrapper.setProgramExercises(Lists.newArrayList(programExercise));
         wrapper.setExercises(Lists.newArrayList(exercise));
         assertEquals(exercise, wrapper.getExerciseForProgramExercise(programExercise));
@@ -155,7 +155,7 @@ public class ActualTrainingWrapperTest {
 
     @Test
     public void actualTrainingGetAndSet() {
-        ActualTraining actualTraining = ModelsFixture.createActualTraining(10L, 1L);
+        ActualTraining actualTraining = Models.createActualTraining(10L, 1L);
         wrapper.setActualTraining(actualTraining);
         assertEquals(actualTraining, wrapper.getActualTraining());
     }
@@ -167,9 +167,9 @@ public class ActualTrainingWrapperTest {
 
     @Test
     public void actualExercisesSetAndGet() {
-        List<ProgramExercise> programExercises = ModelsFixture.createProgramExercises(3);
+        List<ProgramExercise> programExercises = Models.createProgramExercises(3);
         programExercises.forEach(pe -> pe.setSortOrder(2 - pe.getSortOrder()));
-        List<ActualExercise> exercises = ModelsFixture.createActualExercises(401L, 402L, 403L);
+        List<ActualExercise> exercises = Models.createActualExercises(401L, 402L, 403L);
         for (int i = 0; i < 3; i++) {
             exercises.get(i).setProgramExerciseId(programExercises.get(i).getId());
         }
@@ -213,13 +213,13 @@ public class ActualTrainingWrapperTest {
     }
 
     private ProgramTraining stubProgramTraining() {
-        final LiveData<ProgramTraining> liveProgramTraining = ModelsFixture.createLiveProgramTraining(1L, "foo", false);
+        final LiveData<ProgramTraining> liveProgramTraining = Models.createLiveProgramTraining(1L, "foo", false);
         when(programTrainingRepository.getProgramTrainingById(1L)).thenReturn(liveProgramTraining);
         return liveProgramTraining.getValue();
     }
 
     private List<ProgramExercise> stubProgramExercises() {
-        final LiveData<List<ProgramExercise>> liveProgramExercises = ModelsFixture.createLiveProgramExercises(10);
+        final LiveData<List<ProgramExercise>> liveProgramExercises = Models.createLiveProgramExercises(10);
         AtomicLong l = new AtomicLong();
         liveProgramExercises.getValue().forEach(e -> e.setExerciseId(100L + l.getAndIncrement() % 3));
         when(programTrainingRepository.getProgramExercisesForTraining(1L)).thenReturn(liveProgramExercises);
@@ -227,7 +227,7 @@ public class ActualTrainingWrapperTest {
     }
 
     private List<ProgramSet> stubProgramSets() {
-        final LiveData<List<ProgramSet>> liveProgramSets = ModelsFixture.createLiveProgramSets(10);
+        final LiveData<List<ProgramSet>> liveProgramSets = Models.createLiveProgramSets(10);
         when(programTrainingRepository.getProgramSetsForTraining(1L)).thenReturn(liveProgramSets);
         return liveProgramSets.getValue();
     }
@@ -260,14 +260,14 @@ public class ActualTrainingWrapperTest {
     }
 
     private void stubLoadActualTrainingRepo() {
-        when(actualTrainingRepository.getActualTrainingById(1000L)).thenReturn(ModelsFixture.createLiveActualTraining(1000L, 1L));
-        final List<ActualExercise> actualExercises = ModelsFixture.createActualExercises(1L, 2L, 3L);
+        when(actualTrainingRepository.getActualTrainingById(1000L)).thenReturn(Models.createLiveActualTraining(1000L, 1L));
+        final List<ActualExercise> actualExercises = Models.createActualExercises(1L, 2L, 3L);
         actualExercises.forEach(ae -> {
             ae.setActualTrainingId(1000L);
             ae.setExerciseName(Lists.newArrayList("foo", "bar", "baz").get((int)(ae.getId()-1)));
         });
         when(actualTrainingRepository.getActualExercisesForActualTraining(1000L)).thenReturn(LiveDataUtil.getLive(actualExercises));
-        when(actualTrainingRepository.getActualSetsForActualTraining(1000L)).thenReturn(ModelsFixture.createLiveActualSets(1L, 1003L, 1004L, 1005L));
+        when(actualTrainingRepository.getActualSetsForActualTraining(1000L)).thenReturn(Models.createLiveActualSets(1L, 1003L, 1004L, 1005L));
     }
 
     private void assertActualTrainingLoaded(ActualTrainingWrapper w) {
@@ -299,7 +299,7 @@ public class ActualTrainingWrapperTest {
     }
 
     private List<Exercise> stubExercisesRepo() {
-        final LiveData<List<Exercise>> liveExercises = ModelsFixture.createLiveExercises("foo", "bar", "baz");
+        final LiveData<List<Exercise>> liveExercises = Models.createLiveExercises("foo", "bar", "baz");
         when(exercisesRepository.getExercisesForProgramTraining(1L)).thenReturn(liveExercises);
         return liveExercises.getValue();
     }
@@ -314,7 +314,7 @@ public class ActualTrainingWrapperTest {
 
     @Test
     public void createAndGetActualSet() {
-        ActualExercise actualExercise = ModelsFixture.createActualExercise(1002L, "foo", 1000L, 2L);
+        ActualExercise actualExercise = Models.createActualExercise(1002L, "foo", 1000L, 2L);
         doAnswer(invocation -> {
             ActualSet set = invocation.getArgument(0);
             set.setId(1003L);
@@ -326,7 +326,7 @@ public class ActualTrainingWrapperTest {
 
     @Test(expected = IllegalArgumentException.class)
     public void createActualSetForInvalidActualExercise() {
-        wrapper.createActualSet(ModelsFixture.createActualExercise(0L, "foo", 1000L, 2L), 0, 0);
+        wrapper.createActualSet(Models.createActualExercise(0L, "foo", 1000L, 2L), 0, 0);
     }
 
     @Test(expected = IllegalArgumentException.class)
@@ -336,8 +336,8 @@ public class ActualTrainingWrapperTest {
 
     @Test
     public void actualSetsSetAndGet() {
-        ActualExercise ex1 = ModelsFixture.createActualExercise(1002L, "foo", 1L, 2L);
-        List<ActualSet> actualSets = ModelsFixture.createActualSets(1002L, 1003L, 1004L);
+        ActualExercise ex1 = Models.createActualExercise(1002L, "foo", 1L, 2L);
+        List<ActualSet> actualSets = Models.createActualSets(1002L, 1003L, 1004L);
 
         wrapper.setActualSets(actualSets);
         assertEquals(actualSets.subList(0, 2), wrapper.getActualSets(ex1));
@@ -355,7 +355,7 @@ public class ActualTrainingWrapperTest {
         LiveTest.verifyLiveData(wrapper.load(1000L), w -> {
             assertProgramTrainingLoaded(w, programTraining, programExercises, programSets);
             assertActualTrainingLoaded(w);
-            assertEquals(3, w.getActualSets(ModelsFixture.createActualExercise(1L, "foo", 1000L, 2L)).size());
+            assertEquals(3, w.getActualSets(Models.createActualExercise(1L, "foo", 1000L, 2L)).size());
 
             return true;
         });

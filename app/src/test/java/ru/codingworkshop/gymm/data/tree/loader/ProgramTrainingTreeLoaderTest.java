@@ -9,7 +9,7 @@ import ru.codingworkshop.gymm.data.tree.loader.datasource.ProgramTrainingDataSou
 import ru.codingworkshop.gymm.data.tree.node.ImmutableProgramTrainingTree;
 import ru.codingworkshop.gymm.data.tree.node.ProgramTrainingTree;
 import ru.codingworkshop.gymm.util.LiveTest;
-import ru.codingworkshop.gymm.util.ModelsFixture;
+import ru.codingworkshop.gymm.util.Models;
 
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.mock;
@@ -25,10 +25,10 @@ public class ProgramTrainingTreeLoaderTest {
     @Test
     public void load() throws Exception {
         ProgramTrainingDataSource dataSource = mock(ProgramTrainingDataSource.class);
-        when(dataSource.getParent()).thenReturn(ModelsFixture.createLiveProgramTraining(1L, "foo", false));
-        when(dataSource.getChildren()).thenReturn(ModelsFixture.createLiveProgramExercises(1));
-        when(dataSource.getGrandchildren()).thenReturn(ModelsFixture.createLiveProgramSets(3));
-        when(dataSource.getExercises()).thenReturn(ModelsFixture.createLiveExercises("bar", "baz"));
+        when(dataSource.getParent()).thenReturn(Models.createLiveProgramTraining(1L, "foo", false));
+        when(dataSource.getChildren()).thenReturn(Models.createLiveProgramExercises(1));
+        when(dataSource.getGrandchildren()).thenReturn(Models.createLiveProgramSets(3));
+        when(dataSource.getExercises()).thenReturn(Models.createLiveExercises("bar", "baz"));
 
         ProgramTrainingTree tree = new ImmutableProgramTrainingTree();
 

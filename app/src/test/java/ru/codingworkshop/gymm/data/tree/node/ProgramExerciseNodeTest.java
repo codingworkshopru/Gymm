@@ -9,7 +9,7 @@ import org.mockito.junit.MockitoJUnitRunner;
 import ru.codingworkshop.gymm.data.entity.Exercise;
 import ru.codingworkshop.gymm.data.entity.ProgramExercise;
 import ru.codingworkshop.gymm.data.tree.holder.SimpleChildrenHolder;
-import ru.codingworkshop.gymm.util.ModelsFixture;
+import ru.codingworkshop.gymm.util.Models;
 
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.verify;
@@ -31,7 +31,7 @@ public class ProgramExerciseNodeTest {
 
     @Test
     public void exerciseAccessors() throws Exception {
-        final Exercise foo = ModelsFixture.createExercise(100L, "foo");
+        final Exercise foo = Models.createExercise(100L, "foo");
         node.setExercise(foo);
         assertEquals(foo, node.getExercise());
     }

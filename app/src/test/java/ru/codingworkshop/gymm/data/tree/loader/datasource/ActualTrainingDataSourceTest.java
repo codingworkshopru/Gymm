@@ -15,7 +15,7 @@ import ru.codingworkshop.gymm.data.entity.ActualExercise;
 import ru.codingworkshop.gymm.data.entity.ActualSet;
 import ru.codingworkshop.gymm.data.entity.ActualTraining;
 import ru.codingworkshop.gymm.repository.ActualTrainingRepository;
-import ru.codingworkshop.gymm.util.ModelsFixture;
+import ru.codingworkshop.gymm.util.Models;
 
 import static junit.framework.Assert.assertEquals;
 import static org.mockito.Mockito.verify;
@@ -34,9 +34,9 @@ public class ActualTrainingDataSourceTest {
 
     @Test
     public void test() throws Exception {
-        final LiveData<ActualTraining> liveActualTraining = ModelsFixture.createLiveActualTraining(11L, 1L);
-        final LiveData<List<ActualExercise>> liveActualExercises = ModelsFixture.createLiveActualExercises(12L);
-        final LiveData<List<ActualSet>> liveActualSets = ModelsFixture.createLiveActualSets(12L, 13L);
+        final LiveData<ActualTraining> liveActualTraining = Models.createLiveActualTraining(11L, 1L);
+        final LiveData<List<ActualExercise>> liveActualExercises = Models.createLiveActualExercises(12L);
+        final LiveData<List<ActualSet>> liveActualSets = Models.createLiveActualSets(12L, 13L);
 
         when(repository.getActualTrainingById(11L)).thenReturn(liveActualTraining);
         when(repository.getActualExercisesForActualTraining(11L)).thenReturn(liveActualExercises);

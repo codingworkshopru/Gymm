@@ -4,7 +4,6 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 
 import ru.codingworkshop.gymm.data.tree.TreeTestSuite;
-import ru.codingworkshop.gymm.data.wrapper.WrapperTestSuite;
 import ru.codingworkshop.gymm.repository.RepositoryTestSuite;
 
 /**
@@ -14,7 +13,6 @@ import ru.codingworkshop.gymm.repository.RepositoryTestSuite;
 @RunWith(Suite.class)
 @Suite.SuiteClasses({
         TreeTestSuite.class,
-        WrapperTestSuite.class,
         RepositoryTestSuite.class
 })
 public class GymmTest {

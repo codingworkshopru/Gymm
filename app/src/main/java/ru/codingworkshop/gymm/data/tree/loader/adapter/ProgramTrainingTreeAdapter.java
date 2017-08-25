@@ -20,7 +20,7 @@ import ru.codingworkshop.gymm.data.tree.node.ProgramTrainingTree;
 
 public class ProgramTrainingTreeAdapter extends TreeAdapter<ProgramTraining, ProgramExercise, ProgramSet> {
     private Map<Long, Exercise> exercisesMap;
-    ProgramTrainingTree tree;
+    private ProgramTrainingTree tree;
 
     public ProgramTrainingTreeAdapter(ProgramTrainingTree tree) {
         super(tree);

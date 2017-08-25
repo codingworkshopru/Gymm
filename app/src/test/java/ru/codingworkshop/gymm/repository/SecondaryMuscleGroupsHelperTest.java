@@ -19,7 +19,7 @@ import ru.codingworkshop.gymm.data.entity.MuscleGroup;
 import ru.codingworkshop.gymm.data.entity.SecondaryMuscleGroupLink;
 import ru.codingworkshop.gymm.db.dao.ExerciseDao;
 import ru.codingworkshop.gymm.db.dao.MuscleGroupDao;
-import ru.codingworkshop.gymm.util.ModelsFixture;
+import ru.codingworkshop.gymm.util.Models;
 
 import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.Mockito.verify;
@@ -39,8 +39,8 @@ public class SecondaryMuscleGroupsHelperTest {
 
     @Test
     public void createMuscleGroupExerciseLinksTest() {
-        List<MuscleGroup> muscleGroups = ModelsFixture.createMuscleGroups(200L, 300L, 400L);
-        List<Exercise> exercises = ModelsFixture.createExercises("a", "c", "z", "f");
+        List<MuscleGroup> muscleGroups = Models.createMuscleGroups(200L, 300L, 400L);
+        List<Exercise> exercises = Models.createExercises("a", "c", "z", "f");
         List<SecondaryMuscleGroupLink> links = Lists.newArrayList();
         exercises.forEach(e -> {
             e.primaryMuscle = muscleGroups.get(0).getName();

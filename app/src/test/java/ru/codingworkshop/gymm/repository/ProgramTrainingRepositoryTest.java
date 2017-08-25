@@ -21,7 +21,7 @@ import ru.codingworkshop.gymm.data.entity.ProgramTraining;
 import ru.codingworkshop.gymm.data.util.LiveDataUtil;
 import ru.codingworkshop.gymm.db.dao.ProgramTrainingDao;
 import ru.codingworkshop.gymm.util.LiveTest;
-import ru.codingworkshop.gymm.util.ModelsFixture;
+import ru.codingworkshop.gymm.util.Models;
 
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
@@ -66,7 +66,7 @@ public class ProgramTrainingRepositoryTest {
 
     @Test
     public void insertProgramTraining() { // TODO training name must be unique; write feature to throw exception up from dao (insertChildren, updateChildren)
-        ProgramTraining trainingEntity = ModelsFixture.createProgramTraining(0L, "foo");
+        ProgramTraining trainingEntity = Models.createProgramTraining(0L, "foo");
         when(dao.insertProgramTraining(trainingEntity)).thenReturn(1L);
         repository.insertProgramTraining(trainingEntity);
 
@@ -75,7 +75,7 @@ public class ProgramTrainingRepositoryTest {
 
     @Test(expected = IllegalStateException.class)
     public void insertionFailTest() {
-        ProgramTraining training = ModelsFixture.createProgramTraining(0L, "foo");
+        ProgramTraining training = Models.createProgramTraining(0L, "foo");
         when(dao.insertProgramTraining(training)).thenReturn(-1L);
         repository.insertProgramTraining(training);
     }
@@ -83,7 +83,7 @@ public class ProgramTrainingRepositoryTest {
     @Test(expected = IllegalArgumentException.class)
     @Parameters(method = "getInvalidNames")
     public void insertProgramTrainingWithInvalidName(String name) {
-        ProgramTraining training = ModelsFixture.createProgramTraining(1, name);
+        ProgramTraining training = Models.createProgramTraining(1, name);
         repository.insertProgramTraining(training);
     }
 
@@ -93,7 +93,7 @@ public class ProgramTrainingRepositoryTest {
 
     @Test
     public void deleteProgramTraining() {
-        ProgramTraining trainingEntity = ModelsFixture.createProgramTraining(1, "foo");
+        ProgramTraining trainingEntity = Models.createProgramTraining(1, "foo");
         when(dao.deleteProgramTraining(trainingEntity)).thenReturn(1);
 
         repository.deleteProgramTraining(trainingEntity);
@@ -103,7 +103,7 @@ public class ProgramTrainingRepositoryTest {
 
     @Test
     public void updateProgramTraining() {
-        ProgramTraining trainingEntity = ModelsFixture.createProgramTraining(1, "foo");
+        ProgramTraining trainingEntity = Models.createProgramTraining(1, "foo");
         when(dao.updateProgramTraining(trainingEntity)).thenReturn(1);
 
         trainingEntity.setName("bar");
@@ -116,13 +116,13 @@ public class ProgramTrainingRepositoryTest {
     @Test(expected = IllegalArgumentException.class)
     @Parameters(method = "getInvalidNames")
     public void updateProgramTrainingWithEmptyAndNullName(String name) {
-        ProgramTraining training = ModelsFixture.createProgramTraining(1, name);
+        ProgramTraining training = Models.createProgramTraining(1, name);
         repository.updateProgramTraining(training);
     }
 
     @Test
     public void queryProgramExercisesForTraining() {
-        ProgramTraining programTraining = ModelsFixture.createProgramTraining(1L, "foo");
+        ProgramTraining programTraining = Models.createProgramTraining(1L, "foo");
         repository.getProgramExercisesForTraining(programTraining);
         verify(dao).getProgramExercisesForTraining(1L);
     }
@@ -141,7 +141,7 @@ public class ProgramTrainingRepositoryTest {
 
     @Test(expected = IllegalArgumentException.class)
     public void queryDraftingProgramExercise() {
-        ProgramTraining training = ModelsFixture.createProgramTraining(1L, "foo");
+        ProgramTraining training = Models.createProgramTraining(1L, "foo");
         repository.getDraftingProgramExercise(training);
         repository.getDraftingProgramExercise(1L);
         verify(dao, times(2)).getDraftingProgramExercise(1L);
@@ -151,7 +151,7 @@ public class ProgramTrainingRepositoryTest {
 
     @Test
     public void insertProgramExercise() {
-        ProgramExercise exercise = ModelsFixture.createProgramExercise(2L, 1L, 100L, false);
+        ProgramExercise exercise = Models.createProgramExercise(2L, 1L, 100L, false);
         exercise.setExerciseId(10);
         when(dao.insertProgramExercise(exercise)).thenReturn(1L);
 
@@ -179,7 +179,7 @@ public class ProgramTrainingRepositoryTest {
 
     @Test
     public void updateProgramExercise() {
-        ProgramExercise exercise = ModelsFixture.createLiveProgramExercise(2, 1, false).getValue();
+        ProgramExercise exercise = Models.createLiveProgramExercise(2, 1, false).getValue();
         exercise.setExerciseId(10);
         when(dao.updateProgramExercise(exercise)).thenReturn(1);
 
@@ -191,7 +191,7 @@ public class ProgramTrainingRepositoryTest {
     @Test
     public void updateProgramExercises() {
         List<ProgramExercise> exercisesToUpdate = Lists.newArrayList(2,3,4,5).stream().map(id -> {
-            ProgramExercise exercise = ModelsFixture.createLiveProgramExercise(id, 1, false).getValue();
+            ProgramExercise exercise = Models.createLiveProgramExercise(id, 1, false).getValue();
             exercise.setExerciseId(10);
             return exercise;
         }).collect(Collectors.toList());
@@ -211,7 +211,7 @@ public class ProgramTrainingRepositoryTest {
 
     @Test
     public void deleteProgramExercise() {
-        ProgramExercise exercise = ModelsFixture.createLiveProgramExercise(2, 1, false).getValue();
+        ProgramExercise exercise = Models.createLiveProgramExercise(2, 1, false).getValue();
         when(dao.deleteProgramExercise(exercise)).thenReturn(1);
 
         repository.deleteProgramExercise(exercise);
@@ -222,7 +222,7 @@ public class ProgramTrainingRepositoryTest {
     @Test
     public void deleteProgramExercises() {
         List<ProgramExercise> exercisesToDelete = Lists.newArrayList(2,3,4,5).stream().map(id -> {
-            ProgramExercise exercise = ModelsFixture.createLiveProgramExercise(id, 1, false).getValue();
+            ProgramExercise exercise = Models.createLiveProgramExercise(id, 1, false).getValue();
             exercise.setExerciseId(10);
             return exercise;
         }).collect(Collectors.toList());
@@ -236,8 +236,8 @@ public class ProgramTrainingRepositoryTest {
 
     @Test
     public void queryProgramSetsForExercise() {
-        ProgramExercise exercise = ModelsFixture.createLiveProgramExercise(2, 1, false).getValue();
-        ProgramSet set = ModelsFixture.createLiveProgramSet(3, 2, 1).getValue();
+        ProgramExercise exercise = Models.createLiveProgramExercise(2, 1, false).getValue();
+        ProgramSet set = Models.createLiveProgramSet(3, 2, 1).getValue();
         LiveData<List<ProgramSet>> list = LiveDataUtil.getLive(Lists.newArrayList(set));
 
         when(dao.getProgramSetsForExercise(exercise.getId())).thenReturn(list);
@@ -254,8 +254,8 @@ public class ProgramTrainingRepositoryTest {
 
     @Test
     public void queryProgramSetsForExerciseId() {
-        ProgramExercise exercise = ModelsFixture.createLiveProgramExercise(2, 1, false).getValue();
-        ProgramSet set = ModelsFixture.createLiveProgramSet(3, 2, 1).getValue();
+        ProgramExercise exercise = Models.createLiveProgramExercise(2, 1, false).getValue();
+        ProgramSet set = Models.createLiveProgramSet(3, 2, 1).getValue();
         LiveData<List<ProgramSet>> list = LiveDataUtil.getLive(Lists.newArrayList(set));
 
         when(dao.getProgramSetsForExercise(exercise.getId())).thenReturn(list);
@@ -273,7 +273,7 @@ public class ProgramTrainingRepositoryTest {
     @Test
     public void queryProgramSetsForTrainingId() {
         List<Long> ids = Lists.newArrayList(23L, 24L, 25L, 26L, 27L, 38L, 39L);
-        List<ProgramSet> sets = ids.stream().map(id -> ModelsFixture.createLiveProgramSet(id, id / 10, id.intValue()).getValue()).collect(Collectors.toList());
+        List<ProgramSet> sets = ids.stream().map(id -> Models.createLiveProgramSet(id, id / 10, id.intValue()).getValue()).collect(Collectors.toList());
 
         when(dao.getProgramSetsForTraining(1L)).thenReturn(LiveDataUtil.getLive(sets));
 
@@ -285,14 +285,14 @@ public class ProgramTrainingRepositoryTest {
 
     @Test
     public void queryProgramSetById() {
-        when(dao.getProgramSetById(3)).thenReturn(ModelsFixture.createLiveProgramSet(3, 2, 1));
+        when(dao.getProgramSetById(3)).thenReturn(Models.createLiveProgramSet(3, 2, 1));
         LiveTest.verifyLiveData(repository.getProgramSetById(3), returned -> returned.getId() == 3 && returned.getReps() == 1);
         verify(dao).getProgramSetById(3);
     }
 
     @Test
     public void insertProgramSet() {
-        ProgramSet set = ModelsFixture.createLiveProgramSet(3L, 2L, 1).getValue();
+        ProgramSet set = Models.createLiveProgramSet(3L, 2L, 1).getValue();
         when(dao.insertProgramSet(set)).thenReturn(set.getId());
 
         repository.insertProgramSet(set);
@@ -304,7 +304,7 @@ public class ProgramTrainingRepositoryTest {
     public void insertProgramSets() {
         List<Long> setIds = Lists.newArrayList(1L, 2L, 3L);
         List<ProgramSet> sets = setIds.stream().map(
-                id -> ModelsFixture.createLiveProgramSet(id, 2L, id.intValue() * 10).getValue()
+                id -> Models.createLiveProgramSet(id, 2L, id.intValue() * 10).getValue()
         ).collect(Collectors.toList());
         when(dao.insertProgramSets(sets)).thenReturn(setIds);
 
@@ -332,7 +332,7 @@ public class ProgramTrainingRepositoryTest {
 
     @Test
     public void updateProgramSet() {
-        ProgramSet set = ModelsFixture.createLiveProgramSet(3, 2, 1).getValue();
+        ProgramSet set = Models.createLiveProgramSet(3, 2, 1).getValue();
         when(dao.updateProgramSet(set)).thenReturn(1);
 
         repository.updateProgramSet(set);
@@ -344,7 +344,7 @@ public class ProgramTrainingRepositoryTest {
     public void updateProgramSets() {
         List<Long> setIds = Lists.newArrayList(1L, 2L, 3L);
         List<ProgramSet> sets = setIds.stream().map(
-                id -> ModelsFixture.createLiveProgramSet(id, 2L, id.intValue() * 10).getValue()
+                id -> Models.createLiveProgramSet(id, 2L, id.intValue() * 10).getValue()
         ).collect(Collectors.toList());
         when(dao.updateProgramSets(sets)).thenReturn(3);
 
@@ -361,7 +361,7 @@ public class ProgramTrainingRepositoryTest {
 
     @Test
     public void deleteProgramSet() {
-        ProgramSet set = ModelsFixture.createLiveProgramSet(3, 2, 1).getValue();
+        ProgramSet set = Models.createLiveProgramSet(3, 2, 1).getValue();
         when(dao.deleteProgramSet(set)).thenReturn(1);
 
         repository.deleteProgramSet(set);
@@ -373,7 +373,7 @@ public class ProgramTrainingRepositoryTest {
     public void deleteProgramSets() {
         List<Long> setIds = Lists.newArrayList(1L, 2L, 3L);
         List<ProgramSet> sets = setIds.stream().map(
-                id -> ModelsFixture.createLiveProgramSet(id, 2L, id.intValue() * 10).getValue()
+                id -> Models.createLiveProgramSet(id, 2L, id.intValue() * 10).getValue()
         ).collect(Collectors.toList());
         when(dao.deleteProgramSets(sets)).thenReturn(3);
 

@@ -4,7 +4,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import ru.codingworkshop.gymm.data.tree.holder.ImmutableChildrenHolder;
-import ru.codingworkshop.gymm.util.ModelsFixture;
+import ru.codingworkshop.gymm.util.Models;
 
 import static org.junit.Assert.assertEquals;
 
@@ -25,20 +25,20 @@ public class ImmutableProgramExerciseNodeTest {
         node = new ImmutableProgramExerciseNode();
         assertImmutableChildrenDelegate(node);
 
-        node = new ImmutableProgramExerciseNode(ModelsFixture.createProgramExercise(2L, 1L, 100L, false));
+        node = new ImmutableProgramExerciseNode(Models.createProgramExercise(2L, 1L, 100L, false));
         assertEquals(2L, node.getParent().getId());
         assertImmutableChildrenDelegate(node);
     }
 
     @Test
     public void setExercise() {
-        node.setExercise(ModelsFixture.createExercise(1L, "foo"));
+        node.setExercise(Models.createExercise(1L, "foo"));
         assertEquals("foo", node.getExercise().getName());
     }
 
     @Test
     public void setParent() throws Exception {
-        node.setParent(ModelsFixture.createProgramExercise(2L, 1L, 100L, false));
+        node.setParent(Models.createProgramExercise(2L, 1L, 100L, false));
         assertEquals(2L, node.getParent().getId());
     }
 

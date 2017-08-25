@@ -9,7 +9,7 @@ import ru.codingworkshop.gymm.data.tree.loader.datasource.ProgramExerciseDataSou
 import ru.codingworkshop.gymm.data.tree.node.ImmutableProgramExerciseNode;
 import ru.codingworkshop.gymm.data.tree.node.ProgramExerciseNode;
 import ru.codingworkshop.gymm.util.LiveTest;
-import ru.codingworkshop.gymm.util.ModelsFixture;
+import ru.codingworkshop.gymm.util.Models;
 
 import static junit.framework.Assert.assertEquals;
 import static org.mockito.Mockito.mock;
@@ -25,9 +25,9 @@ public class ProgramExerciseLoaderTest {
     @Test
     public void load() throws Exception {
         ProgramExerciseDataSource dataSource = mock(ProgramExerciseDataSource.class);
-        when(dataSource.getParent()).thenReturn(ModelsFixture.createLiveProgramExercise(2L, 1L, false));
-        when(dataSource.getChildren()).thenReturn(ModelsFixture.createLiveProgramSets(1));
-        when(dataSource.getExercise()).thenReturn(ModelsFixture.createLiveExercise(100L, "foo"));
+        when(dataSource.getParent()).thenReturn(Models.createLiveProgramExercise(2L, 1L, false));
+        when(dataSource.getChildren()).thenReturn(Models.createLiveProgramSets(1));
+        when(dataSource.getExercise()).thenReturn(Models.createLiveExercise(100L, "foo"));
 
         ProgramExerciseNode node = new ImmutableProgramExerciseNode();
         ProgramExerciseLoader loader = new ProgramExerciseLoader(node, dataSource);

@@ -4,7 +4,7 @@ import org.junit.Test;
 
 import ru.codingworkshop.gymm.data.entity.ProgramExercise;
 import ru.codingworkshop.gymm.data.tree.holder.SortableRestoreChildrenHolder;
-import ru.codingworkshop.gymm.util.ModelsFixture;
+import ru.codingworkshop.gymm.util.Models;
 
 import static org.junit.Assert.assertEquals;
 
@@ -17,7 +17,7 @@ public class MutableProgramExerciseNodeTest {
         MutableProgramExerciseNode node = new MutableProgramExerciseNode();
         assertImmutableChildrenDelegate(node);
 
-        final ProgramExercise programExercise = ModelsFixture.createProgramExercise(2L, 1L, 100L, false);
+        final ProgramExercise programExercise = Models.createProgramExercise(2L, 1L, 100L, false);
         node = new MutableProgramExerciseNode(programExercise);
         assertImmutableChildrenDelegate(node);
         assertEquals(programExercise, node.getParent());

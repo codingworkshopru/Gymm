@@ -16,7 +16,7 @@ import ru.codingworkshop.gymm.data.entity.MuscleGroup;
 import ru.codingworkshop.gymm.repository.ExercisesRepository;
 import ru.codingworkshop.gymm.repository.MuscleGroupsRepository;
 import ru.codingworkshop.gymm.util.LiveTest;
-import ru.codingworkshop.gymm.util.ModelsFixture;
+import ru.codingworkshop.gymm.util.Models;
 
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.verify;
@@ -35,10 +35,10 @@ public class ExerciseDataSourceTest {
 
     @Test
     public void test() throws Exception {
-        final LiveData<Exercise> liveExercise = ModelsFixture.createLiveExercise(100L, "foo");
+        final LiveData<Exercise> liveExercise = Models.createLiveExercise(100L, "foo");
         liveExercise.getValue().setPrimaryMuscleGroupId(200L);
-        final LiveData<List<MuscleGroup>> liveMuscleGroups = ModelsFixture.createLiveMuscleGroups(1L);
-        final LiveData<MuscleGroup> liveMuscleGroup = ModelsFixture.createLiveMuscleGroup(200L, "bar");
+        final LiveData<List<MuscleGroup>> liveMuscleGroups = Models.createLiveMuscleGroups(1L);
+        final LiveData<MuscleGroup> liveMuscleGroup = Models.createLiveMuscleGroup(200L, "bar");
 
         when(repository.getExerciseById(100L)).thenReturn(liveExercise);
         when(muscleGroupsRepository.getSecondaryMuscleGroupsForExercise(100L)).thenReturn(liveMuscleGroups);

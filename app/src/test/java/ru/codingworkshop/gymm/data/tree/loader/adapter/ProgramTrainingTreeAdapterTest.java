@@ -11,7 +11,7 @@ import ru.codingworkshop.gymm.data.entity.ProgramTraining;
 import ru.codingworkshop.gymm.data.tree.node.ImmutableProgramExerciseNode;
 import ru.codingworkshop.gymm.data.tree.node.ProgramExerciseNode;
 import ru.codingworkshop.gymm.data.tree.node.ProgramTrainingTree;
-import ru.codingworkshop.gymm.util.ModelsFixture;
+import ru.codingworkshop.gymm.util.Models;
 
 import static junit.framework.Assert.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
@@ -35,7 +35,7 @@ public class ProgramTrainingTreeAdapterTest {
 
     @Test
     public void setParent() throws Exception {
-        final ProgramTraining training = ModelsFixture.createProgramTraining(1L, "foo");
+        final ProgramTraining training = Models.createProgramTraining(1L, "foo");
         adapter.setParent(training);
         verify(tree).setParent(training);
     }
@@ -47,9 +47,9 @@ public class ProgramTrainingTreeAdapterTest {
             return new ImmutableProgramExerciseNode(programExercise);
         }).when(tree).createChildNode(any());
 
-        adapter.setChildren(ModelsFixture.createProgramExercises(1));
-        adapter.setGrandchildren(ModelsFixture.createProgramSets(3));
-        adapter.setExercises(ModelsFixture.createExercises("foobar"));
+        adapter.setChildren(Models.createProgramExercises(1));
+        adapter.setGrandchildren(Models.createProgramSets(3));
+        adapter.setExercises(Models.createExercises("foobar"));
         adapter.build();
 
         verify(tree).setChildren(argThat(nodes -> {

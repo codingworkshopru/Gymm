@@ -5,7 +5,7 @@ import org.junit.Test;
 
 import ru.codingworkshop.gymm.data.entity.ActualExercise;
 import ru.codingworkshop.gymm.data.tree.holder.SimpleChildrenHolder;
-import ru.codingworkshop.gymm.util.ModelsFixture;
+import ru.codingworkshop.gymm.util.Models;
 
 import static junit.framework.Assert.assertEquals;
 
@@ -25,7 +25,7 @@ public class ActualExerciseNodeTest {
     public void constructing() throws Exception {
         assertEquals(SimpleChildrenHolder.class, node.getChildrenDelegate().getClass());
 
-        final ActualExercise actualExercise = ModelsFixture.createActualExercise(12L, "foo", 11L, 2L);
+        final ActualExercise actualExercise = Models.createActualExercise(12L, "foo", 11L, 2L);
         node = new ActualExerciseNode(actualExercise);
         assertEquals(actualExercise, node.getParent());
     }

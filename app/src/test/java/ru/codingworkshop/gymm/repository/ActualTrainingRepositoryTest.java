@@ -21,7 +21,7 @@ import ru.codingworkshop.gymm.data.entity.ActualSet;
 import ru.codingworkshop.gymm.data.entity.ActualTraining;
 import ru.codingworkshop.gymm.data.entity.common.Model;
 import ru.codingworkshop.gymm.db.dao.ActualTrainingDao;
-import ru.codingworkshop.gymm.util.ModelsFixture;
+import ru.codingworkshop.gymm.util.Models;
 
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.verify;
@@ -50,7 +50,7 @@ public class ActualTrainingRepositoryTest {
 
     @Test
     public void insertActualTraining() {
-        ActualTraining training = ModelsFixture.createActualTraining(0L, 1L);
+        ActualTraining training = Models.createActualTraining(0L, 1L);
         when(dao.insertActualTraining(training)).thenReturn(11L);
         repository.insertActualTraining(training);
         verify(dao).insertActualTraining(training);
@@ -65,7 +65,7 @@ public class ActualTrainingRepositoryTest {
     @Test
     public void insertActualExercises() {
         List<Long> ids = Lists.newArrayList(1002L, 1003L, 1004L);
-        Collection<ActualExercise> actualExercises = ModelsFixture.createActualExercises(ids.toArray(new Long[]{}));
+        Collection<ActualExercise> actualExercises = Models.createActualExercises(ids.toArray(new Long[]{}));
         when(dao.insertActualExercises(actualExercises)).thenReturn(ids);
         repository.insertActualExercises(actualExercises);
         assertEquals(ids, actualExercises.stream().map(Model::getId).collect(Collectors.toList()));
@@ -80,7 +80,7 @@ public class ActualTrainingRepositoryTest {
 
     @Test
     public void insertActualSet() {
-        ActualSet actualSet = ModelsFixture.createActualSet(1003L, 1002L, 7);
+        ActualSet actualSet = Models.createActualSet(1003L, 1002L, 7);
         when(dao.insertActualSet(actualSet)).thenReturn(1003L);
         repository.insertActualSet(actualSet);
         verify(dao).insertActualSet(actualSet);

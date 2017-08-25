@@ -12,7 +12,7 @@ import org.mockito.junit.MockitoJUnitRunner;
 import ru.codingworkshop.gymm.repository.ExercisesRepository;
 import ru.codingworkshop.gymm.repository.ProgramTrainingRepository;
 import ru.codingworkshop.gymm.util.LiveTest;
-import ru.codingworkshop.gymm.util.ModelsFixture;
+import ru.codingworkshop.gymm.util.Models;
 
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -36,10 +36,10 @@ public class ProgramTrainingViewModelTest {
 
     @Test
     public void createViewModelFromProgramTrainingId() {
-        when(repository.getProgramTrainingById(1L)).thenReturn(ModelsFixture.createLiveProgramTraining(1L, "foo", false));
-        when(repository.getProgramExercisesForTraining(1L)).thenReturn(ModelsFixture.createLiveProgramExercises(3));
-        when(repository.getProgramSetsForTraining(1L)).thenReturn(ModelsFixture.createLiveProgramSets(3));
-        when(exercisesRepository.getExercisesForProgramTraining(1L)).thenReturn(ModelsFixture.createLiveExercises("foobar", "bar", "baz"));
+        when(repository.getProgramTrainingById(1L)).thenReturn(Models.createLiveProgramTraining(1L, "foo", false));
+        when(repository.getProgramExercisesForTraining(1L)).thenReturn(Models.createLiveProgramExercises(3));
+        when(repository.getProgramSetsForTraining(1L)).thenReturn(Models.createLiveProgramSets(3));
+        when(exercisesRepository.getExercisesForProgramTraining(1L)).thenReturn(Models.createLiveExercises("foobar", "bar", "baz"));
 
         viewModel = new ProgramTrainingViewModel(repository, exercisesRepository);
         LiveTest.verifyLiveData(viewModel.init(1L), b -> b);

@@ -24,7 +24,7 @@ import ru.codingworkshop.gymm.data.util.LiveDataUtil;
  * Created by Радик on 31.07.2017 as part of the Gymm project.
  */
 
-public class ModelsFixture {
+public class Models {
     public static List<SimpleModel> createSimpleModels(String... names) {
         List<String> namesList = Lists.newArrayList(names);
         return namesList.stream().map(
