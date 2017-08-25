@@ -6,22 +6,24 @@ import android.support.annotation.NonNull;
 import com.google.common.base.Preconditions;
 
 import ru.codingworkshop.gymm.data.entity.common.Model;
-import ru.codingworkshop.gymm.data.tree.loader.adapter.TreeAdapter;
+import ru.codingworkshop.gymm.data.tree.holder.SimpleChildrenHolder;
+import ru.codingworkshop.gymm.data.tree.loader.builder.TreeBuilder;
 import ru.codingworkshop.gymm.data.tree.loader.datasource.TreeDataSource;
+import ru.codingworkshop.gymm.data.tree.node.BaseNode;
 
 /**
  * Created by Радик on 22.08.2017 as part of the Gymm project.
  */
 
 public class TreeLoader<P,C extends Model,GC> extends NodeLoader<P,C> {
-    private TreeAdapter<P,C,GC> adapter;
+    private TreeBuilder<P, C, GC> builder;
     private TreeDataSource<P,C,GC> dataSource;
     private LiveData<Boolean> loaded;
 
-    public TreeLoader(@NonNull TreeAdapter<P,C,GC> tree, @NonNull TreeDataSource<P,C,GC> dataSource) {
-        super(tree, dataSource);
-        this.adapter = Preconditions.checkNotNull(tree);
+    public TreeLoader(@NonNull TreeDataSource<P,C,GC> dataSource, @NonNull TreeBuilder<P,C,GC> builder) {
+        super(new BaseNode<P, C>(new SimpleChildrenHolder<>()) {}, dataSource);
         this.dataSource = Preconditions.checkNotNull(dataSource);
+        this.builder = builder;
     }
 
     @Override
@@ -31,14 +33,22 @@ public class TreeLoader<P,C extends Model,GC> extends NodeLoader<P,C> {
         return loaded;
     }
 
+    public TreeBuilder<P, C, GC> getBuilder() {
+        return builder;
+    }
+
     private void buildChildNodes(boolean isLoaded) {
         if (!isLoaded) return;
         loaded.removeObserver(this::buildChildNodes);
-        adapter.build();
+
+        builder.setParent(getNode().getParent());
+        builder.setChildren(getNode().getChildren());
+
+        builder.build();
     }
 
     @Override
     void loadAdditional(SetAndRemove setAndRemove) {
-        setAndRemove.ok(dataSource.getGrandchildren(), adapter::setGrandchildren);
+        setAndRemove.ok(dataSource.getGrandchildren(), builder::setGrandchildren);
     }
 }

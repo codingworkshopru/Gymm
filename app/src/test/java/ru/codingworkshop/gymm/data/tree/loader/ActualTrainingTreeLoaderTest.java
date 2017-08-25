@@ -10,7 +10,7 @@ import org.mockito.junit.MockitoJUnitRunner;
 
 import java.util.stream.Collectors;
 
-import ru.codingworkshop.gymm.data.tree.loader.adapter.ActualTrainingTreeAdapter;
+import ru.codingworkshop.gymm.data.tree.loader.builder.ActualTrainingTreeBuilder;
 import ru.codingworkshop.gymm.data.tree.loader.datasource.ActualTrainingDataSource;
 import ru.codingworkshop.gymm.data.tree.node.ActualTrainingTree;
 import ru.codingworkshop.gymm.data.tree.node.ImmutableProgramTrainingTree;
@@ -50,12 +50,13 @@ public class ActualTrainingTreeLoaderTest {
 
     @Test
     public void load() throws Exception {
-        ActualTrainingTreeAdapter adapter = new ActualTrainingTreeAdapter(tree, programTree);
         ActualTrainingDataSource dataSource = mock(ActualTrainingDataSource.class);
         when(dataSource.getParent()).thenReturn(Models.createLiveActualTraining(11L, 1L));
         when(dataSource.getChildren()).thenReturn(Models.createLiveActualExercises(12L));
         when(dataSource.getGrandchildren()).thenReturn(Models.createLiveActualSets(12L, 13L));
-        ActualTrainingTreeLoader loader = new ActualTrainingTreeLoader(adapter, dataSource);
+        ActualTrainingTreeBuilder builder = new ActualTrainingTreeBuilder(tree);
+        builder.setProgramTrainingTree(programTree);
+        ActualTrainingTreeLoader loader = new ActualTrainingTreeLoader(builder, dataSource);
 
         LiveTest.verifyLiveData(loader.load(), b -> b);
 

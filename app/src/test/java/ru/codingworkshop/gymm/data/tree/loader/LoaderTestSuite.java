@@ -3,7 +3,7 @@ package ru.codingworkshop.gymm.data.tree.loader;
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 
-import ru.codingworkshop.gymm.data.tree.loader.adapter.LoaderAdapterTestSuite;
+import ru.codingworkshop.gymm.data.tree.loader.builder.TreeBuilderTestSuite;
 import ru.codingworkshop.gymm.data.tree.loader.datasource.DataSourceTestSuite;
 
 /**
@@ -12,7 +12,7 @@ import ru.codingworkshop.gymm.data.tree.loader.datasource.DataSourceTestSuite;
 
 @RunWith(Suite.class)
 @Suite.SuiteClasses({
-        LoaderAdapterTestSuite.class,
+        TreeBuilderTestSuite.class,
         DataSourceTestSuite.class,
         NodeLoaderTest.class,
         SetAndRemoveTest.class,

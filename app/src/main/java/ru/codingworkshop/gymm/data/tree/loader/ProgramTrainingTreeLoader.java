@@ -5,7 +5,7 @@ import android.support.annotation.NonNull;
 import ru.codingworkshop.gymm.data.entity.ProgramExercise;
 import ru.codingworkshop.gymm.data.entity.ProgramSet;
 import ru.codingworkshop.gymm.data.entity.ProgramTraining;
-import ru.codingworkshop.gymm.data.tree.loader.adapter.ProgramTrainingTreeAdapter;
+import ru.codingworkshop.gymm.data.tree.loader.builder.ProgramTrainingTreeBuilder;
 import ru.codingworkshop.gymm.data.tree.loader.datasource.ProgramTrainingDataSource;
 import ru.codingworkshop.gymm.data.tree.node.ProgramTrainingTree;
 
@@ -17,14 +17,14 @@ public class ProgramTrainingTreeLoader extends TreeLoader<ProgramTraining, Progr
     private ProgramTrainingDataSource dataSource;
 
     public ProgramTrainingTreeLoader(@NonNull ProgramTrainingTree tree, @NonNull ProgramTrainingDataSource dataSource) {
-        super(new ProgramTrainingTreeAdapter(tree), dataSource);
+        super(dataSource, new ProgramTrainingTreeBuilder(tree));
         this.dataSource = dataSource;
     }
 
     @Override
     void loadAdditional(SetAndRemove setAndRemove) {
         super.loadAdditional(setAndRemove);
-        ProgramTrainingTreeAdapter adapter = (ProgramTrainingTreeAdapter) getNode();
-        setAndRemove.ok(dataSource.getExercises(), adapter::setExercises);
+        ProgramTrainingTreeBuilder builder = (ProgramTrainingTreeBuilder) getBuilder();
+        setAndRemove.ok(dataSource.getExercises(), builder::setExercises);
     }
 }

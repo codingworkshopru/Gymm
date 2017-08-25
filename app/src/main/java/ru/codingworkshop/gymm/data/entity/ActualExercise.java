@@ -54,7 +54,7 @@ public class ActualExercise implements Model {
     private long actualTrainingId;
     private Long programExerciseId;
 
-    public ActualExercise(String exerciseName, long actualTrainingId, Long programExerciseId) {
+    public ActualExercise(String exerciseName, long actualTrainingId, long programExerciseId) {
         this.exerciseName = exerciseName;
         this.actualTrainingId = actualTrainingId;
         this.programExerciseId = programExerciseId;

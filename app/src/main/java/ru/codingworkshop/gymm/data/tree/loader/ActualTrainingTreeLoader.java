@@ -5,7 +5,7 @@ import android.support.annotation.NonNull;
 import ru.codingworkshop.gymm.data.entity.ActualExercise;
 import ru.codingworkshop.gymm.data.entity.ActualSet;
 import ru.codingworkshop.gymm.data.entity.ActualTraining;
-import ru.codingworkshop.gymm.data.tree.loader.adapter.ActualTrainingTreeAdapter;
+import ru.codingworkshop.gymm.data.tree.loader.builder.ActualTrainingTreeBuilder;
 import ru.codingworkshop.gymm.data.tree.loader.datasource.ActualTrainingDataSource;
 
 /**
@@ -13,7 +13,7 @@ import ru.codingworkshop.gymm.data.tree.loader.datasource.ActualTrainingDataSour
  */
 
 class ActualTrainingTreeLoader extends TreeLoader<ActualTraining, ActualExercise, ActualSet> {
-    public ActualTrainingTreeLoader(@NonNull ActualTrainingTreeAdapter tree, @NonNull ActualTrainingDataSource dataSource) {
-        super(tree, dataSource);
+    public ActualTrainingTreeLoader(@NonNull ActualTrainingTreeBuilder treeBuilder, @NonNull ActualTrainingDataSource dataSource) {
+        super(dataSource, treeBuilder);
     }
 }
