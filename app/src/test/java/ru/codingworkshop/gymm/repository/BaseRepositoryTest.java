@@ -1,7 +1,6 @@
 package ru.codingworkshop.gymm.repository;
 
 import android.arch.core.executor.testing.InstantTaskExecutorRule;
-import android.arch.lifecycle.LiveData;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
@@ -18,16 +17,11 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import ru.codingworkshop.gymm.data.entity.common.Model;
-import ru.codingworkshop.gymm.data.util.LiveDataUtil;
-import ru.codingworkshop.gymm.data.util.LongSupplier;
 import ru.codingworkshop.gymm.util.DummyDao;
-import ru.codingworkshop.gymm.util.LiveTest;
 import ru.codingworkshop.gymm.util.Models;
 import ru.codingworkshop.gymm.util.SimpleModel;
 
 import static org.junit.Assert.assertEquals;
-import static org.mockito.Mockito.any;
-import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -40,18 +34,11 @@ public class BaseRepositoryTest {
     @Rule public InstantTaskExecutorRule instantTaskExecutorRule = new InstantTaskExecutorRule();
 
     @Mock private DummyDao<SimpleModel> dao;
-    @Mock private BaseRepository.ATask asyncTask;
     private BaseRepository repository;
 
     @Before
     public void init() {
-        doAnswer(invocation -> {
-            LongSupplier supplier = invocation.getArgument(0);
-            final LiveData<Long> liveId = LiveDataUtil.getLive(supplier.get());
-            when(asyncTask.getLiveResult()).thenReturn(liveId);
-            return null;
-        }).when(asyncTask).run(any(LongSupplier.class));
-        repository = new BaseRepository(Runnable::run, asyncTask);
+        repository = new BaseRepository(Runnable::run);
     }
 
     @Test
@@ -71,15 +58,6 @@ public class BaseRepositoryTest {
 
         verify(dao).insert(model);
         verify(dao).insert(models);
-    }
-
-    @Test
-    public void asyncInsertTest() {
-        SimpleModel model = new SimpleModel(0L, "foo");
-        when(dao.insert(model)).thenReturn(2L);
-        LiveData<Long> liveId = repository.insertWithResult(model, dao::insert, BaseRepositoryTest::checkName);
-        LiveTest.verifyLiveData(liveId, id -> id == 2L);
-        verify(dao).insert(model);
     }
 
     @Test(expected = IllegalArgumentException.class)

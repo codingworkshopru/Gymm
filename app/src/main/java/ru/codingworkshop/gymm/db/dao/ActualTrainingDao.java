@@ -2,8 +2,10 @@ package ru.codingworkshop.gymm.db.dao;
 
 import android.arch.lifecycle.LiveData;
 import android.arch.persistence.room.Dao;
+import android.arch.persistence.room.Delete;
 import android.arch.persistence.room.Insert;
 import android.arch.persistence.room.Query;
+import android.arch.persistence.room.Update;
 
 import java.util.Collection;
 import java.util.List;
@@ -28,7 +30,16 @@ public interface ActualTrainingDao {
     List<Long> insertActualExercises(Collection<ActualExercise> actualExercises);
 
     @Insert
+    Long insertActualExercise(ActualExercise actualExercise);
+
+    @Insert
     Long insertActualSet(ActualSet actualSet);
+
+    @Update
+    int updateActualSet(ActualSet actualSet);
+
+    @Delete
+    int deleteActualSet(ActualSet actualSet);
 
     @Query("select * " +
             "from ActualExercise " +

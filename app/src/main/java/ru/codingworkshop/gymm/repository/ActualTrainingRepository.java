@@ -2,7 +2,6 @@ package ru.codingworkshop.gymm.repository;
 
 import android.arch.lifecycle.LiveData;
 import android.support.annotation.NonNull;
-import android.support.annotation.VisibleForTesting;
 
 import com.google.common.base.Preconditions;
 
@@ -32,12 +31,6 @@ public class ActualTrainingRepository extends BaseRepository {
         this.dao = dao;
     }
 
-    @VisibleForTesting
-    ActualTrainingRepository(Executor executor, ATask aTask, ActualTrainingDao dao) {
-        super(executor, aTask);
-        this.dao = dao;
-    }
-
     public LiveData<ActualTraining> getActualTrainingById(long actualTrainingId) {
         return dao.getActualTrainingById(actualTrainingId);
     }
@@ -55,6 +48,10 @@ public class ActualTrainingRepository extends BaseRepository {
         return dao.getActualExercisesForActualTraining(actualTrainingId);
     }
 
+    public void insertActualExercise(ActualExercise actualExercise) {
+        insert(actualExercise, dao::insertActualExercise, ActualTrainingRepository::checkActualExercise);
+    }
+
     public void insertActualExercises(Collection<ActualExercise> actualExercises) {
         insert(actualExercises, dao::insertActualExercises, ActualTrainingRepository::checkActualExercise);
     }
@@ -70,6 +67,14 @@ public class ActualTrainingRepository extends BaseRepository {
 
     public void insertActualSet(ActualSet actualSet) {
         insert(actualSet, dao::insertActualSet, ActualTrainingRepository::checkActualSet);
+    }
+
+    public void updateActualSet(ActualSet actualSet) {
+        update(actualSet, dao::updateActualSet, ActualTrainingRepository::checkActualSet);
+    }
+
+    public void deleteActualSet(ActualSet actualSet) {
+        delete(actualSet, dao::deleteActualSet);
     }
 
     private static void checkActualSet(@NonNull ActualSet actualSet) {

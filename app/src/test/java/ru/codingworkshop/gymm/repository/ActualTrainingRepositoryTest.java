@@ -37,16 +37,13 @@ public class ActualTrainingRepositoryTest {
     public InstantTaskExecutorRule instantTaskExecutorRule = new InstantTaskExecutorRule();
 
     @Mock private ActualTrainingDao dao;
-    @Mock private ActualTrainingRepository.ATask asyncTask;
     private Executor executor = Runnable::run;
     private ActualTrainingRepository repository;
 
     @Before
     public void init() {
-        repository = new ActualTrainingRepository(executor, asyncTask, dao);
+        repository = new ActualTrainingRepository(executor, dao);
     }
-
-    // TODO add instrumented tests for async task
 
     @Test
     public void insertActualTraining() {
@@ -73,6 +70,15 @@ public class ActualTrainingRepositoryTest {
     }
 
     @Test
+    public void insertActualExercise() throws Exception {
+        ActualExercise actualExercise = Models.createActualExercise(0L, "foo", 11L, 2L);
+        when(dao.insertActualExercise(actualExercise)).thenReturn(12L);
+        repository.insertActualExercise(actualExercise);
+        assertEquals(12L, actualExercise.getId());
+        verify(dao).insertActualExercise(actualExercise);
+    }
+
+    @Test
     public void getActualExercisesForActualTraining() {
         repository.getActualExercisesForActualTraining(1000L);
         verify(dao).getActualExercisesForActualTraining(1000L);
@@ -80,10 +86,26 @@ public class ActualTrainingRepositoryTest {
 
     @Test
     public void insertActualSet() {
-        ActualSet actualSet = Models.createActualSet(1003L, 1002L, 7);
+        ActualSet actualSet = Models.createActualSet(0L, 1002L, 7);
         when(dao.insertActualSet(actualSet)).thenReturn(1003L);
         repository.insertActualSet(actualSet);
         verify(dao).insertActualSet(actualSet);
+    }
+
+    @Test
+    public void updateActualSet() throws Exception {
+        ActualSet actualSet = Models.createActualSet(13L, 12L, 7);
+        when(dao.updateActualSet(actualSet)).thenReturn(1);
+        repository.updateActualSet(actualSet);
+        verify(dao).updateActualSet(actualSet);
+    }
+
+    @Test
+    public void deleteActualSet() throws Exception {
+        ActualSet actualSet = Models.createActualSet(13L, 12L, 7);
+        when(dao.deleteActualSet(actualSet)).thenReturn(1);
+        repository.deleteActualSet(actualSet);
+        verify(dao).deleteActualSet(actualSet);
     }
 
     @Test

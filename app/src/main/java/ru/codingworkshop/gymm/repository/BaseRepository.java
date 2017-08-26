@@ -1,9 +1,5 @@
 package ru.codingworkshop.gymm.repository;
 
-import android.arch.lifecycle.LiveData;
-import android.arch.lifecycle.MutableLiveData;
-import android.os.AsyncTask;
-import android.support.annotation.VisibleForTesting;
 import android.support.annotation.WorkerThread;
 
 import com.google.common.base.Function;
@@ -17,7 +13,6 @@ import java.util.concurrent.Executor;
 import ru.codingworkshop.gymm.data.entity.common.Model;
 import ru.codingworkshop.gymm.data.util.BiConsumer;
 import ru.codingworkshop.gymm.data.util.Consumer;
-import ru.codingworkshop.gymm.data.util.LongSupplier;
 
 /**
  * Created by Радик on 28.07.2017.
@@ -26,21 +21,9 @@ import ru.codingworkshop.gymm.data.util.LongSupplier;
 @SuppressWarnings("Guava")
 class BaseRepository {
     private Executor executor;
-    private ATask aTask;
 
     BaseRepository(Executor executor) {
         this.executor = executor;
-    }
-
-    @VisibleForTesting
-    BaseRepository(Executor executor, ATask aTask) {
-        this(executor);
-        this.aTask = aTask;
-    }
-
-    <T extends Model> LiveData<Long> insertWithResult(T entity, Function<T, Long> insert, Consumer<T> check) {
-        aTask.run(() -> performSync(entity, insert, BaseRepository::afterInsertion, check));
-        return aTask.getLiveResult();
     }
 
     <T extends Model> void insert(T entity, Function<T, Long> insert, Consumer<T> check) {
@@ -117,29 +100,6 @@ class BaseRepository {
     private static <T> void applyToEach(Collection<T> collection, Consumer<T> consumer) {
         for (T element : collection) {
             consumer.accept(element);
-        }
-    }
-
-    @VisibleForTesting
-    static class ATask extends AsyncTask<LongSupplier, Void, Long> {
-        private MutableLiveData<Long> liveResult = new MutableLiveData<>();
-
-        void run(LongSupplier task) {
-            execute(task);
-        }
-
-        @Override
-        protected Long doInBackground(LongSupplier[] suppliers) {
-            return suppliers[0].get();
-        }
-
-        @Override
-        protected void onPostExecute(Long id) {
-            liveResult.setValue(id);
-        }
-
-        LiveData<Long> getLiveResult() {
-            return liveResult;
         }
     }
 }

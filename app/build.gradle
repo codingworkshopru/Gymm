@@ -37,11 +37,11 @@ ext {
     guava = "23.0-android"
     dagger = "2.11"
     picasso = "2.5.2"
-    leakcanary = "1.5.1"
+    leakcanary = "1.5.2"
     timber = "4.5.1"
 
     espresso = "3.0.0"
-    mockito = "2.8.47"
+    mockito = "2.9.0"
     junit = "4.12"
     junit_params = "1.1.0"
 }

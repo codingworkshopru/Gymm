@@ -9,11 +9,17 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 
+import ru.codingworkshop.gymm.data.entity.ProgramTraining;
+import ru.codingworkshop.gymm.data.tree.node.ProgramTrainingTree;
 import ru.codingworkshop.gymm.repository.ExercisesRepository;
 import ru.codingworkshop.gymm.repository.ProgramTrainingRepository;
 import ru.codingworkshop.gymm.util.LiveTest;
 import ru.codingworkshop.gymm.util.Models;
 
+import static junit.framework.Assert.assertEquals;
+import static junit.framework.Assert.assertNotNull;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -23,30 +29,65 @@ import static org.mockito.Mockito.when;
 
 @RunWith(MockitoJUnitRunner.class)
 public class ProgramTrainingViewModelTest {
+    private ProgramTrainingViewModel vm;
+
     @Mock private ProgramTrainingRepository repository;
     @Mock private ExercisesRepository exercisesRepository;
-    private ProgramTrainingViewModel viewModel;
 
-    @Rule public InstantTaskExecutorRule instantTaskExecutorRule = new InstantTaskExecutorRule();
+    @Rule
+    public InstantTaskExecutorRule instantTaskExecutorRule = new InstantTaskExecutorRule();
 
     @Before
-    public void init() {
-        viewModel = new ProgramTrainingViewModel(repository, exercisesRepository);
-    }
+    public void setUp() {
+        vm = new ProgramTrainingViewModel(repository, exercisesRepository);
 
-    @Test
-    public void createViewModelFromProgramTrainingId() {
         when(repository.getProgramTrainingById(1L)).thenReturn(Models.createLiveProgramTraining(1L, "foo", false));
         when(repository.getProgramExercisesForTraining(1L)).thenReturn(Models.createLiveProgramExercises(3));
         when(repository.getProgramSetsForTraining(1L)).thenReturn(Models.createLiveProgramSets(3));
         when(exercisesRepository.getExercisesForProgramTraining(1L)).thenReturn(Models.createLiveExercises("foobar", "bar", "baz"));
+    }
 
-        viewModel = new ProgramTrainingViewModel(repository, exercisesRepository);
-        LiveTest.verifyLiveData(viewModel.init(1L), b -> b);
+    @Test
+    public void load() {
+
+        vm = new ProgramTrainingViewModel(repository, exercisesRepository);
+        LiveTest.verifyLiveData(vm.load(1L), b -> {
+            ProgramTrainingTree tree = vm.getProgramTrainingTree();
+            assertEquals(1L, tree.getParent().getId());
+            assertEquals(2L, tree.getChildren().get(0).getParent().getId());
+            assertEquals(3L, tree.getChildren().get(0).getChildren().get(0).getId());
+
+            return b;
+        });
 
         verify(repository).getProgramTrainingById(1L);
-        verify(repository).getProgramExerciseById(1L);
+        verify(repository).getProgramExercisesForTraining(1L);
         verify(repository).getProgramSetsForTraining(1L);
         verify(exercisesRepository).getExercisesForProgramTraining(1L);
     }
+
+    @Test
+    public void create() throws Exception {
+        vm.create();
+
+        assertNotNull(vm.getProgramTrainingTree().getParent());
+        verify(repository).insertProgramTraining(any(ProgramTraining.class));
+    }
+
+    @Test
+    public void save() throws Exception {
+        when(repository.getProgramExercisesForTraining(any(ProgramTraining.class))).thenReturn(Models.createLiveProgramExercises(3));
+        LiveTest.verifyLiveData(vm.load(1L), l -> {
+            ProgramTrainingTree tree = vm.getProgramTrainingTree();
+            tree.moveChild(0,1);
+
+            vm.save();
+
+            verify(repository).updateProgramTraining(tree.getParent());
+            verify(repository).updateProgramExercises(argThat(toUpdate -> toUpdate.size() == 2));
+
+            return l;
+        });
+    }
+
 }

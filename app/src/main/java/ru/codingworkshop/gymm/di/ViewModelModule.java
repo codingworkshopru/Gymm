@@ -6,6 +6,7 @@ import android.arch.lifecycle.ViewModelProvider;
 import dagger.Binds;
 import dagger.Module;
 import dagger.multibindings.IntoMap;
+import ru.codingworkshop.gymm.ui.actual.ActualTrainingViewModel;
 import ru.codingworkshop.gymm.viewmodel.ViewModelFactory;
 
 /**
@@ -14,6 +15,11 @@ import ru.codingworkshop.gymm.viewmodel.ViewModelFactory;
 
 @Module
 abstract class ViewModelModule {
+    @Binds
+    @IntoMap
+    @ViewModelKey(ActualTrainingViewModel.class)
+    abstract ViewModel bindsActualTrainingViewModel(ActualTrainingViewModel actualTrainingViewModel);
+
 //    @Binds
 //    @IntoMap
 //    @ViewModelKey(MusclesViewModel.class)
@@ -29,6 +35,6 @@ abstract class ViewModelModule {
 //    @ViewModelKey(EditorViewModel.class)
 //    abstract ViewModel bindsEditorViewModel(EditorViewModel editorViewModel);
 //
-//    @Binds
-//    abstract ViewModelProvider.Factory bindsViewModelFactory(ViewModelFactory viewModelFactory);
+    @Binds
+    abstract ViewModelProvider.Factory bindsViewModelFactory(ViewModelFactory viewModelFactory);
 }
