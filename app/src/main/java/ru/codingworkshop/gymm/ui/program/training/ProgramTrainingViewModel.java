@@ -27,28 +27,30 @@ class ProgramTrainingViewModel extends ViewModel {
     public ProgramTrainingViewModel(ProgramTrainingRepository repository, ExercisesRepository exercisesRepository) {
         this.repository = repository;
         this.exercisesRepository = exercisesRepository;
+        tree = new MutableProgramTrainingTree();
     }
 
     public ProgramTrainingTree getProgramTrainingTree() {
         return tree;
     }
 
+    public void create() {
+
+        ProgramTraining programTraining = new ProgramTraining();
+        programTraining.setDrafting(true); // TODO consider place drafting setter to repository
+        repository.insertProgramTraining(programTraining);
+
+        tree.setParent(programTraining);
+    }
+
     public LiveData<Boolean> load(long programTrainingId) {
-        tree = new MutableProgramTrainingTree();
         ProgramTrainingDataSource dataSource = new ProgramTrainingDataSource(repository, exercisesRepository, programTrainingId);
         ProgramTrainingTreeLoader loader = new ProgramTrainingTreeLoader(tree, dataSource);
         return loader.load();
     }
 
-    public void create() {
-        ProgramTraining programTraining = new ProgramTraining();
-        repository.insertProgramTraining(programTraining);
-
-        tree = new MutableProgramTrainingTree();
-        tree.setParent(programTraining);
-    }
-
     public void save() {
-        new ProgramTrainingSaver(tree, repository).save();
+        ProgramTrainingSaver saver = new ProgramTrainingSaver(tree, repository);
+        saver.save();
     }
 }

@@ -3,6 +3,8 @@ package ru.codingworkshop.gymm.data.tree.loader.datasource;
 import android.arch.lifecycle.LiveData;
 import android.arch.lifecycle.Transformations;
 
+import com.google.common.base.Preconditions;
+
 import ru.codingworkshop.gymm.data.entity.Exercise;
 import ru.codingworkshop.gymm.data.entity.ProgramExercise;
 import ru.codingworkshop.gymm.data.entity.ProgramSet;
@@ -19,7 +21,9 @@ public class ProgramExerciseDataSource extends NodeDataSource<ProgramExercise, P
     public ProgramExerciseDataSource(ProgramTrainingRepository repository, ExercisesRepository exercisesRepository, long programExerciseId) {
         setParent(repository.getProgramExerciseById(programExerciseId));
         setChildren(repository.getProgramSetsForExercise(programExerciseId));
-        exercise = Transformations.switchMap(getParent(), input -> exercisesRepository.getExerciseById(input.getExerciseId()));
+        exercise = Transformations.switchMap(getParent(), input ->
+                Preconditions.checkNotNull(exercisesRepository.getExerciseById(input.getExerciseId()))
+        );
     }
 
     public LiveData<Exercise> getExercise() {

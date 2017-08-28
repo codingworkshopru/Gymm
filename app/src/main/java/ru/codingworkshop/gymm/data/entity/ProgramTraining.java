@@ -6,6 +6,7 @@ import android.arch.persistence.room.PrimaryKey;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
+import ru.codingworkshop.gymm.data.entity.common.Draftable;
 import ru.codingworkshop.gymm.data.entity.common.Model;
 import ru.codingworkshop.gymm.data.entity.common.Named;
 
@@ -14,7 +15,7 @@ import ru.codingworkshop.gymm.data.entity.common.Named;
  */
 
 @Entity(tableName = "ProgramTraining", indices = @Index(value = "name", unique = true))
-public class ProgramTraining implements Model, Named {
+public class ProgramTraining implements Model, Named, Draftable {
     @PrimaryKey(autoGenerate = true)
     private long id;
     private String name;
@@ -49,10 +50,12 @@ public class ProgramTraining implements Model, Named {
         this.weekday = weekday;
     }
 
+    @Override
     public boolean isDrafting() {
         return drafting;
     }
 
+    @Override
     public void setDrafting(boolean drafting) {
         this.drafting = drafting;
     }

@@ -17,7 +17,7 @@ import ru.codingworkshop.gymm.util.LiveTest;
 import ru.codingworkshop.gymm.util.Models;
 
 import static junit.framework.Assert.assertEquals;
-import static junit.framework.Assert.assertNotNull;
+import static junit.framework.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.Mockito.verify;
@@ -49,7 +49,6 @@ public class ProgramTrainingViewModelTest {
 
     @Test
     public void load() {
-
         vm = new ProgramTrainingViewModel(repository, exercisesRepository);
         LiveTest.verifyLiveData(vm.load(1L), b -> {
             ProgramTrainingTree tree = vm.getProgramTrainingTree();
@@ -70,13 +69,13 @@ public class ProgramTrainingViewModelTest {
     public void create() throws Exception {
         vm.create();
 
-        assertNotNull(vm.getProgramTrainingTree().getParent());
+        assertTrue(vm.getProgramTrainingTree().getParent().isDrafting());
         verify(repository).insertProgramTraining(any(ProgramTraining.class));
     }
 
     @Test
     public void save() throws Exception {
-        when(repository.getProgramExercisesForTraining(any(ProgramTraining.class))).thenReturn(Models.createLiveProgramExercises(3));
+        when(repository.getProgramExercisesForTraining(any())).thenReturn(Models.createLiveProgramExercises(3));
         LiveTest.verifyLiveData(vm.load(1L), l -> {
             ProgramTrainingTree tree = vm.getProgramTrainingTree();
             tree.moveChild(0,1);

@@ -22,6 +22,9 @@ public abstract class ProgramExerciseNode extends BaseNode<ProgramExercise, Prog
     }
 
     public void setExercise(Exercise exercise) {
+        if (this.exercise != null) {
+            setExerciseId(exercise.getId());
+        }
         this.exercise = exercise;
     }
 
