@@ -39,6 +39,7 @@ public class ProgramTrainingSaver implements Saver,
     }
 
     public void saveParent() {
+        // TODO set drafting false here and there
         new ModelSaver<>(tree.getParent(), this).save();
     }
 

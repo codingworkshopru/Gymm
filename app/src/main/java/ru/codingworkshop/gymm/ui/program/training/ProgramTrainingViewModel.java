@@ -1,6 +1,7 @@
 package ru.codingworkshop.gymm.ui.program.training;
 
 import android.arch.lifecycle.LiveData;
+import android.arch.lifecycle.Transformations;
 import android.arch.lifecycle.ViewModel;
 
 import javax.inject.Inject;
@@ -11,6 +12,7 @@ import ru.codingworkshop.gymm.data.tree.loader.datasource.ProgramTrainingDataSou
 import ru.codingworkshop.gymm.data.tree.node.MutableProgramTrainingTree;
 import ru.codingworkshop.gymm.data.tree.node.ProgramTrainingTree;
 import ru.codingworkshop.gymm.data.tree.saver.ProgramTrainingSaver;
+import ru.codingworkshop.gymm.data.util.LiveDataUtil;
 import ru.codingworkshop.gymm.repository.ExercisesRepository;
 import ru.codingworkshop.gymm.repository.ProgramTrainingRepository;
 
@@ -18,7 +20,7 @@ import ru.codingworkshop.gymm.repository.ProgramTrainingRepository;
  * Created by Радик on 20.08.2017 as part of the Gymm project.
  */
 
-class ProgramTrainingViewModel extends ViewModel {
+public class ProgramTrainingViewModel extends ViewModel {
     private ProgramTrainingRepository repository;
     private ExercisesRepository exercisesRepository;
     private ProgramTrainingTree tree;
@@ -34,13 +36,23 @@ class ProgramTrainingViewModel extends ViewModel {
         return tree;
     }
 
-    public void create() {
-
+    private void initTree() {
         ProgramTraining programTraining = new ProgramTraining();
         programTraining.setDrafting(true); // TODO consider place drafting setter to repository
         repository.insertProgramTraining(programTraining);
 
         tree.setParent(programTraining);
+    }
+
+    public LiveData<Boolean> create() {
+        return Transformations.switchMap(repository.getDraftingProgramTraining(), input -> {
+            if (input == null) {
+                initTree();
+                return LiveDataUtil.getLive(true);
+            } else {
+                return load(input.getId());
+            }
+        });
     }
 
     public LiveData<Boolean> load(long programTrainingId) {

@@ -11,7 +11,7 @@
         android:theme="?attr/actionBarTheme">
 
         <android.support.v7.widget.Toolbar
-            android:id="@+id/toolbar"
+            android:id="@+id/actualTrainingToolbar"
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
             android:background="?attr/colorPrimary"
@@ -20,9 +20,10 @@
     </android.support.design.widget.AppBarLayout>
 
     <android.support.v7.widget.RecyclerView
-        android:id="@+id/list_view"
+        android:id="@+id/actualExerciseSteps"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        app:layout_behavior="@string/appbar_scrolling_view_behavior" />
+        app:layout_behavior="@string/appbar_scrolling_view_behavior"
+        tools:listitem="@layout/activity_actual_training_stepper_item"/>
 
 </android.support.design.widget.CoordinatorLayout>

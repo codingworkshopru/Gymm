@@ -13,10 +13,14 @@ import ru.codingworkshop.gymm.data.tree.saver.Saver;
  * Created by Радик on 27.08.2017 as part of the Gymm project.
  */
 
-public abstract class ExerciseViewModel<P extends Draftable, C> extends ViewModel {
-    private BaseNode<P, C> node;
+public abstract class ProgramViewModel<P extends Draftable, C> extends ViewModel {
+    private BaseNode<P, ? extends C> node;
 
-    public BaseNode<P, C> getNode() {
+    public ProgramViewModel() {
+        this.node = createNode();
+    }
+
+    public BaseNode<P, ? extends C> getNode() {
         return node;
     }
 
@@ -31,21 +35,20 @@ public abstract class ExerciseViewModel<P extends Draftable, C> extends ViewMode
 
     protected abstract P createParent();
     protected abstract void insertParent(P parent);
-    protected abstract BaseNode<P, C> createNode();
+    protected abstract BaseNode<P, ? extends C> createNode();
 
     public LiveData<Boolean> load(long id) {
         node = createNode();
-        NodeDataSource<P, C> dataSource = createDataSource(id);
-        NodeLoader<P, C> loader = createLoader(dataSource);
+        NodeDataSource<P, ? extends C> dataSource = createDataSource(id);
+        NodeLoader<P, ? extends C> loader = createLoader(dataSource);
         return loader.load();
     }
 
-    protected abstract NodeDataSource<P,C> createDataSource(long id);
-    protected abstract NodeLoader<P,C> createLoader(NodeDataSource<P,C> dataSource);
+    protected abstract NodeDataSource<P, ? extends C> createDataSource(long id);
+    protected abstract NodeLoader<P, ? extends C> createLoader(NodeDataSource<P, ? extends C> dataSource);
 
     public void save() {
-        Saver saver = createSaver();
-        saver.save();
+        createSaver().save();
     }
 
     protected abstract Saver createSaver();

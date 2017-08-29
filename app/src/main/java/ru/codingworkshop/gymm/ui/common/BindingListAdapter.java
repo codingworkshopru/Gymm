@@ -12,23 +12,29 @@ import java.util.List;
  */
 
 public abstract class BindingListAdapter<T, V extends ViewDataBinding> extends RecyclerView.Adapter<BindingListViewHolder<V>> {
-
     @Nullable
     private List<T> items;
 
+    public BindingListAdapter() {
+    }
+
+    public BindingListAdapter(@Nullable List<T> items) {
+        this.items = items;
+    }
+
     @Override
-    public BindingListViewHolder<V> onCreateViewHolder(ViewGroup parent, int i) {
+    public BindingListViewHolder<V> onCreateViewHolder(ViewGroup parent, int viewType) {
         V binding = createBinding(parent);
         return new BindingListViewHolder<>(binding);
     }
 
     @Override
-    public void onBindViewHolder(BindingListViewHolder<V> holder, int i) {
+    public void onBindViewHolder(BindingListViewHolder<V> holder, int position) {
         if (items == null) {
             throw new NullPointerException("Items list is pointing to null");
         }
 
-        bind(holder.binding, items.get(i));
+        bind(holder.binding, items.get(position));
         holder.binding.executePendingBindings();
     }
 

@@ -9,7 +9,6 @@ import ru.codingworkshop.gymm.R;
 import ru.codingworkshop.gymm.ui.common.LifecycleDaggerActivity;
 
 public class MainActivity extends LifecycleDaggerActivity {
-    private static final String TAG = MainActivity.class.getSimpleName();
     private static final int TEST_LOADER = 0;
 
     @Override

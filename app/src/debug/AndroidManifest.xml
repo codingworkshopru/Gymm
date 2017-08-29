@@ -1,0 +1,9 @@
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="ru.codingworkshop.gymm">
+    <uses-permission android:name="android.permission.INTERNET"/>
+    <application>
+        <activity android:name=".testing.ActualTrainingActivityIsolated">
+        </activity>
+    </application>
+
+</manifest>

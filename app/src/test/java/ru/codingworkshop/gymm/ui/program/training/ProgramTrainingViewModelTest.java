@@ -1,6 +1,7 @@
 package ru.codingworkshop.gymm.ui.program.training;
 
 import android.arch.core.executor.testing.InstantTaskExecutorRule;
+import android.arch.lifecycle.LiveData;
 
 import org.junit.Before;
 import org.junit.Rule;
@@ -11,6 +12,7 @@ import org.mockito.junit.MockitoJUnitRunner;
 
 import ru.codingworkshop.gymm.data.entity.ProgramTraining;
 import ru.codingworkshop.gymm.data.tree.node.ProgramTrainingTree;
+import ru.codingworkshop.gymm.data.util.LiveDataUtil;
 import ru.codingworkshop.gymm.repository.ExercisesRepository;
 import ru.codingworkshop.gymm.repository.ProgramTrainingRepository;
 import ru.codingworkshop.gymm.util.LiveTest;
@@ -20,6 +22,7 @@ import static junit.framework.Assert.assertEquals;
 import static junit.framework.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.argThat;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -66,11 +69,28 @@ public class ProgramTrainingViewModelTest {
     }
 
     @Test
-    public void create() throws Exception {
-        vm.create();
+    public void createWithDrafting() throws Exception {
+        final LiveData<ProgramTraining> foo = Models.createLiveProgramTraining(1L, "foo", true);
+        when(repository.getProgramTrainingById(1L)).thenReturn(foo);
+        when(repository.getDraftingProgramTraining()).thenReturn(foo);
+        LiveTest.verifyLiveData(vm.create(), created -> {
+            assertTrue(vm.getProgramTrainingTree().getParent().isDrafting());
+            verify(repository, never()).insertProgramTraining(any(ProgramTraining.class));
 
-        assertTrue(vm.getProgramTrainingTree().getParent().isDrafting());
-        verify(repository).insertProgramTraining(any(ProgramTraining.class));
+            return created;
+        });
+    }
+
+    @Test
+    public void createWithoutDrafting() throws Exception {
+        when(repository.getDraftingProgramTraining()).thenReturn(LiveDataUtil.getLive(null));
+        LiveTest.verifyLiveData(vm.create(), created -> {
+            assertEquals(0L, vm.getProgramTrainingTree().getParent().getId());
+            assertTrue(vm.getProgramTrainingTree().getParent().isDrafting());
+            verify(repository).insertProgramTraining(any(ProgramTraining.class));
+
+            return created;
+        });
     }
 
     @Test

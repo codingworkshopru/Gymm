@@ -2,7 +2,7 @@ apply plugin: "com.android.application"
 
 android {
     compileSdkVersion 26
-    buildToolsVersion "26.0.1"
+    buildToolsVersion "25.0.3"
     defaultConfig {
         applicationId "ru.codingworkshop.gymm"
         minSdkVersion 15
@@ -16,13 +16,16 @@ android {
         targetCompatibility JavaVersion.VERSION_1_8
         sourceCompatibility JavaVersion.VERSION_1_8
     }
+    sourceSets {
+        androidTest.java.srcDirs += "src/test-common/java"
+        test.java.srcDirs += "src/test-common/java"
+    }
     buildTypes {
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro"
         }
     }
-
     dataBinding {
         enabled true
     }
@@ -37,7 +40,7 @@ ext {
     guava = "23.0-android"
     dagger = "2.11"
     picasso = "2.5.2"
-    leakcanary = "1.5.2"
+//    leakcanary = "1.5.2"
     timber = "4.5.1"
 
     espresso = "3.0.0"
@@ -67,8 +70,8 @@ dependencies {
     compile "com.squareup.picasso:picasso:$picasso"
     compile "com.jakewharton.timber:timber:$timber"
 
-    debugCompile "com.squareup.leakcanary:leakcanary-android:$leakcanary"
-    releaseCompile "com.squareup.leakcanary:leakcanary-android-no-op:$leakcanary"
+//    debugCompile "com.squareup.leakcanary:leakcanary-android:$leakcanary"
+//    releaseCompile "com.squareup.leakcanary:leakcanary-android-no-op:$leakcanary"
 
     annotationProcessor "android.arch.lifecycle:compiler:$arch"
     annotationProcessor "android.arch.persistence.room:compiler:$arch"
@@ -78,7 +81,7 @@ dependencies {
     testCompile "junit:junit:$junit"
     testCompile "pl.pragmatists:JUnitParams:$junit_params"
     testCompile "org.mockito:mockito-core:$mockito"
-    testCompile "com.squareup.leakcanary:leakcanary-android-no-op:$leakcanary"
+//    testCompile "com.squareup.leakcanary:leakcanary-android-no-op:$leakcanary"
     testCompile "android.arch.core:core-testing:$arch"
 
     androidTestCompile "com.android.support:appcompat-v7:$support"

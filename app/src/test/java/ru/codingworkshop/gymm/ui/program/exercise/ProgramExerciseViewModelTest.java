@@ -1,6 +1,7 @@
 package ru.codingworkshop.gymm.ui.program.exercise;
 
 import android.arch.core.executor.testing.InstantTaskExecutorRule;
+import android.arch.lifecycle.LiveData;
 
 import org.junit.Before;
 import org.junit.Rule;
@@ -9,7 +10,9 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 
+import ru.codingworkshop.gymm.data.entity.ProgramExercise;
 import ru.codingworkshop.gymm.data.tree.node.ProgramExerciseNode;
+import ru.codingworkshop.gymm.data.util.LiveDataUtil;
 import ru.codingworkshop.gymm.repository.ExercisesRepository;
 import ru.codingworkshop.gymm.repository.ProgramTrainingRepository;
 import ru.codingworkshop.gymm.util.LiveTest;
@@ -18,6 +21,7 @@ import ru.codingworkshop.gymm.util.Models;
 import static junit.framework.Assert.assertEquals;
 import static junit.framework.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -53,11 +57,35 @@ public class ProgramExerciseViewModelTest {
     }
 
     @Test
-    public void create() throws Exception {
-        vm.create();
-        ProgramExerciseNode node = vm.getProgramExerciseNode();
-        assertTrue(node.getParent().isDrafting());
-        verify(repository).insertProgramExercise(any());
+    public void createWithoutDrafting() throws Exception {
+        when(repository.getDraftingProgramExercise(1L)).thenReturn(LiveDataUtil.getLive(null));
+        vm.setProgramTrainingId(1L);
+        LiveTest.verifyLiveData(vm.create(), loaded -> {
+            final ProgramExercise parent = vm.getProgramExerciseNode().getParent();
+            assertEquals(0L, parent.getId());
+            assertEquals(1L, parent.getProgramTrainingId());
+            assertTrue(parent.isDrafting());
+            verify(repository).insertProgramExercise(any());
+
+            return loaded;
+        });
+    }
+
+    @Test
+    public void createWithDrafting() throws Exception {
+        final LiveData<ProgramExercise> liveProgramExercise = Models.createLiveProgramExercise(2L, 1L, true);
+        when(repository.getProgramExerciseById(2L)).thenReturn(liveProgramExercise);
+        when(repository.getDraftingProgramExercise(1L)).thenReturn(liveProgramExercise);
+
+        vm.setProgramTrainingId(1L);
+        LiveTest.verifyLiveData(vm.create(), loaded -> {
+            final ProgramExercise parent = vm.getProgramExerciseNode().getParent();
+            assertEquals(2L, parent.getId());
+            assertTrue(parent.isDrafting());
+            verify(repository, never()).insertProgramExercise(any());
+
+            return loaded;
+        });
     }
 
     @Test
