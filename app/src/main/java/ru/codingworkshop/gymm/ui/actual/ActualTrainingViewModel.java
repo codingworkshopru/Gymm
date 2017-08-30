@@ -117,13 +117,15 @@ public class ActualTrainingViewModel extends ViewModel {
 
     public void createActualExercise(int actualExerciseNodeIndex) {
         ActualExerciseNode node = getActualExerciseNode(actualExerciseNodeIndex);
-        ProgramExerciseNode programExerciseNode = node.getProgramExerciseNode();
-        ActualExercise actualExercise = new ActualExercise(
-                programExerciseNode.getExercise().getName(),
-                tree.getParent().getId(),
-                programExerciseNode.getId());
-        actualTrainingRepository.insertActualExercise(actualExercise);
-        node.setParent(actualExercise);
+        if (node.getParent() == null) {
+            ProgramExerciseNode programExerciseNode = node.getProgramExerciseNode();
+            ActualExercise actualExercise = new ActualExercise(
+                    programExerciseNode.getExercise().getName(),
+                    tree.getParent().getId(),
+                    programExerciseNode.getId());
+            actualTrainingRepository.insertActualExercise(actualExercise);
+            node.setParent(actualExercise);
+        }
     }
 
     public void createActualSet(int actualExerciseNodeIndex, int reps, double weight) {

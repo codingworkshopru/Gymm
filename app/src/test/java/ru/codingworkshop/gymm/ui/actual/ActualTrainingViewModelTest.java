@@ -98,6 +98,9 @@ public class ActualTrainingViewModelTest {
             vm.createActualExercise(0);
             assertEquals(12L, vm.getActualTrainingTree().getChildren().get(0).getParent().getId());
 
+            // check if actual exercise creates for the same index (it mustn't)
+            vm.createActualExercise(0);
+
             return l;
         });
 

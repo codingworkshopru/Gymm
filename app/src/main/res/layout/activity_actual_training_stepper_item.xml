@@ -1,6 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
-<layout xmlns:app="http://schemas.android.com/apk/res-auto">
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
     <data>
+        <import type="android.view.View" />
+        <import type="ru.codingworkshop.gymm.R.style" alias="style" />
         <variable
             name="index"
             type="int" />
@@ -10,11 +14,17 @@
         <variable
             name="summarise"
             type="String" />
+        <variable
+            name="active"
+            type="boolean" />
+        <variable
+            name="first"
+            type="boolean" />
+        <variable
+            name="last"
+            type="boolean" />
     </data>
     <android.support.constraint.ConstraintLayout
-        xmlns:android="http://schemas.android.com/apk/res/android"
-        xmlns:app="http://schemas.android.com/apk/res-auto"
-        xmlns:tools="http://schemas.android.com/tools"
 
         android:background="?attr/selectableItemBackground"
         android:layout_width="match_parent"
@@ -22,28 +32,31 @@
         android:orientation="vertical">
 
         <ImageView
-            android:id="@+id/imageView3"
+            android:id="@+id/stepperItemTopLine"
             android:layout_width="1dp"
             android:layout_height="0dp"
             android:layout_marginBottom="8dp"
             android:layout_marginLeft="36dp"
             android:layout_marginTop="0dp"
-            app:layout_constraintBottom_toTopOf="@+id/imageView2"
+            android:visibility="@{first ? View.INVISIBLE : View.VISIBLE}"
+            android:background="@color/color_material_grey_400"
+            app:layout_constraintBottom_toTopOf="@+id/stepperItemCircle"
             app:layout_constraintLeft_toLeftOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:srcCompat="@color/color_material_grey_400"/>
+            app:layout_constraintTop_toTopOf="parent"/>
 
         <ImageView
-            android:id="@+id/imageView2"
+            android:id="@+id/stepperItemCircle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            app:layout_constraintLeft_toRightOf="@+id/imageView3"
-            app:layout_constraintRight_toLeftOf="@+id/imageView3"
-            app:layout_constraintTop_toTopOf="@+id/linearLayout"
-            app:srcCompat="@drawable/ic_circle_grey_24dp" />
+            android:layout_marginTop="0dp"
+            android:background="@{active ? @drawable/ic_circle_primary_24dp : @drawable/ic_circle_grey_24dp}"
+            app:layout_constraintLeft_toRightOf="@+id/stepperItemTopLine"
+            app:layout_constraintRight_toLeftOf="@+id/stepperItemTopLine"
+            app:layout_constraintTop_toTopOf="@+id/stepperItemTitle"
+            tools:background="@drawable/ic_circle_grey_24dp" />
 
         <TextView
-            android:id="@+id/textView4"
+            android:id="@+id/stepperItemIndex"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textAlignment="center"
@@ -51,62 +64,56 @@
             android:textColor="@android:color/white"
             android:text="@{Integer.toString(index)}"
             tools:text="0"
-            app:layout_constraintBottom_toBottomOf="@+id/imageView2"
-            app:layout_constraintTop_toTopOf="@+id/imageView2"
-            app:layout_constraintLeft_toLeftOf="@+id/imageView2"
-            app:layout_constraintRight_toRightOf="@+id/imageView2" />
+            app:layout_constraintBottom_toBottomOf="@+id/stepperItemCircle"
+            app:layout_constraintTop_toTopOf="@+id/stepperItemCircle"
+            app:layout_constraintLeft_toLeftOf="@+id/stepperItemCircle"
+            app:layout_constraintRight_toRightOf="@+id/stepperItemCircle" />
 
         <ImageView
-            android:id="@+id/imageView4"
+            android:id="@+id/stepperItemBottomLine"
             android:layout_width="1dp"
             android:layout_height="0dp"
             android:layout_marginBottom="0dp"
             android:layout_marginLeft="36dp"
             android:layout_marginTop="8dp"
+            android:visibility="@{last ? View.INVISIBLE : View.VISIBLE}"
+            android:background="@color/color_material_grey_400"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintLeft_toLeftOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/imageView2"
-            app:srcCompat="@color/color_material_grey_400" />
+            app:layout_constraintTop_toBottomOf="@+id/stepperItemCircle" />
 
-        <LinearLayout
-            android:id="@+id/linearLayout"
+        <TextView
+            android:id="@+id/stepperItemTitle"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginLeft="8dp"
-            android:layout_marginRight="24dp"
-            android:layout_marginStart="8dp"
-            android:layout_marginEnd="24dp"
+            android:layout_weight="1"
             android:layout_marginTop="24dp"
-            android:orientation="vertical"
-            app:layout_constraintLeft_toRightOf="@+id/imageView2"
-            app:layout_constraintRight_toRightOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            android:paddingBottom="16dp">
+            android:layout_marginLeft="8dp"
+            android:ellipsize="end"
+            android:maxLines="1"
+            android:text="@{title}"
+            android:textAppearance="@{active ? style.TextAppearance_AppCompat_Body2 : style.TextAppearance_AppCompat_Small}"
+            tools:text="Inactive step is here"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@+id/stepperItemCircle"
+            app:layout_constraintTop_toTopOf="parent" />
 
-            <TextView
-                android:id="@+id/textView3"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:ellipsize="end"
-                android:maxLines="1"
-                android:textAppearance="@style/TextAppearance.AppCompat.Body1"
-                android:text="@{title}"
-                tools:text="Inactive step is here" />
-
-            <TextView
-                android:id="@+id/textView5"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:ellipsize="end"
-                android:textAppearance="@style/TextAppearance.AppCompat.Caption"
-                android:visibility="gone"
-                android:text="@{summarise}"
-                tools:text="Summarize if needed"
-                tools:visibility="visible" />
-
-        </LinearLayout>
+        <TextView
+            android:id="@+id/stepperItemSubtitle"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:ellipsize="end"
+            android:visibility="invisible"
+            android:textAppearance="@style/TextAppearance.AppCompat.Caption"
+            android:text="@{summarise}"
+            tools:text="Summary if needed"
+            tools:visibility="visible"
+            android:layout_marginBottom="16dp"
+            android:layout_marginEnd="24dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="@+id/stepperItemTitle"
+            app:layout_constraintTop_toBottomOf="@+id/stepperItemTitle" />
 
     </android.support.constraint.ConstraintLayout>
 </layout>

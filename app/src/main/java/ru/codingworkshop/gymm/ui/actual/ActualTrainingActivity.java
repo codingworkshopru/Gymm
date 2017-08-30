@@ -22,6 +22,9 @@ import ru.codingworkshop.gymm.databinding.ActivityActualTrainingStepperItemBindi
 import ru.codingworkshop.gymm.ui.common.BindingListAdapter;
 
 public class ActualTrainingActivity extends LifecycleActivity {
+    public static final String EXTRA_ACTUAL_TRAINING_ID = "extraActualTrainingId";
+    public static final String EXTRA_PROGRAM_TRAINING_ID = "extraProgramTrainingId";
+
     private ActualTrainingViewModel viewModel;
     private ActualTrainingTree tree;
 
@@ -46,7 +49,7 @@ public class ActualTrainingActivity extends LifecycleActivity {
     }
 
     private void loadData() {
-        final long foo = getIntent().getLongExtra("foo", 0L);
+        final long foo = getIntent().getLongExtra(EXTRA_PROGRAM_TRAINING_ID, 0L);
         viewModel.startTraining(foo).observe(this, this::dataLoaded);
     }
 
@@ -61,18 +64,37 @@ public class ActualTrainingActivity extends LifecycleActivity {
         setToolbarTitle(tree.getProgramTraining().getName());
         RecyclerView recyclerView = findViewById(R.id.actualExerciseSteps);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
+
         recyclerView.setAdapter(new BindingListAdapter<ActualExerciseNode, ActivityActualTrainingStepperItemBinding>(tree.getChildren()) {
+            ActivityActualTrainingStepperItemBinding activeView;
 
             @Override
             protected ActivityActualTrainingStepperItemBinding createBinding(ViewGroup parent) {
                 LayoutInflater inflater = LayoutInflater.from(ActualTrainingActivity.this);
-                return DataBindingUtil.inflate(inflater, R.layout.activity_actual_training_stepper_item, parent, false);
+                ActivityActualTrainingStepperItemBinding binding = DataBindingUtil.inflate(inflater, R.layout.activity_actual_training_stepper_item, parent, false);
+                binding.getRoot().setOnClickListener(v -> {
+                    if (binding == activeView) {
+                        return;
+                    }
+
+                    viewModel.createActualExercise(recyclerView.getChildAdapterPosition(binding.getRoot()));
+
+                    if (activeView != null) {
+                        activeView.setActive(false);
+                    }
+                    binding.setActive(true);
+                    activeView = binding;
+                });
+                return binding;
             }
 
             @Override
             protected void bind(ActivityActualTrainingStepperItemBinding binding, ActualExerciseNode item) {
                 final ProgramExerciseNode programExerciseNode = item.getProgramExerciseNode();
-                binding.setIndex(programExerciseNode.getSortOrder() + 1);
+                final int sortOrder = programExerciseNode.getSortOrder();
+                binding.setFirst(sortOrder == 0);
+                binding.setLast(sortOrder == tree.getChildren().size() - 1);
+                binding.setIndex(sortOrder + 1);
                 binding.setTitle(programExerciseNode.getExercise().getName());
             }
         });
