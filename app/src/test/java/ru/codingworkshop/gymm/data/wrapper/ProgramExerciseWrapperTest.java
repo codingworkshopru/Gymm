@@ -62,7 +62,7 @@ public class ProgramExerciseWrapperTest {
     @Test
     public void settingWrappedValues() {
         wrapper.setRoot(Models.createProgramExercise(2L, 1L, 33L, false));
-        wrapper.setChildren(Models.createProgramSets(10));
+        wrapper.setChildren(Models.createProgramSets(2L, 10));
         wrapper.setExercise(Models.createExercise(1, "foo"));
 
         assertNotNull(wrapper.getExercise());
@@ -83,7 +83,7 @@ public class ProgramExerciseWrapperTest {
         assertFalse(wrapper.hasChildren());
 
         // add
-        ProgramSet set = Models.createProgramSets(1).get(0);
+        ProgramSet set = Models.createProgramSets(2L, 1).get(0);
         wrapper.addChild(set);
         assertEquals(set, wrapper.getChildren().get(0));
 
@@ -96,7 +96,7 @@ public class ProgramExerciseWrapperTest {
         assertFalse(wrapper.hasChildren());
 
         // move
-        List<ProgramSet> sets = Models.createProgramSets(10);
+        List<ProgramSet> sets = Models.createProgramSets(2L, 10);
         wrapper.setChildren(sets);
         wrapper.move(3, 7);
         assertEquals(sets.get(3), wrapper.getChildren().get(7));
@@ -141,7 +141,7 @@ public class ProgramExerciseWrapperTest {
     public void loadDrafting() {
         LiveData<ProgramExercise> draftingExercise = LiveDataUtil.getLive(Models.createProgramExercise(2L, 1L, 100L, false));
         draftingExercise.getValue().setDrafting(true);
-        LiveData<List<ProgramSet>> sets = LiveDataUtil.getLive(Models.createProgramSets(10));
+        LiveData<List<ProgramSet>> sets = LiveDataUtil.getLive(Models.createProgramSets(2L, 10));
 
         when(repository.getDraftingProgramExercise(1L)).thenReturn(draftingExercise);
         when(repository.getProgramSetsForExercise(draftingExercise.getValue())).thenReturn(sets);
@@ -166,7 +166,7 @@ public class ProgramExerciseWrapperTest {
     @Test
     public void load() {
         LiveData<ProgramExercise> loadedExercise = LiveDataUtil.getLive(Models.createProgramExercise(2L, 1L, 100L, false));
-        LiveData<List<ProgramSet>> sets = Models.createLiveProgramSets(10);
+        LiveData<List<ProgramSet>> sets = Models.createLiveProgramSets(2L, 10);
 
         when(repository.getProgramExerciseById(2L)).thenReturn(loadedExercise);
         when(repository.getProgramSetsForExercise(2L)).thenReturn(sets);
@@ -192,7 +192,7 @@ public class ProgramExerciseWrapperTest {
         ProgramExercise programExercise = Models.createProgramExercise(2L, 1L, 33L, false);
         wrapper.setRoot(programExercise);
 
-        List<ProgramSet> oldSets = Models.createProgramSets(10);
+        List<ProgramSet> oldSets = Models.createProgramSets(2L, 10);
         List<ProgramSet> newSets = Lists.newArrayList(oldSets);
         newSets.removeIf(set -> set.getId() % 2 == 0);
         ProgramSet newSet = Models.createProgramSet(51L, 2L, 3);

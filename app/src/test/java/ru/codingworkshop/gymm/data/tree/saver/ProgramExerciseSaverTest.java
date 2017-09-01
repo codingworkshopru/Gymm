@@ -48,7 +48,7 @@ public class ProgramExerciseSaverTest {
     public void save() throws Exception {
         ProgramExercise programExercise = Models.createProgramExercise(2L, 1L, 100L, false);
         ProgramExerciseNode node = new MutableProgramExerciseNode(programExercise);
-        List<ProgramSet> programSets = Models.createProgramSets(5);
+        List<ProgramSet> programSets = Models.createProgramSets(2L, 5);
         node.setChildren(programSets);
         node.moveChild(2,3);
         node.getChildren().get(0).setReps(100);
@@ -56,7 +56,7 @@ public class ProgramExerciseSaverTest {
         ProgramSet addedProgramSet = Models.createProgramSet(0L, 2L, 90);
         node.addChild(addedProgramSet);
 
-        when(repository.getProgramSetsForExercise(programExercise)).thenReturn(LiveDataUtil.getLive(Models.createProgramSets(5)));
+        when(repository.getProgramSetsForExercise(programExercise)).thenReturn(LiveDataUtil.getLive(Models.createProgramSets(2L, 5)));
 
         ProgramExerciseSaver saver = new ProgramExerciseSaver(node, repository);
         saver.save();

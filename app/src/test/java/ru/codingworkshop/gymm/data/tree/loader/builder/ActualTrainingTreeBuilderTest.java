@@ -34,7 +34,7 @@ public class ActualTrainingTreeBuilderTest {
         when(programTrainingTree.getParent()).thenReturn(Models.createProgramTraining(1L, "foo"));
         when(programTrainingTree.getChildren()).thenReturn(Models.createProgramExercises(1).stream().map(e -> {
             ImmutableProgramExerciseNode node = new ImmutableProgramExerciseNode(e);
-            node.setChildren(Models.createProgramSets(1));
+            node.setChildren(Models.createProgramSets(2L, 1));
             node.setExercise(Models.createExercise(100L, "bar"));
             return node;
         }).collect(Collectors.toList()));

@@ -128,32 +128,19 @@ public class ActualTrainingViewModel extends ViewModel {
         }
     }
 
-    public void createActualSet(int actualExerciseNodeIndex, int reps, double weight) {
-        ActualExerciseNode node = getActualExerciseNode(actualExerciseNodeIndex);
+    public void createActualSet(int actualExerciseNodeIndex, @NonNull ActualSet actualSet) {
+        Preconditions.checkNotNull(actualSet);
 
-        ActualSet actualSet = new ActualSet(node.getParent().getId(), reps);
-        actualSet.setWeight(weight);
+        ActualExerciseNode node = getActualExerciseNode(actualExerciseNodeIndex);
+        actualSet.setActualExerciseId(node.getParent().getId());
         actualTrainingRepository.insertActualSet(actualSet);
 
         node.addChild(actualSet);
     }
 
-    public void updateActualSet(int actualExerciseNodeIndex, int actualSetIndex, int reps, double weight) {
-        ActualSet set = getActualSet(actualExerciseNodeIndex, actualSetIndex);
-        set.setReps(reps);
-        set.setWeight(weight);
-
-        actualTrainingRepository.updateActualSet(set);
-    }
-
-    public void deleteActualSet(int actualExerciseNodeIndex, int actualSetIndex) {
-        ActualSet set = getActualSet(actualExerciseNodeIndex, actualSetIndex);
-        getActualExerciseNode(actualExerciseNodeIndex).removeChild(actualSetIndex);
-        actualTrainingRepository.deleteActualSet(set);
-    }
-
-    private ActualSet getActualSet(int actualExerciseNodeIndex, int actualSetIndex) {
-        return getActualExerciseNode(actualExerciseNodeIndex).getChildren().get(actualSetIndex);
+    public void updateActualSet(@NonNull ActualSet actualSet) {
+        Preconditions.checkNotNull(actualSet);
+        actualTrainingRepository.updateActualSet(actualSet);
     }
 
     private ActualExerciseNode getActualExerciseNode(int actualExerciseNodeIndex) {

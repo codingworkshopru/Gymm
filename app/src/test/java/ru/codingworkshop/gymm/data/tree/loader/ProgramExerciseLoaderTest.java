@@ -26,7 +26,7 @@ public class ProgramExerciseLoaderTest {
     public void load() throws Exception {
         ProgramExerciseDataSource dataSource = mock(ProgramExerciseDataSource.class);
         when(dataSource.getParent()).thenReturn(Models.createLiveProgramExercise(2L, 1L, false));
-        when(dataSource.getChildren()).thenReturn(Models.createLiveProgramSets(1));
+        when(dataSource.getChildren()).thenReturn(Models.createLiveProgramSets(2L, 1));
         when(dataSource.getExercise()).thenReturn(Models.createLiveExercise(100L, "foo"));
 
         ProgramExerciseNode node = new ImmutableProgramExerciseNode();

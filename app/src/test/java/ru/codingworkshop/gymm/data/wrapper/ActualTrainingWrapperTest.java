@@ -109,7 +109,7 @@ public class ActualTrainingWrapperTest {
 
     @Test
     public void programSetsSetAndGet() {
-        List<ProgramSet> sets = Models.createProgramSets(10);
+        List<ProgramSet> sets = Models.createProgramSets(2L, 10);
         wrapper.setProgramSets(sets);
         assertEquals(sets, wrapper.getProgramSets());
     }
@@ -127,7 +127,7 @@ public class ActualTrainingWrapperTest {
     @Test
     public void getProgramSetsForProgramExercise() {
         ProgramExercise exercise = Models.createProgramExercise(2L, 1L, 100L, false);
-        List<ProgramSet> sets = Models.createProgramSets(9);
+        List<ProgramSet> sets = Models.createProgramSets(2L, 9);
         wrapper.setProgramExercises(Lists.newArrayList(exercise));
         wrapper.setProgramSets(sets);
         assertEquals(sets, wrapper.getProgramSetsForExercise(exercise));
@@ -227,7 +227,7 @@ public class ActualTrainingWrapperTest {
     }
 
     private List<ProgramSet> stubProgramSets() {
-        final LiveData<List<ProgramSet>> liveProgramSets = Models.createLiveProgramSets(10);
+        final LiveData<List<ProgramSet>> liveProgramSets = Models.createLiveProgramSets(2L, 10);
         when(programTrainingRepository.getProgramSetsForTraining(1L)).thenReturn(liveProgramSets);
         return liveProgramSets.getValue();
     }

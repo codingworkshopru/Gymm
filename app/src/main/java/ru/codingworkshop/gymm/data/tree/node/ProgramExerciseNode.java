@@ -1,8 +1,8 @@
 package ru.codingworkshop.gymm.data.tree.node;
 
 import ru.codingworkshop.gymm.data.entity.Exercise;
+import ru.codingworkshop.gymm.data.entity.IProgramExercise;
 import ru.codingworkshop.gymm.data.entity.ProgramExercise;
-import ru.codingworkshop.gymm.data.entity.ProgramExerciseInterface;
 import ru.codingworkshop.gymm.data.entity.ProgramSet;
 import ru.codingworkshop.gymm.data.tree.holder.ChildrenHolder;
 
@@ -10,7 +10,7 @@ import ru.codingworkshop.gymm.data.tree.holder.ChildrenHolder;
  * Created by Радик on 14.08.2017 as part of the Gymm project.
  */
 
-public abstract class ProgramExerciseNode extends BaseNode<ProgramExercise, ProgramSet> implements ProgramExerciseInterface {
+public abstract class ProgramExerciseNode extends BaseNode<ProgramExercise, ProgramSet> implements IProgramExercise {
     private Exercise exercise;
 
     public ProgramExerciseNode(ChildrenHolder<ProgramSet> childrenDelegate) {

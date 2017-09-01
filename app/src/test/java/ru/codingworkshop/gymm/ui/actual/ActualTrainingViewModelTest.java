@@ -7,8 +7,9 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.MockitoAnnotations;
 
+import junitparams.JUnitParamsRunner;
 import ru.codingworkshop.gymm.data.entity.ActualExercise;
 import ru.codingworkshop.gymm.data.entity.ActualSet;
 import ru.codingworkshop.gymm.data.tree.node.ActualTrainingTree;
@@ -19,7 +20,6 @@ import ru.codingworkshop.gymm.util.LiveTest;
 import ru.codingworkshop.gymm.util.Models;
 
 import static junit.framework.Assert.assertEquals;
-import static junit.framework.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.times;
@@ -30,7 +30,7 @@ import static org.mockito.Mockito.when;
  * Created by Радик on 25.08.2017 as part of the Gymm project.
  */
 
-@RunWith(MockitoJUnitRunner.class)
+@RunWith(JUnitParamsRunner.class)
 public class ActualTrainingViewModelTest {
     private ActualTrainingViewModel vm;
 
@@ -43,10 +43,11 @@ public class ActualTrainingViewModelTest {
 
     @Before
     public void setUp() {
+        MockitoAnnotations.initMocks(this);
         vm = new ActualTrainingViewModel(actualRepository, programRepository, exercisesRepository);
         when(programRepository.getProgramTrainingById(1L)).thenReturn(Models.createLiveProgramTraining(1L, "foo", false));
         when(programRepository.getProgramExercisesForTraining(1L)).thenReturn(Models.createLiveProgramExercises(1));
-        when(programRepository.getProgramSetsForTraining(1L)).thenReturn(Models.createLiveProgramSets(1));
+        when(programRepository.getProgramSetsForTraining(1L)).thenReturn(Models.createLiveProgramSets(2L, 1));
         when(exercisesRepository.getExercisesForProgramTraining(1L)).thenReturn(Models.createLiveExercises("bar"));
     }
 
@@ -117,7 +118,9 @@ public class ActualTrainingViewModelTest {
 
         LiveTest.verifyLiveData(vm.startTraining(1L), l -> {
             vm.createActualExercise(0);
-            vm.createActualSet(0, 10, 5.5);
+            final ActualSet toInsert = Models.createActualSet(0L, 0L, 10);
+            toInsert.setWeight(5.5);
+            vm.createActualSet(0, toInsert);
 
             final ActualSet actualSet = vm.getActualTrainingTree().getChildren().get(0).getChildren().get(0);
             assertEquals(13L, actualSet.getId());
@@ -133,33 +136,13 @@ public class ActualTrainingViewModelTest {
     @Test
     public void updateActualSet() throws Exception {
         LiveTest.verifyLiveData(vm.startTraining(1L), loaded -> {
-            vm.createActualExercise(0);
-            vm.createActualSet(0, 10, 5.5);
-            vm.updateActualSet(0, 0, 7, 6.5);
-
-            ActualSet actualSet = vm.getActualTrainingTree().getChildren().get(0).getChildren().get(0);
-            assertEquals(7, actualSet.getReps());
-            assertEquals(6.5, actualSet.getWeight());
-
+            final ActualSet actualSet = Models.createActualSet(13L, 12L, 10);
+            vm.updateActualSet(actualSet);
+            verify(actualRepository).updateActualSet(actualSet);
             return true;
         });
 
         verify(actualRepository).updateActualSet(any());
-    }
-
-    @Test
-    public void deleteActualSet() throws Exception {
-        LiveTest.verifyLiveData(vm.startTraining(1L), loaded -> {
-            vm.createActualExercise(0);
-            vm.createActualSet(0, 10, 5.5);
-            vm.deleteActualSet(0, 0);
-
-            assertTrue(vm.getActualTrainingTree().getChildren().get(0).getChildren().isEmpty());
-
-            return true;
-        });
-
-        verify(actualRepository).deleteActualSet(any());
     }
 
     private void verifyProgramLoaded() throws Exception {

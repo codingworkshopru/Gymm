@@ -84,14 +84,14 @@ public class Models {
         return exercises;
     }
 
-    public static LiveData<List<ProgramSet>> createLiveProgramSets(int count) {
-        return LiveDataUtil.getLive(createProgramSets(count));
+    public static LiveData<List<ProgramSet>> createLiveProgramSets(long programExerciseId, int count) {
+        return LiveDataUtil.getLive(createProgramSets(programExerciseId, count));
     }
 
-    public static List<ProgramSet> createProgramSets(int count) {
+    public static List<ProgramSet> createProgramSets(long programExerciseId, int count) {
         List<ProgramSet> result = Lists.newArrayList();
         for (int i = 0; i < count; i++) {
-            ProgramSet programSet = createProgramSet(i + 3, 2L, i * 10);
+            ProgramSet programSet = createProgramSet(i + 3, programExerciseId, i + 3);
             programSet.setSortOrder(i);
             result.add(programSet);
         }

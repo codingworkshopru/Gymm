@@ -41,7 +41,7 @@ public class ActualTrainingTreeLoaderTest {
         programTree.setChildren(Models.createProgramExercises(1).stream().map(e -> {
             ProgramExerciseNode node = programTree.createChildNode(e);
             node.setExercise(Models.createExercise(100L, "bar"));
-            node.setChildren(Models.createProgramSets(1));
+            node.setChildren(Models.createProgramSets(2L, 1));
             return node;
         }).collect(Collectors.toList()));
 

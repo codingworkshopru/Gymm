@@ -42,7 +42,7 @@ public class ProgramExerciseViewModelTest {
     public void setUp() throws Exception {
         vm = new ProgramExerciseViewModel(repository, exercisesRepository);
         when(repository.getProgramExerciseById(2L)).thenReturn(Models.createLiveProgramExercise(2L,1L,false));
-        when(repository.getProgramSetsForExercise(2L)).thenReturn(Models.createLiveProgramSets(1));
+        when(repository.getProgramSetsForExercise(2L)).thenReturn(Models.createLiveProgramSets(2L, 1));
         when(exercisesRepository.getExerciseById(100L)).thenReturn(Models.createLiveExercise(100L, "foo"));
     }
 
@@ -90,7 +90,7 @@ public class ProgramExerciseViewModelTest {
 
     @Test
     public void save() throws Exception {
-        when(repository.getProgramSetsForExercise(any())).thenReturn(Models.createLiveProgramSets(1));
+        when(repository.getProgramSetsForExercise(any())).thenReturn(Models.createLiveProgramSets(2L, 1));
         LiveTest.verifyLiveData(vm.load(2L), loaded -> {
             ProgramExerciseNode node = vm.getProgramExerciseNode();
             node.getChildren().get(0).setReps(1);

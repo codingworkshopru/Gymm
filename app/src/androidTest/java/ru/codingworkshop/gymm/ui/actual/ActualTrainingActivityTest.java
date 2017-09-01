@@ -7,6 +7,7 @@ import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.drawable.Drawable;
 import android.support.annotation.DrawableRes;
+import android.support.annotation.NonNull;
 import android.support.test.InstrumentationRegistry;
 import android.support.test.espresso.contrib.RecyclerViewActions;
 import android.support.test.espresso.matcher.BoundedMatcher;
@@ -15,6 +16,7 @@ import android.support.test.rule.ActivityTestRule;
 import android.support.test.runner.AndroidJUnit4;
 import android.support.v4.content.ContextCompat;
 import android.view.View;
+import android.widget.EditText;
 
 import org.hamcrest.Description;
 import org.hamcrest.Matcher;
@@ -29,15 +31,18 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import ru.codingworkshop.gymm.R;
+import ru.codingworkshop.gymm.data.entity.ActualExercise;
 import ru.codingworkshop.gymm.data.tree.node.ActualExerciseNode;
 import ru.codingworkshop.gymm.data.tree.node.ActualTrainingTree;
 import ru.codingworkshop.gymm.data.tree.node.ImmutableProgramExerciseNode;
 import ru.codingworkshop.gymm.data.tree.node.ProgramExerciseNode;
 import ru.codingworkshop.gymm.testing.ActualTrainingActivityIsolated;
 import ru.codingworkshop.gymm.util.Models;
+import ru.codingworkshop.gymm.util.RecyclerViewItemMatcher;
 
 import static android.support.test.espresso.Espresso.onView;
 import static android.support.test.espresso.action.ViewActions.click;
+import static android.support.test.espresso.action.ViewActions.typeText;
 import static android.support.test.espresso.assertion.ViewAssertions.matches;
 import static android.support.test.espresso.matcher.ViewMatchers.isDisplayed;
 import static android.support.test.espresso.matcher.ViewMatchers.withId;
@@ -47,6 +52,9 @@ import static org.hamcrest.Matchers.allOf;
 import static org.hamcrest.Matchers.both;
 import static org.hamcrest.Matchers.not;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.argThat;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -86,22 +94,37 @@ public class ActualTrainingActivityTest {
 
     private void buildTree(int size) {
         List<ActualExerciseNode> actualExerciseNodes = Models.createProgramExercises(size).stream().map(pe -> {
-            ActualExerciseNode node = new ActualExerciseNode();
             ProgramExerciseNode peNode = new ImmutableProgramExerciseNode(pe);
+
+            peNode.setChildren(Models.createProgramSets(pe.getId(), 5));
+
             final long exerciseId = peNode.getExerciseId();
             peNode.setExercise(Models.createExercise(exerciseId, "exercise" + exerciseId));
+
+            ActualExerciseNode node = new ActualExerciseNode();
             node.setProgramExerciseNode(peNode);
             return node;
         }).collect(Collectors.toList());
         tree.setProgramTraining(Models.createProgramTraining(1L, "foo"));
         tree.setChildren(actualExerciseNodes);
+
+        liveTrue.postValue(true);
     }
 
     @Before
     public void setUp() throws Exception {
-        liveTrue.postValue(true);
         tree = new ActualTrainingTree();
         when(vm.getActualTrainingTree()).thenReturn(tree);
+        RecyclerViewItemMatcher.setRecyclerViewId(R.id.actualExerciseSteps);
+
+        doAnswer(a -> {
+            Integer i = a.getArgument(0);
+            ActualExerciseNode node = tree.getChildren().get(i);
+            final ProgramExerciseNode programExerciseNode = node.getProgramExerciseNode();
+            ActualExercise actualExercise = new ActualExercise(programExerciseNode.getExercise().getName(), 11L, programExerciseNode.getId());
+            node.setParent(actualExercise);
+            return null;
+        }).when(vm).createActualExercise(any(Integer.class));
     }
 
     @Test
@@ -124,25 +147,73 @@ public class ActualTrainingActivityTest {
     }
 
     @Test
-    public void verifyVerticalLinesOnOneItem() throws Exception {
-        buildTree(1);
-        onView(withId(R.id.stepperItemTopLine)).check(matches(not(isDisplayed())));
-        onView(withId(R.id.stepperItemBottomLine)).check(matches(not(isDisplayed())));
-    }
-
-    @Test
     public void verifyVerticalLinesOnMultipleItems() throws Exception {
         buildTree(2);
-        onView(both(withId(R.id.stepperItemTopLine)).and(isDisplayed()));
-        onView(both(withId(R.id.stepperItemBottomLine)).and(isDisplayed()));
+        onView(RecyclerViewItemMatcher.itemAtPosition(R.id.stepperItemTopLine, 0)).check(matches(not(isDisplayed())));
+        onView(RecyclerViewItemMatcher.itemAtPosition(R.id.stepperItemBottomLine, 0)).check(matches(isDisplayed()));
+        onView(RecyclerViewItemMatcher.itemAtPosition(R.id.stepperItemTopLine, 1)).check(matches(isDisplayed()));
+        onView(RecyclerViewItemMatcher.itemAtPosition(R.id.stepperItemBottomLine, 1)).check(matches(not(isDisplayed())));
     }
 
     @Test
     public void verifyActiveStatusSet() throws Exception {
+        buildTree(2);
+        final int reps = tree.getChildren().get(0).getProgramExerciseNode().getChildren().get(0).getReps();
+
+        onView(withId(R.id.actualExerciseSteps)).perform(RecyclerViewActions.actionOnItemAtPosition(0, click()));
+        match(R.id.stepperItemCircle, hasBackground(R.drawable.ic_circle_primary_24dp), hasBackground(R.drawable.ic_circle_grey_24dp));
+        match(R.id.stepperItemWeightEditText, isDisplayed(), not(isDisplayed()));
+        match(R.id.stepperItemRepsEditText, isDisplayed(), not(isDisplayed()));
+        match(R.id.stepperItemFinishSetButton, isDisplayed(), not(isDisplayed()));
+        onView(both(withHint(Integer.toString(reps))).and(iap(R.id.stepperItemRepsEditText, 0))).check(matches(isDisplayed()));
+
+        onView(withId(R.id.actualExerciseSteps)).perform(RecyclerViewActions.actionOnItemAtPosition(1, click()));
+        match(R.id.stepperItemCircle, hasBackground(R.drawable.ic_circle_grey_24dp), hasBackground(R.drawable.ic_circle_primary_24dp));
+        match(R.id.stepperItemWeightEditText, not(isDisplayed()), isDisplayed());
+        match(R.id.stepperItemRepsEditText, not(isDisplayed()), isDisplayed());
+        match(R.id.stepperItemFinishSetButton, not(isDisplayed()), isDisplayed());
+        onView(both(withHint(Integer.toString(reps))).and(iap(R.id.stepperItemRepsEditText, 1))).check(matches(isDisplayed()));
+
+        verify(vm).createActualExercise(0);
+        verify(vm).createActualExercise(1);
+    }
+
+    private void match(int id, Matcher<View> matcher1, Matcher<View> matcher2) {
+        onView(iap(id, 0)).check(matches(matcher1));
+        onView(iap(id, 1)).check(matches(matcher2));
+    }
+
+    @NonNull
+    private Matcher<View> iap(int id, int pos) {
+        return RecyclerViewItemMatcher.itemAtPosition(id, pos);
+    }
+
+    @Test
+    public void addActualTrainingSet() throws Exception {
         buildTree(1);
         onView(withId(R.id.actualExerciseSteps)).perform(RecyclerViewActions.actionOnItemAtPosition(0, click()));
-        onView(withId(R.id.stepperItemCircle)).check(matches(hasBackground(R.drawable.ic_circle_primary_24dp)));
-        verify(vm).createActualExercise(0);
+
+        onView(withId(R.id.stepperItemWeightEditText)).perform(typeText("5.125"));
+        onView(withId(R.id.stepperItemRepsEditText)).perform(typeText("10"));
+
+        onView(withId(R.id.stepperItemFinishSetButton)).perform(click());
+
+        verify(vm).createActualSet(eq(0), argThat(s -> s.getReps() == 10 && s.getWeight() == 5.125));
+    }
+
+    private static Matcher<View> withHint(String hint) {
+        return new BoundedMatcher<View, EditText>(EditText.class) {
+
+            @Override
+            public void describeTo(Description description) {
+                description.appendText("is matches to specified hint");
+            }
+
+            @Override
+            protected boolean matchesSafely(EditText item) {
+                return hint.equals(item.getHint());
+            }
+        };
     }
 
     private static Matcher<View> hasBackground(@DrawableRes int drawableId) {

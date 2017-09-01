@@ -25,7 +25,7 @@ public class ProgramTrainingTreeBuilderTest {
     public void build() throws Exception {
         final ProgramTraining programTraining = Models.createProgramTraining(1L, "foo");
         final List<ProgramExercise> programExercises = Models.createProgramExercises(1);
-        final List<ProgramSet> programSets = Models.createProgramSets(1);
+        final List<ProgramSet> programSets = Models.createProgramSets(2L, 1);
         final List<Exercise> exercises = Models.createExercises("exercises");
 
         ProgramTrainingTree tree = (ProgramTrainingTree) new ProgramTrainingTreeBuilder(new ImmutableProgramTrainingTree())

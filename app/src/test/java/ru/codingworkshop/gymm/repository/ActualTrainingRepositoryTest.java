@@ -1,6 +1,7 @@
 package ru.codingworkshop.gymm.repository;
 
 import android.arch.core.executor.testing.InstantTaskExecutorRule;
+import android.support.annotation.NonNull;
 
 import com.google.common.collect.Lists;
 
@@ -9,13 +10,15 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.MockitoAnnotations;
 
 import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.Executor;
 import java.util.stream.Collectors;
 
+import junitparams.JUnitParamsRunner;
+import junitparams.Parameters;
 import ru.codingworkshop.gymm.data.entity.ActualExercise;
 import ru.codingworkshop.gymm.data.entity.ActualSet;
 import ru.codingworkshop.gymm.data.entity.ActualTraining;
@@ -24,6 +27,7 @@ import ru.codingworkshop.gymm.db.dao.ActualTrainingDao;
 import ru.codingworkshop.gymm.util.Models;
 
 import static org.junit.Assert.assertEquals;
+import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -31,7 +35,7 @@ import static org.mockito.Mockito.when;
  * Created by Радик on 29.07.2017.
  */
 
-@RunWith(MockitoJUnitRunner.class)
+@RunWith(JUnitParamsRunner.class)
 public class ActualTrainingRepositoryTest {
     @Rule
     public InstantTaskExecutorRule instantTaskExecutorRule = new InstantTaskExecutorRule();
@@ -42,6 +46,7 @@ public class ActualTrainingRepositoryTest {
 
     @Before
     public void init() {
+        MockitoAnnotations.initMocks(this);
         repository = new ActualTrainingRepository(executor, dao);
     }
 
@@ -84,20 +89,64 @@ public class ActualTrainingRepositoryTest {
         verify(dao).getActualExercisesForActualTraining(1000L);
     }
 
+    @Parameters(method = "weights")
     @Test
-    public void insertActualSet() {
+    public void insertActualSet(Double weight, Double expectedWeight) {
         ActualSet actualSet = Models.createActualSet(0L, 1002L, 7);
+        actualSet.setWeight(weight);
         when(dao.insertActualSet(actualSet)).thenReturn(1003L);
         repository.insertActualSet(actualSet);
-        verify(dao).insertActualSet(actualSet);
+        verify(dao).insertActualSet(argThat(set ->
+                set == actualSet && ((set.getWeight() == null && expectedWeight == null) || set.getWeight().equals(expectedWeight))
+        ));
     }
 
+    private Object[] weights() {
+        return new Object[] {
+                new Object[] {0.0, null},
+                new Object[] {5.5, 5.5},
+                new Object[] {null, null}
+        };
+    }
+
+    @Parameters(method = "invalidActualSets")
+    @Test(expected = IllegalArgumentException.class)
+    public void insertInvalidActualSet(ActualSet actualSet) throws Exception {
+        repository.insertActualSet(actualSet);
+    }
+
+    @NonNull
+    private static ActualSet[] invalidActualSets() {
+        return new ActualSet[] {
+                Models.createActualSet(13L, 0L, 10),
+                Models.createActualSet(13L, 12L, 0)
+        };
+    }
+
+    @Parameters(method = "weights")
     @Test
-    public void updateActualSet() throws Exception {
+    public void updateActualSet(Double weight, Double expectedWeight) throws Exception {
         ActualSet actualSet = Models.createActualSet(13L, 12L, 7);
+        actualSet.setWeight(weight);
         when(dao.updateActualSet(actualSet)).thenReturn(1);
         repository.updateActualSet(actualSet);
-        verify(dao).updateActualSet(actualSet);
+        verify(dao).updateActualSet(argThat(set ->
+                set == actualSet && ((set.getWeight() == null && expectedWeight == null) || set.getWeight().equals(expectedWeight))
+        ));
+    }
+
+    @Parameters(method = "invalidActualSetsForUpdate")
+    @Test(expected = IllegalArgumentException.class)
+    public void updateInvalidActualSet(ActualSet actualSet) throws Exception {
+        repository.updateActualSet(actualSet);
+    }
+
+    @NonNull
+    private static ActualSet[] invalidActualSetsForUpdate() {
+        ActualSet[] actualSets = new ActualSet[3];
+        System.arraycopy(invalidActualSets(), 0, actualSets, 0, 2);
+        actualSets[2] = Models.createActualSet(0L, 12L, 10);
+        return actualSets;
     }
 
     @Test

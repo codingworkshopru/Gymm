@@ -13,6 +13,7 @@ import java.util.concurrent.Executor;
 import ru.codingworkshop.gymm.data.entity.common.Model;
 import ru.codingworkshop.gymm.data.util.BiConsumer;
 import ru.codingworkshop.gymm.data.util.Consumer;
+import ru.codingworkshop.gymm.db.GymmDatabase;
 
 /**
  * Created by Радик on 28.07.2017.
@@ -34,7 +35,8 @@ class BaseRepository {
         performForCollection(entities, insert, BaseRepository::afterInsertion, check);
     }
 
-    <T> void update(T entity, Function<T, Integer> update, Consumer<T> check) {
+    <T extends Model> void update(T entity, Function<T, Integer> update, Consumer<T> check) {
+        Preconditions.checkArgument(GymmDatabase.isValidId(entity.getId()));
         perform(entity, update, null, check);
     }
 

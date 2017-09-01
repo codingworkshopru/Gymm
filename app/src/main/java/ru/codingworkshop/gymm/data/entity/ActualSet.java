@@ -33,7 +33,7 @@ public class ActualSet implements Model {
     private long id;
     private long actualExerciseId;
     private int reps;
-    private double weight;
+    private Double weight;
 
     public ActualSet(long actualExerciseId, int reps) {
         this.actualExerciseId = actualExerciseId;

@@ -78,6 +78,11 @@ public class ActualTrainingRepository extends BaseRepository {
     }
 
     private static void checkActualSet(@NonNull ActualSet actualSet) {
+        final Double weight = actualSet.getWeight();
+        if (weight != null && weight == 0.0) {
+            actualSet.setWeight(null);
+        }
+        Preconditions.checkArgument(actualSet.getReps() != 0);
         Preconditions.checkArgument(isValidId(actualSet.getActualExerciseId()));
     }
 }

@@ -15,6 +15,7 @@ import android.view.ViewGroup;
 import javax.inject.Inject;
 
 import ru.codingworkshop.gymm.R;
+import ru.codingworkshop.gymm.data.entity.ActualSet;
 import ru.codingworkshop.gymm.data.tree.node.ActualExerciseNode;
 import ru.codingworkshop.gymm.data.tree.node.ActualTrainingTree;
 import ru.codingworkshop.gymm.data.tree.node.ProgramExerciseNode;
@@ -66,23 +67,36 @@ public class ActualTrainingActivity extends LifecycleActivity {
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
 
         recyclerView.setAdapter(new BindingListAdapter<ActualExerciseNode, ActivityActualTrainingStepperItemBinding>(tree.getChildren()) {
-            ActivityActualTrainingStepperItemBinding activeView;
+            private ActivityActualTrainingStepperItemBinding activeView;
 
             @Override
             protected ActivityActualTrainingStepperItemBinding createBinding(ViewGroup parent) {
                 LayoutInflater inflater = LayoutInflater.from(ActualTrainingActivity.this);
                 ActivityActualTrainingStepperItemBinding binding = DataBindingUtil.inflate(inflater, R.layout.activity_actual_training_stepper_item, parent, false);
+                binding.getRoot().findViewById(R.id.stepperItemFinishSetButton).setOnClickListener(v -> {
+                    final ActualSetObservable actualSet = binding.getActualSet();
+                    viewModel.createActualSet(binding.getIndex(), actualSet.unwrap());
+                });
                 binding.getRoot().setOnClickListener(v -> {
                     if (binding == activeView) {
                         return;
                     }
-
                     viewModel.createActualExercise(recyclerView.getChildAdapterPosition(binding.getRoot()));
 
                     if (activeView != null) {
                         activeView.setActive(false);
                     }
+
                     binding.setActive(true);
+                    final ActualExerciseNode node = tree.getChildren().get(binding.getIndex());
+                    binding.setProgramSet(node.getProgramExerciseNode().getChildren().get(0));
+
+                    ActualSet actualSet = node.hasChildren()
+                            ? node.getChildren().get(0)
+                            : new ActualSet(node.getParent().getId(), 0);
+                    ActualSetObservable actualSetObservable = new ActualSetObservable(actualSet);
+                    binding.setActualSet(actualSetObservable);
+
                     activeView = binding;
                 });
                 return binding;
@@ -94,7 +108,7 @@ public class ActualTrainingActivity extends LifecycleActivity {
                 final int sortOrder = programExerciseNode.getSortOrder();
                 binding.setFirst(sortOrder == 0);
                 binding.setLast(sortOrder == tree.getChildren().size() - 1);
-                binding.setIndex(sortOrder + 1);
+                binding.setIndex(sortOrder);
                 binding.setTitle(programExerciseNode.getExercise().getName());
             }
         });
@@ -105,3 +119,4 @@ public class ActualTrainingActivity extends LifecycleActivity {
         toolbar.setTitle(title);
     }
 }
+

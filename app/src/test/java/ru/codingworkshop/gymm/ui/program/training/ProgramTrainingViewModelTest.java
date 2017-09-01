@@ -46,7 +46,7 @@ public class ProgramTrainingViewModelTest {
 
         when(repository.getProgramTrainingById(1L)).thenReturn(Models.createLiveProgramTraining(1L, "foo", false));
         when(repository.getProgramExercisesForTraining(1L)).thenReturn(Models.createLiveProgramExercises(3));
-        when(repository.getProgramSetsForTraining(1L)).thenReturn(Models.createLiveProgramSets(3));
+        when(repository.getProgramSetsForTraining(1L)).thenReturn(Models.createLiveProgramSets(2L, 3));
         when(exercisesRepository.getExercisesForProgramTraining(1L)).thenReturn(Models.createLiveExercises("foobar", "bar", "baz"));
     }
 

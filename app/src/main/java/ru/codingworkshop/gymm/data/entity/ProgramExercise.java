@@ -34,7 +34,7 @@ import static android.arch.persistence.room.ForeignKey.CASCADE;
                 @Index("exerciseId")
         }
 )
-public class ProgramExercise implements ProgramExerciseInterface {
+public class ProgramExercise implements IProgramExercise {
     @PrimaryKey(autoGenerate = true)
     private long id;
     private long programTrainingId;

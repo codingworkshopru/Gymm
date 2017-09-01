@@ -51,6 +51,11 @@
     <string name="exercises_picker_activity_primary">Основные</string>
     <string name="exercises_picker_activity_secondary">С задействованием</string>
 
+    <!-- actual training activity -->
+    <string name="actual_training_activity_stepper_item_weight">Вес</string>
+    <string name="actual_training_activity_stepper_item_reps">Повторения</string>
+    <string name="actual_training_activity_stepper_item_finish_set">Завершить подход</string>
+
     <!-- notification -->
     <string name="notification_time_till_rest_finish">Время до конца отдыха: </string>
     <string name="notification_rest_finished">Пора продолжить тренировку!</string>

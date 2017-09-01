@@ -38,7 +38,7 @@ public class ProgramTrainingDataSourceTest {
     public void test() throws Exception {
         final LiveData<ProgramTraining> liveProgramTraining = Models.createLiveProgramTraining(1L, "foo", false);
         final LiveData<List<ProgramExercise>> liveProgramExercises = Models.createLiveProgramExercises(1);
-        final LiveData<List<ProgramSet>> liveProgramSets = Models.createLiveProgramSets(1);
+        final LiveData<List<ProgramSet>> liveProgramSets = Models.createLiveProgramSets(2L, 1);
         final LiveData<List<Exercise>> liveExercises = Models.createLiveExercises("foobar", "baz");
 
         when(repository.getProgramTrainingById(1L)).thenReturn(liveProgramTraining);
