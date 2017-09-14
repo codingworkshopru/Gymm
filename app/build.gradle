@@ -32,7 +32,7 @@ android {
 }
 
 ext {
-    support = "26.0.1"
+    support = "26.0.2"
     constraint = "1.0.2"
     arch = "1.0.0-alpha9"
 
@@ -49,7 +49,10 @@ ext {
     junit_params = "1.1.0"
 }
 
+
+
 dependencies {
+    implementation 'com.android.support:support-v4:26.0.2'
     compile fileTree(dir: "libs", include: ["*.jar"])
 
     compile "com.android.support:support-annotations:$support"
@@ -84,6 +87,7 @@ dependencies {
 //    testCompile "com.squareup.leakcanary:leakcanary-android-no-op:$leakcanary"
     testCompile "android.arch.core:core-testing:$arch"
 
+    androidTestCompile "pl.pragmatists:JUnitParams:$junit_params"
     androidTestCompile "com.android.support:appcompat-v7:$support"
     androidTestCompile "com.android.support:recyclerview-v7:$support"
     androidTestCompile "com.android.support:support-v4:$support"

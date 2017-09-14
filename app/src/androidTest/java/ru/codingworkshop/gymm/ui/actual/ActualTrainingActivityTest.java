@@ -16,7 +16,6 @@ import android.support.test.rule.ActivityTestRule;
 import android.support.test.runner.AndroidJUnit4;
 import android.support.v4.content.ContextCompat;
 import android.view.View;
-import android.widget.EditText;
 
 import org.hamcrest.Description;
 import org.hamcrest.Matcher;
@@ -42,6 +41,7 @@ import ru.codingworkshop.gymm.util.RecyclerViewItemMatcher;
 
 import static android.support.test.espresso.Espresso.onView;
 import static android.support.test.espresso.action.ViewActions.click;
+import static android.support.test.espresso.action.ViewActions.swipeLeft;
 import static android.support.test.espresso.action.ViewActions.typeText;
 import static android.support.test.espresso.assertion.ViewAssertions.matches;
 import static android.support.test.espresso.matcher.ViewMatchers.isDisplayed;
@@ -149,38 +149,53 @@ public class ActualTrainingActivityTest {
     @Test
     public void verifyVerticalLinesOnMultipleItems() throws Exception {
         buildTree(2);
-        onView(RecyclerViewItemMatcher.itemAtPosition(R.id.stepperItemTopLine, 0)).check(matches(not(isDisplayed())));
-        onView(RecyclerViewItemMatcher.itemAtPosition(R.id.stepperItemBottomLine, 0)).check(matches(isDisplayed()));
-        onView(RecyclerViewItemMatcher.itemAtPosition(R.id.stepperItemTopLine, 1)).check(matches(isDisplayed()));
-        onView(RecyclerViewItemMatcher.itemAtPosition(R.id.stepperItemBottomLine, 1)).check(matches(not(isDisplayed())));
+        onView(iap(R.id.stepperItemTopLine, 0)).check(matches(not(isDisplayed())));
+        onView(iap(R.id.stepperItemBottomLine, 0)).check(matches(isDisplayed()));
+        onView(iap(R.id.stepperItemTopLine, 1)).check(matches(isDisplayed()));
+        onView(iap(R.id.stepperItemBottomLine, 1)).check(matches(not(isDisplayed())));
+    }
+
+    @Test
+    public void actualSetsSlideTest() throws Exception {
+        final int exercisesCount = 3;
+        buildTree(exercisesCount);
+
+        for (int exerciseIndex = 0; exerciseIndex < exercisesCount; exerciseIndex++) {
+            onView(withId(R.id.actualExerciseSteps)).perform(RecyclerViewActions.actionOnItemAtPosition(exerciseIndex, click()));
+            onView(both(withId(R.id.actualSetIndex)).and(isDisplayed())).check(matches(withText("1")));
+            for (int setIndex = 2; setIndex < 6; setIndex++) {
+                onView(both(withId(R.id.stepperItemActualSetsContainer)).and(isDisplayed())).perform(swipeLeft());
+                onView(both(withId(R.id.actualSetIndex)).and(isDisplayed())).check(matches(withText(Integer.toString(setIndex))));
+            }
+        }
     }
 
     @Test
     public void verifyActiveStatusSet() throws Exception {
         buildTree(2);
-        final int reps = tree.getChildren().get(0).getProgramExerciseNode().getChildren().get(0).getReps();
 
         onView(withId(R.id.actualExerciseSteps)).perform(RecyclerViewActions.actionOnItemAtPosition(0, click()));
-        match(R.id.stepperItemCircle, hasBackground(R.drawable.ic_circle_primary_24dp), hasBackground(R.drawable.ic_circle_grey_24dp));
-        match(R.id.stepperItemWeightEditText, isDisplayed(), not(isDisplayed()));
-        match(R.id.stepperItemRepsEditText, isDisplayed(), not(isDisplayed()));
-        match(R.id.stepperItemFinishSetButton, isDisplayed(), not(isDisplayed()));
-        onView(both(withHint(Integer.toString(reps))).and(iap(R.id.stepperItemRepsEditText, 0))).check(matches(isDisplayed()));
+
+        assertItemAtPositionIsActive(0);
+        assertItemAtPositionIsInactive(1);
 
         onView(withId(R.id.actualExerciseSteps)).perform(RecyclerViewActions.actionOnItemAtPosition(1, click()));
-        match(R.id.stepperItemCircle, hasBackground(R.drawable.ic_circle_grey_24dp), hasBackground(R.drawable.ic_circle_primary_24dp));
-        match(R.id.stepperItemWeightEditText, not(isDisplayed()), isDisplayed());
-        match(R.id.stepperItemRepsEditText, not(isDisplayed()), isDisplayed());
-        match(R.id.stepperItemFinishSetButton, not(isDisplayed()), isDisplayed());
-        onView(both(withHint(Integer.toString(reps))).and(iap(R.id.stepperItemRepsEditText, 1))).check(matches(isDisplayed()));
+
+        assertItemAtPositionIsActive(1);
+        assertItemAtPositionIsInactive(0);
 
         verify(vm).createActualExercise(0);
         verify(vm).createActualExercise(1);
     }
 
-    private void match(int id, Matcher<View> matcher1, Matcher<View> matcher2) {
-        onView(iap(id, 0)).check(matches(matcher1));
-        onView(iap(id, 1)).check(matches(matcher2));
+    private void assertItemAtPositionIsActive(int position) {
+        onView(iap(R.id.stepperItemCircle, position)).check(matches(hasBackground(R.drawable.ic_circle_primary_24dp)));
+        onView(iap(R.id.stepperItemActualSetsContainer, position)).check(matches(isDisplayed()));
+    }
+
+    private void assertItemAtPositionIsInactive(int position) {
+        onView(iap(R.id.stepperItemCircle, position)).check(matches(hasBackground(R.drawable.ic_circle_grey_24dp)));
+        onView(iap(R.id.stepperItemActualSetsContainer, position)).check(matches(not(isDisplayed())));
     }
 
     @NonNull
@@ -193,27 +208,12 @@ public class ActualTrainingActivityTest {
         buildTree(1);
         onView(withId(R.id.actualExerciseSteps)).perform(RecyclerViewActions.actionOnItemAtPosition(0, click()));
 
-        onView(withId(R.id.stepperItemWeightEditText)).perform(typeText("5.125"));
-        onView(withId(R.id.stepperItemRepsEditText)).perform(typeText("10"));
+        onView(withId(R.id.actualSetWeightEditText)).perform(typeText("5.125"));
+        onView(withId(R.id.actualSetRepsCountEditText)).perform(typeText("10"));
 
-        onView(withId(R.id.stepperItemFinishSetButton)).perform(click());
+        onView(withId(R.id.actualSetDoneButton)).perform(click());
 
         verify(vm).createActualSet(eq(0), argThat(s -> s.getReps() == 10 && s.getWeight() == 5.125));
-    }
-
-    private static Matcher<View> withHint(String hint) {
-        return new BoundedMatcher<View, EditText>(EditText.class) {
-
-            @Override
-            public void describeTo(Description description) {
-                description.appendText("is matches to specified hint");
-            }
-
-            @Override
-            protected boolean matchesSafely(EditText item) {
-                return hint.equals(item.getHint());
-            }
-        };
     }
 
     private static Matcher<View> hasBackground(@DrawableRes int drawableId) {

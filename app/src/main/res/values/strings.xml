@@ -27,7 +27,6 @@
     <!-- program exercise activity -->
     <string name="program_exercise_activity_title">Упражнение</string>
     <!-- layout items -->
-    <string name="program_exercise_activity_reps_label">Повторения</string>
     <string name="program_exercise_activity_rest_time_minutes_label">Минуты</string>
     <string name="program_exercise_activity_rest_time_seconds_label">Секунды</string>
     <string name="program_exercise_activity_empty_list">Вы ещё не добавили подходы</string>
@@ -53,7 +52,6 @@
 
     <!-- actual training activity -->
     <string name="actual_training_activity_stepper_item_weight">Вес</string>
-    <string name="actual_training_activity_stepper_item_reps">Повторения</string>
     <string name="actual_training_activity_stepper_item_finish_set">Завершить подход</string>
 
     <!-- notification -->
@@ -61,6 +59,7 @@
     <string name="notification_rest_finished">Пора продолжить тренировку!</string>
 
     <!-- common -->
+    <string name="reps">Повторения</string>
     <string name="bullet" translatable="false">•</string>
     <string name="no_button_text">Нет</string>
     <string name="save_button_text">Сохранить</string>
@@ -92,4 +91,7 @@
         <item quantity="other">%d секунд</item>
     </plurals>
     <string name="title_activity_actual_training">ActualTrainingActivity</string>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
 </resources>

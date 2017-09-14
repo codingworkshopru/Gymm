@@ -6,12 +6,6 @@
         <import type="android.view.View" />
         <import type="ru.codingworkshop.gymm.R.style" alias="style" />
         <variable
-            name="programSet"
-            type="ru.codingworkshop.gymm.data.entity.ProgramSet" />
-        <variable
-            name="actualSet"
-            type="ru.codingworkshop.gymm.ui.actual.ActualSetObservable" />
-        <variable
             name="index"
             type="int" />
         <variable
@@ -50,7 +44,7 @@
             android:visibility="@{first ? View.INVISIBLE : View.VISIBLE}"
             app:layout_constraintBottom_toTopOf="@+id/stepperItemCircle"
             app:layout_constraintLeft_toLeftOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintTop_toTopOf="parent" android:layout_marginStart="36dp" />
 
         <ImageView
             android:id="@+id/stepperItemCircle"
@@ -83,6 +77,7 @@
             android:layout_height="0dp"
             android:layout_marginBottom="0dp"
             android:layout_marginLeft="36dp"
+            android:layout_marginStart="36dp"
             android:layout_marginTop="8dp"
             android:background="@color/color_material_grey_400"
             android:visibility="@{last ? View.INVISIBLE : View.VISIBLE}"
@@ -112,6 +107,7 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginEnd="8dp"
+            android:layout_marginRight="8dp"
             android:ellipsize="end"
             android:text="@{summarise}"
             android:textAppearance="@style/TextAppearance.AppCompat.Caption"
@@ -120,66 +116,6 @@
             app:layout_constraintStart_toStartOf="@+id/stepperItemTitle"
             app:layout_constraintTop_toBottomOf="@+id/stepperItemTitle"
             tools:text="Summary if needed"
-            tools:visibility="visible"
-            android:layout_marginRight="8dp" />
-
-        <android.support.design.widget.TextInputLayout
-            android:id="@+id/textInputLayout3"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginEnd="24dp"
-            android:layout_marginTop="16dp"
-            android:visibility="@{active ? View.VISIBLE : View.GONE}"
-            app:layout_constraintEnd_toStartOf="@+id/textInputLayout4"
-            app:layout_constraintStart_toEndOf="@+id/stepperItemBottomLine"
-            app:layout_constraintStart_toStartOf="@+id/stepperItemSubtitle"
-            app:layout_constraintTop_toBottomOf="@+id/stepperItemSubtitle"
-            tools:visibility="visible"
-            android:layout_marginRight="24dp">
-
-            <android.support.design.widget.TextInputEditText
-                android:id="@+id/stepperItemWeightEditText"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:hint="@string/actual_training_activity_stepper_item_weight"
-                android:inputType="numberDecimal"
-                android:text="@={actualSet.weight}"
-                tools:text="5.125" />
-        </android.support.design.widget.TextInputLayout>
-
-        <android.support.design.widget.TextInputLayout
-            android:id="@+id/textInputLayout4"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginEnd="8dp"
-            android:visibility="@{active ? View.VISIBLE : View.GONE}"
-            app:layout_constraintEnd_toStartOf="@+id/guideline4"
-            app:layout_constraintStart_toEndOf="@+id/textInputLayout3"
-            app:layout_constraintTop_toTopOf="@+id/textInputLayout3"
-            tools:visibility="visible"
-            android:layout_marginRight="8dp">
-
-            <android.support.design.widget.TextInputEditText
-                android:id="@+id/stepperItemRepsEditText"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:hint="@{programSet != null ? Integer.toString(programSet.reps) : @string/actual_training_activity_stepper_item_reps}"
-                android:text="@={actualSet.reps}"
-                tools:hint="3"/>
-        </android.support.design.widget.TextInputLayout>
-
-        <Button
-            android:id="@+id/stepperItemFinishSetButton"
-            style="@style/Widget.AppCompat.Button.Colored"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="32dp"
-            android:layout_marginTop="8dp"
-            android:text="@string/actual_training_activity_stepper_item_finish_set"
-            android:visibility="@{active ? View.VISIBLE : View.GONE}"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintStart_toStartOf="@+id/textInputLayout3"
-            app:layout_constraintTop_toBottomOf="@+id/textInputLayout3"
             tools:visibility="visible" />
 
         <android.support.constraint.Guideline
@@ -188,6 +124,22 @@
             android:layout_height="wrap_content"
             android:orientation="vertical"
             app:layout_constraintGuide_end="16dp" />
+
+        <FrameLayout
+            android:id="@+id/stepperItemActualSetsContainer"
+            android:visibility="@{active ? View.VISIBLE : View.GONE}"
+            android:layout_width="0dp"
+            android:layout_height="200dp"
+            android:layout_marginBottom="24dp"
+            android:layout_marginEnd="0dp"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="8dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toStartOf="@+id/guideline4"
+            app:layout_constraintStart_toEndOf="@+id/stepperItemIndex"
+            app:layout_constraintTop_toBottomOf="@+id/stepperItemSubtitle">
+
+        </FrameLayout>
 
     </android.support.constraint.ConstraintLayout>
 </layout>

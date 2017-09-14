@@ -6,16 +6,24 @@ import android.arch.lifecycle.ViewModelProviders;
 import android.databinding.DataBindingUtil;
 import android.os.Bundle;
 import android.support.annotation.VisibleForTesting;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentPagerAdapter;
+import android.support.v4.view.ViewPager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
+import android.view.View;
 import android.view.ViewGroup;
+import android.widget.FrameLayout;
+
+import java.util.List;
 
 import javax.inject.Inject;
 
 import ru.codingworkshop.gymm.R;
-import ru.codingworkshop.gymm.data.entity.ActualSet;
+import ru.codingworkshop.gymm.data.entity.ProgramSet;
 import ru.codingworkshop.gymm.data.tree.node.ActualExerciseNode;
 import ru.codingworkshop.gymm.data.tree.node.ActualTrainingTree;
 import ru.codingworkshop.gymm.data.tree.node.ProgramExerciseNode;
@@ -31,6 +39,8 @@ public class ActualTrainingActivity extends LifecycleActivity {
 
     @VisibleForTesting(otherwise = VisibleForTesting.PACKAGE_PRIVATE)
     @Inject public ViewModelProvider.Factory viewModelFactory;
+    private MyFragmentPagerAdapter fragmentPagerAdapter;
+    private ViewPager viewPager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -62,6 +72,15 @@ public class ActualTrainingActivity extends LifecycleActivity {
     }
 
     private void initViews() {
+        fragmentPagerAdapter = new MyFragmentPagerAdapter(getSupportFragmentManager(), tree);
+        viewPager = new ViewPager(this);
+        viewPager.setId(View.generateViewId());
+        ViewPager.LayoutParams layoutParams = new ViewPager.LayoutParams();
+        layoutParams.height = ViewPager.LayoutParams.MATCH_PARENT;
+        layoutParams.width = ViewPager.LayoutParams.MATCH_PARENT;
+        viewPager.setLayoutParams(layoutParams);
+        viewPager.setAdapter(fragmentPagerAdapter);
+
         setToolbarTitle(tree.getProgramTraining().getName());
         RecyclerView recyclerView = findViewById(R.id.actualExerciseSteps);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
@@ -73,10 +92,7 @@ public class ActualTrainingActivity extends LifecycleActivity {
             protected ActivityActualTrainingStepperItemBinding createBinding(ViewGroup parent) {
                 LayoutInflater inflater = LayoutInflater.from(ActualTrainingActivity.this);
                 ActivityActualTrainingStepperItemBinding binding = DataBindingUtil.inflate(inflater, R.layout.activity_actual_training_stepper_item, parent, false);
-                binding.getRoot().findViewById(R.id.stepperItemFinishSetButton).setOnClickListener(v -> {
-                    final ActualSetObservable actualSet = binding.getActualSet();
-                    viewModel.createActualSet(binding.getIndex(), actualSet.unwrap());
-                });
+
                 binding.getRoot().setOnClickListener(v -> {
                     if (binding == activeView) {
                         return;
@@ -85,20 +101,20 @@ public class ActualTrainingActivity extends LifecycleActivity {
 
                     if (activeView != null) {
                         activeView.setActive(false);
+                        FrameLayout layout = activeView.getRoot().findViewById(R.id.stepperItemActualSetsContainer);
+                        layout.removeView(viewPager);
                     }
 
-                    binding.setActive(true);
-                    final ActualExerciseNode node = tree.getChildren().get(binding.getIndex());
-                    binding.setProgramSet(node.getProgramExerciseNode().getChildren().get(0));
+                    FrameLayout layout = binding.getRoot().findViewById(R.id.stepperItemActualSetsContainer);
+                    layout.addView(viewPager);
+                    viewPager.setAdapter(new MyFragmentPagerAdapter(getSupportFragmentManager(), tree));
+//                    fragmentPagerAdapter.notifyDataSetChanged(binding.getIndex());
 
-                    ActualSet actualSet = node.hasChildren()
-                            ? node.getChildren().get(0)
-                            : new ActualSet(node.getParent().getId(), 0);
-                    ActualSetObservable actualSetObservable = new ActualSetObservable(actualSet);
-                    binding.setActualSet(actualSetObservable);
+                    binding.setActive(true);
 
                     activeView = binding;
                 });
+
                 return binding;
             }
 
@@ -117,6 +133,36 @@ public class ActualTrainingActivity extends LifecycleActivity {
     private void setToolbarTitle(String title) {
         Toolbar toolbar = findViewById(R.id.actualTrainingToolbar);
         toolbar.setTitle(title);
+    }
+
+    private static class MyFragmentPagerAdapter extends FragmentPagerAdapter {
+        private int exerciseIndex;
+        private ActualTrainingTree tree;
+
+        public MyFragmentPagerAdapter(FragmentManager fm, ActualTrainingTree tree) {
+            super(fm);
+            this.tree = tree;
+        }
+
+        @Override
+        public Fragment getItem(int position) {
+            final int reps = getProgramSets().get(position).getReps();
+            return ActualSetFragment.newInstance(position, getCount(), reps);
+        }
+
+        @Override
+        public int getCount() {
+            return getProgramSets().size();
+        }
+
+        private List<ProgramSet> getProgramSets() {
+            return tree.getChildren().get(exerciseIndex).getProgramExerciseNode().getChildren();
+        }
+
+        public void notifyDataSetChanged(int exerciseIndex) {
+            this.exerciseIndex = exerciseIndex;
+            notifyDataSetChanged();
+        }
     }
 }
 

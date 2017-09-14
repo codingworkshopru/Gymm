@@ -80,7 +80,7 @@
             android:id="@+id/textInputLayout2"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:hint="@string/program_exercise_activity_reps_label"
+            android:hint="@string/reps"
             app:layout_constraintLeft_toRightOf="@+id/textInputLayout"
             app:layout_constraintRight_toRightOf="parent"
             android:layout_marginRight="24dp"
