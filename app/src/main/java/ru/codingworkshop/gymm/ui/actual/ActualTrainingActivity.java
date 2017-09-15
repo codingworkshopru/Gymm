@@ -1,8 +1,10 @@
 package ru.codingworkshop.gymm.ui.actual;
 
+import android.annotation.SuppressLint;
 import android.arch.lifecycle.LifecycleActivity;
 import android.arch.lifecycle.ViewModelProvider;
 import android.arch.lifecycle.ViewModelProviders;
+import android.content.Context;
 import android.databinding.DataBindingUtil;
 import android.os.Bundle;
 import android.support.annotation.VisibleForTesting;
@@ -17,6 +19,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
+import android.widget.LinearLayout;
 
 import java.util.List;
 
@@ -71,13 +74,31 @@ public class ActualTrainingActivity extends LifecycleActivity {
         initViews();
     }
 
+    private static final class MyViewPager extends ViewPager {
+
+        public MyViewPager(Context context) {
+            super(context);
+        }
+
+        @Override
+        protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
+            View child = getChildAt(0);
+            if (child != null) {
+                int childHeightMeasureSpec = MeasureSpec.makeMeasureSpec(0, MeasureSpec.UNSPECIFIED);
+                child.measure(widthMeasureSpec, childHeightMeasureSpec);
+                heightMeasureSpec = MeasureSpec.makeMeasureSpec(child.getMeasuredHeight(), MeasureSpec.EXACTLY);
+            }
+            super.onMeasure(widthMeasureSpec, heightMeasureSpec);
+        }
+    }
+
+    @SuppressLint("NewApi")
     private void initViews() {
         fragmentPagerAdapter = new MyFragmentPagerAdapter(getSupportFragmentManager(), tree);
-        viewPager = new ViewPager(this);
+        viewPager = new MyViewPager(this);
         viewPager.setId(View.generateViewId());
-        ViewPager.LayoutParams layoutParams = new ViewPager.LayoutParams();
-        layoutParams.height = ViewPager.LayoutParams.MATCH_PARENT;
-        layoutParams.width = ViewPager.LayoutParams.MATCH_PARENT;
+
+        LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, 0, 1f);
         viewPager.setLayoutParams(layoutParams);
         viewPager.setAdapter(fragmentPagerAdapter);
 
@@ -107,8 +128,9 @@ public class ActualTrainingActivity extends LifecycleActivity {
 
                     FrameLayout layout = binding.getRoot().findViewById(R.id.stepperItemActualSetsContainer);
                     layout.addView(viewPager);
-                    viewPager.setAdapter(new MyFragmentPagerAdapter(getSupportFragmentManager(), tree));
-//                    fragmentPagerAdapter.notifyDataSetChanged(binding.getIndex());
+                    final MyFragmentPagerAdapter adapter = new MyFragmentPagerAdapter(getSupportFragmentManager(), tree);
+                    viewPager.setAdapter(adapter);
+                    adapter.notifyDataSetChanged(binding.getIndex());
 
                     binding.setActive(true);
 
@@ -146,8 +168,9 @@ public class ActualTrainingActivity extends LifecycleActivity {
 
         @Override
         public Fragment getItem(int position) {
-            final int reps = getProgramSets().get(position).getReps();
-            return ActualSetFragment.newInstance(position, getCount(), reps);
+            int reps = getProgramSets().get(position).getReps();
+            boolean isWithWeight = tree.getChildren().get(exerciseIndex).getProgramExerciseNode().getExercise().isWithWeight();
+            return ActualSetFragment.newInstance(position, getCount(), isWithWeight, reps);
         }
 
         @Override

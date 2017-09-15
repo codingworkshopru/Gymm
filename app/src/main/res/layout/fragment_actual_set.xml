@@ -1,8 +1,7 @@
 <layout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
-    tools:context="ru.codingworkshop.gymm.ui.actual.ActualSetFragment">
+    xmlns:tools="http://schemas.android.com/tools">
 
     <data>
         <variable
@@ -20,7 +19,8 @@
 
     <android.support.constraint.ConstraintLayout
         android:layout_width="match_parent"
-        android:layout_height="210dp"
+        android:layout_height="wrap_content"
+        tools:context="ru.codingworkshop.gymm.ui.actual.ActualSetFragment"
         tools:layout_editor_absoluteX="0dp"
         tools:layout_editor_absoluteY="0dp">
 
@@ -28,66 +28,74 @@
             android:id="@+id/actualSetIndex"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginLeft="8dp"
-            android:layout_marginStart="8dp"
+            android:layout_marginEnd="4dp"
             android:layout_marginTop="8dp"
-            android:text="@{Integer.toString(index + 1)}"
-            app:layout_constraintEnd_toStartOf="@+id/actualSetProgramSetsCount"
-            app:layout_constraintHorizontal_bias="0.5"
-            app:layout_constraintStart_toStartOf="parent"
+            android:text="@{@plurals/number_of_sets(index + 1, index + 1)}"
+            app:layout_constraintEnd_toStartOf="@+id/actualSetOutOfTextView"
             app:layout_constraintTop_toTopOf="parent"
-            tools:text="1" />
+            tools:text="1 подход" />
+
+        <TextView
+            android:id="@+id/actualSetOutOfTextView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="4dp"
+            android:layout_marginTop="8dp"
+            android:text="@string/out_of"
+            app:layout_constraintEnd_toStartOf="@+id/actualSetProgramSetsCount"
+            app:layout_constraintTop_toTopOf="parent" />
 
         <TextView
             android:id="@+id/actualSetProgramSetsCount"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginEnd="8dp"
-            android:layout_marginRight="8dp"
             android:layout_marginTop="8dp"
             android:text="@{Integer.toString(setsCount)}"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.5"
-            app:layout_constraintStart_toEndOf="@+id/actualSetIndex"
             app:layout_constraintTop_toTopOf="parent"
             tools:text="5" />
-
-        <android.support.design.widget.TextInputLayout
-            android:id="@+id/actualSetWeightLayout"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginEnd="8dp"
-            android:layout_marginStart="8dp"
-            android:layout_marginTop="8dp"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/actualSetIndex">
-
-            <android.support.design.widget.TextInputEditText
-                android:id="@+id/actualSetWeightEditText"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:hint="@string/actual_training_activity_stepper_item_weight" />
-        </android.support.design.widget.TextInputLayout>
 
         <android.support.design.widget.TextInputLayout
             android:id="@+id/actualSetRepsCountLayout"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginEnd="8dp"
             android:layout_marginStart="8dp"
             android:layout_marginTop="8dp"
-            app:layout_constraintEnd_toEndOf="parent"
+            app:errorEnabled="true"
+            app:layout_constraintEnd_toStartOf="@+id/actualSetWeightLayout"
+            app:layout_constraintHorizontal_bias="0.5"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/actualSetWeightLayout">
+            app:layout_constraintTop_toBottomOf="@+id/actualSetIndex">
 
             <android.support.design.widget.TextInputEditText
                 android:id="@+id/actualSetRepsCountEditText"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:hint="@string/reps"
+                android:inputType="number"
                 android:text="@{reps.toString()}"
                 tools:text="10" />
+        </android.support.design.widget.TextInputLayout>
+
+        <android.support.design.widget.TextInputLayout
+            android:id="@+id/actualSetWeightLayout"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="8dp"
+            android:layout_marginTop="8dp"
+            app:errorEnabled="true"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintStart_toEndOf="@+id/actualSetRepsCountLayout"
+            app:layout_constraintTop_toBottomOf="@+id/actualSetIndex">
+
+            <android.support.design.widget.TextInputEditText
+                android:id="@+id/actualSetWeightEditText"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="@string/actual_training_activity_stepper_item_weight"
+                android:inputType="numberDecimal" />
         </android.support.design.widget.TextInputLayout>
 
         <Button

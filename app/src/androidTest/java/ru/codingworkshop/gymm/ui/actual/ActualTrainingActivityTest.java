@@ -9,6 +9,7 @@ import android.graphics.drawable.Drawable;
 import android.support.annotation.DrawableRes;
 import android.support.annotation.NonNull;
 import android.support.test.InstrumentationRegistry;
+import android.support.test.espresso.Espresso;
 import android.support.test.espresso.contrib.RecyclerViewActions;
 import android.support.test.espresso.matcher.BoundedMatcher;
 import android.support.test.filters.LargeTest;
@@ -27,6 +28,7 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
 import java.util.List;
+import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 import ru.codingworkshop.gymm.R;
@@ -160,12 +162,17 @@ public class ActualTrainingActivityTest {
         final int exercisesCount = 3;
         buildTree(exercisesCount);
 
+        Consumer<Integer> actualSetIndexValidator = i -> {
+            String sets = InstrumentationRegistry.getTargetContext().getResources().getQuantityString(R.plurals.number_of_sets, i, i);
+            onView(both(withId(R.id.actualSetIndex)).and(isDisplayed())).check(matches(withText(sets)));
+        };
+
         for (int exerciseIndex = 0; exerciseIndex < exercisesCount; exerciseIndex++) {
             onView(withId(R.id.actualExerciseSteps)).perform(RecyclerViewActions.actionOnItemAtPosition(exerciseIndex, click()));
-            onView(both(withId(R.id.actualSetIndex)).and(isDisplayed())).check(matches(withText("1")));
+            actualSetIndexValidator.accept(1);
             for (int setIndex = 2; setIndex < 6; setIndex++) {
                 onView(both(withId(R.id.stepperItemActualSetsContainer)).and(isDisplayed())).perform(swipeLeft());
-                onView(both(withId(R.id.actualSetIndex)).and(isDisplayed())).check(matches(withText(Integer.toString(setIndex))));
+                actualSetIndexValidator.accept(setIndex);
             }
         }
     }
@@ -208,10 +215,13 @@ public class ActualTrainingActivityTest {
         buildTree(1);
         onView(withId(R.id.actualExerciseSteps)).perform(RecyclerViewActions.actionOnItemAtPosition(0, click()));
 
-        onView(withId(R.id.actualSetWeightEditText)).perform(typeText("5.125"));
-        onView(withId(R.id.actualSetRepsCountEditText)).perform(typeText("10"));
+        onView(both(withId(R.id.actualSetWeightEditText)).and(isDisplayed())).perform(typeText("5.125"));
+        onView(both(withId(R.id.actualSetRepsCountEditText)).and(isDisplayed())).perform(typeText("10"));
 
-        onView(withId(R.id.actualSetDoneButton)).perform(click());
+        Espresso.closeSoftKeyboard();
+        onView(both(withId(R.id.actualSetDoneButton)).and(isDisplayed())).perform(click());
+
+        activityRule.getActivity();
 
         verify(vm).createActualSet(eq(0), argThat(s -> s.getReps() == 10 && s.getWeight() == 5.125));
     }

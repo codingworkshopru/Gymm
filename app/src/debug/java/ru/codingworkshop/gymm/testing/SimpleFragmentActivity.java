@@ -27,4 +27,11 @@ public class SimpleFragmentActivity extends AppCompatActivity {
                 .add(R.id.container, fragment)
                 .commit();
     }
+
+    public void replaceFragment(Fragment fragment) {
+        getSupportFragmentManager()
+                .beginTransaction()
+                .replace(R.id.container, fragment)
+                .commit();
+    }
 }

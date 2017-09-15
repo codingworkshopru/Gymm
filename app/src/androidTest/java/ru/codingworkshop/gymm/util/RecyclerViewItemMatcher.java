@@ -1,6 +1,7 @@
 package ru.codingworkshop.gymm.util;
 
 import android.support.annotation.IdRes;
+import android.support.annotation.LayoutRes;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
 
@@ -12,14 +13,13 @@ import org.hamcrest.TypeSafeMatcher;
  * Created by Радик on 01.09.2017 as part of the Gymm project.
  */
 public final class RecyclerViewItemMatcher {
-    private static @IdRes
-    int recyclerViewId;
+    private static @IdRes int recyclerViewId;
 
     public static int getRecyclerViewId() {
         return recyclerViewId;
     }
 
-    public static void setRecyclerViewId(int recyclerViewId) {
+    public static void setRecyclerViewId(@LayoutRes int recyclerViewId) {
         RecyclerViewItemMatcher.recyclerViewId = recyclerViewId;
     }
 

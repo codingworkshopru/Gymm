@@ -127,13 +127,13 @@
 
         <FrameLayout
             android:id="@+id/stepperItemActualSetsContainer"
-            android:visibility="@{active ? View.VISIBLE : View.GONE}"
             android:layout_width="0dp"
-            android:layout_height="200dp"
+            android:layout_height="wrap_content"
             android:layout_marginBottom="24dp"
             android:layout_marginEnd="0dp"
             android:layout_marginStart="8dp"
             android:layout_marginTop="8dp"
+            android:visibility="@{active ? View.VISIBLE : View.GONE}"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toStartOf="@+id/guideline4"
             app:layout_constraintStart_toEndOf="@+id/stepperItemIndex"
