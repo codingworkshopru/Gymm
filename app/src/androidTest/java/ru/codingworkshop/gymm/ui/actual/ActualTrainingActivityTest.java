@@ -7,6 +7,7 @@ import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.drawable.Drawable;
 import android.support.annotation.DrawableRes;
+import android.support.annotation.IdRes;
 import android.support.annotation.NonNull;
 import android.support.test.InstrumentationRegistry;
 import android.support.test.espresso.Espresso;
@@ -16,10 +17,16 @@ import android.support.test.filters.LargeTest;
 import android.support.test.rule.ActivityTestRule;
 import android.support.test.runner.AndroidJUnit4;
 import android.support.v4.content.ContextCompat;
+import android.support.v4.view.ViewPager;
+import android.support.v7.widget.RecyclerView;
 import android.view.View;
+import android.view.ViewGroup;
+
+import com.google.common.collect.Lists;
 
 import org.hamcrest.Description;
 import org.hamcrest.Matcher;
+import org.hamcrest.TypeSafeMatcher;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -28,8 +35,6 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
 import java.util.List;
-import java.util.function.Consumer;
-import java.util.stream.Collectors;
 
 import ru.codingworkshop.gymm.R;
 import ru.codingworkshop.gymm.data.entity.ActualExercise;
@@ -37,11 +42,13 @@ import ru.codingworkshop.gymm.data.tree.node.ActualExerciseNode;
 import ru.codingworkshop.gymm.data.tree.node.ActualTrainingTree;
 import ru.codingworkshop.gymm.data.tree.node.ImmutableProgramExerciseNode;
 import ru.codingworkshop.gymm.data.tree.node.ProgramExerciseNode;
+import ru.codingworkshop.gymm.data.util.Consumer;
 import ru.codingworkshop.gymm.testing.ActualTrainingActivityIsolated;
 import ru.codingworkshop.gymm.util.Models;
 import ru.codingworkshop.gymm.util.RecyclerViewItemMatcher;
 
 import static android.support.test.espresso.Espresso.onView;
+import static android.support.test.espresso.action.ViewActions.clearText;
 import static android.support.test.espresso.action.ViewActions.click;
 import static android.support.test.espresso.action.ViewActions.swipeLeft;
 import static android.support.test.espresso.action.ViewActions.typeText;
@@ -51,7 +58,6 @@ import static android.support.test.espresso.matcher.ViewMatchers.withId;
 import static android.support.test.espresso.matcher.ViewMatchers.withParent;
 import static android.support.test.espresso.matcher.ViewMatchers.withText;
 import static org.hamcrest.Matchers.allOf;
-import static org.hamcrest.Matchers.both;
 import static org.hamcrest.Matchers.not;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.argThat;
@@ -95,7 +101,7 @@ public class ActualTrainingActivityTest {
     private ActualTrainingTree tree;
 
     private void buildTree(int size) {
-        List<ActualExerciseNode> actualExerciseNodes = Models.createProgramExercises(size).stream().map(pe -> {
+        List<ActualExerciseNode> actualExerciseNodes = Lists.transform( Models.createProgramExercises(size), pe -> {
             ProgramExerciseNode peNode = new ImmutableProgramExerciseNode(pe);
 
             peNode.setChildren(Models.createProgramSets(pe.getId(), 5));
@@ -106,7 +112,7 @@ public class ActualTrainingActivityTest {
             ActualExerciseNode node = new ActualExerciseNode();
             node.setProgramExerciseNode(peNode);
             return node;
-        }).collect(Collectors.toList());
+        });
         tree.setProgramTraining(Models.createProgramTraining(1L, "foo"));
         tree.setChildren(actualExerciseNodes);
 
@@ -164,14 +170,14 @@ public class ActualTrainingActivityTest {
 
         Consumer<Integer> actualSetIndexValidator = i -> {
             String sets = InstrumentationRegistry.getTargetContext().getResources().getQuantityString(R.plurals.number_of_sets, i, i);
-            onView(both(withId(R.id.actualSetIndex)).and(isDisplayed())).check(matches(withText(sets)));
+            onView(currentPageItem(R.id.actualSetIndex)).check(matches(withText(sets)));
         };
 
         for (int exerciseIndex = 0; exerciseIndex < exercisesCount; exerciseIndex++) {
             onView(withId(R.id.actualExerciseSteps)).perform(RecyclerViewActions.actionOnItemAtPosition(exerciseIndex, click()));
             actualSetIndexValidator.accept(1);
             for (int setIndex = 2; setIndex < 6; setIndex++) {
-                onView(both(withId(R.id.stepperItemActualSetsContainer)).and(isDisplayed())).perform(swipeLeft());
+                onView(RecyclerViewItemMatcher.itemAtPosition(R.id.stepperItemActualSetsContainer, exerciseIndex)).perform(swipeLeft());
                 actualSetIndexValidator.accept(setIndex);
             }
         }
@@ -215,15 +221,45 @@ public class ActualTrainingActivityTest {
         buildTree(1);
         onView(withId(R.id.actualExerciseSteps)).perform(RecyclerViewActions.actionOnItemAtPosition(0, click()));
 
-        onView(both(withId(R.id.actualSetWeightEditText)).and(isDisplayed())).perform(typeText("5.125"));
-        onView(both(withId(R.id.actualSetRepsCountEditText)).and(isDisplayed())).perform(typeText("10"));
+        onView(currentPageItem(R.id.actualSetRepsCountEditText)).perform(clearText());
+        onView(currentPageItem(R.id.actualSetRepsCountEditText)).perform(typeText("10"));
+        onView(currentPageItem(R.id.actualSetWeightEditText)).perform(typeText("5.125"));
 
         Espresso.closeSoftKeyboard();
-        onView(both(withId(R.id.actualSetDoneButton)).and(isDisplayed())).perform(click());
+        onView(currentPageItem(R.id.actualSetDoneButton)).perform(click());
 
         activityRule.getActivity();
 
         verify(vm).createActualSet(eq(0), argThat(s -> s.getReps() == 10 && s.getWeight() == 5.125));
+    }
+
+    private static Matcher<View> currentPageItem(@IdRes int itemId) {
+        return new TypeSafeMatcher<View>() {
+            @Override
+            protected boolean matchesSafely(View item) {
+                View root = item.getRootView();
+                RecyclerView stepperRecyclerView = root.findViewById(R.id.actualExerciseSteps);
+                ViewGroup pagerContainer = null;
+                for (int i = 0; i < stepperRecyclerView.getChildCount(); i++) {
+                    View stepContainer = stepperRecyclerView.getChildAt(i);
+                    pagerContainer = stepContainer.findViewById(R.id.stepperItemActualSetsContainer);
+                    if (pagerContainer.getChildCount() > 0) {
+                        break;
+                    }
+                }
+                ViewPager viewPager = (ViewPager) pagerContainer.getChildAt(0);
+                int currentItem = viewPager.getCurrentItem();
+                View pageView = viewPager.getChildAt(currentItem);
+                View desiredView = pageView.findViewById(itemId);
+
+                return item == desiredView;
+            }
+
+            @Override
+            public void describeTo(Description description) {
+                description.appendText("is matches to specified page on specified step");
+            }
+        };
     }
 
     private static Matcher<View> hasBackground(@DrawableRes int drawableId) {

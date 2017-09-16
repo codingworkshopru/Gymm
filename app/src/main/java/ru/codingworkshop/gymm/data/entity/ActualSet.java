@@ -4,6 +4,8 @@ import android.arch.persistence.room.Entity;
 import android.arch.persistence.room.ForeignKey;
 import android.arch.persistence.room.Index;
 import android.arch.persistence.room.PrimaryKey;
+import android.os.Parcel;
+import android.os.Parcelable;
 
 import javax.annotation.Nullable;
 
@@ -28,7 +30,7 @@ import static android.arch.persistence.room.ForeignKey.CASCADE;
         },
         indices = @Index("actualExerciseId")
 )
-public class ActualSet implements Model {
+public class ActualSet implements Model, Parcelable {
     @PrimaryKey(autoGenerate = true)
     private long id;
     private long actualExerciseId;
@@ -72,5 +74,46 @@ public class ActualSet implements Model {
 
     public void setWeight(Double weight) {
         this.weight = weight;
+    }
+
+    protected ActualSet(Parcel in) {
+        id = in.readLong();
+        actualExerciseId = in.readLong();
+        reps = in.readInt();
+        if (in.readByte() == 0) {
+            weight = null;
+        } else {
+            weight = in.readDouble();
+        }
+    }
+
+    public static final Creator<ActualSet> CREATOR = new Creator<ActualSet>() {
+        @Override
+        public ActualSet createFromParcel(Parcel in) {
+            return new ActualSet(in);
+        }
+
+        @Override
+        public ActualSet[] newArray(int size) {
+            return new ActualSet[size];
+        }
+    };
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeLong(id);
+        dest.writeLong(actualExerciseId);
+        dest.writeInt(reps);
+        if (weight == null) {
+            dest.writeByte((byte) 0);
+        } else {
+            dest.writeByte((byte) 1);
+            dest.writeDouble(weight);
+        }
     }
 }

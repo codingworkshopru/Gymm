@@ -15,6 +15,14 @@
         <variable
             name="reps"
             type="Integer" />
+
+        <variable
+            name="actualSet"
+            type="ru.codingworkshop.gymm.ui.actual.ActualSetDataBindingWrapper" />
+
+        <variable
+            name="programSet"
+            type="ru.codingworkshop.gymm.data.entity.ProgramSet" />
     </data>
 
     <android.support.constraint.ConstraintLayout
@@ -74,7 +82,7 @@
                 android:layout_height="wrap_content"
                 android:hint="@string/reps"
                 android:inputType="number"
-                android:text="@{reps.toString()}"
+                android:text="@={actualSet.reps}"
                 tools:text="10" />
         </android.support.design.widget.TextInputLayout>
 
@@ -95,7 +103,8 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:hint="@string/actual_training_activity_stepper_item_weight"
-                android:inputType="numberDecimal" />
+                android:inputType="numberDecimal"
+                android:text="@={actualSet.weight}" />
         </android.support.design.widget.TextInputLayout>
 
         <Button
@@ -103,7 +112,6 @@
             style="@style/Widget.AppCompat.Button.Colored"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginLeft="8dp"
             android:layout_marginStart="8dp"
             android:layout_marginTop="8dp"
             android:text="@string/actual_training_activity_stepper_item_finish_set"

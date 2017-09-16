@@ -1,6 +1,7 @@
 package ru.codingworkshop.gymm.ui.actual;
 
 import android.support.annotation.NonNull;
+import android.text.TextUtils;
 
 import com.google.common.base.Preconditions;
 
@@ -13,10 +14,10 @@ import ru.codingworkshop.gymm.data.entity.ActualSet;
  */
 
 // TODO replace with binding adapters when gradle plugin 3+ will be released
-public class ActualSetObservable {
+public class ActualSetDataBindingWrapper {
     private ActualSet actualSet;
 
-    public ActualSetObservable(@NonNull ActualSet actualSet) {
+    public ActualSetDataBindingWrapper(@NonNull ActualSet actualSet) {
         this.actualSet = Preconditions.checkNotNull(actualSet);
     }
 
@@ -25,12 +26,11 @@ public class ActualSetObservable {
     }
 
     public String getReps() {
-        final int reps = actualSet.getReps();
-        return reps == 0 ? "" : Integer.toString(reps);
+        return actualSet.getReps() == 0 ? "" : Integer.toString(actualSet.getReps());
     }
 
     public void setReps(String reps) {
-        actualSet.setReps(Integer.valueOf(reps));
+        actualSet.setReps(TextUtils.isEmpty(reps) ? 0 : Integer.valueOf(reps));
     }
 
     @Nullable
@@ -39,6 +39,6 @@ public class ActualSetObservable {
     }
 
     public void setWeight(String weight) {
-        actualSet.setWeight(Double.valueOf(weight));
+        actualSet.setWeight(TextUtils.isEmpty(weight) ? null : Double.valueOf(weight));
     }
 }

@@ -4,6 +4,8 @@ import android.arch.persistence.room.Entity;
 import android.arch.persistence.room.ForeignKey;
 import android.arch.persistence.room.Index;
 import android.arch.persistence.room.PrimaryKey;
+import android.os.Parcel;
+import android.os.Parcelable;
 import android.support.annotation.Nullable;
 
 import com.google.common.base.Objects;
@@ -30,13 +32,16 @@ import static android.arch.persistence.room.ForeignKey.CASCADE;
         },
         indices = @Index("programExerciseId")
 )
-public class ProgramSet implements Model, Sortable {
+public class ProgramSet implements Model, Sortable, Parcelable {
     @PrimaryKey(autoGenerate = true)
     private long id;
     private long programExerciseId;
     private int reps;
     private int secondsForRest;
     private int sortOrder;
+
+    public ProgramSet() {
+    }
 
     @Override
     public long getId() {
@@ -97,5 +102,39 @@ public class ProgramSet implements Model, Sortable {
     @Override
     public int hashCode() {
         return Objects.hashCode(id, programExerciseId, reps, secondsForRest, sortOrder);
+    }
+
+    protected ProgramSet(Parcel in) {
+        id = in.readLong();
+        programExerciseId = in.readLong();
+        reps = in.readInt();
+        secondsForRest = in.readInt();
+        sortOrder = in.readInt();
+    }
+
+    public static final Creator<ProgramSet> CREATOR = new Creator<ProgramSet>() {
+        @Override
+        public ProgramSet createFromParcel(Parcel in) {
+            return new ProgramSet(in);
+        }
+
+        @Override
+        public ProgramSet[] newArray(int size) {
+            return new ProgramSet[size];
+        }
+    };
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeLong(id);
+        dest.writeLong(programExerciseId);
+        dest.writeInt(reps);
+        dest.writeInt(secondsForRest);
+        dest.writeInt(sortOrder);
     }
 }

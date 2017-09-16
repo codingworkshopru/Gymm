@@ -78,7 +78,7 @@
 
     <plurals name="number_of_sets">
         <item quantity="one">%d подход</item>
-        <item quantity="few">%d подхода</item>
+        <item quantity="many">%d подхода</item>
         <item quantity="other">%d подходов</item>
     </plurals>
 

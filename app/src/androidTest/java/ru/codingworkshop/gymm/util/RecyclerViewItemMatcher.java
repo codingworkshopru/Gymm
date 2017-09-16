@@ -31,20 +31,26 @@ public final class RecyclerViewItemMatcher {
         return itemAtPosition(recyclerViewId, targetViewId, position);
     }
 
+    public static View findItemView(View item, @IdRes int recyclerViewId, @IdRes int targetViewId, int position) {
+        RecyclerView rv = item.getRootView().findViewById(recyclerViewId);
+        if (rv == null) {
+            return null;
+        }
+
+        View child = rv.findViewHolderForAdapterPosition(position).itemView;
+        if (child == null) {
+            return null;
+        }
+
+        return child.findViewById(targetViewId);
+    }
+
     public static Matcher<View> itemAtPosition(@IdRes int recyclerViewId, @IdRes int targetViewId, int position) {
         return new TypeSafeMatcher<View>() {
             @Override
             protected boolean matchesSafely(View item) {
-                RecyclerView rv = item.getRootView().findViewById(recyclerViewId);
-                if (rv == null) {
-                    return false;
-                }
-                View child = rv.findViewHolderForAdapterPosition(position).itemView;
-                if (child == null) {
-                    return false;
-                }
-                View targetView = child.findViewById(targetViewId);
-                return item == targetView;
+                View targetView = findItemView(item, recyclerViewId, targetViewId, position);
+                return targetView != null && item == targetView;
             }
 
             @Override
