@@ -6,7 +6,7 @@ import android.arch.lifecycle.ViewModelProvider;
 import dagger.Binds;
 import dagger.Module;
 import dagger.multibindings.IntoMap;
-import ru.codingworkshop.gymm.ui.actual.ActualTrainingViewModel;
+import ru.codingworkshop.gymm.ui.actual.viewmodel.ActualTrainingViewModel;
 import ru.codingworkshop.gymm.viewmodel.ViewModelFactory;
 
 /**

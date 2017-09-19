@@ -59,6 +59,22 @@ public class ActualTrainingRepositoryTest {
     }
 
     @Test
+    public void updateActualTraining() throws Exception {
+        ActualTraining training = Models.createActualTraining(11L, 1L);
+        when(dao.updateActualTraining(training)).thenReturn(1);
+        repository.updateActualTraining(training);
+        verify(dao).updateActualTraining(training);
+    }
+
+    @Test
+    public void deleteActualTraining() throws Exception {
+        ActualTraining training = Models.createActualTraining(11L, 1L);
+        when(dao.deleteActualTraining(training)).thenReturn(1);
+        repository.deleteActualTraining(training);
+        verify(dao).deleteActualTraining(training);
+    }
+
+    @Test
     public void getActualTrainingById() {
         repository.getActualTrainingById(1L);
         verify(dao).getActualTrainingById(1L);
@@ -81,6 +97,14 @@ public class ActualTrainingRepositoryTest {
         repository.insertActualExercise(actualExercise);
         assertEquals(12L, actualExercise.getId());
         verify(dao).insertActualExercise(actualExercise);
+    }
+
+    @Test
+    public void deleteActualExercises() throws Exception {
+        List<ActualExercise> actualExercises = Models.createActualExercises(12L);
+        when(dao.deleteActualExercises(actualExercises)).thenReturn(1);
+        repository.deleteActualExercises(actualExercises);
+        verify(dao).deleteActualExercises(actualExercises);
     }
 
     @Test

@@ -1,18 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
-    <item
-        android:id="@+id/actual_training_start_action"
-        android:title="Начать тренировку"
-        app:showAsAction="never" />
 
     <item
-        android:id="@+id/actual_training_finish_action"
+        android:id="@+id/action_finish_training"
+        android:icon="@drawable/ic_flag_black_24dp"
         android:title="Закончить тренировку"
-        app:showAsAction="never" />
-
-    <item
-        android:id="@+id/actual_training_some_action"
-        android:title="Сделать что-нибудь"
-        app:showAsAction="never" />
+        app:showAsAction="ifRoom" />
 </menu>

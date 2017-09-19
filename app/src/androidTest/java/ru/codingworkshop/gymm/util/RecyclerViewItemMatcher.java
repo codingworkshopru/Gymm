@@ -32,7 +32,7 @@ public final class RecyclerViewItemMatcher {
     }
 
     public static View findItemView(View item, @IdRes int recyclerViewId, @IdRes int targetViewId, int position) {
-        RecyclerView rv = item.getRootView().findViewById(recyclerViewId);
+        RecyclerView rv = (RecyclerView) item.getRootView().findViewById(recyclerViewId);
         if (rv == null) {
             return null;
         }

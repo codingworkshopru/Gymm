@@ -55,6 +55,7 @@
     <string name="actual_training_activity_stepper_item_finish_set">Завершить подход</string>
     <string name="actual_training_activity_stepper_item_reps_error">введите количество повторений</string>
     <string name="actual_training_activity_stepper_item_weight_error">введите вес</string>
+    <string name="actual_training_activity_are_you_sure_message">Завершить тренировку?</string>
 
     <!-- notification -->
     <string name="notification_time_till_rest_finish">Время до конца отдыха: </string>

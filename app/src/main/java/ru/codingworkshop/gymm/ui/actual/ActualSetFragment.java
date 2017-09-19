@@ -94,10 +94,10 @@ public class ActualSetFragment extends Fragment {
 
         root.findViewById(R.id.actualSetDoneButton).setOnClickListener(this::onDoneButtonClick);
 
-        repsValidator = new EditTextValidator(root.findViewById(R.id.actualSetRepsCountLayout),
+        repsValidator = new EditTextValidator((TextInputLayout) root.findViewById(R.id.actualSetRepsCountLayout),
                 R.string.actual_training_activity_stepper_item_reps_error);
 
-        weightValidator = new EditTextValidator(root.findViewById(R.id.actualSetWeightLayout),
+        weightValidator = new EditTextValidator((TextInputLayout) root.findViewById(R.id.actualSetWeightLayout),
                 R.string.actual_training_activity_stepper_item_weight_error) {
             @Override
             protected boolean isValid(CharSequence textEditContents) {

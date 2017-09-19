@@ -19,7 +19,6 @@ import com.google.common.eventbus.Subscribe;
 
 import java.util.concurrent.TimeUnit;
 
-import ru.codingworkshop.gymm.data.entity.ProgramTraining;
 import ru.codingworkshop.gymm.ui.TrainingNotification;
 
 /**
@@ -35,6 +34,9 @@ public class TrainingTimeService extends Service {
     private RestTimer restTimer;
 
     private static final String TAG = TrainingTimeService.class.getSimpleName();
+
+    public static final String TRAINING_TIME_SERVICE_TITLE = TAG + "title";
+    public static final String TRAINING_TIME_SERVICE_TRAINING_ID = TAG + "id";
 
     @Override
     public void onCreate() {
@@ -95,12 +97,10 @@ public class TrainingTimeService extends Service {
         if (intent == null)
             return START_STICKY;
 
-        ProgramTraining programTraining = intent.getParcelableExtra("model");
-
         notification = new TrainingNotification(
                 this,
-                programTraining.getName(),
-                programTraining.getId()
+                intent.getStringExtra(TRAINING_TIME_SERVICE_TITLE),
+                intent.getLongExtra(TRAINING_TIME_SERVICE_TRAINING_ID, 0L)
         );
 
         notification.show(this);

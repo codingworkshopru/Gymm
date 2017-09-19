@@ -17,7 +17,6 @@ public class MainActivity extends LifecycleDaggerActivity {
         setContentView(R.layout.activity_main);
     }
 
-
     // menu
     //-----------------------------------------
     @Override

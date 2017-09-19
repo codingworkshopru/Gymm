@@ -1,6 +1,7 @@
 package ru.codingworkshop.gymm.ui;
 
 import android.app.Notification;
+import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.Service;
 import android.content.Context;
@@ -8,7 +9,7 @@ import android.os.Build;
 import android.os.SystemClock;
 import android.support.annotation.IdRes;
 import android.support.annotation.StringRes;
-import android.support.v7.app.NotificationCompat;
+import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 import android.view.View;
 import android.widget.RemoteViews;
@@ -51,7 +52,14 @@ public final class TrainingNotification {
 
 //        PendingIntent mainAction = stackBuilder.getPendingIntent(123, PendingIntent.FLAG_UPDATE_CURRENT);
 
-        notification = new NotificationCompat.Builder(context)
+        final String GYMM_CHANNEL_ID = "gymm_channel_id";
+
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+            NotificationChannel notificationChannel = new NotificationChannel(GYMM_CHANNEL_ID, "Gymm notifications", NotificationManager.IMPORTANCE_DEFAULT);
+            notificationManager.createNotificationChannel(notificationChannel);
+        }
+
+        notification = new NotificationCompat.Builder(context, GYMM_CHANNEL_ID)
                 .setSmallIcon(R.mipmap.ic_launcher)
                 .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
                 .setOngoing(true)

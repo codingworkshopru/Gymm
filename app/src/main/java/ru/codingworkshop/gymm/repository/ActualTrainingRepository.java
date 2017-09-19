@@ -39,6 +39,14 @@ public class ActualTrainingRepository extends BaseRepository {
         insert(actualTraining, dao::insertActualTraining, ActualTrainingRepository::checkActualTraining);
     }
 
+    public void updateActualTraining(ActualTraining actualTraining) {
+        update(actualTraining, dao::updateActualTraining, ActualTrainingRepository::checkActualTraining);
+    }
+
+    public void deleteActualTraining(ActualTraining actualTraining) {
+        delete(actualTraining, dao::deleteActualTraining);
+    }
+
     private static void checkActualTraining(@NonNull ActualTraining actualTraining) {
         Preconditions.checkNotNull(actualTraining.getStartTime());
         Preconditions.checkArgument(actualTraining.getProgramTrainingId() != null && isValidId(actualTraining.getProgramTrainingId()));
@@ -54,6 +62,10 @@ public class ActualTrainingRepository extends BaseRepository {
 
     public void insertActualExercises(Collection<ActualExercise> actualExercises) {
         insert(actualExercises, dao::insertActualExercises, ActualTrainingRepository::checkActualExercise);
+    }
+
+    public void deleteActualExercises(Collection<ActualExercise> actualExercises) {
+        delete(actualExercises, dao::deleteActualExercises);
     }
 
     private static void checkActualExercise(@NonNull ActualExercise actualExercise) {

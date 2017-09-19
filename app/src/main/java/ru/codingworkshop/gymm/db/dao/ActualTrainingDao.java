@@ -26,11 +26,20 @@ public interface ActualTrainingDao {
     @Insert
     Long insertActualTraining(ActualTraining actualTraining);
 
+    @Update
+    int updateActualTraining(ActualTraining training);
+
+    @Delete
+    int deleteActualTraining(ActualTraining training);
+
     @Insert
     List<Long> insertActualExercises(Collection<ActualExercise> actualExercises);
 
     @Insert
     Long insertActualExercise(ActualExercise actualExercise);
+
+    @Delete
+    int deleteActualExercises(Collection<ActualExercise> actualExercises);
 
     @Insert
     Long insertActualSet(ActualSet actualSet);
