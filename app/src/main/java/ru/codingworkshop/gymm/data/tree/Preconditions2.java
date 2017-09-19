@@ -9,6 +9,10 @@ public final class Preconditions2 {
     }
 
     public static void checkIsNull(Object o) {
-        if (o != null) throw new UnsupportedOperationException();
+        checkIsNull(o, null);
+    }
+
+    public static void checkIsNull(Object o, String message) {
+        if (o != null) throw new UnsupportedOperationException(message);
     }
 }

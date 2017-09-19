@@ -27,7 +27,7 @@ public class ImmutableChildrenHolder<C> extends ListChildrenHolder<C> {
 
     @Override
     public void setChildren(@NonNull List<C> children) {
-        Preconditions2.checkIsNull(getChildren());
+        Preconditions2.checkIsNull(getChildren(), "Trying to set children to immutable children holder");
         super.setChildren(children);
     }
 

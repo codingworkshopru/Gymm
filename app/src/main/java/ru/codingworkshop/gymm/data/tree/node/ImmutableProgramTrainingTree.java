@@ -22,7 +22,7 @@ public class ImmutableProgramTrainingTree extends ProgramTrainingTree {
 
     @Override
     public void setParent(ProgramTraining parent) {
-        Preconditions2.checkIsNull(getParent());
+        Preconditions2.checkIsNull(getParent(), "Immutable tree already have a parent");
         super.setParent(parent);
     }
 }

@@ -10,8 +10,7 @@ import org.junit.runners.Suite;
 @RunWith(Suite.class)
 @Suite.SuiteClasses({
         ActualSetFragmentTest.class,
-        ActualTrainingActivityStartTrainingTest.class,
-        ActualTrainingActivityResumeTrainingTest.class
+        ActualTrainingActivityTest.class
 })
 public class ActualUiTestSuite {
 }

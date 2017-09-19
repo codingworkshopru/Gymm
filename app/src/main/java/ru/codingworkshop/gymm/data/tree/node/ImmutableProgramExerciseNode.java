@@ -21,13 +21,13 @@ public class ImmutableProgramExerciseNode extends ProgramExerciseNode {
 
     @Override
     public void setParent(ProgramExercise parent) {
-        Preconditions2.checkIsNull(getParent());
+        Preconditions2.checkIsNull(getParent(), "Immutable node already has a parent");
         super.setParent(parent);
     }
 
     @Override
     public void setExercise(Exercise exercise) {
-        Preconditions2.checkIsNull(getExercise());
+        Preconditions2.checkIsNull(getExercise(), "Immutable node already has an exercise");
         super.setExercise(exercise);
     }
 

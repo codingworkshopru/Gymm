@@ -49,9 +49,9 @@ public abstract class TreeBuilder<P, C extends Model, GC> {
         if (children != null) {
             for (C child : children) {
                 BaseNode<C, GC> node = getNode(child);
-                Collection<GC> gcs = grandchildren.get(child.getId());
-                if (!gcs.isEmpty()) {
-                    node.setChildren(new ArrayList<>(gcs));
+                Collection<GC> gcn = grandchildren.get(child.getId());
+                if (!gcn.isEmpty()) {
+                    node.setChildren(new ArrayList<>(gcn));
                 }
                 nodes.add(node);
             }

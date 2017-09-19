@@ -18,6 +18,9 @@
             name="active"
             type="boolean" />
         <variable
+            name="done"
+            type="boolean" />
+        <variable
             name="first"
             type="boolean" />
         <variable
@@ -51,7 +54,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="0dp"
-            android:background="@{active ? @drawable/ic_circle_primary_24dp : @drawable/ic_circle_grey_24dp}"
+            android:background="@{done ? @drawable/ic_check_circle_primary_24dp : active ? @drawable/ic_circle_primary_24dp : @drawable/ic_circle_grey_24dp}"
             app:layout_constraintLeft_toRightOf="@+id/stepperItemTopLine"
             app:layout_constraintRight_toLeftOf="@+id/stepperItemTopLine"
             app:layout_constraintTop_toTopOf="@+id/stepperItemTitle"
@@ -59,9 +62,10 @@
 
         <TextView
             android:id="@+id/stepperItemIndex"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_width="9dp"
+            android:layout_height="17dp"
             android:text="@{Integer.toString(index + 1)}"
+            android:visibility="@{done ? View.GONE : View.VISIBLE}"
             android:textAlignment="center"
             android:textAppearance="@style/TextAppearance.AppCompat.Caption"
             android:textColor="@android:color/white"

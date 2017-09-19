@@ -23,6 +23,7 @@ import javax.inject.Inject;
 
 import ru.codingworkshop.gymm.R;
 import ru.codingworkshop.gymm.data.entity.ActualSet;
+import ru.codingworkshop.gymm.data.tree.node.ActualExerciseNode;
 import ru.codingworkshop.gymm.data.tree.node.ActualTrainingTree;
 import ru.codingworkshop.gymm.databinding.ActivityActualTrainingStepperItemBinding;
 import ru.codingworkshop.gymm.db.GymmDatabase;
@@ -56,10 +57,6 @@ public class ActualTrainingActivity extends AppCompatActivity implements ActualS
         Toolbar toolbar = (Toolbar) findViewById(R.id.actualTrainingToolbar);
         setSupportActionBar(toolbar);
 
-        init();
-    }
-
-    private void init() {
         initViewModel();
         loadData();
     }
@@ -69,6 +66,11 @@ public class ActualTrainingActivity extends AppCompatActivity implements ActualS
     }
 
     private void loadData() {
+        if (viewModel.getActualTrainingTree() != null) {
+            dataLoaded(true);
+            return;
+        }
+
         final long actualTrainingId = getIntent().getLongExtra(EXTRA_ACTUAL_TRAINING_ID, 0L);
 
         if (getIntent().hasExtra(EXTRA_PROGRAM_TRAINING_ID)) {
@@ -165,6 +167,10 @@ public class ActualTrainingActivity extends AppCompatActivity implements ActualS
     public void goToNextStep() {
         final int nextStep = activeBindingItem.getIndex() + 1;
         RecyclerView.ViewHolder viewHolder = recyclerView.findViewHolderForAdapterPosition(nextStep);
+
+        final ActualExerciseNode currentExerciseNode = tree.getChildren().get(nextStep - 1);
+        activeBindingItem.setDone(currentExerciseNode.getChildren().size() == currentExerciseNode.getProgramExerciseNode().getChildren().size());
+
         if (viewHolder == null) {
             recyclerView.scrollToPosition(nextStep);
             recyclerView.addOnChildAttachStateChangeListener(new RecyclerView.OnChildAttachStateChangeListener() {

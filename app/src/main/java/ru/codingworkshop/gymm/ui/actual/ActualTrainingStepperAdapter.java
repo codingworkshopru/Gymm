@@ -31,7 +31,8 @@ class ActualTrainingStepperAdapter extends BindingListAdapter<ActualExerciseNode
     @Override
     protected ActivityActualTrainingStepperItemBinding createBinding(ViewGroup parent) {
         LayoutInflater inflater = LayoutInflater.from(context);
-        ActivityActualTrainingStepperItemBinding binding = DataBindingUtil.inflate(inflater, R.layout.activity_actual_training_stepper_item, parent, false);
+        ActivityActualTrainingStepperItemBinding binding = DataBindingUtil.inflate(
+                inflater, R.layout.activity_actual_training_stepper_item, parent, false);
 
         binding.getRoot().setOnClickListener(listener);
 
@@ -46,5 +47,6 @@ class ActualTrainingStepperAdapter extends BindingListAdapter<ActualExerciseNode
         binding.setLast(sortOrder == getItemCount() - 1);
         binding.setIndex(sortOrder);
         binding.setTitle(programExerciseNode.getExercise().getName());
+        binding.setDone(item.getChildren().size() == item.getProgramExerciseNode().getChildren().size());
     }
 }
