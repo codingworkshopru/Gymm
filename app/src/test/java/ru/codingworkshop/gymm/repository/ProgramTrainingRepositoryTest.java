@@ -65,15 +65,16 @@ public class ProgramTrainingRepositoryTest {
     }
 
     @Test
-    public void insertProgramTraining() { // TODO training name must be unique; write feature to throw exception up from dao (insertChildren, updateChildren)
+    public void insertProgramTraining() {
         ProgramTraining trainingEntity = Models.createProgramTraining(0L, "foo");
+        trainingEntity.setDrafting(true);
         when(dao.insertProgramTraining(trainingEntity)).thenReturn(1L);
         repository.insertProgramTraining(trainingEntity);
 
         verify(dao).insertProgramTraining(trainingEntity);
     }
 
-    @Test(expected = IllegalStateException.class)
+    @Test(expected = IllegalArgumentException.class)
     public void insertionFailTest() {
         ProgramTraining training = Models.createProgramTraining(0L, "foo");
         when(dao.insertProgramTraining(training)).thenReturn(-1L);
@@ -151,7 +152,7 @@ public class ProgramTrainingRepositoryTest {
 
     @Test
     public void insertProgramExercise() {
-        ProgramExercise exercise = Models.createProgramExercise(2L, 1L, 100L, false);
+        ProgramExercise exercise = Models.createProgramExercise(2L, 1L, 100L, true);
         exercise.setExerciseId(10);
         when(dao.insertProgramExercise(exercise)).thenReturn(1L);
 

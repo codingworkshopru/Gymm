@@ -3,7 +3,6 @@ package ru.codingworkshop.gymm.ui.actual;
 import android.annotation.SuppressLint;
 import android.arch.lifecycle.ViewModelProvider;
 import android.arch.lifecycle.ViewModelProviders;
-import android.content.Intent;
 import android.databinding.DataBindingUtil;
 import android.os.Bundle;
 import android.support.annotation.VisibleForTesting;
@@ -87,17 +86,16 @@ public class ActualTrainingActivity extends AppCompatActivity implements ActualS
         final long programTrainingId = getIntent().getLongExtra(EXTRA_PROGRAM_TRAINING_ID, 0L);
         viewModel.startTraining(programTrainingId)
                 .observe(this, this::dataLoaded);
-
-        Intent timeServiceIntent = new Intent(this, TrainingTimeService.class);
-        timeServiceIntent.putExtra(TrainingTimeService.TRAINING_TIME_SERVICE_TRAINING_ID, 11L);
-        timeServiceIntent.putExtra(TrainingTimeService.TRAINING_TIME_SERVICE_TITLE, "foo");
-        startService(timeServiceIntent);
     }
 
     private void dataLoaded(boolean loaded) {
         if (!loaded) return;
 
         tree = viewModel.getActualTrainingTree();
+
+        // TODO if the service crashed it must be started with ActualTraining.getStartTime()
+        TrainingTimeService.startService(this, tree.getParent().getId(), tree.getProgramTraining().getName());
+
         initViews();
     }
 

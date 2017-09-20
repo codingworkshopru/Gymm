@@ -2,7 +2,6 @@ package ru.codingworkshop.gymm.repository;
 
 import android.arch.core.executor.testing.InstantTaskExecutorRule;
 
-import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
 
 import org.junit.Before;
@@ -50,8 +49,8 @@ public class BaseRepositoryTest {
         final ArrayList<Long> ids = Lists.newArrayList(1L, 2L, 3L);
         when(dao.insert(models)).thenReturn(ids);
 
-        repository.insert(model, dao::insert, BaseRepositoryTest::checkName);
-        repository.insert(models, dao::insert, BaseRepositoryTest::checkName);
+        repository.insert(model, dao::insert);
+        repository.insert(models, dao::insert);
 
         assertEquals(1L, model.getId());
         assertEquals(ids, models.stream().map(Model::getId).collect(Collectors.toList()));
@@ -60,30 +59,18 @@ public class BaseRepositoryTest {
         verify(dao).insert(models);
     }
 
-    @Test(expected = IllegalArgumentException.class)
-    public void insertWithoutNameTest() {
-        SimpleModel model = new SimpleModel(1L, null);
-        repository.insert(model, dao::insert, BaseRepositoryTest::checkName);
-    }
-
     @Test(expected = IllegalStateException.class)
     public void insertFailTest() {
         SimpleModel m = new SimpleModel(1L, "foo");
         when(dao.insert(m)).thenReturn(-1L);
-        repository.insert(m, dao::insert, null);
-    }
-
-    @Test(expected = IllegalArgumentException.class)
-    public void insertCollectionWithoutNameTest() {
-        List<SimpleModel> models = Models.createSimpleModels("foo", null, "bar");
-        repository.insert(Lists.newArrayList(models), dao::insert, BaseRepositoryTest::checkName);
+        repository.insert(m, dao::insert);
     }
 
     @Test(expected = IllegalStateException.class)
     public void insertCollectionFailTest() {
         List<SimpleModel> ms = Models.createSimpleModels("foo", "bar", "baz");
         when(dao.insert(ms)).thenReturn(Lists.newArrayList(-1L, 1L, 2L));
-        repository.insert(ms, dao::insert, BaseRepositoryTest::checkName);
+        repository.insert(ms, dao::insert);
     }
 
     @Test
@@ -94,23 +81,11 @@ public class BaseRepositoryTest {
         when(dao.update(model)).thenReturn(1);
         when(dao.update(models)).thenReturn(3);
 
-        repository.update(model, dao::update, BaseRepositoryTest::checkName);
-        repository.update(models, dao::update, BaseRepositoryTest::checkName);
+        repository.update(model, dao::update);
+        repository.update(models, dao::update);
 
         verify(dao).update(model);
         verify(dao).update(models);
-    }
-
-    @Test(expected = IllegalArgumentException.class)
-    public void updateWithoutName() {
-        SimpleModel model = new SimpleModel(1L, null);
-        repository.update(model, dao::update, BaseRepositoryTest::checkName);
-    }
-
-    @Test(expected = IllegalArgumentException.class)
-    public void updateCollectionWithoutName() {
-        List<SimpleModel> models = Models.createSimpleModels("foo", "bar", null);
-        repository.update(models, dao::update, BaseRepositoryTest::checkName);
     }
 
     @Test
@@ -126,9 +101,5 @@ public class BaseRepositoryTest {
 
         verify(dao).delete(model);
         verify(dao).delete(models);
-    }
-
-    private static void checkName(SimpleModel m) {
-        Preconditions.checkArgument(m.getName() != null, "Model must be named");
     }
 }

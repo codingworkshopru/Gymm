@@ -14,6 +14,7 @@ import javax.inject.Inject;
 import ru.codingworkshop.gymm.data.entity.ActualExercise;
 import ru.codingworkshop.gymm.data.entity.ActualSet;
 import ru.codingworkshop.gymm.data.entity.ActualTraining;
+import ru.codingworkshop.gymm.db.GymmDatabase;
 import ru.codingworkshop.gymm.db.dao.ActualTrainingDao;
 
 import static ru.codingworkshop.gymm.db.GymmDatabase.isValidId;
@@ -36,11 +37,18 @@ public class ActualTrainingRepository extends BaseRepository {
     }
 
     public void insertActualTraining(@NonNull ActualTraining actualTraining) {
-        insert(actualTraining, dao::insertActualTraining, ActualTrainingRepository::checkActualTraining);
+        checkActualTraining(actualTraining);
+        insert(actualTraining, dao::insertActualTraining);
+    }
+
+    public LiveData<Long> insertActualTrainingWithResult(ActualTraining actualTraining) {
+        checkActualTraining(actualTraining);
+        return insertWithResult(actualTraining, dao::insertActualTraining);
     }
 
     public void updateActualTraining(ActualTraining actualTraining) {
-        update(actualTraining, dao::updateActualTraining, ActualTrainingRepository::checkActualTraining);
+        checkActualTraining(actualTraining);
+        update(actualTraining, dao::updateActualTraining);
     }
 
     public void deleteActualTraining(ActualTraining actualTraining) {
@@ -57,11 +65,13 @@ public class ActualTrainingRepository extends BaseRepository {
     }
 
     public void insertActualExercise(ActualExercise actualExercise) {
-        insert(actualExercise, dao::insertActualExercise, ActualTrainingRepository::checkActualExercise);
+        checkActualExercise(actualExercise);
+        insert(actualExercise, dao::insertActualExercise);
     }
 
     public void insertActualExercises(Collection<ActualExercise> actualExercises) {
-        insert(actualExercises, dao::insertActualExercises, ActualTrainingRepository::checkActualExercise);
+        applyToEach(actualExercises, ActualTrainingRepository::checkActualExercise);
+        insert(actualExercises, dao::insertActualExercises);
     }
 
     public void deleteActualExercises(Collection<ActualExercise> actualExercises) {
@@ -78,11 +88,14 @@ public class ActualTrainingRepository extends BaseRepository {
     }
 
     public void insertActualSet(ActualSet actualSet) {
-        insert(actualSet, dao::insertActualSet, ActualTrainingRepository::checkActualSet);
+        checkActualSet(actualSet);
+        insert(actualSet, dao::insertActualSet);
     }
 
     public void updateActualSet(ActualSet actualSet) {
-        update(actualSet, dao::updateActualSet, ActualTrainingRepository::checkActualSet);
+        checkActualSet(actualSet);
+        Preconditions.checkArgument(GymmDatabase.isValidId(actualSet));
+        update(actualSet, dao::updateActualSet);
     }
 
     public void deleteActualSet(ActualSet actualSet) {

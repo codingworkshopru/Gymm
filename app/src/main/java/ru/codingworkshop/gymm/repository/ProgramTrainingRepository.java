@@ -15,6 +15,7 @@ import javax.inject.Singleton;
 import ru.codingworkshop.gymm.data.entity.ProgramExercise;
 import ru.codingworkshop.gymm.data.entity.ProgramSet;
 import ru.codingworkshop.gymm.data.entity.ProgramTraining;
+import ru.codingworkshop.gymm.data.entity.common.Draftable;
 import ru.codingworkshop.gymm.data.entity.common.Named;
 import ru.codingworkshop.gymm.db.dao.ProgramTrainingDao;
 
@@ -47,9 +48,11 @@ public class ProgramTrainingRepository extends BaseRepository {
         return dao.getDraftingProgramTraining();
     }
 
-    //TODO inserted must be drafting
+    // TODO training name must be unique; write feature to throw exception up from dao (insertChildren, updateChildren)
     public void insertProgramTraining(@NonNull ProgramTraining programTraining) {
-        insert(programTraining, dao::insertProgramTraining, ProgramTrainingRepository::checkName);
+        checkName(programTraining);
+        checkIsDrafting(programTraining);
+        insert(programTraining, dao::insertProgramTraining);
     }
 
     public void deleteProgramTraining(@NonNull ProgramTraining programTraining) {
@@ -57,7 +60,8 @@ public class ProgramTrainingRepository extends BaseRepository {
     }
 
     public void updateProgramTraining(@NonNull ProgramTraining programTraining) {
-        update(programTraining, dao::updateProgramTraining, ProgramTrainingRepository::checkName);
+        checkName(programTraining);
+        update(programTraining, dao::updateProgramTraining);
     }
 
     public LiveData<List<ProgramExercise>> getProgramExercisesForTraining(@NonNull ProgramTraining programTraining) {
@@ -81,17 +85,24 @@ public class ProgramTrainingRepository extends BaseRepository {
         return dao.getDraftingProgramExercise(programTrainingId);
     }
 
-    //TODO inserted must be drafting
     public void insertProgramExercise(ProgramExercise programExercise) {
-        insert(programExercise, dao::insertProgramExercise, ProgramTrainingRepository::checkProgramExercise);
+        checkProgramExercise(programExercise);
+        checkIsDrafting(programExercise);
+        insert(programExercise, dao::insertProgramExercise);
+    }
+
+    private void checkIsDrafting(Draftable draftable) {
+        Preconditions.checkArgument(draftable.isDrafting());
     }
 
     public void updateProgramExercise(ProgramExercise programExercise) {
-        update(programExercise, dao::updateProgramExercise, ProgramTrainingRepository::checkProgramExercise);
+        checkProgramExercise(programExercise);
+        update(programExercise, dao::updateProgramExercise);
     }
 
     public void updateProgramExercises(Collection<ProgramExercise> exerciseEntities) {
-        update(exerciseEntities, dao::updateProgramExercises, ProgramTrainingRepository::checkProgramExercise);
+        applyToEach(exerciseEntities, ProgramTrainingRepository::checkProgramExercise);
+        update(exerciseEntities, dao::updateProgramExercises);
     }
 
     private static void checkProgramExercise(ProgramExercise programExercise) {
@@ -124,19 +135,23 @@ public class ProgramTrainingRepository extends BaseRepository {
     }
 
     public void insertProgramSet(@NonNull ProgramSet set) {
-        insert(set, dao::insertProgramSet, ProgramTrainingRepository::checkProgramSet);
+        checkProgramSet(set);
+        insert(set, dao::insertProgramSet);
     }
 
     public void insertProgramSets(@NonNull Collection<ProgramSet> sets) {
-        insert(sets, dao::insertProgramSets, ProgramTrainingRepository::checkProgramSet);
+        applyToEach(sets, ProgramTrainingRepository::checkProgramSet);
+        insert(sets, dao::insertProgramSets);
     }
 
     public void updateProgramSet(@NonNull ProgramSet set) {
-        update(set, dao::updateProgramSet, ProgramTrainingRepository::checkProgramSet);
+        checkProgramSet(set);
+        update(set, dao::updateProgramSet);
     }
 
     public void updateProgramSets(@NonNull Collection<ProgramSet> sets) {
-        update(sets, dao::updateProgramSets, ProgramTrainingRepository::checkProgramSet);
+        applyToEach(sets, ProgramTrainingRepository::checkProgramSet);
+        update(sets, dao::updateProgramSets);
     }
 
     private static void checkProgramSet(@NonNull ProgramSet set) {

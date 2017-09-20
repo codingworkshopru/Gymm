@@ -3,6 +3,7 @@ package ru.codingworkshop.gymm.service;
 import android.app.ActivityManager;
 import android.app.Service;
 import android.content.Context;
+import android.content.ContextWrapper;
 import android.content.Intent;
 import android.os.Binder;
 import android.os.Build;
@@ -37,6 +38,15 @@ public class TrainingTimeService extends Service {
 
     public static final String TRAINING_TIME_SERVICE_TITLE = TAG + "title";
     public static final String TRAINING_TIME_SERVICE_TRAINING_ID = TAG + "id";
+
+    public static void startService(ContextWrapper contextWrapper, long actualTrainingId, String notificationTitle) {
+        if (!isRunning(contextWrapper)) {
+            Intent intent = new Intent(contextWrapper, TrainingTimeService.class);
+            intent.putExtra(TRAINING_TIME_SERVICE_TRAINING_ID, actualTrainingId);
+            intent.putExtra(TRAINING_TIME_SERVICE_TITLE, notificationTitle);
+            contextWrapper.startService(intent);
+        }
+    }
 
     @Override
     public void onCreate() {

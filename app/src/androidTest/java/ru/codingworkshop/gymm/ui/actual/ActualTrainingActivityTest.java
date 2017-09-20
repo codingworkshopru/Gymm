@@ -18,7 +18,6 @@ import org.hamcrest.Matcher;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
-import org.mockito.stubbing.Answer;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -105,7 +104,12 @@ public class ActualTrainingActivityTest {
 
     @Test
     public void startTrainingTest() throws Exception {
-        doAnswer(createAnswer(buildTreeWithoutActuals(1))).when(vm).startTraining(1L);
+        doAnswer(invocation -> {
+            final ActualTrainingTree tree = buildTreeWithoutActuals(1);
+            when(vm.getActualTrainingTree()).thenReturn(tree);
+            tree.setParent(Models.createActualTraining(11L, invocation.getArgument(0)));
+            return new LiveData<Boolean>() {{postValue(true);}};
+        }).when(vm).startTraining(1L);
         reconfigure(ActualTrainingActivity.EXTRA_PROGRAM_TRAINING_ID, 1L);
 
         onView(withId(R.id.actualTrainingToolbar)).check(matches(withChild(withText("foo"))));
@@ -119,7 +123,10 @@ public class ActualTrainingActivityTest {
 
     @Test
     public void resumeTrainingTest() throws Exception {
-        doAnswer(createAnswer(buildHalfPopulatedTree(2))).when(vm).loadTraining(11L);
+        doAnswer(invocation -> {
+            when(vm.getActualTrainingTree()).thenReturn(buildHalfPopulatedTree(2));
+            return new LiveData<Boolean>() {{postValue(true);}};
+        }).when(vm).loadTraining(11L);
         reconfigure(ActualTrainingActivity.EXTRA_ACTUAL_TRAINING_ID, 11L);
 
         selectStepAtPosition(0);
@@ -129,13 +136,6 @@ public class ActualTrainingActivityTest {
 
         verify(vm).loadTraining(11L);
         verify(vm, atLeastOnce()).getActualTrainingTree();
-    }
-
-    private Answer createAnswer(ActualTrainingTree actualTrainingTree) {
-        return invocation -> {
-            when(vm.getActualTrainingTree()).thenReturn(actualTrainingTree);
-            return new LiveData<Boolean>() {{postValue(true);}};
-        };
     }
 
     private void reconfigure(String extraKey, long extraValue) {
@@ -188,7 +188,7 @@ public class ActualTrainingActivityTest {
         selectStepAtPosition(1);
 
         assertItemAtPositionIsActive(1);
-        assertItemAtPositionIsInactive(0);
+        assertItemAtPositionIsInactive(2);
     }
 
     @Test

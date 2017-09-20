@@ -1,5 +1,7 @@
 package ru.codingworkshop.gymm.repository;
 
+import android.arch.lifecycle.LiveData;
+import android.arch.lifecycle.MutableLiveData;
 import android.support.annotation.WorkerThread;
 
 import com.google.common.base.Function;
@@ -13,7 +15,6 @@ import java.util.concurrent.Executor;
 import ru.codingworkshop.gymm.data.entity.common.Model;
 import ru.codingworkshop.gymm.data.util.BiConsumer;
 import ru.codingworkshop.gymm.data.util.Consumer;
-import ru.codingworkshop.gymm.db.GymmDatabase;
 
 /**
  * Created by Радик on 28.07.2017.
@@ -27,43 +28,40 @@ class BaseRepository {
         this.executor = executor;
     }
 
-    <T extends Model> void insert(T entity, Function<T, Long> insert, Consumer<T> check) {
-        perform(entity, insert, BaseRepository::afterInsertion, check);
+    <T extends Model> void insert(T entity, Function<T, Long> insert) {
+        perform(entity, insert, BaseRepository::afterInsertion);
     }
 
-    <T extends Model> void insert(Collection<T> entities, Function<Collection<T>, List<Long>> insert, Consumer<T> check) {
-        performForCollection(entities, insert, BaseRepository::afterInsertion, check);
+    <T extends Model> void insert(Collection<T> entities, Function<Collection<T>, List<Long>> insert) {
+        perform(entities, insert, BaseRepository::afterInsertion);
     }
 
-    <T extends Model> void update(T entity, Function<T, Integer> update, Consumer<T> check) {
-        Preconditions.checkArgument(GymmDatabase.isValidId(entity.getId()));
-        perform(entity, update, null, check);
+    <T extends Model> LiveData<Long> insertWithResult(T model, Function<T, Long> insert) {
+        MutableLiveData<Long> liveId = new MutableLiveData<>();
+        executor.execute(() -> liveId.postValue(performSync(model, insert, BaseRepository::afterInsertion)));
+        return liveId;
     }
 
-    <T> void update(Collection<T> entities, Function<Collection<T>, Integer> update, Consumer<T> check) {
-        performForCollection(entities, update, null, check);
+    <T extends Model> void update(T entity, Function<T, Integer> update) {
+        perform(entity, update, null);
+    }
+
+    <T> void update(Collection<T> entities, Function<Collection<T>, Integer> update) {
+        perform(entities, update, null);
     }
 
     <T> void delete(T entity, Function<T, Integer> delete) {
-        perform(entity, delete, null, null);
+        perform(entity, delete, null);
     }
 
-    private <T, F> void performForCollection(Collection<T> entities, Function<Collection<T>, F> operation, BiConsumer<Collection<T>, F> after, Consumer<T> before) {
-        perform(entities, operation, after, e -> applyToEach(entities, before));
-    }
-
-    private <T, F> void perform(T entity, Function<T, F> operation, BiConsumer<T, F> after, Consumer<T> before) {
-        executor.execute(() -> performSync(entity, operation, after, before));
+    private <T, F> void perform(T entity, Function<T, F> operation, BiConsumer<T, F> after) {
+        executor.execute(() -> performSync(entity, operation, after));
     }
 
     @WorkerThread
-    private <T, F> F performSync(T entity, Function<T, F> operation, BiConsumer<T, F> after, Consumer<T> before) {
+    private static  <T, F> F performSync(T entity, Function<T, F> operation, BiConsumer<T, F> after) {
         Preconditions.checkNotNull(operation);
         Preconditions.checkNotNull(entity);
-
-        if (before != null) {
-            before.accept(entity);
-        }
 
         F f = operation.apply(entity);
         if (after != null) {
@@ -99,7 +97,7 @@ class BaseRepository {
         }
     }
 
-    private static <T> void applyToEach(Collection<T> collection, Consumer<T> consumer) {
+    static <T> void applyToEach(Collection<T> collection, Consumer<T> consumer) {
         for (T element : collection) {
             consumer.accept(element);
         }

@@ -19,13 +19,13 @@ final class ActualTrainingCreateTreeDelegate extends ActualTrainingTreeDelegate 
     @Override
     LiveData<Boolean> load(ActualTrainingTree tree) {
         ActualTraining actualTraining = new ActualTraining(id);
-        actualTrainingRepository.insertActualTraining(actualTraining);
-
-        return Transformations.map(loadProgramTrainingTree(id), unused -> {
-            ActualTrainingTreeBuilder builder = new ActualTrainingTreeBuilder(tree);
-            builder.setParent(actualTraining);
-            builder.setProgramTrainingTree(programTrainingTree).build();
-            return true;
-        });
+        return Transformations.switchMap(actualTrainingRepository.insertActualTrainingWithResult(actualTraining), unusedId ->
+                Transformations.map(loadProgramTrainingTree(id), unused -> {
+                    ActualTrainingTreeBuilder builder = new ActualTrainingTreeBuilder(tree);
+                    builder.setParent(actualTraining);
+                    builder.setProgramTrainingTree(programTrainingTree).build();
+                    return true;
+                }
+        ));
     }
 }

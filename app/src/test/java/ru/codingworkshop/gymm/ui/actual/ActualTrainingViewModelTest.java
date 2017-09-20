@@ -12,8 +12,10 @@ import org.mockito.MockitoAnnotations;
 import junitparams.JUnitParamsRunner;
 import ru.codingworkshop.gymm.data.entity.ActualExercise;
 import ru.codingworkshop.gymm.data.entity.ActualSet;
+import ru.codingworkshop.gymm.data.entity.ActualTraining;
 import ru.codingworkshop.gymm.data.tree.node.ActualExerciseNode;
 import ru.codingworkshop.gymm.data.tree.node.ActualTrainingTree;
+import ru.codingworkshop.gymm.data.util.LiveDataUtil;
 import ru.codingworkshop.gymm.repository.ActualTrainingRepository;
 import ru.codingworkshop.gymm.repository.ExercisesRepository;
 import ru.codingworkshop.gymm.repository.ProgramTrainingRepository;
@@ -56,13 +58,22 @@ public class ActualTrainingViewModelTest {
 
     @Test
     public void startTraining() throws Exception {
-        LiveTest.verifyLiveData(vm.startTraining(1L), l -> l);
-        ActualTrainingTree tree = vm.getActualTrainingTree();
+        doAnswer(invocation -> {
+            ActualTraining actualTraining = invocation.getArgument(0);
+            actualTraining.setId(11L);
+            return LiveDataUtil.getLive(11L);
+        }).when(actualRepository).insertActualTrainingWithResult(any(ActualTraining.class));
 
+        LiveTest.verifyLiveData(vm.startTraining(1L), l -> l);
+
+        ActualTrainingTree tree = vm.getActualTrainingTree();
         assertEquals(1, tree.getChildren().size());
-        verify(actualRepository).insertActualTraining(any());
+        assertEquals(11L, tree.getParent().getId());
+        verify(actualRepository).insertActualTrainingWithResult(any());
+
         verifyProgramLoaded();
 
+        // don't start if already started
         LiveTest.verifyLiveData(vm.startTraining(0L), l -> l);
         assertEquals(tree, vm.getActualTrainingTree());
     }
