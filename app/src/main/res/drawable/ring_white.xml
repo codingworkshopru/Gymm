@@ -1,0 +1,10 @@
+<shape android:shape="ring"
+    android:innerRadius="120dp"
+    android:thickness="@dimen/timerCircleThickness"
+    android:useLevel="false"
+    xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <size android:height="250dp" android:width="250dp" />
+    <solid android:color="#FFF" />
+
+</shape>

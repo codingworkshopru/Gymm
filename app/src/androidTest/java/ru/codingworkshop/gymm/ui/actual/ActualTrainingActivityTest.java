@@ -27,7 +27,6 @@ import ru.codingworkshop.gymm.R;
 import ru.codingworkshop.gymm.data.entity.ActualExercise;
 import ru.codingworkshop.gymm.data.entity.ActualSet;
 import ru.codingworkshop.gymm.data.entity.ActualTraining;
-import ru.codingworkshop.gymm.data.entity.Exercise;
 import ru.codingworkshop.gymm.data.entity.ProgramSet;
 import ru.codingworkshop.gymm.data.tree.loader.builder.ActualTrainingTreeBuilder;
 import ru.codingworkshop.gymm.data.tree.node.ActualExerciseNode;
@@ -36,7 +35,7 @@ import ru.codingworkshop.gymm.data.tree.node.ImmutableProgramExerciseNode;
 import ru.codingworkshop.gymm.data.tree.node.ImmutableProgramTrainingTree;
 import ru.codingworkshop.gymm.data.tree.node.ProgramExerciseNode;
 import ru.codingworkshop.gymm.data.tree.node.ProgramTrainingTree;
-import ru.codingworkshop.gymm.service.TrainingTimeService;
+import ru.codingworkshop.gymm.service.TrainingForegroundService;
 import ru.codingworkshop.gymm.testing.ActualTrainingActivityIsolated;
 import ru.codingworkshop.gymm.ui.actual.viewmodel.ActualTrainingViewModel;
 import ru.codingworkshop.gymm.util.Models;
@@ -104,6 +103,16 @@ public class ActualTrainingActivityTest {
 
     @Test
     public void startTrainingTest() throws Exception {
+        setUpForStartTraining();
+
+        onView(withId(R.id.actualTrainingToolbar)).check(matches(withChild(withText("foo"))));
+        onView(withText("exercise100")).check(matches(isDisplayed()));
+
+        verify(vm).startTraining(1L);
+        verify(vm, atLeastOnce()).getActualTrainingTree();
+    }
+
+    private void setUpForStartTraining() {
         doAnswer(invocation -> {
             final ActualTrainingTree tree = buildTreeWithoutActuals(1);
             when(vm.getActualTrainingTree()).thenReturn(tree);
@@ -111,14 +120,13 @@ public class ActualTrainingActivityTest {
             return new LiveData<Boolean>() {{postValue(true);}};
         }).when(vm).startTraining(1L);
         reconfigure(ActualTrainingActivity.EXTRA_PROGRAM_TRAINING_ID, 1L);
+    }
 
-        onView(withId(R.id.actualTrainingToolbar)).check(matches(withChild(withText("foo"))));
-        onView(withText("exercise100")).check(matches(isDisplayed()));
+    @Test
+    public void startTrainingServiceTest() throws Exception {
+        setUpForStartTraining();
 
-        assertTrue(TrainingTimeService.isRunning(InstrumentationRegistry.getTargetContext()));
-
-        verify(vm).startTraining(1L);
-        verify(vm, atLeastOnce()).getActualTrainingTree();
+        assertTrue(TrainingForegroundService.isRunning(InstrumentationRegistry.getTargetContext()));
     }
 
     @Test
@@ -279,7 +287,7 @@ public class ActualTrainingActivityTest {
         return tree;
     }
 
-    protected ActualTrainingTree buildTreeWithoutActuals(int exercisesCount) {
+    private ActualTrainingTree buildTreeWithoutActuals(int exercisesCount) {
         ActualTrainingTreeBuilder builder = new ActualTrainingTreeBuilder(new ActualTrainingTree());
 
         builder.setProgramTrainingTree(buildProgramTrainingTree(exercisesCount));
@@ -287,7 +295,7 @@ public class ActualTrainingActivityTest {
         return (ActualTrainingTree) builder.build();
     }
 
-    protected ActualTrainingTree buildFullPopulatedTree(int exercisesCount) {
+    private ActualTrainingTree buildFullPopulatedTree(int exercisesCount) {
         ActualTrainingTreeBuilder builder = new ActualTrainingTreeBuilder(new ActualTrainingTree());
 
         ProgramTrainingTree programTrainingTree = buildProgramTrainingTree(exercisesCount);
@@ -314,7 +322,7 @@ public class ActualTrainingActivityTest {
         return (ActualTrainingTree) builder.build();
     }
 
-    protected ActualTrainingTree buildHalfPopulatedTree(int exercisesCount) {
+    private ActualTrainingTree buildHalfPopulatedTree(int exercisesCount) {
         Preconditions.checkArgument(exercisesCount > 1, "Exercises count must be more than 1");
         // since the method is for testing purposes
         // a full tree taken and removed last actual sets
@@ -332,66 +340,44 @@ public class ActualTrainingActivityTest {
         return tree;
     }
 
-    protected ActualTrainingTree buildTreeForStart(int exercisesCount) {
-        ActualTrainingTree tree = new ActualTrainingTree();
-        tree.setProgramTraining(Models.createProgramTraining(1L, "foo"));
-
-        tree.setChildren(Lists.transform(Models.createProgramExercises(exercisesCount), pe -> {
-            ProgramExerciseNode peNode = new ImmutableProgramExerciseNode(pe);
-
-            peNode.setChildren(Models.createProgramSets(pe.getId(), 2));
-
-            final long exerciseId = peNode.getExerciseId();
-            Exercise exercise = Models.createExercise(exerciseId, "exercise" + exerciseId);
-            exercise.setWithWeight(true);
-            peNode.setExercise(exercise);
-
-            ActualExerciseNode node = new ActualExerciseNode();
-            node.setProgramExerciseNode(peNode);
-            return node;
-        }));
-
-        return tree;
-    }
-
-    protected void clickDoneButton() {
+    private void clickDoneButton() {
         onView(currentPageItem(R.id.actualSetDoneButton)).perform(click());
     }
 
-    protected void selectStepAtPosition(int position) {
+    private void selectStepAtPosition(int position) {
         onView(withId(R.id.actualExerciseSteps)).perform(RecyclerViewActions.actionOnItemAtPosition(position, click()));
     }
 
-    protected void typeRepsCount(int repsCount, boolean clear) {
+    private void typeRepsCount(int repsCount, boolean clear) {
         type(R.id.actualSetRepsCountEditText, Integer.toString(repsCount), clear);
     }
 
-    protected void typeWeight(double weight, boolean clear) {
+    private void typeWeight(double weight, boolean clear) {
         type(R.id.actualSetWeightEditText, Double.toString(weight), clear);
     }
 
-    protected void type(@LayoutRes int id, String text, boolean clear) {
+    private void type(@LayoutRes int id, String text, boolean clear) {
         if (clear) {
             onView(currentPageItem(id)).perform(clearText());
         }
         onView(currentPageItem(id)).perform(typeText(text));
     }
 
-    protected void checkWeight(double weight) {
+    private void checkWeight(double weight) {
         onView(currentPageItem(R.id.actualSetWeightEditText)).check(matches(withText(Double.toString(weight))));
     }
 
-    protected void checkRepsCount(int repsCount) {
+    private void checkRepsCount(int repsCount) {
         onView(currentPageItem(R.id.actualSetRepsCountEditText)).check(matches(withText(Integer.toString(repsCount))));
     }
 
-    protected void assertCurrentPageIndex(int inUiIndex) {
+    private void assertCurrentPageIndex(int inUiIndex) {
         String sets = getQuantityString(R.plurals.number_of_sets, inUiIndex);
         onView(currentPageItem(R.id.actualSetIndex)).check(matches(withText(sets)));
     }
 
     @NonNull
-    protected String getQuantityString(@PluralsRes int pluralId, Integer i) {
+    private String getQuantityString(@PluralsRes int pluralId, Integer i) {
         return InstrumentationRegistry.getTargetContext().getResources().getQuantityString(pluralId, i, i);
     }
 }

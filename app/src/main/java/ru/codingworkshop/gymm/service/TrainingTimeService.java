@@ -104,8 +104,9 @@ public class TrainingTimeService extends Service {
     public int onStartCommand(Intent intent, int flags, int startId) {
         Log.d(TAG, "onStartCommand");
 
-        if (intent == null)
+        if (intent == null) {
             return START_STICKY;
+        }
 
         notification = new TrainingNotification(
                 this,

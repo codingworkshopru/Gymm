@@ -49,52 +49,50 @@ ext {
     junit_params = "1.1.0"
 }
 
-
-
 dependencies {
-//    implementation 'com.android.support:support-v4:26.0.2' // dunno what's that
-    compile fileTree(dir: "libs", include: ["*.jar"])
+    implementation fileTree(dir: "libs", include: ["*.jar"])
 
-    compile "com.android.support:support-annotations:$support"
-    compile "com.android.support:appcompat-v7:$support"
-    compile "com.android.support:recyclerview-v7:$support"
-    compile "com.android.support:design:$support"
-    compile "com.android.support:support-v4:$support"
-    compile "com.android.support.constraint:constraint-layout:$constraint"
+    implementation "com.android.support:support-annotations:$support"
+    implementation "com.android.support:appcompat-v7:$support"
+    implementation "com.android.support:recyclerview-v7:$support"
+    implementation "com.android.support:design:$support"
+    implementation "com.android.support:support-v4:$support"
+    implementation "com.android.support.constraint:constraint-layout:$constraint"
 
-    compile "android.arch.lifecycle:runtime:$arch"
-    compile "android.arch.lifecycle:extensions:$arch"
-    compile "android.arch.persistence.room:runtime:$arch"
+    implementation "android.arch.lifecycle:runtime:$arch"
+    implementation "android.arch.lifecycle:extensions:$arch"
+    implementation "android.arch.persistence.room:runtime:$arch"
 
-    compile "com.google.guava:guava:$guava"
-    compile "com.google.code.gson:gson:$gson"
-    compile "com.google.dagger:dagger:$dagger"
-    compile "com.google.dagger:dagger-android:$dagger"
-    compile "com.squareup.picasso:picasso:$picasso"
-    compile "com.jakewharton.timber:timber:$timber"
+    implementation "com.google.guava:guava:$guava"
+    implementation "com.google.code.gson:gson:$gson"
+    implementation "com.google.dagger:dagger:$dagger"
+    implementation "com.google.dagger:dagger-android:$dagger"
+    implementation "com.squareup.picasso:picasso:$picasso"
+    implementation "com.jakewharton.timber:timber:$timber"
 
-//    debugCompile "com.squareup.leakcanary:leakcanary-android:$leakcanary"
-//    releaseCompile "com.squareup.leakcanary:leakcanary-android-no-op:$leakcanary"
+//    debugImplementation "com.squareup.leakcanary:leakcanary-android:$leakcanary"
+//    releaseImplementation "com.squareup.leakcanary:leakcanary-android-no-op:$leakcanary"
 
+    implementation 'com.android.support:support-v4:26.1.0'
     annotationProcessor "android.arch.lifecycle:compiler:$arch"
     annotationProcessor "android.arch.persistence.room:compiler:$arch"
     annotationProcessor "com.google.dagger:dagger-android-processor:$dagger"
     annotationProcessor "com.google.dagger:dagger-compiler:$dagger"
 
-    testCompile "junit:junit:$junit"
-    testCompile "pl.pragmatists:JUnitParams:$junit_params"
-    testCompile "org.mockito:mockito-core:$mockito"
-//    testCompile "com.squareup.leakcanary:leakcanary-android-no-op:$leakcanary"
-    testCompile "android.arch.core:core-testing:$arch"
+    testImplementation "junit:junit:$junit"
+    testImplementation "pl.pragmatists:JUnitParams:$junit_params"
+    testImplementation "org.mockito:mockito-core:$mockito"
+//    testImplementation "com.squareup.leakcanary:leakcanary-android-no-op:$leakcanary"
+    testImplementation "android.arch.core:core-testing:$arch"
 
-    androidTestCompile "pl.pragmatists:JUnitParams:$junit_params"
-    androidTestCompile "com.android.support:appcompat-v7:$support"
-    androidTestCompile "com.android.support:recyclerview-v7:$support"
-    androidTestCompile "com.android.support:support-v4:$support"
-    androidTestCompile "com.android.support:design:$support"
-    androidTestCompile "android.arch.core:core-testing:$arch"
-    androidTestCompile "org.mockito:mockito-android:$mockito"
-    androidTestCompile "com.android.support.test.espresso:espresso-core:$espresso"
-    androidTestCompile "com.android.support.test.espresso:espresso-contrib:$espresso"
-    androidTestCompile "com.android.support.test.espresso:espresso-intents:$espresso"
+    androidTestImplementation "pl.pragmatists:JUnitParams:$junit_params"
+    androidTestImplementation "com.android.support:appcompat-v7:$support"
+    androidTestImplementation "com.android.support:recyclerview-v7:$support"
+    androidTestImplementation "com.android.support:support-v4:$support"
+    androidTestImplementation "com.android.support:design:$support"
+    androidTestImplementation "android.arch.core:core-testing:$arch"
+    androidTestImplementation "org.mockito:mockito-android:$mockito"
+    androidTestImplementation "com.android.support.test.espresso:espresso-core:$espresso"
+    androidTestImplementation "com.android.support.test.espresso:espresso-contrib:$espresso"
+    androidTestImplementation "com.android.support.test.espresso:espresso-intents:$espresso"
 }

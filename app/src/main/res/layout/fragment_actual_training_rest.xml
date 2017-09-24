@@ -1,0 +1,93 @@
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+        <variable
+            name="totalSeconds"
+            type="int" />
+
+        <variable
+            name="currentTimeSeconds"
+            type="int" />
+
+        <variable
+            name="currentTime"
+            type="String" />
+    </data>
+
+    <android.support.constraint.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="?attr/colorPrimary"
+        tools:context="ru.codingworkshop.gymm.ui.actual.ActualTrainingRestFragment">
+
+        <TextView
+            android:id="@+id/restTimeLeft"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:fontFamily="sans-serif-light"
+            android:text="@{currentTime}"
+            android:textAppearance="@style/TextAppearance.AppCompat.Display3"
+            android:textColor="?android:attr/textColorPrimaryInverse"
+            app:layout_constraintBottom_toBottomOf="@+id/animatedLoadingView"
+            app:layout_constraintEnd_toEndOf="@+id/animatedLoadingView"
+            app:layout_constraintStart_toStartOf="@+id/animatedLoadingView"
+            app:layout_constraintTop_toTopOf="@+id/animatedLoadingView"
+            tools:text="01:30" />
+
+        <android.support.design.widget.FloatingActionButton
+            android:id="@+id/restPlayPauseActionButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="@dimen/fab_margin"
+            android:clickable="true"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:srcCompat="@drawable/ic_play_arrow_white_24dp" />
+
+        <ImageButton
+            android:id="@+id/restStopButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:padding="8dp"
+            app:layout_constraintBottom_toTopOf="@+id/restPlayPauseActionButton"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.65"
+            app:layout_constraintStart_toEndOf="@+id/restPlayPauseActionButton"
+            app:layout_constraintTop_toBottomOf="@+id/restPlayPauseActionButton"
+            app:srcCompat="@drawable/ic_stop_white_24dp" />
+
+        <ImageButton
+            android:id="@+id/restPlusOneMinuteButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:padding="8dp"
+            app:layout_constraintBottom_toTopOf="@+id/restPlayPauseActionButton"
+            app:layout_constraintEnd_toStartOf="@+id/restPlayPauseActionButton"
+            app:layout_constraintHorizontal_bias="0.35"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/restPlayPauseActionButton"
+            app:srcCompat="@drawable/ic_plus_1_white_24dp" />
+
+        <ru.codingworkshop.gymm.ui.actual.SatelliteProgressBar
+            android:id="@+id/animatedLoadingView"
+            android:layout_width="250dp"
+            android:layout_height="250dp"
+            app:angle="0"
+            app:startAngle="90"
+            app:mainColor="?attr/colorAccent"
+            app:orbitStrokeWidth="5dp"
+            app:satelliteDiameter="15dp"
+            app:layout_constraintBottom_toTopOf="@id/restPlayPauseActionButton"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
+
+        </ru.codingworkshop.gymm.ui.actual.SatelliteProgressBar>
+
+    </android.support.constraint.ConstraintLayout>
+</layout>

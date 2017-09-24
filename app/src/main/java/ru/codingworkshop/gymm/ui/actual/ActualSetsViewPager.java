@@ -4,8 +4,6 @@ import android.content.Context;
 import android.support.v4.view.ViewPager;
 import android.view.View;
 
-import timber.log.Timber;
-
 /**
  * Created by Радик on 16.09.2017 as part of the Gymm project.
  */
@@ -25,7 +23,6 @@ final class ActualSetsViewPager extends ViewPager {
     }
 
     private int getHeightMeasureSpec(int widthMeasureSpec, int heightMeasureSpec) {
-        Timber.d("getHeightMeasureSpec()");
         View child = getChildAt(0);
         if (child != null) {
             int childHeightMeasureSpec = MeasureSpec.makeMeasureSpec(0, MeasureSpec.UNSPECIFIED);

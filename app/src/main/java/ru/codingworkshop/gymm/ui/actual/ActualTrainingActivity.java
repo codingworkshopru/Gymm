@@ -1,8 +1,10 @@
 package ru.codingworkshop.gymm.ui.actual;
 
 import android.annotation.SuppressLint;
+import android.arch.lifecycle.LiveData;
 import android.arch.lifecycle.ViewModelProvider;
 import android.arch.lifecycle.ViewModelProviders;
+import android.content.Intent;
 import android.databinding.DataBindingUtil;
 import android.os.Bundle;
 import android.support.annotation.VisibleForTesting;
@@ -26,7 +28,7 @@ import ru.codingworkshop.gymm.data.tree.node.ActualExerciseNode;
 import ru.codingworkshop.gymm.data.tree.node.ActualTrainingTree;
 import ru.codingworkshop.gymm.databinding.ActivityActualTrainingStepperItemBinding;
 import ru.codingworkshop.gymm.db.GymmDatabase;
-import ru.codingworkshop.gymm.service.TrainingTimeService;
+import ru.codingworkshop.gymm.service.TrainingForegroundService;
 import ru.codingworkshop.gymm.ui.ActivityAlerts;
 import ru.codingworkshop.gymm.ui.actual.viewmodel.ActualTrainingViewModel;
 
@@ -84,22 +86,27 @@ public class ActualTrainingActivity extends AppCompatActivity implements ActualS
 
     private void startTraining() {
         final long programTrainingId = getIntent().getLongExtra(EXTRA_PROGRAM_TRAINING_ID, 0L);
-        viewModel.startTraining(programTrainingId)
-                .observe(this, this::dataLoaded);
+        final LiveData<Boolean> liveLoaded = viewModel.startTraining(programTrainingId);
+        liveLoaded.observe(this, this::dataLoaded);
+        liveLoaded.observe(this, this::startTrainingService);
     }
 
     private void dataLoaded(boolean loaded) {
         if (!loaded) return;
 
         tree = viewModel.getActualTrainingTree();
-
-        // TODO if the service crashed it must be started with ActualTraining.getStartTime()
-        TrainingTimeService.startService(this, tree.getParent().getId(), tree.getProgramTraining().getName());
-
         initViews();
     }
 
-    @SuppressLint("NewApi")
+    private void startTrainingService(boolean loaded) {
+        if (!loaded) return;
+
+        // TODO if the service crashed it must be started with ActualTraining.getStartTime()
+        final Intent serviceIntent = new Intent(this, TrainingForegroundService.class);
+        startService(serviceIntent);
+    }
+
+    @SuppressLint("NewApi") // FIXME
     private void initViews() {
         setToolbarTitle(tree.getProgramTraining().getName());
 

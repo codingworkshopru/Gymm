@@ -49,7 +49,7 @@ public final class TrainingNotification {
 //        TaskStackBuilder stackBuilder = TaskStackBuilder.programTrainingInstance(context)
 //                .addParentStack(ActualTrainingActivity.class)
 //                .addNextIntent(actualTrainingIntent);
-
+//
 //        PendingIntent mainAction = stackBuilder.getPendingIntent(123, PendingIntent.FLAG_UPDATE_CURRENT);
 
         final String GYMM_CHANNEL_ID = "gymm_channel_id";

@@ -4,7 +4,7 @@
 
     <item
         android:id="@+id/action_finish_training"
-        android:icon="@drawable/ic_flag_black_24dp"
+        android:icon="@drawable/ic_flag_white_24dp"
         android:title="Закончить тренировку"
         app:showAsAction="ifRoom" />
 </menu>
