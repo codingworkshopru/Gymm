@@ -21,8 +21,8 @@ import ru.codingworkshop.gymm.R;
 public class SatelliteProgressBar extends View {
     private float satelliteDiameter;
     private float orbitStrokeWidth;
-    private int angle;
-    private int startAngle;
+    private float angle;
+    private float startAngle;
     private @ColorInt int mainColor;
     private @ColorInt int secondaryColor;
 
@@ -46,8 +46,8 @@ public class SatelliteProgressBar extends View {
         try {
             satelliteDiameter = a.getDimension(R.styleable.SatelliteProgressBar_satelliteDiameter, 30f);
             orbitStrokeWidth = a.getDimension(R.styleable.SatelliteProgressBar_orbitStrokeWidth, 10f);
-            angle = -a.getInteger(R.styleable.SatelliteProgressBar_angle, 120);
-            startAngle = -a.getInteger(R.styleable.SatelliteProgressBar_startAngle, 90);
+            angle = -a.getFloat(R.styleable.SatelliteProgressBar_angle, 120);
+            startAngle = -a.getFloat(R.styleable.SatelliteProgressBar_startAngle, 90);
             mainColor = a.getColor(R.styleable.SatelliteProgressBar_mainColor, Color.BLACK);
             secondaryColor = a.getColor(R.styleable.SatelliteProgressBar_secondaryColor, Color.WHITE);
         } finally {
@@ -113,11 +113,11 @@ public class SatelliteProgressBar extends View {
         requestLayout();
     }
 
-    public int getAngle() {
+    public float getAngle() {
         return -angle;
     }
 
-    public void setAngle(int angle) {
+    public void setAngle(float angle) {
         this.angle = -angle;
         updateSatellitePosition(getWidth(), getHeight());
         invalidate();
@@ -125,11 +125,11 @@ public class SatelliteProgressBar extends View {
 //                (int) (satelliteCenter.x + satelliteDiameter), (int) (satelliteCenter.y + satelliteDiameter));
     }
 
-    public int getStartAngle() {
+    public float getStartAngle() {
         return -startAngle;
     }
 
-    public void setStartAngle(int startAngle) {
+    public void setStartAngle(float startAngle) {
         this.startAngle = -startAngle;
         invalidate();
     }

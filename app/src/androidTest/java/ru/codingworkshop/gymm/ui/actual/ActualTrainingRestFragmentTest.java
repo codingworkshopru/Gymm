@@ -30,6 +30,5 @@ public class ActualTrainingRestFragmentTest {
     @Test
     public void initializationTest() throws Exception {
         onView(withId(R.id.restTimeLeft)).check(matches(withText("0:30")));
-        Thread.sleep(1100);
     }
 }

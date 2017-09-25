@@ -42,7 +42,7 @@ public class ActualTrainingRestFragment extends Fragment {
 
         initBinding();
 
-        ObjectAnimator animation = ObjectAnimator.ofInt(binding.animatedLoadingView, "angle", 0, 360);
+        ObjectAnimator animation = ObjectAnimator.ofFloat(binding.animatedLoadingView, "angle", 0f, 360f);
         animation.setDuration(90000);
         animation.setInterpolator(new LinearInterpolator());
         animation.setRepeatCount(ValueAnimator.INFINITE);
