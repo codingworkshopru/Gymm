@@ -12,13 +12,15 @@ import android.os.Looper;
 import android.os.Process;
 import android.support.annotation.Nullable;
 
+import com.google.common.eventbus.EventBus;
+
 import timber.log.Timber;
 
 /**
  * Created by Радик on 21.09.2017 as part of the Gymm project.
  */
 
-public class TrainingForegroundService extends Service {
+public class TrainingForegroundService extends Service implements RestEventBusHolder {
 
     static final class ServiceBinder extends Binder {
         private TrainingForegroundService service;
@@ -35,12 +37,6 @@ public class TrainingForegroundService extends Service {
     private Looper serviceLooper;
     private RestController timerController;
     private IBinder binder = new ServiceBinder(this);
-
-    public void startRest(long millisecondsForRest) {
-        Timber.d("startRest: %d", millisecondsForRest);
-
-        timerController.startRest(millisecondsForRest);
-    }
 
     @Override
     public void onCreate() {
@@ -79,20 +75,9 @@ public class TrainingForegroundService extends Service {
         return binder;
     }
 
-    public void pauseRest() {
-        timerController.pauseRest();
-    }
-
-    public void resumeRest() {
-        timerController.resumeRest();
-    }
-
-    public void stopRest() {
-        timerController.stopRest();
-    }
-
-    public void addRestTime(long additionalTime) {
-        timerController.addRestTime(additionalTime);
+    @Override
+    public EventBus getRestEventBus() {
+        return timerController.getRestEventBus();
     }
 
     public boolean isRestInProgress() {

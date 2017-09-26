@@ -8,9 +8,22 @@ import android.os.Message;
 import android.support.annotation.WorkerThread;
 
 import com.google.common.base.Preconditions;
+import com.google.common.eventbus.EventBus;
+import com.google.common.eventbus.Subscribe;
 
 import java.util.concurrent.atomic.AtomicLong;
 
+import ru.codingworkshop.gymm.service.event.incoming.AddRestTimeEvent;
+import ru.codingworkshop.gymm.service.event.incoming.PauseRestEvent;
+import ru.codingworkshop.gymm.service.event.incoming.ResumeRestEvent;
+import ru.codingworkshop.gymm.service.event.incoming.StartRestEvent;
+import ru.codingworkshop.gymm.service.event.incoming.StopRestEvent;
+import ru.codingworkshop.gymm.service.event.outcoming.RestFinishedEvent;
+import ru.codingworkshop.gymm.service.event.outcoming.RestPausedEvent;
+import ru.codingworkshop.gymm.service.event.outcoming.RestResumedEvent;
+import ru.codingworkshop.gymm.service.event.outcoming.RestStartedEvent;
+import ru.codingworkshop.gymm.service.event.outcoming.RestTimeAddedEvent;
+import ru.codingworkshop.gymm.service.event.outcoming.RestTimerTickEvent;
 import ru.codingworkshop.gymm.service.state.RestInPause;
 import ru.codingworkshop.gymm.service.state.RestInProgress;
 import ru.codingworkshop.gymm.service.state.RestInactive;
@@ -23,22 +36,28 @@ import timber.log.Timber;
 public final class RestController extends Handler {
     public static final int START_REST_MSG = 0;
     public static final int PAUSE_REST_MSG = 1;
-    public static final int STOP_REST_MSG = 2;
+    public static final int RESUME_REST_MSG = 2;
+    public static final int STOP_REST_MSG = 3;
     private static final int ADD_TIME_REST_MSG = 4;
 
     public static final String REST_MILLISECONDS_KEY = "restMillisecondsKey";
 
-    private AtomicLong millisecondsLeft = new AtomicLong();
+    private final AtomicLong millisecondsLeft = new AtomicLong();
     private CountDownTimer timer;
 
-    private RestInProgress restInProgress;
-    private RestInactive restInactive;
-    private RestInPause restInPause;
+    private final RestInProgress restInProgress;
+    private final RestInactive restInactive;
+    private final RestInPause restInPause;
 
     private State currentState;
+    private final EventBus restEventBus;
 
     public RestController(Looper looper) {
         super(looper);
+
+        restEventBus = new EventBus();
+        restEventBus.register(this);
+
         restInProgress = new RestInProgress(this);
         restInactive = new RestInactive(this);
         restInPause = new RestInPause(this);
@@ -48,30 +67,46 @@ public final class RestController extends Handler {
 
     @Override
     public void handleMessage(Message msg) {
+        long millis;
         switch (msg.what) {
-
             case ADD_TIME_REST_MSG:
                 stopTimer();
+                millis = getMillis(msg);
+                startTimer(millis);
+                restEventBus.post(new RestTimeAddedEvent(millis));
+                break;
 
             case START_REST_MSG:
-                final Bundle data = msg.getData();
-                Preconditions.checkArgument(data.containsKey(REST_MILLISECONDS_KEY), "Message object must contain rest time");
-                long millis = data.getLong(REST_MILLISECONDS_KEY);
+                millis = getMillis(msg);
                 startTimer(millis);
+                restEventBus.post(new RestStartedEvent(millis));
                 break;
 
             case PAUSE_REST_MSG:
                 stopTimer();
+                restEventBus.post(new RestPausedEvent(millisecondsLeft.get()));
+                break;
+
+            case RESUME_REST_MSG:
+                startTimer(millisecondsLeft.get());
+                restEventBus.post(new RestResumedEvent());
                 break;
 
             case STOP_REST_MSG:
                 stopTimer();
                 millisecondsLeft.set(0L);
+                restEventBus.post(new RestFinishedEvent());
                 break;
 
             default:
                 throw new IllegalArgumentException("Wrong timer message type");
         }
+    }
+
+    private long getMillis(Message msg) {
+        final Bundle data = msg.getData();
+        Preconditions.checkArgument(data.containsKey(REST_MILLISECONDS_KEY), "Message object must contain rest time");
+        return data.getLong(REST_MILLISECONDS_KEY);
     }
 
     @WorkerThread
@@ -84,11 +119,12 @@ public final class RestController extends Handler {
             @Override
             public void onTick(long millisUntilFinished) {
                 millisecondsLeft.set(millisUntilFinished);
+                restEventBus.post(new RestTimerTickEvent(millisUntilFinished));
             }
 
             @Override
             public void onFinish() {
-                stopRest();
+                finishRest(null);
             }
         };
 
@@ -103,6 +139,36 @@ public final class RestController extends Handler {
             timer.cancel();
             timer = null;
         }
+    }
+
+    EventBus getRestEventBus() {
+        return restEventBus;
+    }
+
+    @Subscribe
+    public void startRest(StartRestEvent event) {
+        getState().startRest(event.getMilliseconds());
+    }
+
+    @Subscribe
+    public void pauseRest(PauseRestEvent event) {
+        getState().pauseRest();
+    }
+
+    @Subscribe
+    public void resumeRest(ResumeRestEvent event) {
+        getState().resumeRest();
+    }
+
+    @Subscribe
+    public void finishRest(StopRestEvent event) {
+        getState().stopRest();
+    }
+
+    @Subscribe
+    public void addRestTime(AddRestTimeEvent event) {
+        final long totalTime = getMillisecondsLeft() + event.getMilliseconds();
+        obtainRestMessageWithTime(ADD_TIME_REST_MSG, totalTime).sendToTarget();
     }
 
     public RestInProgress getRestInProgress() {
@@ -127,27 +193,6 @@ public final class RestController extends Handler {
 
     public long getMillisecondsLeft() {
         return millisecondsLeft.get();
-    }
-
-    public void startRest(long milliseconds) {
-        getState().startRest(milliseconds);
-    }
-
-    public void pauseRest() {
-        getState().pauseRest();
-    }
-
-    public void resumeRest() {
-        getState().resumeRest();
-    }
-
-    public void stopRest() {
-        getState().stopRest();
-    }
-
-    public void addRestTime(long additionalTime) {
-        final long totalTime = getMillisecondsLeft() + additionalTime;
-        obtainRestMessageWithTime(ADD_TIME_REST_MSG, totalTime).sendToTarget();
     }
 
     public Message obtainRestStartMessage(long restTimeInMillis) {

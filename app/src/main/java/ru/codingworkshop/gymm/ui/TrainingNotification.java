@@ -17,6 +17,7 @@ import android.widget.RemoteViews;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.Locale;
 
 import ru.codingworkshop.gymm.R;
 
@@ -33,6 +34,7 @@ public final class TrainingNotification {
 
     private static final int NOTIFICATION_ID = 1;
     private static final String TAG = TrainingNotification.class.getSimpleName();
+    private final DateFormat NOTIFICATION_TIME_FORMATTER = new SimpleDateFormat("mm:ss", Locale.getDefault());
 
     public TrainingNotification(Context c, String title, long id) {
         context = c;
@@ -93,8 +95,7 @@ public final class TrainingNotification {
     }
 
     public void setRestTime(long milliseconds) {
-        DateFormat f = new SimpleDateFormat("mm:ss");
-        String time = f.format(new Date(milliseconds));
+        String time = NOTIFICATION_TIME_FORMATTER.format(new Date(milliseconds));
         setText(R.id.notification_rest_elapsed_time, time);
         update();
     }

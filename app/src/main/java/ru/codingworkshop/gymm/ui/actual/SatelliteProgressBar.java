@@ -121,8 +121,6 @@ public class SatelliteProgressBar extends View {
         this.angle = -angle;
         updateSatellitePosition(getWidth(), getHeight());
         invalidate();
-//                (int) (satelliteCenter.x - satelliteDiameter), (int) (satelliteCenter.y - satelliteDiameter),
-//                (int) (satelliteCenter.x + satelliteDiameter), (int) (satelliteCenter.y + satelliteDiameter));
     }
 
     public float getStartAngle() {

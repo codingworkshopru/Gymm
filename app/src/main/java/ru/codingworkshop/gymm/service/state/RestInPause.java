@@ -3,6 +3,7 @@ package ru.codingworkshop.gymm.service.state;
 import ru.codingworkshop.gymm.service.RestController;
 import timber.log.Timber;
 
+import static ru.codingworkshop.gymm.service.RestController.RESUME_REST_MSG;
 import static ru.codingworkshop.gymm.service.RestController.STOP_REST_MSG;
 
 /**
@@ -28,7 +29,7 @@ public class RestInPause implements State {
 
     @Override
     public void resumeRest() {
-        context.obtainRestStartMessage(context.getMillisecondsLeft()).sendToTarget();
+        context.obtainMessage(RESUME_REST_MSG).sendToTarget();
         context.setState(context.getRestInProgress());
     }
 
