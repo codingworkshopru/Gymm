@@ -8,7 +8,7 @@
             type="String" />
 
         <import type="android.view.View" />
-        <import type="ru.codingworkshop.gymm.ui.actual.ActualTrainingRestFragment.State" />
+        <import type="ru.codingworkshop.gymm.ui.actual.rest.ActualTrainingRestFragment.State" />
 
         <variable
             name="state"
@@ -20,7 +20,7 @@
         android:layout_height="match_parent"
         android:background="?attr/colorPrimary"
         android:theme="@style/AppTheme.WhiteHighlights"
-        tools:context="ru.codingworkshop.gymm.ui.actual.ActualTrainingRestFragment">
+        tools:context="ru.codingworkshop.gymm.ui.actual.rest.ActualTrainingRestFragment">
 
         <TextView
             android:id="@+id/restTimeLeft"
@@ -30,10 +30,10 @@
             android:textAppearance="@style/TextAppearance.AppCompat.Display4"
             android:textColor="?android:attr/textColorPrimaryInverse"
             android:textSize="72sp"
-            app:layout_constraintBottom_toBottomOf="@+id/animatedLoadingView"
-            app:layout_constraintEnd_toEndOf="@+id/animatedLoadingView"
-            app:layout_constraintStart_toStartOf="@+id/animatedLoadingView"
-            app:layout_constraintTop_toTopOf="@+id/animatedLoadingView"
+            app:layout_constraintBottom_toBottomOf="@+id/satelliteProgressBar"
+            app:layout_constraintEnd_toEndOf="@+id/satelliteProgressBar"
+            app:layout_constraintStart_toStartOf="@+id/satelliteProgressBar"
+            app:layout_constraintTop_toTopOf="@+id/satelliteProgressBar"
             tools:text="01:30" />
 
         <android.support.design.widget.FloatingActionButton
@@ -76,8 +76,8 @@
             app:layout_constraintTop_toBottomOf="@+id/restPauseResumeActionButton"
             app:srcCompat="@drawable/ic_plus_1_white_24dp" />
 
-        <ru.codingworkshop.gymm.ui.actual.SatelliteProgressBar
-            android:id="@+id/animatedLoadingView"
+        <ru.codingworkshop.gymm.ui.actual.rest.SatelliteProgressBar
+            android:id="@+id/satelliteProgressBar"
             android:layout_width="250dp"
             android:layout_height="250dp"
             app:angle="0"
@@ -90,7 +90,7 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent">
 
-        </ru.codingworkshop.gymm.ui.actual.SatelliteProgressBar>
+        </ru.codingworkshop.gymm.ui.actual.rest.SatelliteProgressBar>
 
     </android.support.constraint.ConstraintLayout>
 </layout>

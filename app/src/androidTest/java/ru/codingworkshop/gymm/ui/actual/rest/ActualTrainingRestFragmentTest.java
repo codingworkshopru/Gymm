@@ -1,13 +1,17 @@
-package ru.codingworkshop.gymm.ui.actual;
+package ru.codingworkshop.gymm.ui.actual.rest;
 
 import android.support.test.rule.ActivityTestRule;
 
 import com.google.common.eventbus.EventBus;
+import com.google.common.eventbus.Subscribe;
 
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.mockito.MockitoAnnotations;
+
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
 
 import ru.codingworkshop.gymm.R;
 import ru.codingworkshop.gymm.service.event.incoming.AddRestTimeEvent;
@@ -21,6 +25,7 @@ import ru.codingworkshop.gymm.service.event.outcoming.RestResumedEvent;
 import ru.codingworkshop.gymm.service.event.outcoming.RestTimeAddedEvent;
 import ru.codingworkshop.gymm.service.event.outcoming.RestTimerTickEvent;
 import ru.codingworkshop.gymm.testing.SimpleFragmentActivity;
+import ru.codingworkshop.gymm.ui.actual.Matchers;
 
 import static android.support.test.espresso.Espresso.onView;
 import static android.support.test.espresso.action.ViewActions.click;
@@ -49,10 +54,7 @@ public class ActualTrainingRestFragmentTest {
     public void setUp() throws Exception {
         MockitoAnnotations.initMocks(this);
 
-        fragment = ActualTrainingRestFragment.newInstance(30000);
         bus = spy(new EventBus());
-        fragment.restEventBus = bus;
-        activityTestRule.getActivity().setFragment(fragment);
 
         doAnswer(invocation -> {
             bus.post(new RestResumedEvent(25000));
@@ -68,6 +70,10 @@ public class ActualTrainingRestFragmentTest {
             bus.post(new RestTimeAddedEvent(90000));
             return null;
         }).when(bus).post(any(AddRestTimeEvent.class));
+
+        fragment = ActualTrainingRestFragment.newInstance(30000);
+        fragment.restEventBus = bus;
+        activityTestRule.getActivity().setFragment(fragment);
 
         assertTime("0:30");
     }
@@ -125,6 +131,14 @@ public class ActualTrainingRestFragmentTest {
     @Test
     public void setCurrentTime() throws Exception {
         bus.post(new RestTimerTickEvent(20000));
+        CountDownLatch l = new CountDownLatch(1);
+        bus.register(new Object() {
+            @Subscribe
+            public void onEvent(RestTimerTickEvent e) {
+                l.countDown();
+            }
+        });
+        l.await(1000, TimeUnit.MILLISECONDS);
         assertTime("0:20");
     }
 

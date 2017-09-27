@@ -1,7 +1,6 @@
-package ru.codingworkshop.gymm.ui.actual;
+package ru.codingworkshop.gymm.ui.actual.rest;
 
 
-import android.animation.ObjectAnimator;
 import android.content.Context;
 import android.databinding.DataBindingUtil;
 import android.os.Bundle;
@@ -11,7 +10,8 @@ import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.animation.LinearInterpolator;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
@@ -35,16 +35,20 @@ import ru.codingworkshop.gymm.service.event.outcoming.RestStoppedEvent;
 import ru.codingworkshop.gymm.service.event.outcoming.RestTimeAddedEvent;
 import ru.codingworkshop.gymm.service.event.outcoming.RestTimerTickEvent;
 
+import static android.view.animation.Animation.INFINITE;
+import static android.view.animation.Animation.REVERSE;
+
+@SuppressWarnings("unused")
 public class ActualTrainingRestFragment extends Fragment {
     private static final String REST_TIME_MILLISECONDS_KEY = "restTimeMillisecondsKey";
     private final SimpleDateFormat TIME_FORMATTER = new SimpleDateFormat("m:ss", Locale.getDefault());
 
     private FragmentActualTrainingRestBinding binding;
     private long totalTimeMilliseconds;
-    private boolean paused;
     @VisibleForTesting
     EventBus restEventBus;
-    private ObjectAnimator animation;
+    private SatelliteProgressBarAnimation progressBarAnimation;
+    private Animation fadeInFadeOut;
 
     public enum State {
         PAUSED, IN_PROGRESS, FINISHED
@@ -80,11 +84,11 @@ public class ActualTrainingRestFragment extends Fragment {
 
     @Override
     public void onDetach() {
-        animation.end();
+        super.onDetach();
+
+        progressBarAnimation.stop();
         restEventBus.unregister(this);
         restEventBus = null;
-
-        super.onDetach();
     }
 
     @Override
@@ -98,17 +102,19 @@ public class ActualTrainingRestFragment extends Fragment {
         setTimeLeft(totalTimeMilliseconds);
 
         initListeners();
-        initAnimation();
+        initAnimations();
 
         setViewState(State.IN_PROGRESS);
 
         return binding.getRoot();
     }
 
-    private void initAnimation() {
-        animation = ObjectAnimator.ofFloat(binding.animatedLoadingView, "angle", 0f, 360f);
-        animation.setDuration(totalTimeMilliseconds);
-        animation.setInterpolator(new LinearInterpolator());
+    private void initAnimations() {
+        progressBarAnimation = new SatelliteProgressBarAnimation(binding.satelliteProgressBar, totalTimeMilliseconds);
+
+        fadeInFadeOut = AnimationUtils.loadAnimation(getContext(), android.R.anim.fade_out);
+        fadeInFadeOut.setRepeatMode(REVERSE);
+        fadeInFadeOut.setRepeatCount(INFINITE);
     }
 
     private void initListeners() {
@@ -135,7 +141,12 @@ public class ActualTrainingRestFragment extends Fragment {
     @Subscribe
     private void onRestTimeAdded(RestTimeAddedEvent event) {
         setTimeLeft(event.getMilliseconds());
-        animation.setDuration(event.getMilliseconds());
+        progressBarAnimation.setDuration(event.getMilliseconds());
+    }
+
+    @Subscribe
+    private void onRestStopped(RestStoppedEvent event) {
+        // TODO call an activity method which will detach the fragment
     }
 
     @Subscribe
@@ -144,30 +155,8 @@ public class ActualTrainingRestFragment extends Fragment {
         setViewState(State.FINISHED);
     }
 
-    @Subscribe
-    private void onRestStopped(RestStoppedEvent event) {
-        // TODO call an activity method which will detach the fragment
-    }
-
     private void setTimeLeft(long milliseconds) {
         binding.setCurrentTime(TIME_FORMATTER.format(new Date(milliseconds)));
-    }
-
-    private void onPlusOneMinuteButtonClick(View view) {
-        restEventBus.post(new AddRestTimeEvent(60000));
-    }
-
-    private void onStopRestButtonClick(View view) {
-        restEventBus.post(new StopRestEvent());
-    }
-
-    private void onPauseResumeButtonClick(View view) {
-        setPaused(!paused);
-    }
-
-    private void setPaused(boolean pausedFlag) {
-        paused = pausedFlag;
-        restEventBus.post(paused ? new PauseRestEvent() : new ResumeRestEvent());
     }
 
     private void setViewState(State state) {
@@ -176,23 +165,20 @@ public class ActualTrainingRestFragment extends Fragment {
 
             switch (state) {
                 case PAUSED:
-                    animation.cancel();
+                    progressBarAnimation.pause();
                     playPauseButtonDrawable = R.drawable.ic_play_arrow_white_24dp;
+//                    binding.restTimeLeft.startAnimation(fadeInFadeOut);
                     break;
 
                 case IN_PROGRESS:
-                    animation.setupStartValues();
-                    animation.start();
+                    progressBarAnimation.start();
                     playPauseButtonDrawable = R.drawable.ic_pause_white_24dp;
+                    binding.restTimeLeft.clearAnimation();
                     break;
 
                 case FINISHED:
-                    animation.end();
+                    progressBarAnimation.stop();
                     playPauseButtonDrawable = R.drawable.ic_stop_white_24dp;
-
-//                    Animation fadeInFadeOut = AnimationUtils.loadAnimation(getContext(), android.R.anim.fade_out);
-//                    fadeInFadeOut.setRepeatMode(REVERSE);
-//                    fadeInFadeOut.setRepeatCount(INFINITE);
 //                    binding.restTimeLeft.startAnimation(fadeInFadeOut);
                     break;
 
@@ -205,4 +191,25 @@ public class ActualTrainingRestFragment extends Fragment {
         });
     }
 
+    private void onPlusOneMinuteButtonClick(View view) {
+        restEventBus.post(new AddRestTimeEvent(60000));
+    }
+
+    private void onStopRestButtonClick(View view) {
+        restEventBus.post(new StopRestEvent());
+    }
+
+    private void onPauseResumeButtonClick(View view) {
+        switch (binding.getState()) {
+            case PAUSED:
+                restEventBus.post(new ResumeRestEvent());
+                break;
+            case IN_PROGRESS:
+                restEventBus.post(new PauseRestEvent());
+                break;
+            case FINISHED:
+                onRestStopped(null);
+                break;
+        }
+    }
 }

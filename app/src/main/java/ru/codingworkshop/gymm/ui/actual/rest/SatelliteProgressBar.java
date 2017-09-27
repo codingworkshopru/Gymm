@@ -1,4 +1,4 @@
-package ru.codingworkshop.gymm.ui.actual;
+package ru.codingworkshop.gymm.ui.actual.rest;
 
 import android.content.Context;
 import android.content.res.TypedArray;

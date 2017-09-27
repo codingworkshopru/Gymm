@@ -24,7 +24,7 @@ import ru.codingworkshop.gymm.R;
  * Created by Радик on 16.09.2017 as part of the Gymm project.
  */
 
-final class Matchers {
+public final class Matchers {
     private Matchers() {
 
     }
@@ -73,7 +73,7 @@ final class Matchers {
         };
     }
 
-    static Matcher<View> hasImage(@DrawableRes int drawableId) {
+    public static Matcher<View> hasImage(@DrawableRes int drawableId) {
         return new BoundedMatcher<View, ImageView>(ImageView.class) {
             @Override
             protected boolean matchesSafely(ImageView item) {
