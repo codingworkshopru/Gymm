@@ -30,6 +30,7 @@ import ru.codingworkshop.gymm.service.event.outcoming.RestFinishedEvent;
 import ru.codingworkshop.gymm.service.event.outcoming.RestPausedEvent;
 import ru.codingworkshop.gymm.service.event.outcoming.RestResumedEvent;
 import ru.codingworkshop.gymm.service.event.outcoming.RestStartedEvent;
+import ru.codingworkshop.gymm.service.event.outcoming.RestStoppedEvent;
 import ru.codingworkshop.gymm.service.event.outcoming.RestTimeAddedEvent;
 import ru.codingworkshop.gymm.service.event.outcoming.RestTimerTickEvent;
 
@@ -62,9 +63,9 @@ public class TrainingForegroundServiceTest {
         TrainingForegroundService service = bind();
         assertFalse(service.isRestInProgress());
 
-        postEvent(service, new StartRestEvent(1000));
+        postEvent(service, new StartRestEvent(2000));
         assertTrue(service.isRestInProgress());
-        assertEventReceived(service, RestStartedEvent.class, e -> assertEquals(1000, e.getMilliseconds()));
+        assertEventReceived(service, RestStartedEvent.class, e -> assertEquals(2000, e.getMilliseconds()));
     }
 
     @Test
@@ -72,7 +73,7 @@ public class TrainingForegroundServiceTest {
         TrainingForegroundService service = bind();
 
         postEvent(service, new StartRestEvent(2000));
-        assertEventReceived(service, RestFinishedEvent.class, null, 3000);
+        assertEventReceived(service, RestFinishedEvent.class, e -> assertFalse(service.isRestInProgress()), 3000);
     }
 
     @Test
@@ -99,12 +100,10 @@ public class TrainingForegroundServiceTest {
 
         postEvent(service, new StartRestEvent(2000));
         assertFalse(service.isRestInPause());
-        Thread.sleep(1100);
         postEvent(service, new PauseRestEvent());
         assertTrue(service.isRestInPause());
 
-        assertEventReceived(service, RestPausedEvent.class,
-                e -> assertThat(e.getMilliseconds(), both(greaterThan(0L)).and(lessThan(1000L))));
+        assertEventReceived(service, RestPausedEvent.class, null);
 
         assertEventsNotReceived(service, null, 1000L, RestTimerTickEvent.class, RestFinishedEvent.class);
     }
@@ -116,7 +115,8 @@ public class TrainingForegroundServiceTest {
         postEvent(service, new PauseRestEvent());
         assertEventsNotReceived(service, null, 2100L, RestTimerTickEvent.class, RestFinishedEvent.class);
         postEvent(service, new ResumeRestEvent());
-        assertEventReceived(service, RestResumedEvent.class, null);
+        assertEventReceived(service, RestResumedEvent.class,
+                e -> assertEquals(2000L, e.getMilliseconds()));
         assertEventReceived(service, RestFinishedEvent.class, null, 2100);
     }
 
@@ -125,7 +125,7 @@ public class TrainingForegroundServiceTest {
         final TrainingForegroundService service = bind();
         postEvent(service, new StartRestEvent(1000));
         postEvent(service, new StopRestEvent());
-        assertEventReceived(service, RestFinishedEvent.class, null);
+        assertEventReceived(service, RestStoppedEvent.class, e -> assertFalse(service.isRestInProgress()));
     }
 
     @Test
@@ -134,7 +134,7 @@ public class TrainingForegroundServiceTest {
         postEvent(service, new StartRestEvent(1000));
         postEvent(service, new PauseRestEvent());
         postEvent(service, new StopRestEvent());
-        assertEventReceived(service, RestFinishedEvent.class, null);
+        assertEventReceived(service, RestStoppedEvent.class, null);
         assertFalse(service.isRestInProgress());
     }
 

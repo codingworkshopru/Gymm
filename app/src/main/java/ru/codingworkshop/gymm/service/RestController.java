@@ -22,6 +22,7 @@ import ru.codingworkshop.gymm.service.event.outcoming.RestFinishedEvent;
 import ru.codingworkshop.gymm.service.event.outcoming.RestPausedEvent;
 import ru.codingworkshop.gymm.service.event.outcoming.RestResumedEvent;
 import ru.codingworkshop.gymm.service.event.outcoming.RestStartedEvent;
+import ru.codingworkshop.gymm.service.event.outcoming.RestStoppedEvent;
 import ru.codingworkshop.gymm.service.event.outcoming.RestTimeAddedEvent;
 import ru.codingworkshop.gymm.service.event.outcoming.RestTimerTickEvent;
 import ru.codingworkshop.gymm.service.state.RestInPause;
@@ -84,18 +85,18 @@ public final class RestController extends Handler {
 
             case PAUSE_REST_MSG:
                 stopTimer();
-                restEventBus.post(new RestPausedEvent(millisecondsLeft.get()));
+                restEventBus.post(new RestPausedEvent());
                 break;
 
             case RESUME_REST_MSG:
                 startTimer(millisecondsLeft.get());
-                restEventBus.post(new RestResumedEvent());
+                restEventBus.post(new RestResumedEvent(millisecondsLeft.get()));
                 break;
 
             case STOP_REST_MSG:
                 stopTimer();
                 millisecondsLeft.set(0L);
-                restEventBus.post(new RestFinishedEvent());
+                restEventBus.post(new RestStoppedEvent());
                 break;
 
             default:
@@ -124,7 +125,8 @@ public final class RestController extends Handler {
 
             @Override
             public void onFinish() {
-                finishRest(null);
+                setState(restInactive);
+                restEventBus.post(new RestFinishedEvent());
             }
         };
 

@@ -4,16 +4,15 @@
 
     <data>
         <variable
-            name="totalSeconds"
-            type="int" />
-
-        <variable
-            name="currentTimeSeconds"
-            type="int" />
-
-        <variable
             name="currentTime"
             type="String" />
+
+        <import type="android.view.View" />
+        <import type="ru.codingworkshop.gymm.ui.actual.ActualTrainingRestFragment.State" />
+
+        <variable
+            name="state"
+            type="State" />
     </data>
 
     <android.support.constraint.ConstraintLayout
@@ -38,7 +37,7 @@
             tools:text="01:30" />
 
         <android.support.design.widget.FloatingActionButton
-            android:id="@+id/restPlayPauseActionButton"
+            android:id="@+id/restPauseResumeActionButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_margin="@dimen/fab_margin"
@@ -47,7 +46,7 @@
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:srcCompat="@drawable/ic_pause_white_24dp" />
+            app:srcCompat="@drawable/ic_pause_white_24dp"/>
 
         <ImageButton
             android:id="@+id/restStopButton"
@@ -55,11 +54,12 @@
             android:layout_height="wrap_content"
             android:background="?attr/selectableItemBackgroundBorderless"
             android:padding="8dp"
-            app:layout_constraintBottom_toTopOf="@+id/restPlayPauseActionButton"
+            android:visibility="@{state == State.FINISHED ? View.GONE : View.VISIBLE}"
+            app:layout_constraintBottom_toTopOf="@+id/restPauseResumeActionButton"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.65"
-            app:layout_constraintStart_toEndOf="@+id/restPlayPauseActionButton"
-            app:layout_constraintTop_toBottomOf="@+id/restPlayPauseActionButton"
+            app:layout_constraintStart_toEndOf="@+id/restPauseResumeActionButton"
+            app:layout_constraintTop_toBottomOf="@+id/restPauseResumeActionButton"
             app:srcCompat="@drawable/ic_stop_white_24dp" />
 
         <ImageButton
@@ -68,11 +68,12 @@
             android:layout_height="wrap_content"
             android:background="?attr/selectableItemBackgroundBorderless"
             android:padding="8dp"
-            app:layout_constraintBottom_toTopOf="@+id/restPlayPauseActionButton"
-            app:layout_constraintEnd_toStartOf="@+id/restPlayPauseActionButton"
+            android:visibility="@{state == State.FINISHED ? View.GONE : View.VISIBLE}"
+            app:layout_constraintBottom_toTopOf="@+id/restPauseResumeActionButton"
+            app:layout_constraintEnd_toStartOf="@+id/restPauseResumeActionButton"
             app:layout_constraintHorizontal_bias="0.35"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/restPlayPauseActionButton"
+            app:layout_constraintTop_toBottomOf="@+id/restPauseResumeActionButton"
             app:srcCompat="@drawable/ic_plus_1_white_24dp" />
 
         <ru.codingworkshop.gymm.ui.actual.SatelliteProgressBar
@@ -84,7 +85,7 @@
             app:mainColor="?attr/colorAccent"
             app:orbitStrokeWidth="5dp"
             app:satelliteDiameter="15dp"
-            app:layout_constraintBottom_toTopOf="@id/restPlayPauseActionButton"
+            app:layout_constraintBottom_toTopOf="@id/restPauseResumeActionButton"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent">
