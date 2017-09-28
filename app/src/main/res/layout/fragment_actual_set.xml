@@ -74,7 +74,8 @@
             app:layout_constraintEnd_toStartOf="@+id/actualSetWeightLayout"
             app:layout_constraintHorizontal_bias="0.5"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/actualSetIndex">
+            app:layout_constraintTop_toBottomOf="@+id/actualSetIndex"
+            android:layout_marginLeft="8dp">
 
             <android.support.design.widget.TextInputEditText
                 android:id="@+id/actualSetRepsCountEditText"
@@ -96,7 +97,8 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.5"
             app:layout_constraintStart_toEndOf="@+id/actualSetRepsCountLayout"
-            app:layout_constraintTop_toBottomOf="@+id/actualSetIndex">
+            app:layout_constraintTop_toBottomOf="@+id/actualSetIndex"
+            android:layout_marginRight="8dp">
 
             <android.support.design.widget.TextInputEditText
                 android:id="@+id/actualSetWeightEditText"
@@ -116,7 +118,8 @@
             android:layout_marginTop="8dp"
             android:text="@string/actual_training_activity_stepper_item_finish_set"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/actualSetRepsCountLayout" />
+            app:layout_constraintTop_toBottomOf="@+id/actualSetRepsCountLayout"
+            android:layout_marginLeft="8dp" />
 
     </android.support.constraint.ConstraintLayout>
 </layout>

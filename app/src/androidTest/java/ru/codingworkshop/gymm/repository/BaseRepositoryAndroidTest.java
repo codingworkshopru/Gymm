@@ -11,7 +11,6 @@ import java.util.concurrent.Executors;
 
 import ru.codingworkshop.gymm.util.DummyDao;
 import ru.codingworkshop.gymm.util.LiveTest;
-import ru.codingworkshop.gymm.util.Models;
 import ru.codingworkshop.gymm.util.SimpleModel;
 
 import static junit.framework.Assert.assertEquals;
@@ -35,7 +34,7 @@ public class BaseRepositoryAndroidTest {
 
     @Test
     public void insertWithResultTest() throws Exception {
-        SimpleModel model = Models.createSimpleModels(0L).get(0);
+        SimpleModel model = new SimpleModel(0L, "simple model 0");
 
         when(dao.insert(model)).thenReturn(1L);
 

@@ -110,11 +110,11 @@ public class TrainingTimeService extends Service {
 
         notification = new TrainingNotification(
                 this,
-                intent.getStringExtra(TRAINING_TIME_SERVICE_TITLE),
-                intent.getLongExtra(TRAINING_TIME_SERVICE_TRAINING_ID, 0L)
+                intent.getLongExtra(TRAINING_TIME_SERVICE_TRAINING_ID, 0L),
+                intent.getStringExtra(TRAINING_TIME_SERVICE_TITLE)
         );
 
-        notification.show(this);
+        notification.show();
 
         return START_STICKY;
     }

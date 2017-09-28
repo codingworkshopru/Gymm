@@ -6,14 +6,17 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Binder;
 import android.os.Build;
+import android.os.Bundle;
 import android.os.HandlerThread;
 import android.os.IBinder;
 import android.os.Looper;
 import android.os.Process;
-import android.support.annotation.Nullable;
+import android.support.annotation.VisibleForTesting;
 
+import com.google.common.base.Preconditions;
 import com.google.common.eventbus.EventBus;
 
+import ru.codingworkshop.gymm.ui.TrainingNotification;
 import timber.log.Timber;
 
 /**
@@ -34,9 +37,29 @@ public class TrainingForegroundService extends Service implements RestEventBusHo
         }
     }
 
+    public static final String ACTUAL_TRAINING_ID_KEY = "actualTrainingIdKey";
+    public static final String TRAINING_NAME_KEY = "trainingNameKey";
+
+    @VisibleForTesting
+    TrainingNotification notification;
     private Looper serviceLooper;
-    private RestController timerController;
+    private RestController restController;
     private IBinder binder = new ServiceBinder(this);
+
+    public static void startService(Context context, long actualTrainingId, String notificationTitle) {
+        if (isRunning(context)) return;
+
+        Intent intent = new Intent(context, TrainingForegroundService.class);
+        intent.putExtras(createExtras(actualTrainingId, notificationTitle));
+        context.startService(intent);
+    }
+
+    public static Bundle createExtras(long actualTrainingId, String notificationTitle) {
+        Bundle extras = new Bundle(2);
+        extras.putLong(ACTUAL_TRAINING_ID_KEY, actualTrainingId);
+        extras.putString(TRAINING_NAME_KEY, notificationTitle);
+        return extras;
+    }
 
     @Override
     public void onCreate() {
@@ -47,19 +70,32 @@ public class TrainingForegroundService extends Service implements RestEventBusHo
         thread.start();
 
         serviceLooper = thread.getLooper();
-        timerController = new RestController(serviceLooper);
+        restController = new RestController(serviceLooper);
     }
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         Timber.d("onStartCommand");
 
-        return START_STICKY;
+        Preconditions.checkArgument(intent.hasExtra(ACTUAL_TRAINING_ID_KEY));
+        Preconditions.checkArgument(intent.hasExtra(TRAINING_NAME_KEY));
+
+        notification = new TrainingNotification(this,
+                intent.getLongExtra(ACTUAL_TRAINING_ID_KEY, 0L),
+                intent.getStringExtra(TRAINING_NAME_KEY));
+
+        notification.show();
+
+        return START_REDELIVER_INTENT;
     }
 
     @Override
     public void onDestroy() {
         Timber.d("onDestroy");
+
+        stopForeground(true);
+        notification = null;
+        restController = null;
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR2) {
             serviceLooper.quitSafely();
@@ -68,7 +104,6 @@ public class TrainingForegroundService extends Service implements RestEventBusHo
         }
     }
 
-    @Nullable
     @Override
     public IBinder onBind(Intent intent) {
         Timber.d("onBind");
@@ -77,19 +112,19 @@ public class TrainingForegroundService extends Service implements RestEventBusHo
 
     @Override
     public EventBus getRestEventBus() {
-        return timerController.getRestEventBus();
+        return restController.getRestEventBus();
     }
 
     public boolean isRestInProgress() {
-        return timerController.isRestInProgress();
+        return restController.isRestInProgress();
     }
 
     public boolean isRestInPause() {
-        return timerController.isRestInPause();
+        return restController.isRestInPause();
     }
 
     public long getMillisecondsLeft() {
-        return timerController.getMillisecondsLeft();
+        return restController.getMillisecondsLeft();
     }
 
     public static boolean isRunning(Context context) {

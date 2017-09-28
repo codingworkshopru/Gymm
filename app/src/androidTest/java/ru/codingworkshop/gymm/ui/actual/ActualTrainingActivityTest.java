@@ -7,6 +7,7 @@ import android.support.annotation.LayoutRes;
 import android.support.annotation.NonNull;
 import android.support.annotation.PluralsRes;
 import android.support.test.InstrumentationRegistry;
+import android.support.test.espresso.Espresso;
 import android.support.test.espresso.contrib.RecyclerViewActions;
 import android.support.test.espresso.core.internal.deps.guava.base.Preconditions;
 import android.support.test.rule.ActivityTestRule;
@@ -249,6 +250,8 @@ public class ActualTrainingActivityTest {
 
         typeRepsCount(1, true);
         typeWeight(0.1, true);
+
+        Espresso.closeSoftKeyboard();
 
         clickDoneButton();
         assertCurrentPageIndex(1);

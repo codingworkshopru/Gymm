@@ -19,7 +19,7 @@
             android:ellipsize="end"
             android:maxLines="1"
             android:textAppearance="@style/TextAppearance.AppCompat.Notification.Title"
-            tools:text="very very very very very very very very very very very very very very long text" />
+            tools:text="very very very very very very very very very very very long text" />
 
         <TextView
             android:layout_width="wrap_content"
@@ -43,7 +43,9 @@
         android:id="@+id/notification_rest_layout"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:orientation="horizontal">
+        android:orientation="horizontal"
+        android:visibility="gone"
+        tools:visibility="visible">
 
         <TextView
             android:id="@+id/notification_text"
@@ -52,9 +54,8 @@
             android:layout_weight="1"
             android:ellipsize="end"
             android:maxLines="1"
-            android:text="1234"
             android:textAppearance="@style/TextAppearance.AppCompat.Notification"
-            tools:text="very very very very very very very very very very very very very very long text" />
+            tools:text="very very very very very very very very very very very long" />
 
         <TextView
             android:id="@+id/notification_rest_elapsed_time"
@@ -63,7 +64,6 @@
             android:layout_marginLeft="4dp"
             android:layout_marginStart="4dp"
             android:maxLines="1"
-            android:text="1234"
             android:textAppearance="@style/TextAppearance.AppCompat.Notification"
             tools:text="1234" />
 

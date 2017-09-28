@@ -72,7 +72,7 @@ public final class RestController extends Handler {
         switch (msg.what) {
             case ADD_TIME_REST_MSG:
                 stopTimer();
-                millis = getMillis(msg);
+                millis = millisecondsLeft.get() + getMillis(msg);
                 startTimer(millis);
                 restEventBus.post(new RestTimeAddedEvent(millis));
                 break;
@@ -169,8 +169,7 @@ public final class RestController extends Handler {
 
     @Subscribe
     public void addRestTime(AddRestTimeEvent event) {
-        final long totalTime = getMillisecondsLeft() + event.getMilliseconds();
-        obtainRestMessageWithTime(ADD_TIME_REST_MSG, totalTime).sendToTarget();
+        obtainRestMessageWithTime(ADD_TIME_REST_MSG, event.getMilliseconds()).sendToTarget();
     }
 
     public RestInProgress getRestInProgress() {

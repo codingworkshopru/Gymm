@@ -1,11 +1,11 @@
 package ru.codingworkshop.gymm.ui.actual;
 
+import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.drawable.Drawable;
 import android.support.annotation.DrawableRes;
 import android.support.annotation.IdRes;
-import android.support.test.InstrumentationRegistry;
 import android.support.test.espresso.matcher.BoundedMatcher;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.view.ViewPager;
@@ -60,7 +60,6 @@ public final class Matchers {
 
     static Matcher<View> hasBackground(@DrawableRes int drawableId) {
         return new TypeSafeMatcher<View>() {
-
             @Override
             public void describeTo(Description description) {
                 description.appendText("is matches to specified drawable");
@@ -68,7 +67,7 @@ public final class Matchers {
 
             @Override
             protected boolean matchesSafely(View item) {
-                return drawablesAreEqual(item.getBackground(), drawableId);
+                return drawablesAreEqual(item.getBackground(), drawableId, item.getContext());
             }
         };
     }
@@ -77,7 +76,7 @@ public final class Matchers {
         return new BoundedMatcher<View, ImageView>(ImageView.class) {
             @Override
             protected boolean matchesSafely(ImageView item) {
-                return drawablesAreEqual(item.getDrawable(), drawableId);
+                return drawablesAreEqual(item.getDrawable(), drawableId, item.getContext());
             }
 
             @Override
@@ -87,15 +86,15 @@ public final class Matchers {
         };
     }
 
-    static private boolean drawablesAreEqual(Drawable actual, @DrawableRes int expectedDrawableId) {
+    static private boolean drawablesAreEqual(Drawable actual, @DrawableRes int expectedDrawableId, Context context) {
         Bitmap actualBitmap = Bitmap.createBitmap(actual.getBounds().width(), actual.getBounds().height(), Bitmap.Config.ARGB_8888);
         Canvas canvas = new Canvas(actualBitmap);
         actual.draw(canvas);
 
-        Drawable expected = ContextCompat.getDrawable(InstrumentationRegistry.getTargetContext(), expectedDrawableId);
+        Drawable expected = ContextCompat.getDrawable(context, expectedDrawableId);
         Bitmap expectedBitmap = Bitmap.createBitmap(expected.getIntrinsicWidth(), expected.getIntrinsicHeight(), Bitmap.Config.ARGB_8888);
-        canvas = new Canvas(expectedBitmap);
         expected.setBounds(0, 0, canvas.getWidth(), canvas.getHeight());
+        canvas = new Canvas(expectedBitmap);
         expected.draw(canvas);
 
         return expectedBitmap.sameAs(actualBitmap);
