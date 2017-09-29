@@ -8,6 +8,8 @@
     tools:context=".ui.actual.ActualTrainingActivity"
     tools:menu="actual_training_menu">
 
+
+
     <android.support.design.widget.AppBarLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -28,5 +30,12 @@
         android:layout_height="match_parent"
         app:layout_behavior="@string/appbar_scrolling_view_behavior"
         tools:listitem="@layout/activity_actual_training_stepper_item"/>
+
+    <FrameLayout
+        android:id="@+id/restFragmentContainer"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+    </FrameLayout>
 
 </android.support.design.widget.CoordinatorLayout>

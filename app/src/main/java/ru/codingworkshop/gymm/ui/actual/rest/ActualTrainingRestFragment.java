@@ -31,9 +31,9 @@ import ru.codingworkshop.gymm.service.event.incoming.StopRestEvent;
 import ru.codingworkshop.gymm.service.event.outcoming.RestFinishedEvent;
 import ru.codingworkshop.gymm.service.event.outcoming.RestPausedEvent;
 import ru.codingworkshop.gymm.service.event.outcoming.RestResumedEvent;
-import ru.codingworkshop.gymm.service.event.outcoming.RestStoppedEvent;
 import ru.codingworkshop.gymm.service.event.outcoming.RestTimeAddedEvent;
 import ru.codingworkshop.gymm.service.event.outcoming.RestTimerTickEvent;
+import timber.log.Timber;
 
 import static android.view.animation.Animation.INFINITE;
 import static android.view.animation.Animation.REVERSE;
@@ -54,20 +54,15 @@ public class ActualTrainingRestFragment extends Fragment {
         PAUSED, IN_PROGRESS, FINISHED
     }
 
-    public static ActualTrainingRestFragment newInstance(long restTimeMillis) {
-        ActualTrainingRestFragment fragment = new ActualTrainingRestFragment();
+    public void setRestTime(long restTimeMillis) {
         Bundle arguments = new Bundle(1);
         arguments.putLong(REST_TIME_MILLISECONDS_KEY, restTimeMillis);
-        fragment.setArguments(arguments);
-
-        return fragment;
-    }
-
-    public ActualTrainingRestFragment() {
+        setArguments(arguments);
     }
 
     @Override
     public void onAttach(Context context) {
+        Timber.d("onAttach");
         super.onAttach(context);
 
         if (restEventBus == null) {
@@ -84,6 +79,7 @@ public class ActualTrainingRestFragment extends Fragment {
 
     @Override
     public void onDetach() {
+        Timber.d("onDetach");
         super.onDetach();
 
         progressBarAnimation.stop();
@@ -145,11 +141,6 @@ public class ActualTrainingRestFragment extends Fragment {
     }
 
     @Subscribe
-    private void onRestStopped(RestStoppedEvent event) {
-        // TODO call an activity method which will detach the fragment
-    }
-
-    @Subscribe
     private void onRestFinished(RestFinishedEvent event) {
         setTimeLeft(0);
         setViewState(State.FINISHED);
@@ -208,7 +199,7 @@ public class ActualTrainingRestFragment extends Fragment {
                 restEventBus.post(new PauseRestEvent());
                 break;
             case FINISHED:
-                onRestStopped(null);
+                onStopRestButtonClick(null);
                 break;
         }
     }

@@ -153,11 +153,12 @@ public class ActualSetFragmentTest {
 
     @Test
     public void testRepsCountEditText() throws Exception {
+        onView(withId(R.id.actualSetRepsCountEditText)).perform(clearText());
         onView(withId(R.id.actualSetRepsCountEditText)).perform(typeText("foo"));
-        onView(withId(R.id.actualSetRepsCountEditText)).check(matches(withText("10")));
+        onView(withId(R.id.actualSetRepsCountEditText)).check(matches(withText("")));
 
         onView(withId(R.id.actualSetRepsCountEditText)).perform(typeText("1.1"));
-        onView(withId(R.id.actualSetRepsCountEditText)).check(matches(withText("1011")));
+        onView(withId(R.id.actualSetRepsCountEditText)).check(matches(withText("11")));
     }
 
     @Test

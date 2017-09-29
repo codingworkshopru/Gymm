@@ -53,6 +53,7 @@ import static android.support.test.espresso.matcher.ViewMatchers.withChild;
 import static android.support.test.espresso.matcher.ViewMatchers.withId;
 import static android.support.test.espresso.matcher.ViewMatchers.withText;
 import static junit.framework.Assert.assertTrue;
+import static org.hamcrest.Matchers.either;
 import static org.hamcrest.Matchers.not;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.argThat;
@@ -98,6 +99,13 @@ public class ActualTrainingActivityTest {
 
             return null;
         }).when(vm).createActualExercise(any(Integer.class));
+
+        doAnswer(invocation -> {
+            int exerciseIndex = invocation.getArgument(0);
+            ActualSet actualSet = invocation.getArgument(1);
+            vm.getActualTrainingTree().getChildren().get(exerciseIndex).addChild(actualSet);
+            return null;
+        }).when(vm).createActualSet(any(Integer.class), any(ActualSet.class));
 
         activityTestRule.launchActivity(null);
     }
@@ -215,17 +223,51 @@ public class ActualTrainingActivityTest {
     }
 
     @Test
+    public void finishSetWithoutRestTest() throws Exception {
+        selectStepAtPosition(2);
+
+        onView(currentPageItem(R.id.actualSetWeightEditText)).perform(click());
+        typeWeight(1.1, false);
+        clickDoneButton();
+
+        verify(vm).createActualSet(eq(2), argThat(set -> set.getWeight() == 1.1));
+    }
+
+    @Test
+    public void finishSetWithRestTest() throws Exception {
+        vm.getActualTrainingTree().getChildren().get(2).getProgramExerciseNode().getChildren().get(0).setSecondsForRest(1);
+
+        selectStepAtPosition(2);
+        typeWeight(1.1, false);
+        Espresso.closeSoftKeyboard();
+        clickDoneButton();
+
+        verify(vm).createActualSet(eq(2), argThat(set -> set.getWeight() == 1.1));
+
+        onView(withId(R.id.restTimeLeft)).check(matches(either(withText("0:00")).or(withText("0:01"))));
+        Thread.sleep(1000);
+        onView(withId(R.id.restPauseResumeActionButton)).perform(click());
+
+        assertCurrentPageIndex(2);
+    }
+
+    @Test
+    public void finishRestBeforeItEnds() throws Exception {
+        vm.getActualTrainingTree().getChildren().get(2).getProgramExerciseNode().getChildren().get(0).setSecondsForRest(10);
+
+        selectStepAtPosition(2);
+        Espresso.closeSoftKeyboard();
+        clickDoneButton();
+        onView(withId(R.id.restStopButton)).perform(click());
+
+        assertCurrentPageIndex(2);
+    }
+
+    @Test
     public void finishExerciseTest() throws Exception {
         onView(stepItem(R.id.stepperItemCircle, 0)).check(matches(hasBackground(R.drawable.ic_check_circle_primary_24dp)));
         selectStepAtPosition(1);
         onView(stepItem(R.id.stepperItemActualSetsContainer, 1)).perform(swipeLeft());
-
-        doAnswer(invocation -> {
-            int exerciseIndex = invocation.getArgument(0);
-            ActualSet actualSet = invocation.getArgument(1);
-            vm.getActualTrainingTree().getChildren().get(exerciseIndex).addChild(actualSet);
-            return null;
-        }).when(vm).createActualSet(any(Integer.class), any(ActualSet.class));
 
         typeWeight(1.1, false);
         clickDoneButton();

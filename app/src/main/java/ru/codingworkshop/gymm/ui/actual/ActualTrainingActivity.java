@@ -4,9 +4,15 @@ import android.annotation.SuppressLint;
 import android.arch.lifecycle.LiveData;
 import android.arch.lifecycle.ViewModelProvider;
 import android.arch.lifecycle.ViewModelProviders;
+import android.content.ComponentName;
+import android.content.Intent;
+import android.content.ServiceConnection;
 import android.databinding.DataBindingUtil;
 import android.os.Bundle;
+import android.os.IBinder;
+import android.support.annotation.NonNull;
 import android.support.annotation.VisibleForTesting;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
@@ -19,20 +25,27 @@ import android.view.ViewGroup;
 import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 
+import com.google.common.eventbus.EventBus;
+import com.google.common.eventbus.Subscribe;
+
 import javax.inject.Inject;
 
 import ru.codingworkshop.gymm.R;
 import ru.codingworkshop.gymm.data.entity.ActualSet;
-import ru.codingworkshop.gymm.data.tree.node.ActualExerciseNode;
 import ru.codingworkshop.gymm.data.tree.node.ActualTrainingTree;
 import ru.codingworkshop.gymm.databinding.ActivityActualTrainingStepperItemBinding;
 import ru.codingworkshop.gymm.db.GymmDatabase;
+import ru.codingworkshop.gymm.service.RestEventBusHolder;
 import ru.codingworkshop.gymm.service.TrainingForegroundService;
+import ru.codingworkshop.gymm.service.event.incoming.StopRestEvent;
 import ru.codingworkshop.gymm.ui.ActivityAlerts;
+import ru.codingworkshop.gymm.ui.actual.rest.ActualTrainingRestFragment;
 import ru.codingworkshop.gymm.ui.actual.viewmodel.ActualTrainingViewModel;
+import timber.log.Timber;
 
 public class ActualTrainingActivity extends AppCompatActivity
-        implements ActualSetFragment.OnActualSetSaveListener {
+        implements ActualSetFragment.OnActualSetSaveListener, RestEventBusHolder,
+        ServiceConnection {
 
     public static final String EXTRA_ACTUAL_TRAINING_ID = "extraActualTrainingId";
     public static final String EXTRA_PROGRAM_TRAINING_ID = "extraProgramTrainingId";
@@ -51,8 +64,14 @@ public class ActualTrainingActivity extends AppCompatActivity
 
     private ActivityAlerts alerts;
 
+    private ActualTrainingRestFragment restFragment;
+
+    private TrainingForegroundService trainingForegroundService;
+    private boolean bound = false;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        Timber.d("onCreate");
         setContentView(R.layout.activity_actual_training);
         super.onCreate(savedInstanceState);
 
@@ -61,6 +80,24 @@ public class ActualTrainingActivity extends AppCompatActivity
 
         initViewModel();
         loadData();
+    }
+
+    @Override
+    protected void onStart() {
+        Timber.d("onStart");
+        super.onStart();
+        bindTrainingService();
+    }
+
+    @Override
+    protected void onStop() {
+        Timber.d("onStop");
+        super.onStop();
+
+        if (bound) {
+            unbindService(this);
+            bound = false;
+        }
     }
 
     private void initViewModel() {
@@ -86,7 +123,6 @@ public class ActualTrainingActivity extends AppCompatActivity
         final long programTrainingId = getIntent().getLongExtra(EXTRA_PROGRAM_TRAINING_ID, 0L);
         final LiveData<Boolean> liveLoaded = viewModel.startTraining(programTrainingId);
         liveLoaded.observe(this, this::dataLoaded);
-        liveLoaded.observe(this, this::startTrainingService);
     }
 
     private void resumeTraining() {
@@ -96,18 +132,46 @@ public class ActualTrainingActivity extends AppCompatActivity
     }
 
     private void dataLoaded(boolean loaded) {
+        Timber.d("dataLoaded: " + loaded);
         if (!loaded) return;
 
         tree = viewModel.getActualTrainingTree();
+
+        if (!TrainingForegroundService.isRunning(this)) {
+            startTrainingService();
+            bindTrainingService();
+        }
+
         initViews();
     }
 
-    private void startTrainingService(boolean loaded) {
-        if (!loaded) return;
-
+    private void startTrainingService() {
+        Timber.d("startTrainingService");
         // TODO if the service crashed it must be started with ActualTraining.getStartTime()
         TrainingForegroundService.startService(
                 this, tree.getParent().getId(), tree.getProgramTraining().getName());
+    }
+
+    private void bindTrainingService() {
+        if (!TrainingForegroundService.isRunning(this)) return;
+        Timber.d("bindTrainingService; bound: " + bound);
+
+        if (!bound) {
+            bindService(new Intent(this, TrainingForegroundService.class), this, 0);
+        }
+    }
+
+    @Override
+    public void onServiceConnected(ComponentName name, IBinder service) {
+        Timber.d("onServiceConnected");
+        bound = true;
+        trainingForegroundService = ((TrainingForegroundService.ServiceBinder) service).getService();
+        trainingForegroundService.getRestEventBus().register(this);
+    }
+
+    @Override
+    public void onServiceDisconnected(ComponentName name) {
+        bound = false;
     }
 
     @SuppressLint("NewApi") // FIXME
@@ -165,27 +229,66 @@ public class ActualTrainingActivity extends AppCompatActivity
         } else {
             viewModel.createActualSet(currentStep, actualSet);
 
-            if (index == viewPager.getAdapter().getCount() - 1) {
-                goToNextStep();
+            Integer secondsForRest = tree.getChildren().get(currentStep).getProgramExerciseNode().getChildren().get(index).getSecondsForRest();
+            if (secondsForRest != null && secondsForRest > 0) {
+                if (restFragment == null) {
+                    restFragment = new ActualTrainingRestFragment();
+                }
+
+                restFragment.setRestTime(secondsForRest * 1000);
+
+
+                FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+                if (!restFragment.isAdded()) {
+                    transaction.add(R.id.restFragmentContainer, restFragment);
+                } else {
+                    transaction.attach(restFragment);
+                }
+                transaction.commit();
             } else {
-                viewPager.setCurrentItem(index + 1);
+                goToNext();
             }
         }
     }
 
-    public void goToNextStep() {
-        final int nextStep = activeBindingItem.getIndex() + 1;
-        RecyclerView.ViewHolder viewHolder = recyclerView.findViewHolderForAdapterPosition(nextStep);
+    @Subscribe
+    private void onRestStopped(StopRestEvent event) {
+        getSupportFragmentManager().beginTransaction().detach(restFragment).commit();
+        goToNext();
+    }
 
-        final ActualExerciseNode currentExerciseNode = tree.getChildren().get(nextStep - 1);
-        activeBindingItem.setDone(currentExerciseNode.getChildren().size() == currentExerciseNode.getProgramExerciseNode().getChildren().size());
+    @NonNull
+    @Override
+    public EventBus getRestEventBus() {
+        return trainingForegroundService.getRestEventBus();
+    }
+
+    private void goToNext() {
+        if (viewPager.getCurrentItem() == viewPager.getAdapter().getCount() - 1) { // last set
+            if (activeBindingItem.getIndex() < recyclerView.getAdapter().getItemCount() - 1) {
+                goToNextExercise();
+            }
+        } else {
+            goToNextSet();
+        }
+    }
+
+    private void goToNextSet() {
+        viewPager.setCurrentItem(viewPager.getCurrentItem() + 1);
+    }
+
+    private void goToNextExercise() {
+        final int nextExerciseIndex = activeBindingItem.getIndex() + 1;
+        RecyclerView.ViewHolder viewHolder = recyclerView.findViewHolderForAdapterPosition(nextExerciseIndex);
+
+        recyclerView.getAdapter().notifyItemChanged(activeBindingItem.getIndex());
 
         if (viewHolder == null) {
-            recyclerView.scrollToPosition(nextStep);
+            recyclerView.scrollToPosition(nextExerciseIndex);
             recyclerView.addOnChildAttachStateChangeListener(new RecyclerView.OnChildAttachStateChangeListener() {
                 @Override
                 public void onChildViewAttachedToWindow(View view) {
-                    View nextStepView = recyclerView.findViewHolderForAdapterPosition(nextStep).itemView;
+                    View nextStepView = recyclerView.findViewHolderForAdapterPosition(nextExerciseIndex).itemView;
                     onStepperItemActivate(nextStepView);
                     recyclerView.removeOnChildAttachStateChangeListener(this);
                 }
@@ -215,7 +318,6 @@ public class ActualTrainingActivity extends AppCompatActivity
         viewPager.setCurrentItem(0, false);
         layout.addView(viewPager);
         fragmentPagerAdapter.notifyDataSetChanged(tree.getChildren().get(binding.getIndex()));
-        viewPager.setOffscreenPageLimit(fragmentPagerAdapter.getCount() - 1); // FIXME this is a bad idea, but otherwise ViewPager stuck on API 24+
 
         binding.setActive(true);
 

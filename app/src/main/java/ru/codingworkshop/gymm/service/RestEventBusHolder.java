@@ -1,5 +1,7 @@
 package ru.codingworkshop.gymm.service;
 
+import android.support.annotation.NonNull;
+
 import com.google.common.eventbus.EventBus;
 
 /**
@@ -7,5 +9,5 @@ import com.google.common.eventbus.EventBus;
  */
 
 public interface RestEventBusHolder {
-    EventBus getRestEventBus();
+    @NonNull EventBus getRestEventBus();
 }

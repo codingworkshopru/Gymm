@@ -68,14 +68,13 @@
             android:id="@+id/actualSetRepsCountLayout"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
+            android:layout_marginLeft="8dp"
             android:layout_marginStart="8dp"
             android:layout_marginTop="8dp"
             app:errorEnabled="true"
             app:layout_constraintEnd_toStartOf="@+id/actualSetWeightLayout"
-            app:layout_constraintHorizontal_bias="0.5"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/actualSetIndex"
-            android:layout_marginLeft="8dp">
+            app:layout_constraintTop_toBottomOf="@+id/actualSetIndex">
 
             <android.support.design.widget.TextInputEditText
                 android:id="@+id/actualSetRepsCountEditText"
@@ -92,13 +91,12 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginEnd="8dp"
+            android:layout_marginRight="8dp"
             android:layout_marginTop="8dp"
             app:errorEnabled="true"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.5"
             app:layout_constraintStart_toEndOf="@+id/actualSetRepsCountLayout"
-            app:layout_constraintTop_toBottomOf="@+id/actualSetIndex"
-            android:layout_marginRight="8dp">
+            app:layout_constraintTop_toBottomOf="@+id/actualSetIndex">
 
             <android.support.design.widget.TextInputEditText
                 android:id="@+id/actualSetWeightEditText"
@@ -114,12 +112,12 @@
             style="@style/Widget.AppCompat.Button.Colored"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginLeft="8dp"
             android:layout_marginStart="8dp"
             android:layout_marginTop="8dp"
             android:text="@string/actual_training_activity_stepper_item_finish_set"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/actualSetRepsCountLayout"
-            android:layout_marginLeft="8dp" />
+            app:layout_constraintTop_toBottomOf="@+id/actualSetRepsCountLayout" />
 
     </android.support.constraint.ConstraintLayout>
 </layout>

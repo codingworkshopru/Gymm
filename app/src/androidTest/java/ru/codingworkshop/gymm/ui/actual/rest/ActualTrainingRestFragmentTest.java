@@ -71,7 +71,8 @@ public class ActualTrainingRestFragmentTest {
             return null;
         }).when(bus).post(any(AddRestTimeEvent.class));
 
-        fragment = ActualTrainingRestFragment.newInstance(30000);
+        fragment = new ActualTrainingRestFragment();
+        fragment.setRestTime(30000);
         fragment.restEventBus = bus;
         activityTestRule.getActivity().setFragment(fragment);
 

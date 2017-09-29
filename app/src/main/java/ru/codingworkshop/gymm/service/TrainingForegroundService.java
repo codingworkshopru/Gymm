@@ -25,7 +25,7 @@ import timber.log.Timber;
 
 public class TrainingForegroundService extends Service implements RestEventBusHolder {
 
-    static final class ServiceBinder extends Binder {
+    public static final class ServiceBinder extends Binder {
         private TrainingForegroundService service;
 
         public ServiceBinder(TrainingForegroundService service) {
