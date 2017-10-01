@@ -1,6 +1,7 @@
 package ru.codingworkshop.gymm.ui.actual;
 
 import android.arch.core.executor.testing.InstantTaskExecutorRule;
+import android.arch.lifecycle.LiveData;
 
 import org.junit.Before;
 import org.junit.Rule;
@@ -54,16 +55,16 @@ public class ActualTrainingViewModelTest {
         when(programRepository.getProgramExercisesForTraining(1L)).thenReturn(Models.createLiveProgramExercises(1));
         when(programRepository.getProgramSetsForTraining(1L)).thenReturn(Models.createLiveProgramSets(2L, 1));
         when(exercisesRepository.getExercisesForProgramTraining(1L)).thenReturn(Models.createLiveExercises("bar"));
-    }
 
-    @Test
-    public void startTraining() throws Exception {
         doAnswer(invocation -> {
             ActualTraining actualTraining = invocation.getArgument(0);
             actualTraining.setId(11L);
             return LiveDataUtil.getLive(11L);
         }).when(actualRepository).insertActualTrainingWithResult(any(ActualTraining.class));
+    }
 
+    @Test
+    public void startTraining() throws Exception {
         LiveTest.verifyLiveData(vm.startTraining(1L), l -> l);
 
         ActualTrainingTree tree = vm.getActualTrainingTree();
@@ -149,7 +150,8 @@ public class ActualTrainingViewModelTest {
             return null;
         }).when(actualRepository).insertActualExercise(any(ActualExercise.class));
 
-        LiveTest.verifyLiveData(vm.startTraining(1L), l -> {
+        final LiveData<Boolean> liveLoaded = vm.startTraining(1L);
+        LiveTest.verifyLiveData(liveLoaded, l -> {
             vm.createActualExercise(0);
             assertEquals(12L, vm.getActualTrainingTree().getChildren().get(0).getParent().getId());
 

@@ -3,6 +3,7 @@ package ru.codingworkshop.gymm.ui.actual;
 import android.content.Context;
 import android.databinding.DataBindingUtil;
 import android.os.Bundle;
+import android.support.annotation.Nullable;
 import android.support.annotation.StringRes;
 import android.support.annotation.VisibleForTesting;
 import android.support.design.widget.TextInputLayout;
@@ -84,6 +85,11 @@ public class ActualSetFragment extends Fragment {
         isWithWeight = args.getBoolean(ACTUAL_SET_FRAGMENT_IS_WITH_WEIGHT);
     }
 
+    @Nullable
+    public FragmentActualSetBinding getBinding() {
+        return binding;
+    }
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -111,8 +117,10 @@ public class ActualSetFragment extends Fragment {
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
-        if (context instanceof OnActualSetSaveListener) {
-            listener = (OnActualSetSaveListener) context;
+
+        Fragment parentFragment = getParentFragment();
+        if (parentFragment instanceof OnActualSetSaveListener) {
+            listener = (OnActualSetSaveListener) parentFragment;
         } else if (listener == null) {
             throw new IllegalStateException("Activity must implement callback interface: "
                     + OnActualSetSaveListener.class.getSimpleName());

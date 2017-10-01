@@ -37,7 +37,12 @@ public final class RecyclerViewItemMatcher {
             return null;
         }
 
-        View child = rv.findViewHolderForAdapterPosition(position).itemView;
+        RecyclerView.ViewHolder viewHolder = rv.findViewHolderForAdapterPosition(position);
+        if (viewHolder == null) {
+            return null;
+        }
+
+        View child = viewHolder.itemView;
         if (child == null) {
             return null;
         }

@@ -4,7 +4,6 @@ import android.content.Context;
 import android.databinding.DataBindingUtil;
 import android.support.annotation.Nullable;
 import android.view.LayoutInflater;
-import android.view.View;
 import android.view.ViewGroup;
 
 import java.util.List;
@@ -18,12 +17,23 @@ import ru.codingworkshop.gymm.ui.common.BindingListAdapter;
 /**
  * Created by Радик on 16.09.2017 as part of the Gymm project.
  */
-class ActualTrainingStepperAdapter extends BindingListAdapter<ActualExerciseNode, ActivityActualTrainingStepperItemBinding> {
-    private Context context;
-    private View.OnClickListener listener;
+public class ActualTrainingStepperAdapter extends
+        BindingListAdapter<ActualExerciseNode, ActivityActualTrainingStepperItemBinding> {
 
-    public ActualTrainingStepperAdapter(@Nullable List<ActualExerciseNode> items, Context context, View.OnClickListener listener) {
+    private Context context;
+    private OnExerciseActivateListener listener;
+    private ActivityActualTrainingStepperItemBinding activeBinding;
+
+    public interface OnExerciseActivateListener {
+        void onExerciseActivate(ActivityActualTrainingStepperItemBinding oldItemBinding,
+                                       ActivityActualTrainingStepperItemBinding newItemBinding);
+    }
+
+    public ActualTrainingStepperAdapter(@Nullable List<ActualExerciseNode> items, Context context,
+                                        OnExerciseActivateListener listener) {
+
         super(items);
+
         this.context = context;
         this.listener = listener;
     }
@@ -34,9 +44,27 @@ class ActualTrainingStepperAdapter extends BindingListAdapter<ActualExerciseNode
         ActivityActualTrainingStepperItemBinding binding = DataBindingUtil.inflate(
                 inflater, R.layout.activity_actual_training_stepper_item, parent, false);
 
-        binding.getRoot().setOnClickListener(listener);
+        binding.getRoot().setOnClickListener(v -> {
+            ActivityActualTrainingStepperItemBinding oldItemBinding = activeBinding;
+            setActiveBinding(binding);
+            listener.onExerciseActivate(oldItemBinding, binding);
+        });
 
         return binding;
+    }
+
+    public ActivityActualTrainingStepperItemBinding getActiveBinding() {
+        return activeBinding;
+    }
+
+    private void setActiveBinding(ActivityActualTrainingStepperItemBinding binding) {
+        if (activeBinding == binding) return;
+
+        if (activeBinding != null) {
+            activeBinding.setActive(false);
+        }
+        binding.setActive(true);
+        activeBinding = binding;
     }
 
     @Override

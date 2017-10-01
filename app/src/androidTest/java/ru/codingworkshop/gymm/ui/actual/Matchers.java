@@ -29,12 +29,12 @@ public final class Matchers {
 
     }
 
-    static Matcher<View> currentPageItem(@IdRes int itemId) {
+    public static Matcher<View> currentPageItem(@IdRes int itemId) {
         return new TypeSafeMatcher<View>() {
             @Override
             protected boolean matchesSafely(View item) {
                 View root = item.getRootView();
-                RecyclerView stepperRecyclerView = (RecyclerView) root.findViewById(R.id.actualExerciseSteps);
+                RecyclerView stepperRecyclerView = (RecyclerView) root.findViewById(R.id.actualExerciseList);
                 ViewGroup pagerContainer = null;
                 for (int i = 0; i < stepperRecyclerView.getChildCount(); i++) {
                     View stepContainer = stepperRecyclerView.getChildAt(i);
@@ -58,7 +58,7 @@ public final class Matchers {
         };
     }
 
-    static Matcher<View> hasBackground(@DrawableRes int drawableId) {
+    public static Matcher<View> hasBackground(@DrawableRes int drawableId) {
         return new TypeSafeMatcher<View>() {
             @Override
             public void describeTo(Description description) {

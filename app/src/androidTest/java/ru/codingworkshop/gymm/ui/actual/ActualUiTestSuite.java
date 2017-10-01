@@ -3,6 +3,7 @@ package ru.codingworkshop.gymm.ui.actual;
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 
+import ru.codingworkshop.gymm.ui.actual.exercise.ActualExercisesTestSuite;
 import ru.codingworkshop.gymm.ui.actual.rest.ActualTrainingRestFragmentTest;
 
 /**
@@ -11,6 +12,7 @@ import ru.codingworkshop.gymm.ui.actual.rest.ActualTrainingRestFragmentTest;
 
 @RunWith(Suite.class)
 @Suite.SuiteClasses({
+        ActualExercisesTestSuite.class,
         ActualSetFragmentTest.class,
         ActualTrainingActivityTest.class,
         ActualTrainingRestFragmentTest.class

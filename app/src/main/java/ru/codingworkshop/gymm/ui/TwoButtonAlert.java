@@ -11,11 +11,11 @@ import ru.codingworkshop.gymm.ui.util.AlertDialogFragment;
  * Created by Радик on 04.05.2017.
  */
 
-public class ActivityAlerts {
+public class TwoButtonAlert {
     private FragmentManager fragmentManager;
     private AlertDialogFragment dialogFragment;
 
-    public ActivityAlerts(@NonNull FragmentManager fragmentManager,
+    public TwoButtonAlert(@NonNull FragmentManager fragmentManager,
                           AlertDialogFragment.OnDialogButtonClickListener listener) {
         this.fragmentManager = fragmentManager;
 

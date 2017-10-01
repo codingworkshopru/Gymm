@@ -1,6 +1,7 @@
 package ru.codingworkshop.gymm.ui.actual;
 
 import android.os.Bundle;
+import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
@@ -12,11 +13,12 @@ import ru.codingworkshop.gymm.data.entity.ActualSet;
 import ru.codingworkshop.gymm.data.entity.ProgramSet;
 import ru.codingworkshop.gymm.data.tree.node.ActualExerciseNode;
 import ru.codingworkshop.gymm.data.tree.node.ProgramExerciseNode;
+import ru.codingworkshop.gymm.databinding.FragmentActualSetBinding;
 
 /**
  * Created by Радик on 16.09.2017 as part of the Gymm project.
  */
-class ActualSetsFragmentPagerAdapter extends FragmentPagerAdapter {
+public class ActualSetsFragmentPagerAdapter extends FragmentPagerAdapter {
     private ActualExerciseNode actualExerciseNode;
     private List<ActualSetFragment> fragments;
     private int childrenCount;
@@ -41,6 +43,12 @@ class ActualSetsFragmentPagerAdapter extends FragmentPagerAdapter {
     @Override
     public int getCount() {
         return childrenCount;
+    }
+
+
+    @Nullable
+    public FragmentActualSetBinding getBinding(int index) {
+        return fragments.get(index).getBinding();
     }
 
     public void notifyDataSetChanged(ActualExerciseNode exerciseNode) {

@@ -7,7 +7,7 @@ import android.view.View;
 /**
  * Created by Радик on 16.09.2017 as part of the Gymm project.
  */
-final class ActualSetsViewPager extends ViewPager {
+public final class ActualSetsViewPager extends ViewPager {
     private int heightMeasureSpec;
 
     public ActualSetsViewPager(Context context) {

@@ -34,9 +34,9 @@ android {
 ext {
     support = "26.1.0"
     constraint = "1.0.2"
-    arch = "1.0.0-alpha9-1"
+    arch = "1.0.0-beta1"
 
-    gson = "2.8.1"
+    gson = "2.8.2"
     guava = "23.0-android"
     dagger = "2.11"
     picasso = "2.5.2"
@@ -48,6 +48,7 @@ ext {
     junit = "4.12"
     junit_params = "1.1.0"
 }
+
 
 dependencies {
     implementation fileTree(dir: "libs", include: ["*.jar"])
@@ -61,7 +62,7 @@ dependencies {
 
 //    implementation "android.arch.lifecycle:runtime:$arch" // not necessary if you are using Support Library 26.1+
     implementation "android.arch.lifecycle:extensions:$arch"
-//    implementation "android.arch.lifecycle:common-java8:$arch"
+    implementation "android.arch.lifecycle:common-java8:$arch"
     implementation "android.arch.persistence.room:runtime:$arch"
 
     implementation "com.google.guava:guava:$guava"
@@ -75,7 +76,7 @@ dependencies {
 //    releaseImplementation "com.squareup.leakcanary:leakcanary-android-no-op:$leakcanary"
 
     implementation 'com.android.support:support-v4:26.1.0'
-    annotationProcessor "android.arch.lifecycle:compiler:$arch" // not needed if you are using the DefaultLifecycleObserver from common-java8 artifact.
+//    annotationProcessor "android.arch.lifecycle:compiler:$arch" // not needed if you are using the DefaultLifecycleObserver from common-java8 artifact.
     annotationProcessor "android.arch.persistence.room:compiler:$arch"
     annotationProcessor "com.google.dagger:dagger-android-processor:$dagger"
     annotationProcessor "com.google.dagger:dagger-compiler:$dagger"
