@@ -6,6 +6,7 @@
 
     <application>
         <activity android:name=".testing.SimpleFragmentActivity"/>
+        <activity android:name=".testing.ActualTrainingActivityInjectedFragments" />
     </application>
 
 </manifest>

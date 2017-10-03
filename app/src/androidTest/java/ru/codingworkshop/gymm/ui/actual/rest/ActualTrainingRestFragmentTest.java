@@ -8,7 +8,10 @@ import com.google.common.eventbus.Subscribe;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.mockito.Spy;
 
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
@@ -36,7 +39,6 @@ import static android.support.test.espresso.matcher.ViewMatchers.withText;
 import static org.hamcrest.Matchers.not;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doAnswer;
-import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
 
 /**
@@ -47,14 +49,13 @@ public class ActualTrainingRestFragmentTest {
     @Rule public ActivityTestRule<SimpleFragmentActivity> activityTestRule =
             new ActivityTestRule<>(SimpleFragmentActivity.class);
 
-    private ActualTrainingRestFragment fragment;
-    private EventBus bus;
+    @Spy private EventBus bus;
+    @Mock private ActualTrainingRestFragment.ActualTrainingRestCallback callback;
+    @InjectMocks private ActualTrainingRestFragment fragment;
 
     @Before
     public void setUp() throws Exception {
         MockitoAnnotations.initMocks(this);
-
-        bus = spy(new EventBus());
 
         doAnswer(invocation -> {
             bus.post(new RestResumedEvent(25000));
@@ -71,9 +72,7 @@ public class ActualTrainingRestFragmentTest {
             return null;
         }).when(bus).post(any(AddRestTimeEvent.class));
 
-        fragment = new ActualTrainingRestFragment();
         fragment.setRestTime(30000);
-        fragment.restEventBus = bus;
         activityTestRule.getActivity().setFragment(fragment);
 
         assertTime("0:30");
@@ -98,6 +97,7 @@ public class ActualTrainingRestFragmentTest {
     @Test
     public void stopRest() throws Exception {
         onView(withId(R.id.restStopButton)).perform(click());
+        verify(callback).onRestStopped();
         verify(bus).post(any(StopRestEvent.class));
     }
 

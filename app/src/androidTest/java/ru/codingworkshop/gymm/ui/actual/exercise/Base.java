@@ -1,6 +1,7 @@
 package ru.codingworkshop.gymm.ui.actual.exercise;
 
 import android.arch.lifecycle.ViewModelProvider;
+import android.support.test.InstrumentationRegistry;
 import android.support.test.espresso.contrib.RecyclerViewActions;
 import android.support.test.rule.ActivityTestRule;
 import android.support.v4.app.Fragment;
@@ -39,7 +40,7 @@ public abstract class Base {
     @Mock ActualExercisesFragment.ActualExercisesCallback callback;
     @Mock ActualTrainingViewModel vm;
 
-    @InjectMocks private ActualExercisesFragment fragment;
+    @InjectMocks ActualExercisesFragment fragment;
 
     ActualTrainingTree fakeTree;
 
@@ -47,6 +48,12 @@ public abstract class Base {
     public void setUp() throws Exception {
         MockitoAnnotations.initMocks(this);
         RecyclerViewItemMatcher.setRecyclerViewId(R.id.actualExerciseList);
+        InstrumentationRegistry
+                .getTargetContext()
+                .getSharedPreferences(ActualExercisesFragment.PREFS_NAME, 0)
+                .edit()
+                .clear()
+                .commit();
         when(viewModelFactory.create(any())).thenReturn(vm);
         before();
         setArguments(fragment);

@@ -1,11 +1,17 @@
 package ru.codingworkshop.gymm.ui.actual.rest;
 
 
+import android.arch.lifecycle.LiveData;
+import android.arch.lifecycle.MutableLiveData;
+import android.arch.lifecycle.Transformations;
+import android.content.ComponentName;
 import android.content.Context;
+import android.content.Intent;
+import android.content.ServiceConnection;
 import android.databinding.DataBindingUtil;
 import android.os.Bundle;
+import android.os.IBinder;
 import android.support.annotation.DrawableRes;
-import android.support.annotation.VisibleForTesting;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -22,7 +28,7 @@ import java.util.Locale;
 
 import ru.codingworkshop.gymm.R;
 import ru.codingworkshop.gymm.databinding.FragmentActualTrainingRestBinding;
-import ru.codingworkshop.gymm.service.RestEventBusHolder;
+import ru.codingworkshop.gymm.service.TrainingForegroundService;
 import ru.codingworkshop.gymm.service.event.incoming.AddRestTimeEvent;
 import ru.codingworkshop.gymm.service.event.incoming.PauseRestEvent;
 import ru.codingworkshop.gymm.service.event.incoming.ResumeRestEvent;
@@ -43,15 +49,59 @@ public class ActualTrainingRestFragment extends Fragment {
     private static final String REST_TIME_MILLISECONDS_KEY = "restTimeMillisecondsKey";
     private final SimpleDateFormat TIME_FORMATTER = new SimpleDateFormat("m:ss", Locale.getDefault());
 
+    public interface ActualTrainingRestCallback {
+        void onRestStopped();
+    }
+
     private FragmentActualTrainingRestBinding binding;
     private long totalTimeMilliseconds;
-    @VisibleForTesting
-    EventBus restEventBus;
+    private EventBus restEventBus;
     private SatelliteProgressBarAnimation progressBarAnimation;
     private Animation fadeInFadeOut;
+    private ServiceBindController serviceBindController;
+
+    private ActualTrainingRestCallback callback;
 
     public enum State {
         PAUSED, IN_PROGRESS, FINISHED
+    }
+
+    public static final class ServiceBindController implements ServiceConnection {
+        private Context context;
+        private boolean bound;
+        private MutableLiveData<TrainingForegroundService> service;
+
+        public ServiceBindController(Context context) {
+            this.context = context;
+            service = new MutableLiveData<>();
+        }
+
+        public LiveData<TrainingForegroundService> bindService() {
+            if (!bound && TrainingForegroundService.isRunning(context)) {
+                Intent intent = new Intent(context, TrainingForegroundService.class);
+                context.bindService(intent, this, 0);
+            }
+
+            return service;
+        }
+
+        public void unbindService() {
+            if (bound) {
+                context.unbindService(this);
+                bound = false;
+            }
+        }
+
+        @Override
+        public void onServiceConnected(ComponentName name, IBinder service) {
+            this.service.setValue(((TrainingForegroundService.ServiceBinder) service).getService());
+            bound = true;
+        }
+
+        @Override
+        public void onServiceDisconnected(ComponentName name) {
+            bound = false;
+        }
     }
 
     public void setRestTime(long restTimeMillis) {
@@ -65,16 +115,27 @@ public class ActualTrainingRestFragment extends Fragment {
         Timber.d("onAttach");
         super.onAttach(context);
 
-        if (restEventBus == null) {
-            if (context instanceof RestEventBusHolder) {
-                restEventBus = ((RestEventBusHolder) context).getRestEventBus();
+        if (callback == null) {
+            if (context instanceof ActualTrainingRestCallback) {
+                callback = (ActualTrainingRestCallback) context;
             } else {
                 throw new IllegalStateException("Activity must implement "
-                        + RestEventBusHolder.class.getSimpleName());
+                        + ActualTrainingRestCallback.class);
             }
         }
 
-        restEventBus.register(this);
+        serviceBindController = new ServiceBindController(getContext());
+        if (restEventBus == null) {
+            Transformations.map(serviceBindController.bindService(), TrainingForegroundService::getRestEventBus).observe(this, this::onServiceConnected);
+        } else {
+            onServiceConnected(restEventBus);
+        }
+    }
+
+    private void onServiceConnected(EventBus restEventBus) {
+        this.restEventBus = restEventBus;
+        this.restEventBus.register(this);
+        this.restEventBus.post(new StartRestEvent(totalTimeMilliseconds));
     }
 
     @Override
@@ -85,6 +146,7 @@ public class ActualTrainingRestFragment extends Fragment {
         progressBarAnimation.stop();
         restEventBus.unregister(this);
         restEventBus = null;
+        serviceBindController.unbindService();
     }
 
     @Override
@@ -94,7 +156,6 @@ public class ActualTrainingRestFragment extends Fragment {
         binding = DataBindingUtil.inflate(inflater, R.layout.fragment_actual_training_rest, container, false);
 
         totalTimeMilliseconds = getArguments().getLong(REST_TIME_MILLISECONDS_KEY);
-        restEventBus.post(new StartRestEvent(totalTimeMilliseconds));
         setTimeLeft(totalTimeMilliseconds);
 
         initListeners();
@@ -188,6 +249,7 @@ public class ActualTrainingRestFragment extends Fragment {
 
     private void onStopRestButtonClick(View view) {
         restEventBus.post(new StopRestEvent());
+        callback.onRestStopped();
     }
 
     private void onPauseResumeButtonClick(View view) {

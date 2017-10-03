@@ -4,6 +4,8 @@ import android.arch.lifecycle.LiveData;
 import android.arch.lifecycle.ViewModelProvider;
 import android.arch.lifecycle.ViewModelProviders;
 import android.content.Context;
+import android.content.SharedPreferences;
+import android.databinding.DataBindingUtil;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -27,17 +29,18 @@ import ru.codingworkshop.gymm.databinding.FragmentActualSetBinding;
 import ru.codingworkshop.gymm.db.GymmDatabase;
 import ru.codingworkshop.gymm.service.TrainingForegroundService;
 import ru.codingworkshop.gymm.ui.TwoButtonAlert;
-import ru.codingworkshop.gymm.ui.actual.ActualSetFragment;
-import ru.codingworkshop.gymm.ui.actual.ActualSetsFragmentPagerAdapter;
-import ru.codingworkshop.gymm.ui.actual.ActualSetsViewPager;
-import ru.codingworkshop.gymm.ui.actual.ActualTrainingStepperAdapter;
 import ru.codingworkshop.gymm.ui.actual.viewmodel.ActualTrainingViewModel;
+import timber.log.Timber;
 
 public class ActualExercisesFragment extends Fragment implements
         ActualSetFragment.OnActualSetSaveListener {
 
     public static final String EXTRA_ACTUAL_TRAINING_ID = "extraActualTrainingId";
     public static final String EXTRA_PROGRAM_TRAINING_ID = "extraProgramTrainingId";
+    static final String PREFS_NAME = "exerciseAndSetIndices";
+    private static final String PREFS_ACTUAL_TRAINING_ID_KEY = "prefsActualTrainingId";
+    private static final String PREFS_EXERCISE_INDEX_KEY = "prefsExerciseIndex";
+    private static final String PREFS_SET_INDEX_KEY = "prefsSetIndex";
 
     public interface ActualExercisesCallback {
         void onStartRest(int restSeconds);
@@ -64,8 +67,8 @@ public class ActualExercisesFragment extends Fragment implements
 
         viewModel = ViewModelProviders.of(this, viewModelFactory).get(ActualTrainingViewModel.class);
 
-        tree = viewModel.getActualTrainingTree();
-        if (tree != null) {
+        if (viewModel.getActualTrainingTree() != null) {
+            onTrainingTreeLoaded(true);
             return;
         }
 
@@ -92,8 +95,11 @@ public class ActualExercisesFragment extends Fragment implements
 
         callback.onLoadingFinished();
 
-        TrainingForegroundService.startService(getContext(), tree.getParent().getId(),
-                tree.getProgramTraining().getName());
+        final Context context = getContext();
+        if (!TrainingForegroundService.isRunning(context)) {
+            TrainingForegroundService.startService(context, tree.getParent().getId(),
+                    tree.getProgramTraining().getName());
+        }
 
         initUi(getView());
     }
@@ -121,9 +127,26 @@ public class ActualExercisesFragment extends Fragment implements
     }
 
     @Override
-    public void onDetach() {
-        super.onDetach();
-        callback = null;
+    public void onStop() {
+        super.onStop();
+
+        if (exercisesAdapter.getActiveBinding() == null) return;
+
+        saveExerciseAndSetPosition();
+
+    }
+
+    private void saveExerciseAndSetPosition() {
+        getSharedPreferences()
+                .edit()
+                .putLong(PREFS_ACTUAL_TRAINING_ID_KEY, tree.getParent().getId())
+                .putInt(PREFS_EXERCISE_INDEX_KEY, exercisesAdapter.getActiveBinding().getIndex())
+                .putInt(PREFS_SET_INDEX_KEY, setsViewPager.getCurrentItem())
+                .apply();
+    }
+
+    private SharedPreferences getSharedPreferences() {
+        return getContext().getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
     }
 
     @Override
@@ -172,7 +195,6 @@ public class ActualExercisesFragment extends Fragment implements
     }
 
     private void getToNextExercise() {// TODO: 01.10.2017 shouldn't go to finished exercise
-
         final ActivityActualTrainingStepperItemBinding exerciseCurrentBinding =
                 exercisesAdapter.getActiveBinding();
 
@@ -183,24 +205,33 @@ public class ActualExercisesFragment extends Fragment implements
             // TODO: 01.10.2017 finish training
         } else {
             final int nextExerciseIndex = currentExerciseIndex + 1;
-            RecyclerView.ViewHolder nextExerciseItem = exerciseList.findViewHolderForAdapterPosition(nextExerciseIndex);
-            if (nextExerciseItem == null) {
-                exerciseList.addOnChildAttachStateChangeListener(new RecyclerView.OnChildAttachStateChangeListener() {
-                    @Override
-                    public void onChildViewAttachedToWindow(View view) {
-                        exerciseList.findViewHolderForAdapterPosition(nextExerciseIndex).itemView.callOnClick();
+            setCurrentExercise(nextExerciseIndex);
+        }
+    }
+
+    private void setCurrentExercise(final int exerciseIndex) {
+        RecyclerView.ViewHolder exerciseItem = exerciseList.findViewHolderForAdapterPosition(exerciseIndex);
+        if (exerciseItem == null) {
+            exerciseList.addOnChildAttachStateChangeListener(new RecyclerView.OnChildAttachStateChangeListener() {
+                @Override
+                public void onChildViewAttachedToWindow(View view) {
+                    ActivityActualTrainingStepperItemBinding binding = DataBindingUtil.findBinding(view);
+                    if (binding != null && binding.getIndex() == exerciseIndex) {
+                        Timber.d("setCurrentExercise: %d", exerciseIndex);
+                        binding.getRoot().callOnClick();
                         exerciseList.removeOnChildAttachStateChangeListener(this);
                     }
+                }
 
-                    @Override
-                    public void onChildViewDetachedFromWindow(View view) {
+                @Override
+                public void onChildViewDetachedFromWindow(View view) {
 
-                    }
-                });
-                exerciseList.scrollToPosition(nextExerciseIndex);
-            } else {
-                nextExerciseItem.itemView.callOnClick();
-            }
+                }
+            });
+            exerciseList.scrollToPosition(exerciseIndex);
+        } else {
+            Timber.d("setCurrentExercise: %d", exerciseIndex);
+            exerciseItem.itemView.callOnClick();
         }
     }
 
@@ -212,6 +243,25 @@ public class ActualExercisesFragment extends Fragment implements
         initToolbar(view);
         initExerciseList(view);
         initSetsViewPager();
+        restoreExerciseAndSetPosition();
+    }
+
+    private void restoreExerciseAndSetPosition() {
+        SharedPreferences sharedPreferences = getSharedPreferencesForCurrentTraining();
+        if (sharedPreferences != null) {
+            setCurrentExercise(sharedPreferences.getInt(PREFS_EXERCISE_INDEX_KEY, 0));
+            final int setIndex = sharedPreferences.getInt(PREFS_SET_INDEX_KEY, 0);
+            setsViewPager.post(() -> setsViewPager.setCurrentItem(setIndex, false));
+            sharedPreferences.edit().clear().apply();
+        }
+    }
+
+    private SharedPreferences getSharedPreferencesForCurrentTraining() {
+        SharedPreferences sharedPreferences = getSharedPreferences();
+        long actualTrainingId = sharedPreferences.getLong(PREFS_ACTUAL_TRAINING_ID_KEY, 0L);
+        return actualTrainingId != 0L && actualTrainingId == tree.getParent().getId()
+                ? sharedPreferences
+                : null;
     }
 
     private void initToolbar(View view) {
@@ -223,9 +273,10 @@ public class ActualExercisesFragment extends Fragment implements
 
     private void initExerciseList(View view) {
         exerciseList = view.findViewById(R.id.actualExerciseList);
+        exerciseList.setHasFixedSize(true);
         exerciseList.setLayoutManager(new LinearLayoutManager(getContext()));
-        exercisesAdapter = new ActualTrainingStepperAdapter(
-                tree.getChildren(), getContext(), this::onStepperItemActivate);
+        exercisesAdapter = new ActualTrainingStepperAdapter(tree.getChildren(), getContext(),
+                this::onStepperItemActivate);
         exerciseList.setAdapter(exercisesAdapter);
     }
 

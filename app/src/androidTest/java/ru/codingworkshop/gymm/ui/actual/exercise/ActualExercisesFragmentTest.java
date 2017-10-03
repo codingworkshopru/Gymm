@@ -33,8 +33,8 @@ import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doAnswer;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyZeroInteractions;
 import static ru.codingworkshop.gymm.ui.actual.Matchers.currentPageItem;
 import static ru.codingworkshop.gymm.ui.actual.Matchers.hasBackground;
 import static ru.codingworkshop.gymm.ui.actual.TreeBuilders.buildHalfPopulatedTree;
@@ -135,7 +135,7 @@ public class ActualExercisesFragmentTest extends Base {
         clickDoneButton();
 
         verify(vm).createActualSet(eq(2), argThat(set -> set.getWeight() == 1.1));
-        verifyZeroInteractions(callback);
+        verify(callback, never()).onStartRest(anyInt());
     }
 
     @Test
@@ -193,6 +193,34 @@ public class ActualExercisesFragmentTest extends Base {
         assertCurrentPageIndex(1);
 
         verify(vm).updateActualSet(eq(0), argThat(s -> s.getReps() == 1 && s.getWeight() == 0.1));
+    }
+
+    @Test
+    public void saveStateBeforeDetach() throws Exception {
+        selectStepAtPosition(2);
+        onView(stepItem(R.id.stepperItemActualSetsContainer, 2)).perform(swipeLeft());
+        typeWeight(6.66);
+
+        activityTestRule
+                .getActivity()
+                .getSupportFragmentManager()
+                .beginTransaction()
+                .remove(fragment)
+                .commit();
+
+        Thread.sleep(100);
+
+        activityTestRule
+                .getActivity()
+                .getSupportFragmentManager()
+                .beginTransaction()
+                .add(R.id.container, fragment)
+                .commit();
+
+        Thread.sleep(100);
+
+        assertItemAtPositionIsActive(2);
+        assertCurrentPageIndex(2);
     }
 
     private Matcher<View> stepItem(@LayoutRes int layoutId, int pos) {

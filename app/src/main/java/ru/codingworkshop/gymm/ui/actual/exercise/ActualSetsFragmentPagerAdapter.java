@@ -1,4 +1,4 @@
-package ru.codingworkshop.gymm.ui.actual;
+package ru.codingworkshop.gymm.ui.actual.exercise;
 
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -20,21 +20,21 @@ import ru.codingworkshop.gymm.databinding.FragmentActualSetBinding;
  */
 public class ActualSetsFragmentPagerAdapter extends FragmentPagerAdapter {
     private ActualExerciseNode actualExerciseNode;
-    private List<ActualSetFragment> fragments;
+    private List<ActualSetFragment> fragments = new ArrayList<>();
     private int childrenCount;
 
     public ActualSetsFragmentPagerAdapter(FragmentManager fm) {
         super(fm);
-        fragments = new ArrayList<>();
     }
 
     @Override
     public Fragment getItem(int position) {
-        final ActualSetFragment actualSetFragment = ActualSetFragment.newInstance();
-        if (position == fragments.size()) {
-            fragments.add(actualSetFragment);
+        ActualSetFragment actualSetFragment;
+        if (position >= fragments.size()) {
+            actualSetFragment = ActualSetFragment.newInstance();
+            fragments.add(position, actualSetFragment);
         } else {
-            fragments.set(position, actualSetFragment);
+            actualSetFragment = fragments.get(position);
         }
         bindData(position);
         return actualSetFragment;
@@ -45,17 +45,17 @@ public class ActualSetsFragmentPagerAdapter extends FragmentPagerAdapter {
         return childrenCount;
     }
 
-
     @Nullable
     public FragmentActualSetBinding getBinding(int index) {
-        return fragments.get(index).getBinding();
+        return index < fragments.size() ? fragments.get(index).getBinding() : null;
     }
 
     public void notifyDataSetChanged(ActualExerciseNode exerciseNode) {
         setActualExerciseNode(exerciseNode);
         notifyDataSetChanged();
 
-        for (int i = 0; i < fragments.size(); i++) {
+        final int length = fragments != null ? fragments.size() : 0;
+        for (int i = 0; i < length; i++) {
             bindData(i);
         }
     }

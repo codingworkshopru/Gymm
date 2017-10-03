@@ -94,5 +94,4 @@
         <item quantity="few">%d секунды</item>
         <item quantity="other">%d секунд</item>
     </plurals>
-    <string name="title_activity_actual_training">ActualTrainingActivity</string>
 </resources>

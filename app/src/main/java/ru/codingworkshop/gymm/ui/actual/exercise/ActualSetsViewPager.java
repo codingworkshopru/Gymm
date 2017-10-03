@@ -1,4 +1,4 @@
-package ru.codingworkshop.gymm.ui.actual;
+package ru.codingworkshop.gymm.ui.actual.exercise;
 
 import android.content.Context;
 import android.support.v4.view.ViewPager;
@@ -23,6 +23,10 @@ public final class ActualSetsViewPager extends ViewPager {
     }
 
     private int getHeightMeasureSpec(int widthMeasureSpec, int heightMeasureSpec) {
+        if (getChildCount() == 0) {
+            return 0;
+        }
+
         View child = getChildAt(0);
         if (child != null) {
             int childHeightMeasureSpec = MeasureSpec.makeMeasureSpec(0, MeasureSpec.UNSPECIFIED);

@@ -31,10 +31,10 @@ public final class Matchers {
 
     public static Matcher<View> currentPageItem(@IdRes int itemId) {
         return new TypeSafeMatcher<View>() {
-            @Override
-            protected boolean matchesSafely(View item) {
-                View root = item.getRootView();
-                RecyclerView stepperRecyclerView = (RecyclerView) root.findViewById(R.id.actualExerciseList);
+            private View desiredView;
+
+            private void findDesiredView(View rootView) {
+                RecyclerView stepperRecyclerView = (RecyclerView) rootView.findViewById(R.id.actualExerciseList);
                 ViewGroup pagerContainer = null;
                 for (int i = 0; i < stepperRecyclerView.getChildCount(); i++) {
                     View stepContainer = stepperRecyclerView.getChildAt(i);
@@ -43,10 +43,18 @@ public final class Matchers {
                         break;
                     }
                 }
+
                 ViewPager viewPager = (ViewPager) pagerContainer.getChildAt(0);
                 int currentItem = viewPager.getCurrentItem();
                 View pageView = viewPager.getChildAt(currentItem);
-                View desiredView = pageView.findViewById(itemId);
+                desiredView = pageView.findViewById(itemId);
+            }
+
+            @Override
+            protected boolean matchesSafely(View item) {
+                if (desiredView == null) {
+                    findDesiredView(item.getRootView());
+                }
 
                 return item == desiredView;
             }

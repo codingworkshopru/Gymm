@@ -1,4 +1,4 @@
-package ru.codingworkshop.gymm.ui.actual;
+package ru.codingworkshop.gymm.ui.actual.exercise;
 
 import android.support.annotation.NonNull;
 import android.text.TextUtils;
