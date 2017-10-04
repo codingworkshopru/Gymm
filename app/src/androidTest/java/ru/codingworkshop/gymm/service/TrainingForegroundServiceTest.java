@@ -88,6 +88,7 @@ public class TrainingForegroundServiceTest {
         postEvent(new StopRestEvent()); // because of ServiceTestRule beta
         postedEvents.clear();
         observers.clear();
+        serviceTestRule.unbindService();
     }
 
     @Test

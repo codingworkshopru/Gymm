@@ -17,7 +17,7 @@ public class ActualTrainingActivity extends AppCompatActivity implements
 
     private LoadingFragment loadingFragment;
 
-    @VisibleForTesting()
+    @VisibleForTesting
     public Fragment actualExercisesFragment;
 
     @Override

@@ -11,7 +11,8 @@ import org.junit.runners.Suite;
 @Suite.SuiteClasses({
         ActualExercisesFragmentTest.class,
         ActualExercisesFragmentResumeTrainingTest.class,
-        ActualExercisesFragmentStartTrainingTest.class
+        ActualExercisesFragmentStartTrainingTest.class,
+        ActualExercisesFragmentServiceInteractionTest.class
 })
 public class ActualExercisesTestSuite {
 }

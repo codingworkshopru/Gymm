@@ -19,8 +19,10 @@ import static android.support.test.espresso.matcher.ViewMatchers.withChild;
 import static android.support.test.espresso.matcher.ViewMatchers.withId;
 import static android.support.test.espresso.matcher.ViewMatchers.withText;
 import static junit.framework.Assert.assertTrue;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.doAnswer;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 
 /**
@@ -30,7 +32,7 @@ import static org.mockito.Mockito.verify;
 public class ActualExercisesFragmentStartTrainingTest extends Base {
 
     @Override
-    void before() {
+    void beforeFragmentSet() {
         doAnswer(invocation -> {
             setFakeTree(TreeBuilders.buildTreeWithoutActuals(1));
             fakeTree.setParent(Models.createActualTraining(11L, invocation.getArgument(0)));
@@ -52,11 +54,13 @@ public class ActualExercisesFragmentStartTrainingTest extends Base {
 
         verify(callback).onLoadingFinished();
         verify(vm).startTraining(1L);
+        verify(vm, never()).loadTraining(anyLong());
         verify(vm, atLeastOnce()).getActualTrainingTree();
     }
 
     @Test
     public void startTrainingServiceTest() throws Exception {
+        startTrainingTest();
         assertTrue(TrainingForegroundService.isRunning(InstrumentationRegistry.getTargetContext()));
     }
 }

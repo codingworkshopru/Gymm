@@ -1,4 +1,4 @@
-package ru.codingworkshop.gymm.ui.actual.exercise;
+package ru.codingworkshop.gymm.ui.actual.set;
 
 import android.os.Bundle;
 import android.support.annotation.IdRes;

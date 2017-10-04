@@ -1,16 +1,10 @@
 package ru.codingworkshop.gymm.ui.actual.rest;
 
 
-import android.arch.lifecycle.LiveData;
-import android.arch.lifecycle.MutableLiveData;
 import android.arch.lifecycle.Transformations;
-import android.content.ComponentName;
 import android.content.Context;
-import android.content.Intent;
-import android.content.ServiceConnection;
 import android.databinding.DataBindingUtil;
 import android.os.Bundle;
-import android.os.IBinder;
 import android.support.annotation.DrawableRes;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
@@ -39,6 +33,7 @@ import ru.codingworkshop.gymm.service.event.outcoming.RestPausedEvent;
 import ru.codingworkshop.gymm.service.event.outcoming.RestResumedEvent;
 import ru.codingworkshop.gymm.service.event.outcoming.RestTimeAddedEvent;
 import ru.codingworkshop.gymm.service.event.outcoming.RestTimerTickEvent;
+import ru.codingworkshop.gymm.ui.actual.ServiceBindController;
 import timber.log.Timber;
 
 import static android.view.animation.Animation.INFINITE;
@@ -64,44 +59,6 @@ public class ActualTrainingRestFragment extends Fragment {
 
     public enum State {
         PAUSED, IN_PROGRESS, FINISHED
-    }
-
-    public static final class ServiceBindController implements ServiceConnection {
-        private Context context;
-        private boolean bound;
-        private MutableLiveData<TrainingForegroundService> service;
-
-        public ServiceBindController(Context context) {
-            this.context = context;
-            service = new MutableLiveData<>();
-        }
-
-        public LiveData<TrainingForegroundService> bindService() {
-            if (!bound && TrainingForegroundService.isRunning(context)) {
-                Intent intent = new Intent(context, TrainingForegroundService.class);
-                context.bindService(intent, this, 0);
-            }
-
-            return service;
-        }
-
-        public void unbindService() {
-            if (bound) {
-                context.unbindService(this);
-                bound = false;
-            }
-        }
-
-        @Override
-        public void onServiceConnected(ComponentName name, IBinder service) {
-            this.service.setValue(((TrainingForegroundService.ServiceBinder) service).getService());
-            bound = true;
-        }
-
-        @Override
-        public void onServiceDisconnected(ComponentName name) {
-            bound = false;
-        }
     }
 
     public void setRestTime(long restTimeMillis) {

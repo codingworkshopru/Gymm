@@ -18,7 +18,7 @@
 
         <variable
             name="actualSet"
-            type="ru.codingworkshop.gymm.ui.actual.exercise.ActualSetDataBindingWrapper" />
+            type="ru.codingworkshop.gymm.ui.actual.set.ActualSetDataBindingWrapper" />
 
         <variable
             name="programSet"
@@ -28,7 +28,7 @@
     <android.support.constraint.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        tools:context="ru.codingworkshop.gymm.ui.actual.exercise.ActualSetFragment"
+        tools:context="ru.codingworkshop.gymm.ui.actual.set.ActualSetFragment"
         tools:layout_editor_absoluteX="0dp"
         tools:layout_editor_absoluteY="0dp">
 
@@ -112,12 +112,12 @@
             style="@style/Widget.AppCompat.Button.Colored"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginLeft="8dp"
             android:layout_marginStart="8dp"
             android:layout_marginTop="8dp"
-            android:text="@string/actual_training_activity_stepper_item_finish_set"
+            android:text="@{actualSet.id == 0 ? @string/actual_training_activity_stepper_item_finish_set : @string/actual_training_activity_stepper_item_edit_set}"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/actualSetRepsCountLayout" />
+            app:layout_constraintTop_toBottomOf="@+id/actualSetRepsCountLayout"
+            tools:text="Завершить подход" />
 
     </android.support.constraint.ConstraintLayout>
 </layout>

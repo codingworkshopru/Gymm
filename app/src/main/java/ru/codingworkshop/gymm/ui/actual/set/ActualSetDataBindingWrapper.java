@@ -1,4 +1,4 @@
-package ru.codingworkshop.gymm.ui.actual.exercise;
+package ru.codingworkshop.gymm.ui.actual.set;
 
 import android.support.annotation.NonNull;
 import android.text.TextUtils;
@@ -8,13 +8,14 @@ import com.google.common.base.Preconditions;
 import javax.annotation.Nullable;
 
 import ru.codingworkshop.gymm.data.entity.ActualSet;
+import ru.codingworkshop.gymm.data.entity.common.Model;
 
 /**
  * Created by Радик on 01.09.2017 as part of the Gymm project.
  */
 
 // TODO replace with binding adapters when gradle plugin 3+ will be released
-public class ActualSetDataBindingWrapper {
+public class ActualSetDataBindingWrapper implements Model {
     private ActualSet actualSet;
 
     public ActualSetDataBindingWrapper(@NonNull ActualSet actualSet) {
@@ -23,6 +24,16 @@ public class ActualSetDataBindingWrapper {
 
     public ActualSet unwrap() {
         return actualSet;
+    }
+
+    @Override
+    public long getId() {
+        return actualSet.getId();
+    }
+
+    @Override
+    public void setId(long id) {
+        actualSet.setId(id);
     }
 
     public String getReps() {

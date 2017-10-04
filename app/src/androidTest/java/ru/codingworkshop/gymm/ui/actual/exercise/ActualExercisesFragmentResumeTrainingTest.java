@@ -6,8 +6,10 @@ import android.support.v4.app.Fragment;
 
 import org.junit.Test;
 
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.doAnswer;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static ru.codingworkshop.gymm.ui.actual.TreeBuilders.buildHalfPopulatedTree;
 
@@ -17,7 +19,7 @@ import static ru.codingworkshop.gymm.ui.actual.TreeBuilders.buildHalfPopulatedTr
 
 public class ActualExercisesFragmentResumeTrainingTest extends Base {
     @Override
-    void before() {
+    void beforeFragmentSet() {
         doAnswer(invocation -> {
             setFakeTree(buildHalfPopulatedTree(2));
             return new LiveData<Boolean>() {{postValue(true);}};
@@ -40,6 +42,7 @@ public class ActualExercisesFragmentResumeTrainingTest extends Base {
 
         verify(callback).onLoadingFinished();
         verify(vm).loadTraining(11L);
+        verify(vm, never()).startTraining(anyLong());
         verify(vm, atLeastOnce()).getActualTrainingTree();
     }
 }

@@ -1,4 +1,4 @@
-package ru.codingworkshop.gymm.ui.actual.exercise;
+package ru.codingworkshop.gymm.ui.actual.set;
 
 import android.content.Context;
 import android.databinding.DataBindingUtil;

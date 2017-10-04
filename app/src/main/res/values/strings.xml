@@ -53,6 +53,7 @@
     <!-- actual training activity -->
     <string name="actual_training_activity_stepper_item_weight">Вес</string>
     <string name="actual_training_activity_stepper_item_finish_set">Завершить подход</string>
+    <string name="actual_training_activity_stepper_item_edit_set">Изменить подход</string>
     <string name="actual_training_activity_stepper_item_reps_error">введите количество повторений</string>
     <string name="actual_training_activity_stepper_item_weight_error">введите вес</string>
     <string name="actual_training_activity_are_you_sure_message">Завершить тренировку?</string>

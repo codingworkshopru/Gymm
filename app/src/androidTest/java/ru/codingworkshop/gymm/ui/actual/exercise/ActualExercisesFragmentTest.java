@@ -46,7 +46,7 @@ import static ru.codingworkshop.gymm.ui.actual.TreeBuilders.buildHalfPopulatedTr
 public class ActualExercisesFragmentTest extends Base {
 
     @Override
-    public void before() {
+    public void beforeFragmentSet() {
         setFakeTree(buildHalfPopulatedTree(3));
 
         doAnswer(a -> {
@@ -89,7 +89,7 @@ public class ActualExercisesFragmentTest extends Base {
     }
 
     @Test
-    public void verifyVerticalVisibility() throws Exception {
+    public void verifyVerticalLinesVisibility() throws Exception {
         onView(stepItem(R.id.stepperItemTopLine, 0)).check(matches(not(isDisplayed())));
         onView(stepItem(R.id.stepperItemBottomLine, 0)).check(matches(isDisplayed()));
         onView(stepItem(R.id.stepperItemTopLine, 2)).check(matches(isDisplayed()));
@@ -102,6 +102,16 @@ public class ActualExercisesFragmentTest extends Base {
         assertCurrentPageIndex(1);
         onView(stepItem(R.id.stepperItemActualSetsContainer, 0)).perform(swipeLeft());
         assertCurrentPageIndex(2);
+
+        selectStepAtPosition(1);
+        assertCurrentPageIndex(1);
+        onView(stepItem(R.id.stepperItemActualSetsContainer, 1)).perform(swipeLeft());
+        assertCurrentPageIndex(2);
+
+        selectStepAtPosition(2);
+        assertCurrentPageIndex(1);
+        onView(stepItem(R.id.stepperItemActualSetsContainer, 2)).perform(swipeLeft());
+        assertCurrentPageIndex(1);
     }
 
     @Test
@@ -110,6 +120,10 @@ public class ActualExercisesFragmentTest extends Base {
 
         assertItemAtPositionIsActive(1);
         assertItemAtPositionIsInactive(2);
+
+        selectStepAtPosition(2);
+        assertItemAtPositionIsInactive(1);
+        assertItemAtPositionIsActive(2);
     }
 
     @Test
@@ -171,7 +185,7 @@ public class ActualExercisesFragmentTest extends Base {
     }
 
     @Test
-    public void goToNextSetAfterCurrentSetCreationTest() throws Exception {
+    public void goToNextSetAfterSetCreationTest() throws Exception {
         selectStepAtPosition(2);
 
         typeWeight(1.1);
@@ -197,9 +211,8 @@ public class ActualExercisesFragmentTest extends Base {
 
     @Test
     public void saveStateBeforeDetach() throws Exception {
-        selectStepAtPosition(2);
-        onView(stepItem(R.id.stepperItemActualSetsContainer, 2)).perform(swipeLeft());
-        typeWeight(6.66);
+        selectStepAtPosition(1);
+        onView(stepItem(R.id.stepperItemActualSetsContainer, 1)).perform(swipeLeft());
 
         activityTestRule
                 .getActivity()
@@ -219,7 +232,7 @@ public class ActualExercisesFragmentTest extends Base {
 
         Thread.sleep(100);
 
-        assertItemAtPositionIsActive(2);
+        assertItemAtPositionIsActive(1);
         assertCurrentPageIndex(2);
     }
 
@@ -258,7 +271,7 @@ public class ActualExercisesFragmentTest extends Base {
     private void clickDoneButton() {
         onCurrentPageItem(R.id.actualSetDoneButton, click());
     }
-
+    
     private void assertCurrentPageIndex(int inUiIndex) {
         String sets = getQuantityString(R.plurals.number_of_sets, inUiIndex);
         onView(currentPageItem(R.id.actualSetIndex)).check(matches(withText(sets)));

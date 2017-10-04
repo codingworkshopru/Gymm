@@ -55,12 +55,12 @@ public abstract class Base {
                 .clear()
                 .commit();
         when(viewModelFactory.create(any())).thenReturn(vm);
-        before();
+        beforeFragmentSet();
         setArguments(fragment);
         activityTestRule.getActivity().setFragment(fragment);
     }
 
-    abstract void before();
+    abstract void beforeFragmentSet() throws Exception;
     void setArguments(Fragment fragment) {
 
     }

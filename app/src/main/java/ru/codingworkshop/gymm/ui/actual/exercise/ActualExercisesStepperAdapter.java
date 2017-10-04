@@ -1,11 +1,14 @@
 package ru.codingworkshop.gymm.ui.actual.exercise;
 
+import android.arch.lifecycle.Observer;
 import android.content.Context;
 import android.databinding.DataBindingUtil;
 import android.support.annotation.Nullable;
 import android.view.LayoutInflater;
+import android.view.View;
 import android.view.ViewGroup;
 
+import java.util.LinkedList;
 import java.util.List;
 
 import ru.codingworkshop.gymm.R;
@@ -18,25 +21,15 @@ import timber.log.Timber;
 /**
  * Created by Радик on 16.09.2017 as part of the Gymm project.
  */
-public class ActualTrainingStepperAdapter extends
+public class ActualExercisesStepperAdapter extends
         BindingListAdapter<ActualExerciseNode, ActivityActualTrainingStepperItemBinding> {
 
     private Context context;
-    private OnExerciseActivateListener onItemClickListener;
-    private ActivityActualTrainingStepperItemBinding activeBinding;
+    private List<Observer<View>> itemClickObservers;
 
-    public interface OnExerciseActivateListener {
-        void onExerciseActivate(ActivityActualTrainingStepperItemBinding oldItemBinding,
-                                       ActivityActualTrainingStepperItemBinding newItemBinding);
-    }
-
-    public ActualTrainingStepperAdapter(@Nullable List<ActualExerciseNode> items, Context context,
-                                        OnExerciseActivateListener onItemClickListener) {
-
+    public ActualExercisesStepperAdapter(@Nullable List<ActualExerciseNode> items, Context context) {
         super(items);
-
         this.context = context;
-        this.onItemClickListener = onItemClickListener;
     }
 
     @Override
@@ -45,27 +38,34 @@ public class ActualTrainingStepperAdapter extends
         ActivityActualTrainingStepperItemBinding binding = DataBindingUtil.inflate(inflater,
                 R.layout.activity_actual_training_stepper_item, parent, false);
 
-        binding.getRoot().setOnClickListener(v -> {
-            if (activeBinding == binding) return;
-
-            ActivityActualTrainingStepperItemBinding oldItemBinding = activeBinding;
-            setActiveBinding(binding);
-            onItemClickListener.onExerciseActivate(oldItemBinding, binding);
-        });
+        binding.getRoot().setOnClickListener(this::notifyOnClickObservers);
 
         return binding;
     }
 
-    public ActivityActualTrainingStepperItemBinding getActiveBinding() {
-        return activeBinding;
+    void addOnClickObserver(Observer<View> observer) {
+        if (itemClickObservers == null) {
+            itemClickObservers = new LinkedList<>();
+        }
+        itemClickObservers.add(observer);
     }
 
-    private void setActiveBinding(ActivityActualTrainingStepperItemBinding binding) {
-        if (activeBinding != null) {
-            activeBinding.setActive(false);
+    void removeOnClickObserver(Observer<View> observer) {
+        if (hasItemClickObservers()) {
+            itemClickObservers.remove(observer);
         }
-        binding.setActive(true);
-        activeBinding = binding;
+    }
+
+    private boolean hasItemClickObservers() {
+        return itemClickObservers != null && !itemClickObservers.isEmpty();
+    }
+
+    private void notifyOnClickObservers(View binding) {
+        if (hasItemClickObservers()) {
+            for (Observer<View> o : itemClickObservers) {
+                o.onChanged(binding);
+            }
+        }
     }
 
     @Override

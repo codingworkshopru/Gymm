@@ -1,10 +1,13 @@
 package ru.codingworkshop.gymm.ui.actual;
 
 import android.arch.lifecycle.ViewModelProvider;
+import android.content.Context;
+import android.content.Intent;
 import android.support.test.InstrumentationRegistry;
 import android.support.test.espresso.contrib.RecyclerViewActions;
 import android.support.test.rule.ActivityTestRule;
 
+import org.junit.After;
 import org.junit.Rule;
 import org.junit.Test;
 import org.mockito.InjectMocks;
@@ -12,7 +15,9 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
 import ru.codingworkshop.gymm.R;
+import ru.codingworkshop.gymm.data.entity.ActualSet;
 import ru.codingworkshop.gymm.data.tree.node.ActualTrainingTree;
+import ru.codingworkshop.gymm.service.TrainingForegroundService;
 import ru.codingworkshop.gymm.testing.ActualTrainingActivityInjectedFragments;
 import ru.codingworkshop.gymm.ui.actual.exercise.ActualExercisesFragment;
 import ru.codingworkshop.gymm.ui.actual.viewmodel.ActualTrainingViewModel;
@@ -25,6 +30,8 @@ import static android.support.test.espresso.matcher.ViewMatchers.withId;
 import static android.support.test.espresso.matcher.ViewMatchers.withText;
 import static org.hamcrest.Matchers.both;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyInt;
+import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.when;
 
 /**
@@ -52,8 +59,21 @@ public class ActualTrainingActivityTest {
         ActualTrainingActivityInjectedFragments.fragment = fragment;
         when(viewModelFactory.create(any())).thenReturn(vm);
         final ActualTrainingTree tree = TreeBuilders.buildHalfPopulatedTree(3);
-        tree.getChildren().get(2).getProgramExerciseNode().getChildren().get(0).setSecondsForRest(1);
+        tree.getChildren().get(2).getProgramExerciseNode().getChildren().get(0).setSecondsForRest(5);
         when(vm.getActualTrainingTree()).thenReturn(tree);
+        doAnswer(invocation -> {
+            int index = invocation.getArgument(0);
+            ActualSet set = invocation.getArgument(1);
+            vm.getActualTrainingTree().getChildren().get(index).addChild(set);
+            return null;
+        }).when(vm).createActualSet(anyInt(), any(ActualSet.class));
+    }
+
+    @After
+    public void tearDown() throws Exception {
+        final Context context = InstrumentationRegistry.getTargetContext();
+        final Intent intent = new Intent(context, TrainingForegroundService.class);
+        context.stopService(intent);
     }
 
     @Test

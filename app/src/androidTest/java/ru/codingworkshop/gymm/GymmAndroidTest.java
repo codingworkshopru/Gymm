@@ -14,8 +14,8 @@ import ru.codingworkshop.gymm.ui.UiTestSuite;
 @RunWith(Suite.class)
 @Suite.SuiteClasses({
         RepositoryTestSuite.class,
-        UiTestSuite.class,
-        TrainingForegroundServiceTest.class
+        TrainingForegroundServiceTest.class,
+        UiTestSuite.class
 })
 public class GymmAndroidTest {
 }

@@ -1,4 +1,4 @@
-package ru.codingworkshop.gymm.ui.actual.exercise;
+package ru.codingworkshop.gymm.ui.actual.set;
 
 import android.content.Context;
 import android.support.v4.view.ViewPager;
