@@ -100,7 +100,7 @@ public class ActualSetFragmentTest {
     public void passActualSetToActivityTest() throws Exception {
         onView(withId(R.id.actualSetWeightEditText)).perform(typeText("1.125"));
         onView(withId(R.id.actualSetDoneButton)).perform(click());
-        verify(listener).onActualSetSave(eq(0), argThat(as -> as.getReps() == 10 && as.getWeight() == 1.125));
+        verify(listener).onActualSetSave(eq(0), argThat(as -> as.unwrap().getReps() == 10 && as.unwrap().getWeight() == 1.125));
     }
 
     @Test

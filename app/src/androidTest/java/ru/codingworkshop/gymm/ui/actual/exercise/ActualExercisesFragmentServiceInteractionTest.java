@@ -7,12 +7,15 @@ import android.os.IBinder;
 import android.support.test.InstrumentationRegistry;
 import android.support.test.rule.ServiceTestRule;
 
+import com.google.common.eventbus.EventBus;
+
 import org.junit.After;
 import org.junit.Rule;
 import org.junit.Test;
 
 import ru.codingworkshop.gymm.service.TrainingForegroundService;
 import ru.codingworkshop.gymm.service.event.incoming.StartRestEvent;
+import ru.codingworkshop.gymm.service.event.incoming.StopRestEvent;
 
 import static android.support.test.espresso.Espresso.onView;
 import static android.support.test.espresso.assertion.ViewAssertions.matches;
@@ -29,6 +32,7 @@ import static ru.codingworkshop.gymm.ui.actual.TreeBuilders.buildHalfPopulatedTr
 public class ActualExercisesFragmentServiceInteractionTest extends Base {
     @Rule
     public ServiceTestRule serviceTestRule = new ServiceTestRule();
+    private EventBus restEventBus;
 
     @Override
     void beforeFragmentSet() throws Exception {
@@ -43,12 +47,14 @@ public class ActualExercisesFragmentServiceInteractionTest extends Base {
 
         IBinder binder = serviceTestRule.bindService(intent);
         TrainingForegroundService service = ((TrainingForegroundService.ServiceBinder) binder).getService();
-        service.getRestEventBus().post(new StartRestEvent(60000));
+        restEventBus = service.getRestEventBus();
+        restEventBus.post(new StartRestEvent(60000));
     }
 
     @After
     public void tearDown() throws Exception {
-
+        restEventBus.post(new StopRestEvent());
+        serviceTestRule.unbindService();
     }
 
     @Test

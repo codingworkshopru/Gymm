@@ -17,6 +17,7 @@ import org.mockito.MockitoAnnotations;
 import ru.codingworkshop.gymm.R;
 import ru.codingworkshop.gymm.data.entity.ActualSet;
 import ru.codingworkshop.gymm.data.tree.node.ActualTrainingTree;
+import ru.codingworkshop.gymm.data.util.LiveDataUtil;
 import ru.codingworkshop.gymm.service.TrainingForegroundService;
 import ru.codingworkshop.gymm.testing.ActualTrainingActivityInjectedFragments;
 import ru.codingworkshop.gymm.ui.actual.exercise.ActualExercisesFragment;
@@ -31,7 +32,6 @@ import static android.support.test.espresso.matcher.ViewMatchers.withText;
 import static org.hamcrest.Matchers.both;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
-import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.when;
 
 /**
@@ -61,12 +61,12 @@ public class ActualTrainingActivityTest {
         final ActualTrainingTree tree = TreeBuilders.buildHalfPopulatedTree(3);
         tree.getChildren().get(2).getProgramExerciseNode().getChildren().get(0).setSecondsForRest(5);
         when(vm.getActualTrainingTree()).thenReturn(tree);
-        doAnswer(invocation -> {
+        when(vm.createActualSet(anyInt(), any(ActualSet.class))).thenAnswer(invocation -> {
             int index = invocation.getArgument(0);
             ActualSet set = invocation.getArgument(1);
             vm.getActualTrainingTree().getChildren().get(index).addChild(set);
-            return null;
-        }).when(vm).createActualSet(anyInt(), any(ActualSet.class));
+            return LiveDataUtil.getLive(13L);
+        });
     }
 
     @After

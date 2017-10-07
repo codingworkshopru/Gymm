@@ -1,4 +1,4 @@
-package ru.codingworkshop.gymm.ui.actual;
+package ru.codingworkshop.gymm.ui.actual.viewmodel;
 
 import android.arch.core.executor.testing.InstantTaskExecutorRule;
 import android.arch.lifecycle.LiveData;
@@ -20,7 +20,6 @@ import ru.codingworkshop.gymm.data.util.LiveDataUtil;
 import ru.codingworkshop.gymm.repository.ActualTrainingRepository;
 import ru.codingworkshop.gymm.repository.ExercisesRepository;
 import ru.codingworkshop.gymm.repository.ProgramTrainingRepository;
-import ru.codingworkshop.gymm.ui.actual.viewmodel.ActualTrainingViewModel;
 import ru.codingworkshop.gymm.util.LiveTest;
 import ru.codingworkshop.gymm.util.Models;
 
@@ -56,11 +55,17 @@ public class ActualTrainingViewModelTest {
         when(programRepository.getProgramSetsForTraining(1L)).thenReturn(Models.createLiveProgramSets(2L, 1));
         when(exercisesRepository.getExercisesForProgramTraining(1L)).thenReturn(Models.createLiveExercises("bar"));
 
-        doAnswer(invocation -> {
+        when(actualRepository.insertActualTrainingWithResult(any())).thenAnswer(invocation -> {
             ActualTraining actualTraining = invocation.getArgument(0);
             actualTraining.setId(11L);
             return LiveDataUtil.getLive(11L);
-        }).when(actualRepository).insertActualTrainingWithResult(any(ActualTraining.class));
+        });
+
+        when(actualRepository.insertActualSetWithResult(any())).thenAnswer(invocation -> {
+            ActualSet set = invocation.getArgument(0);
+            set.setId(13L);
+            return LiveDataUtil.getLive(13L);
+        });
     }
 
     @Test
@@ -166,27 +171,21 @@ public class ActualTrainingViewModelTest {
 
     @Test
     public void createActualSet() throws Exception {
-        doAnswer(invocation -> {
-            ActualSet set = invocation.getArgument(0);
-            set.setId(13L);
-            return null;
-        }).when(actualRepository).insertActualSet(any(ActualSet.class));
+        LiveTest.verifyLiveData(vm.startTraining(1L), l -> l);
 
-        LiveTest.verifyLiveData(vm.startTraining(1L), l -> {
-            vm.createActualExercise(0);
-            final ActualSet toInsert = Models.createActualSet(0L, 0L, 10);
-            toInsert.setWeight(5.5);
-            vm.createActualSet(0, toInsert);
+        vm.createActualExercise(0);
+        final ActualSet toInsert = Models.createActualSet(0L, 0L, 10);
+        toInsert.setWeight(5.5);
+        LiveData<Long> liveLoaded = vm.createActualSet(0, toInsert);
 
-            final ActualSet actualSet = vm.getActualTrainingTree().getChildren().get(0).getChildren().get(0);
-            assertEquals(13L, actualSet.getId());
-            assertEquals(10, actualSet.getReps());
-            assertEquals(5.5, actualSet.getWeight());
+        LiveTest.verifyLiveData(liveLoaded, id -> id == 13L);
 
-            return l;
-        });
+        final ActualSet actualSet = vm.getActualTrainingTree().getChildren().get(0).getChildren().get(0);
+        assertEquals(13L, actualSet.getId());
+        assertEquals(10, actualSet.getReps());
+        assertEquals(5.5, actualSet.getWeight());
 
-        verify(actualRepository).insertActualSet(any());
+        verify(actualRepository).insertActualSetWithResult(any());
     }
 
     @Test

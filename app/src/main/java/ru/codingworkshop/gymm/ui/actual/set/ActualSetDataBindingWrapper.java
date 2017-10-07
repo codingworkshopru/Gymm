@@ -1,5 +1,7 @@
 package ru.codingworkshop.gymm.ui.actual.set;
 
+import android.databinding.BaseObservable;
+import android.databinding.Bindable;
 import android.support.annotation.NonNull;
 import android.text.TextUtils;
 
@@ -15,7 +17,7 @@ import ru.codingworkshop.gymm.data.entity.common.Model;
  */
 
 // TODO replace with binding adapters when gradle plugin 3+ will be released
-public class ActualSetDataBindingWrapper implements Model {
+public class ActualSetDataBindingWrapper extends BaseObservable implements Model {
     private ActualSet actualSet;
 
     public ActualSetDataBindingWrapper(@NonNull ActualSet actualSet) {
@@ -26,6 +28,7 @@ public class ActualSetDataBindingWrapper implements Model {
         return actualSet;
     }
 
+    @Bindable
     @Override
     public long getId() {
         return actualSet.getId();
@@ -34,6 +37,7 @@ public class ActualSetDataBindingWrapper implements Model {
     @Override
     public void setId(long id) {
         actualSet.setId(id);
+        notifyChange();
     }
 
     public String getReps() {

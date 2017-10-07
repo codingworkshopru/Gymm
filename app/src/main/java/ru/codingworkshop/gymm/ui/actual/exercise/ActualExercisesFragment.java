@@ -27,6 +27,7 @@ import ru.codingworkshop.gymm.db.GymmDatabase;
 import ru.codingworkshop.gymm.service.TrainingForegroundService;
 import ru.codingworkshop.gymm.ui.TwoButtonAlert;
 import ru.codingworkshop.gymm.ui.actual.ServiceBindController;
+import ru.codingworkshop.gymm.ui.actual.set.ActualSetDataBindingWrapper;
 import ru.codingworkshop.gymm.ui.actual.set.ActualSetFragment;
 import ru.codingworkshop.gymm.ui.actual.set.ActualSetsFragmentPagerAdapter;
 import ru.codingworkshop.gymm.ui.actual.set.ActualSetsViewPager;
@@ -172,12 +173,14 @@ public class ActualExercisesFragment extends Fragment implements
     }
 
     @Override
-    public void onActualSetSave(int setIndex, ActualSet actualSet) {
+    public void onActualSetSave(int setIndex, ActualSetDataBindingWrapper actualSetWrapped) {
         final int currentExerciseIndex = exerciseList.getCurrentItemPosition();
+        final ActualSet actualSet = actualSetWrapped.unwrap();
         if (GymmDatabase.isValidId(actualSet)) {
             viewModel.updateActualSet(currentExerciseIndex, actualSet);
         } else {
-            viewModel.createActualSet(currentExerciseIndex, actualSet);
+            viewModel.createActualSet(currentExerciseIndex, actualSet)
+                    .observe(this, actualSetWrapped::setId);
             setsPagerAdapter.notifyDataSetChanged();
             startRestIfNeeded(currentExerciseIndex, setIndex);
             goNext();

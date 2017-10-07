@@ -107,14 +107,14 @@ public class ActualTrainingViewModel extends ViewModel {
         }
     }
 
-    public void createActualSet(int actualExerciseNodeIndex, @NonNull ActualSet actualSet) {
+    public LiveData<Long> createActualSet(int actualExerciseNodeIndex, @NonNull ActualSet actualSet) {
         Preconditions.checkNotNull(actualSet);
 
         ActualExerciseNode node = getActualExerciseNode(actualExerciseNodeIndex);
         actualSet.setActualExerciseId(node.getParent().getId());
-        actualTrainingRepository.insertActualSet(actualSet);
 
         node.addChild(actualSet);
+        return actualTrainingRepository.insertActualSetWithResult(actualSet);
     }
 
     public void updateActualSet(int actualExerciseNodeIndex, @NonNull ActualSet actualSet) {

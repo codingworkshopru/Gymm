@@ -15,6 +15,7 @@ import ru.codingworkshop.gymm.R;
 import ru.codingworkshop.gymm.data.entity.ActualSet;
 import ru.codingworkshop.gymm.data.tree.node.ActualExerciseNode;
 import ru.codingworkshop.gymm.data.tree.node.ProgramExerciseNode;
+import ru.codingworkshop.gymm.data.util.LiveDataUtil;
 import ru.codingworkshop.gymm.util.Models;
 import ru.codingworkshop.gymm.util.RecyclerViewItemMatcher;
 
@@ -22,6 +23,7 @@ import static android.support.test.espresso.Espresso.onView;
 import static android.support.test.espresso.action.ViewActions.click;
 import static android.support.test.espresso.action.ViewActions.replaceText;
 import static android.support.test.espresso.action.ViewActions.swipeLeft;
+import static android.support.test.espresso.action.ViewActions.swipeRight;
 import static android.support.test.espresso.action.ViewActions.typeText;
 import static android.support.test.espresso.assertion.ViewAssertions.matches;
 import static android.support.test.espresso.matcher.ViewMatchers.isDisplayed;
@@ -35,6 +37,7 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 import static ru.codingworkshop.gymm.ui.actual.Matchers.currentPageItem;
 import static ru.codingworkshop.gymm.ui.actual.Matchers.hasBackground;
 import static ru.codingworkshop.gymm.ui.actual.TreeBuilders.buildHalfPopulatedTree;
@@ -61,12 +64,12 @@ public class ActualExercisesFragmentTest extends Base {
             return null;
         }).when(vm).createActualExercise(anyInt());
 
-        doAnswer(invocation -> {
+        when(vm.createActualSet(anyInt(), any())).thenAnswer(invocation -> {
             int exerciseIndex = invocation.getArgument(0);
             ActualSet actualSet = invocation.getArgument(1);
             fakeTree.getChildren().get(exerciseIndex).addChild(actualSet);
-            return null;
-        }).when(vm).createActualSet(anyInt(), any(ActualSet.class));
+            return LiveDataUtil.getLive(11L);
+        });
     }
 
     @Test
@@ -99,23 +102,28 @@ public class ActualExercisesFragmentTest extends Base {
     @Test
     public void actualSetsSlideTest() throws Exception {
         selectStepAtPosition(0);
+        assertCurrentSetFinished();
         assertCurrentPageIndex(1);
         onView(stepItem(R.id.stepperItemActualSetsContainer, 0)).perform(swipeLeft());
+        assertCurrentSetFinished();
         assertCurrentPageIndex(2);
 
         selectStepAtPosition(1);
+        assertCurrentSetFinished();
         assertCurrentPageIndex(1);
         onView(stepItem(R.id.stepperItemActualSetsContainer, 1)).perform(swipeLeft());
+        assertCurrentSetNotFinished();
         assertCurrentPageIndex(2);
 
         selectStepAtPosition(2);
+        assertCurrentSetNotFinished();
         assertCurrentPageIndex(1);
         onView(stepItem(R.id.stepperItemActualSetsContainer, 2)).perform(swipeLeft());
         assertCurrentPageIndex(1);
     }
 
     @Test
-    public void verifyActiveStatusSet() throws Exception {
+    public void verifyActiveExercise() throws Exception {
         selectStepAtPosition(1);
 
         assertItemAtPositionIsActive(1);
@@ -147,6 +155,8 @@ public class ActualExercisesFragmentTest extends Base {
         onView(currentPageItem(R.id.actualSetWeightEditText)).perform(click());
         typeWeight(1.1);
         clickDoneButton();
+        onView(stepItem(R.id.stepperItemActualSetsContainer, 2)).perform(swipeRight());
+        assertCurrentSetFinished();
 
         verify(vm).createActualSet(eq(2), argThat(set -> set.getWeight() == 1.1));
         verify(callback, never()).onStartRest(anyInt());
@@ -271,7 +281,15 @@ public class ActualExercisesFragmentTest extends Base {
     private void clickDoneButton() {
         onCurrentPageItem(R.id.actualSetDoneButton, click());
     }
-    
+
+    private void assertCurrentSetFinished() {
+        onView(currentPageItem(R.id.actualSetDoneButton)).check(matches(withText(InstrumentationRegistry.getTargetContext().getString(R.string.actual_training_activity_stepper_item_edit_set))));
+    }
+
+    private void assertCurrentSetNotFinished() {
+        onView(currentPageItem(R.id.actualSetDoneButton)).check(matches(withText(InstrumentationRegistry.getTargetContext().getString(R.string.actual_training_activity_stepper_item_finish_set))));
+    }
+
     private void assertCurrentPageIndex(int inUiIndex) {
         String sets = getQuantityString(R.plurals.number_of_sets, inUiIndex);
         onView(currentPageItem(R.id.actualSetIndex)).check(matches(withText(sets)));

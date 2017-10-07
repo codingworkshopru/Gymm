@@ -40,7 +40,7 @@ public class ActualSetFragment extends Fragment {
     OnActualSetSaveListener listener;
 
     public interface OnActualSetSaveListener {
-        void onActualSetSave(int index, ActualSet actualSet);
+        void onActualSetSave(int index, ActualSetDataBindingWrapper actualSet);
     }
 
     public static ActualSetFragment newInstance() {
@@ -140,7 +140,7 @@ public class ActualSetFragment extends Fragment {
         final boolean repsValid = repsValidator.validate();
         final boolean weightValid = weightValidator.validate();
         if (repsValid && weightValid) {
-            listener.onActualSetSave(binding.getIndex(), binding.getActualSet().unwrap());
+            listener.onActualSetSave(binding.getIndex(), binding.getActualSet());
         }
     }
 

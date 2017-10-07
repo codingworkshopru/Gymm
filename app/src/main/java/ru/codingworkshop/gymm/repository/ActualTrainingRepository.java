@@ -92,6 +92,11 @@ public class ActualTrainingRepository extends BaseRepository {
         insert(actualSet, dao::insertActualSet);
     }
 
+    public LiveData<Long> insertActualSetWithResult(ActualSet actualSet) {
+        checkActualSet(actualSet);
+        return insertWithResult(actualSet, dao::insertActualSet);
+    }
+
     public void updateActualSet(ActualSet actualSet) {
         checkActualSet(actualSet);
         Preconditions.checkArgument(GymmDatabase.isValidId(actualSet));

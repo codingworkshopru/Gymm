@@ -3,6 +3,8 @@ package ru.codingworkshop.gymm.ui.actual;
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 
+import ru.codingworkshop.gymm.ui.actual.viewmodel.ActualTrainingViewModelTest;
+
 /**
  * Created by Радик on 26.08.2017 as part of the Gymm project.
  */
