@@ -63,7 +63,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_vertical"
-                app:srcCompat="@drawable/ic_delete_sweep_24dp" />
+                app:srcCompat="@drawable/ic_delete_black_24dp" />
 
             <ImageView
                 android:id="@+id/program_exercise_list_item_reorder_action"
@@ -74,7 +74,7 @@
                 android:paddingRight="16dp"
                 android:paddingStart="16dp"
                 android:scaleType="center"
-                app:srcCompat="@drawable/ic_reorder_24dp" />
+                app:srcCompat="@drawable/ic_reorder_black_24dp" />
         </LinearLayout>
     </android.support.constraint.ConstraintLayout>
 

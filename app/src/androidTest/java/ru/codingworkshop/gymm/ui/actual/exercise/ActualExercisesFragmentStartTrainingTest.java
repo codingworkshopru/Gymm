@@ -9,8 +9,8 @@ import org.junit.Test;
 
 import ru.codingworkshop.gymm.R;
 import ru.codingworkshop.gymm.service.TrainingForegroundService;
-import ru.codingworkshop.gymm.ui.actual.TreeBuilders;
 import ru.codingworkshop.gymm.util.Models;
+import ru.codingworkshop.gymm.util.TreeBuilders;
 
 import static android.support.test.espresso.Espresso.onView;
 import static android.support.test.espresso.assertion.ViewAssertions.matches;

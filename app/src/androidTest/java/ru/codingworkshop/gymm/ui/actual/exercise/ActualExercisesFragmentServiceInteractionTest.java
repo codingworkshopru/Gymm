@@ -23,7 +23,7 @@ import static android.support.test.espresso.matcher.ViewMatchers.isDisplayed;
 import static android.support.test.espresso.matcher.ViewMatchers.withText;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.Mockito.verify;
-import static ru.codingworkshop.gymm.ui.actual.TreeBuilders.buildHalfPopulatedTree;
+import static ru.codingworkshop.gymm.util.TreeBuilders.buildHalfPopulatedTree;
 
 /**
  * Created by Радик on 04.10.2017 as part of the Gymm project.

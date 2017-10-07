@@ -1,4 +1,4 @@
-package ru.codingworkshop.gymm.ui.actual;
+package ru.codingworkshop.gymm.util;
 
 import android.support.test.espresso.core.internal.deps.guava.base.Preconditions;
 
@@ -15,11 +15,10 @@ import ru.codingworkshop.gymm.data.entity.ProgramSet;
 import ru.codingworkshop.gymm.data.tree.loader.builder.ActualTrainingTreeBuilder;
 import ru.codingworkshop.gymm.data.tree.node.ActualExerciseNode;
 import ru.codingworkshop.gymm.data.tree.node.ActualTrainingTree;
-import ru.codingworkshop.gymm.data.tree.node.ImmutableProgramExerciseNode;
-import ru.codingworkshop.gymm.data.tree.node.ImmutableProgramTrainingTree;
+import ru.codingworkshop.gymm.data.tree.node.MutableProgramExerciseNode;
+import ru.codingworkshop.gymm.data.tree.node.MutableProgramTrainingTree;
 import ru.codingworkshop.gymm.data.tree.node.ProgramExerciseNode;
 import ru.codingworkshop.gymm.data.tree.node.ProgramTrainingTree;
-import ru.codingworkshop.gymm.util.Models;
 
 /**
  * Created by Радик on 01.10.2017 as part of the Gymm project.
@@ -27,10 +26,10 @@ import ru.codingworkshop.gymm.util.Models;
 
 public class TreeBuilders {
     public static ProgramTrainingTree buildProgramTrainingTree(int exercisesCount) {
-        ProgramTrainingTree tree = new ImmutableProgramTrainingTree();
+        ProgramTrainingTree tree = new MutableProgramTrainingTree();
         tree.setParent(Models.createProgramTraining(1L, "foo"));
         tree.setChildren(Lists.transform(Models.createProgramExercises(exercisesCount), pe -> {
-            ProgramExerciseNode node = new ImmutableProgramExerciseNode(pe);
+            ProgramExerciseNode node = new MutableProgramExerciseNode(pe);
 
             long exerciseId = pe.getExerciseId();
             node.setExercise(Models.createExercise(exerciseId, "exercise" + exerciseId));

@@ -11,7 +11,7 @@ import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
-import static ru.codingworkshop.gymm.ui.actual.TreeBuilders.buildHalfPopulatedTree;
+import static ru.codingworkshop.gymm.util.TreeBuilders.buildHalfPopulatedTree;
 
 /**
  * Created by Радик on 01.10.2017 as part of the Gymm project.

@@ -22,6 +22,7 @@ import ru.codingworkshop.gymm.service.TrainingForegroundService;
 import ru.codingworkshop.gymm.testing.ActualTrainingActivityInjectedFragments;
 import ru.codingworkshop.gymm.ui.actual.exercise.ActualExercisesFragment;
 import ru.codingworkshop.gymm.ui.actual.viewmodel.ActualTrainingViewModel;
+import ru.codingworkshop.gymm.util.TreeBuilders;
 
 import static android.support.test.espresso.Espresso.onView;
 import static android.support.test.espresso.action.ViewActions.click;

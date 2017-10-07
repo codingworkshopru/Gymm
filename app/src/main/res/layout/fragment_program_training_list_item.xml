@@ -1,0 +1,60 @@
+<layout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+        <variable
+            name="exerciseName"
+            type="String" />
+        <variable
+            name="setsCount"
+            type="int" />
+    </data>
+
+    <android.support.constraint.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="72dp"
+        android:background="@android:color/background_light">
+
+        <TextView
+            android:id="@+id/programExerciseName"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:ellipsize="end"
+            android:maxLines="1"
+            android:text="@{exerciseName}"
+            android:textAppearance="@style/TextAppearance.AppCompat.Menu"
+            app:layout_constraintBottom_toTopOf="@+id/programSetsCount"
+            app:layout_constraintEnd_toStartOf="@+id/programExerciseReorderImage"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_chainStyle="packed"
+            tools:text="Very very very very very very very very very long text" />
+
+        <TextView
+            android:id="@+id/programSetsCount"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:ellipsize="end"
+            android:maxLines="1"
+            android:text="@{@plurals/number_of_sets(setsCount, setsCount)}"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toStartOf="@+id/programExerciseReorderImage"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/programExerciseName"
+            tools:text="Very very very very very very very very very very long" />
+
+        <ImageView
+            android:id="@+id/programExerciseReorderImage"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:padding="16dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:srcCompat="@drawable/ic_reorder_black_24dp" />
+    </android.support.constraint.ConstraintLayout>
+</layout>

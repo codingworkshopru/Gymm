@@ -40,7 +40,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static ru.codingworkshop.gymm.ui.actual.Matchers.currentPageItem;
 import static ru.codingworkshop.gymm.ui.actual.Matchers.hasBackground;
-import static ru.codingworkshop.gymm.ui.actual.TreeBuilders.buildHalfPopulatedTree;
+import static ru.codingworkshop.gymm.util.TreeBuilders.buildHalfPopulatedTree;
 
 /**
  * Created by Радик on 01.10.2017 as part of the Gymm project.

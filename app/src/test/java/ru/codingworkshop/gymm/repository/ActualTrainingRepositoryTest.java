@@ -1,6 +1,7 @@
 package ru.codingworkshop.gymm.repository;
 
 import android.arch.core.executor.testing.InstantTaskExecutorRule;
+import android.arch.lifecycle.LiveData;
 import android.support.annotation.NonNull;
 
 import com.google.common.collect.Lists;
@@ -24,6 +25,7 @@ import ru.codingworkshop.gymm.data.entity.ActualSet;
 import ru.codingworkshop.gymm.data.entity.ActualTraining;
 import ru.codingworkshop.gymm.data.entity.common.Model;
 import ru.codingworkshop.gymm.db.dao.ActualTrainingDao;
+import ru.codingworkshop.gymm.util.LiveTest;
 import ru.codingworkshop.gymm.util.Models;
 
 import static org.junit.Assert.assertEquals;
@@ -56,6 +58,16 @@ public class ActualTrainingRepositoryTest {
         when(dao.insertActualTraining(training)).thenReturn(11L);
         repository.insertActualTraining(training);
         verify(dao).insertActualTraining(training);
+    }
+
+    @Test
+    public void insertActualTrainingWithResult() throws Exception {
+        ActualTraining actualTraining = Models.createActualTraining(0L, 1L);
+        when(dao.insertActualTraining(actualTraining)).thenReturn(11L);
+
+        LiveData<Long> liveId = repository.insertActualTrainingWithResult(actualTraining);
+        LiveTest.verifyLiveData(liveId, id -> id == 11L);
+        verify(dao).insertActualTraining(actualTraining);
     }
 
     @Test
@@ -123,6 +135,17 @@ public class ActualTrainingRepositoryTest {
         verify(dao).insertActualSet(argThat(set ->
                 set == actualSet && ((set.getWeight() == null && expectedWeight == null) || set.getWeight().equals(expectedWeight))
         ));
+    }
+
+    @Test
+    public void insertActualSetWithResult() throws Exception {
+        ActualSet set = Models.createActualSet(0L, 12L, 10);
+        set.setWeight(6.6);
+        when(dao.insertActualSet(set)).thenReturn(13L);
+
+        LiveData<Long> liveId = repository.insertActualSetWithResult(set);
+        LiveTest.verifyLiveData(liveId, id -> id == 13L);
+        verify(dao).insertActualSet(set);
     }
 
     private Object[] weights() {

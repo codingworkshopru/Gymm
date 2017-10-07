@@ -93,7 +93,8 @@
             android:clipToPadding="false"
             android:paddingBottom="100dp"
             android:scrollbars="vertical"
-            app:layout_behavior="@string/appbar_scrolling_view_behavior" />
+            app:layout_behavior="@string/appbar_scrolling_view_behavior"
+            tools:listitem="@layout/activity_program_training_list_item"/>
 
         <LinearLayout
             android:id="@+id/program_training_empty_state"

@@ -3,7 +3,6 @@ package ru.codingworkshop.gymm;
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 
-import ru.codingworkshop.gymm.repository.RepositoryTestSuite;
 import ru.codingworkshop.gymm.service.TrainingForegroundServiceTest;
 import ru.codingworkshop.gymm.ui.UiTestSuite;
 
@@ -13,7 +12,6 @@ import ru.codingworkshop.gymm.ui.UiTestSuite;
 
 @RunWith(Suite.class)
 @Suite.SuiteClasses({
-        RepositoryTestSuite.class,
         TrainingForegroundServiceTest.class,
         UiTestSuite.class
 })
