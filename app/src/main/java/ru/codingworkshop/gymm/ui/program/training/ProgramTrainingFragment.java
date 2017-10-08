@@ -3,33 +3,27 @@ package ru.codingworkshop.gymm.ui.program.training;
 
 import android.arch.lifecycle.ViewModelProvider;
 import android.content.Context;
-import android.graphics.Bitmap;
-import android.graphics.Canvas;
-import android.graphics.drawable.Drawable;
+import android.databinding.ObservableBoolean;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
-import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.helper.ItemTouchHelper;
+import android.view.ActionMode;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-
-import com.google.common.base.Preconditions;
 
 import javax.inject.Inject;
 
 import ru.codingworkshop.gymm.R;
+import ru.codingworkshop.gymm.data.tree.ChildRestoreAdapter;
 import ru.codingworkshop.gymm.data.tree.node.ProgramTrainingTree;
-import timber.log.Timber;
-
-import static android.support.v7.widget.helper.ItemTouchHelper.ACTION_STATE_SWIPE;
-import static android.support.v7.widget.helper.ItemTouchHelper.DOWN;
-import static android.support.v7.widget.helper.ItemTouchHelper.LEFT;
-import static android.support.v7.widget.helper.ItemTouchHelper.RIGHT;
-import static android.support.v7.widget.helper.ItemTouchHelper.UP;
+import ru.codingworkshop.gymm.ui.program.common.MyAdapterDataObserver;
+import ru.codingworkshop.gymm.ui.program.common.MySimpleCallback;
 
 public class ProgramTrainingFragment extends Fragment {
 
@@ -38,6 +32,7 @@ public class ProgramTrainingFragment extends Fragment {
     private ProgramTrainingViewModel viewModel;
     private ProgramTrainingTree tree;
     private Context context;
+    private ObservableBoolean inActionMode = new ObservableBoolean(false);
 
     @Override
     public void onAttach(Context context) {
@@ -60,70 +55,61 @@ public class ProgramTrainingFragment extends Fragment {
                              Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_program_training, container, false);
         initExerciseList(rootView);
+        rootView.findViewById(R.id.programTrainingBackground).setVisibility(View.GONE);
         return rootView;
     }
 
     private void initExerciseList(View rootView) {
         RecyclerView rv = rootView.findViewById(R.id.programExerciseList);
-        ProgramExercisesAdapter adapter = new ProgramExercisesAdapter(context, tree.getChildren());
+        ProgramExercisesAdapter adapter = new ProgramExercisesAdapter(context, tree.getChildren(), inActionMode);
+        adapter.registerAdapterDataObserver(new MyAdapterDataObserver(rv, R.id.programTrainingBackground, R.string.program_training_activity_exercise_deleted_message) {
+            @Override
+            public void restoreLastRemoved() {
+                new ChildRestoreAdapter(tree).restoreLastRemoved();
+            }
+        });
         rv.setAdapter(adapter);
         rv.setHasFixedSize(true);
 
         rv.addItemDecoration(new DividerItemDecoration(context, DividerItemDecoration.VERTICAL));
 
-        ItemTouchHelper itemTouchHelper = new ItemTouchHelper(new ItemTouchHelper.SimpleCallback(UP | DOWN, LEFT | RIGHT) {
-
+        ItemTouchHelper itemTouchHelper = new ItemTouchHelper(new MySimpleCallback(rv) {
             @Override
-            public boolean onMove(RecyclerView recyclerView, RecyclerView.ViewHolder source, RecyclerView.ViewHolder target) {
-                int from = source.getAdapterPosition();
-                int to = target.getAdapterPosition();
-                tree.moveChild(to, from);
-                adapter.notifyItemMoved(from, to);
-                return from != to;
+            public void moveChild(int from, int to) {
+                tree.moveChild(from, to);
             }
 
             @Override
-            public void onSwiped(RecyclerView.ViewHolder viewHolder, int direction) {
-                final int index = viewHolder.getAdapterPosition();
+            public void removeChild(int index) {
                 tree.removeChild(index);
-                adapter.notifyItemRemoved(index);
             }
-
-            @Override
-            public void onChildDraw(Canvas c, RecyclerView recyclerView,
-                                    RecyclerView.ViewHolder viewHolder, float dX, float dY,
-                                    int actionState, boolean isCurrentlyActive)
-            {
-                super.onChildDraw(c, recyclerView, viewHolder, dX, dY, actionState, isCurrentlyActive);
-                if (isCurrentlyActive && actionState == ACTION_STATE_SWIPE) {
-                    Timber.d("onChildDraw: dX: %f", dX);
-                    Drawable d = Preconditions.checkNotNull(
-                            ContextCompat.getDrawable(context, R.drawable.ic_delete_black_24dp),
-                            "Cannot create drawable from resource"
-                    );
-                    final int w = d.getIntrinsicWidth();
-                    final int h = d.getIntrinsicHeight();
-                    d.setBounds(0, 0, w, h);
-                    Bitmap b = Bitmap.createBitmap(w, h, Bitmap.Config.ARGB_8888);
-                    Canvas imageCanvas = new Canvas(b);
-                    d.draw(imageCanvas);
-
-                    final View view = viewHolder.itemView;
-                    final float top = view.getTop() + view.getHeight() / 2f - h / 2f;
-                    if (dX > 0f) {
-                        c.drawBitmap(b, w, top, null);
-                    } else {
-                        c.drawBitmap(b, view.getWidth() - 2*w, top, null);
-                    }
-
-                    b.recycle();
+        });
+        adapter.setLongClickListener(v -> {
+            getActivity().startActionMode(new ActionMode.Callback() {
+                @Override
+                public boolean onCreateActionMode(ActionMode mode, Menu menu) {
+                    itemTouchHelper.attachToRecyclerView(rv);
+                    inActionMode.set(true);
+                    return true;
                 }
-            }
 
-            @Override
-            public boolean isLongPressDragEnabled() {
-                return false;
-            }
+                @Override
+                public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
+                    return false;
+                }
+
+                @Override
+                public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
+                    return false;
+                }
+
+                @Override
+                public void onDestroyActionMode(ActionMode mode) {
+                    itemTouchHelper.attachToRecyclerView(null);
+                    inActionMode.set(false);
+                }
+            });
+            return true;
         });
         adapter.setReorderDownListener(v -> {
             final RecyclerView.ViewHolder vh = rv.findContainingViewHolder(v);
@@ -131,7 +117,6 @@ public class ProgramTrainingFragment extends Fragment {
                 itemTouchHelper.startDrag(vh);
             }
         });
-        itemTouchHelper.attachToRecyclerView(rv);
     }
 
 }
