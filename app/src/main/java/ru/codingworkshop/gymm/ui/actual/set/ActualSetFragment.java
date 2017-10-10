@@ -4,16 +4,12 @@ import android.content.Context;
 import android.databinding.DataBindingUtil;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.support.annotation.StringRes;
 import android.support.annotation.VisibleForTesting;
-import android.support.design.widget.TextInputLayout;
 import android.support.v4.app.Fragment;
-import android.text.Editable;
-import android.text.TextWatcher;
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.EditText;
 
 import com.google.common.base.Preconditions;
 
@@ -21,6 +17,7 @@ import ru.codingworkshop.gymm.R;
 import ru.codingworkshop.gymm.data.entity.ActualSet;
 import ru.codingworkshop.gymm.data.entity.ProgramSet;
 import ru.codingworkshop.gymm.databinding.FragmentActualSetBinding;
+import ru.codingworkshop.gymm.ui.common.EditTextValidator;
 
 public class ActualSetFragment extends Fragment {
 
@@ -103,13 +100,10 @@ public class ActualSetFragment extends Fragment {
         repsValidator = new EditTextValidator(binding.actualSetRepsCountLayout,
                 R.string.actual_training_activity_stepper_item_reps_error);
 
-        weightValidator = new EditTextValidator(binding.actualSetWeightLayout,
-                R.string.actual_training_activity_stepper_item_weight_error) {
-            @Override
-            protected boolean isValid(CharSequence textEditContents) {
-                return !isWithWeight || super.isValid(textEditContents);
-            }
-        };
+        weightValidator = new EditTextValidator(binding.actualSetWeightLayout);
+        weightValidator.addValidation(
+                s -> !isWithWeight || !TextUtils.isEmpty(s),
+                R.string.actual_training_activity_stepper_item_weight_error);
 
         return root;
     }
@@ -191,45 +185,4 @@ public class ActualSetFragment extends Fragment {
         }
     }
 
-    private static class EditTextValidator {
-        private TextInputLayout textInputLayout;
-        private String errorText;
-
-        public EditTextValidator(TextInputLayout textInputLayout, @StringRes int errorText) {
-            this.textInputLayout = textInputLayout;
-            this.errorText = textInputLayout.getContext().getString(errorText);
-
-            textInputLayout.getEditText().addTextChangedListener(new TextWatcher() {
-                public void onTextChanged(CharSequence s, int start, int before, int count) {
-                    if (isValid(s)) {
-                        setShowError(false);
-                    }
-                }
-
-                public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
-                public void afterTextChanged(Editable s) {}
-            });
-        }
-
-        public boolean validate() throws IllegalStateException {
-            final EditText editText = textInputLayout.getEditText();
-            if (editText == null) return false;
-
-            final boolean valid = isValid(editText.getText());
-            setShowError(!valid);
-
-            return valid;
-        }
-
-        protected boolean isValid(CharSequence textEditContents) {
-            return textEditContents.length() != 0;
-        }
-
-        private void setShowError(boolean show) {
-            CharSequence currentError = textInputLayout.getError();
-            if (show && currentError != null) return;
-            if (!show && currentError == null) return;
-            textInputLayout.setError(show ? errorText : null);
-        }
-    }
 }

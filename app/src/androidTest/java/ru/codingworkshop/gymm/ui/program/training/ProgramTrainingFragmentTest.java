@@ -1,5 +1,6 @@
 package ru.codingworkshop.gymm.ui.program.training;
 
+import android.arch.lifecycle.LiveData;
 import android.arch.lifecycle.ViewModelProvider;
 import android.graphics.Rect;
 import android.support.annotation.LayoutRes;
@@ -25,16 +26,19 @@ import ru.codingworkshop.gymm.R;
 import ru.codingworkshop.gymm.data.tree.node.ProgramExerciseNode;
 import ru.codingworkshop.gymm.data.tree.node.ProgramTrainingTree;
 import ru.codingworkshop.gymm.testing.SimpleFragmentActivity;
+import ru.codingworkshop.gymm.util.LiveTest;
 import ru.codingworkshop.gymm.util.RecyclerViewItemMatcher;
 import ru.codingworkshop.gymm.util.TreeBuilders;
 
 import static android.support.test.espresso.Espresso.onView;
 import static android.support.test.espresso.action.GeneralLocation.CENTER;
 import static android.support.test.espresso.action.ViewActions.actionWithAssertions;
+import static android.support.test.espresso.action.ViewActions.clearText;
 import static android.support.test.espresso.action.ViewActions.click;
 import static android.support.test.espresso.action.ViewActions.longClick;
 import static android.support.test.espresso.action.ViewActions.swipeLeft;
 import static android.support.test.espresso.action.ViewActions.swipeRight;
+import static android.support.test.espresso.action.ViewActions.typeText;
 import static android.support.test.espresso.assertion.ViewAssertions.matches;
 import static android.support.test.espresso.matcher.ViewMatchers.isDisplayed;
 import static android.support.test.espresso.matcher.ViewMatchers.withId;
@@ -42,9 +46,13 @@ import static android.support.test.espresso.matcher.ViewMatchers.withText;
 import static android.support.v7.widget.helper.ItemTouchHelper.LEFT;
 import static android.support.v7.widget.helper.ItemTouchHelper.RIGHT;
 import static junit.framework.Assert.assertEquals;
+import static junit.framework.Assert.assertFalse;
 import static org.hamcrest.Matchers.not;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static ru.codingworkshop.gymm.ui.Matchers.hasErrorText;
 
 /**
  * Created by Радик on 07.10.2017 as part of the Gymm project.
@@ -72,6 +80,8 @@ public class ProgramTrainingFragmentTest {
 
     @Test
     public void trainingListTest() throws Exception {
+        onView(withId(R.id.action_done)).check(matches(isDisplayed()));
+
         onView(exerciseAt(R.id.programExerciseReorderImage, 0)).check(matches(not(isDisplayed())));
         onView(exerciseAt(R.id.programExerciseName, 0)).check(matches(withText("exercise100")));
         String setsCount = InstrumentationRegistry.getTargetContext().getResources().getQuantityString(R.plurals.number_of_sets, 2, 2);
@@ -142,16 +152,50 @@ public class ProgramTrainingFragmentTest {
         checkActionModeOff();
     }
 
+    @Test
+    public void saveWithEmptyNameTest() throws Exception {
+        onView(withId(R.id.programTrainingName)).perform(clearText());
+        onView(withId(R.id.action_done)).perform(click());
+        onView(withId(R.id.programTrainingNameLayout)).check(matches(hasErrorText(R.string.program_training_activity_name_empty_error)));
+        verify(vm, never()).save();
+    }
+
+    @Test
+    public void typeTextWithErrorShownTest() throws Exception {
+        saveWithEmptyNameTest();
+
+        onView(withId(R.id.programTrainingName)).perform(typeText("foo"));
+        onView(withId(R.id.programTrainingNameLayout)).check(matches(not(hasErrorText())));
+    }
+
+    @Test
+    public void saveDuplicateTest() throws Exception {
+        final LiveData<Boolean> liveFalse = new LiveData<Boolean>() {{postValue(false);}};
+        when(vm.save()).thenReturn(liveFalse);
+        assertFalse(LiveTest.getValue(liveFalse));
+        onView(withId(R.id.action_done)).perform(click());
+        onView(withId(R.id.programTrainingNameLayout)).check(matches(hasErrorText(R.string.program_training_activity_name_duplicate_error)));
+    }
+
+    @Test
+    public void saveTest() throws Exception {
+        when(vm.save()).thenReturn(new LiveData<Boolean>() {{postValue(true);}});
+        onView(withId(R.id.action_done)).perform(click());
+        verify(vm).save();
+    }
+
     private void checkActionModeOn() {
         for (int i = 0; i < 3; i++) {
             onView(exerciseAt(R.id.programExerciseReorderImage, i)).check(matches(isDisplayed()));
         }
+        onView(withId(R.id.programTrainingNameLayout)).check(matches(not(isDisplayed())));
     }
 
     private void checkActionModeOff() {
         for (int i = 0; i < 3; i++) {
             onView(exerciseAt(R.id.programExerciseReorderImage, i)).check(matches(not(isDisplayed())));
         }
+        onView(withId(R.id.programTrainingNameLayout)).check(matches(isDisplayed()));
         removeAt(0, LEFT);
         assertEquals(3, tree.getChildren().size());
     }

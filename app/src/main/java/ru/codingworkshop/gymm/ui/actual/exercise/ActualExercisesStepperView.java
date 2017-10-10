@@ -36,11 +36,6 @@ public class ActualExercisesStepperView extends RecyclerView {
         return (ActualExercisesStepperAdapter) super.getAdapter();
     }
 
-    public void setAdapter(ActualExercisesStepperAdapter adapter) {
-        adapter.addOnClickObserver(this::activateItem);
-        super.setAdapter(adapter);
-    }
-
     public void setOnExerciseActivatedListener(OnExerciseActivatedListener listener) {
         this.listener = listener;
     }
@@ -86,7 +81,7 @@ public class ActualExercisesStepperView extends RecyclerView {
         return currentItemPosition;
     }
 
-    private void activateItem(View itemView) {
+    void activateItem(View itemView) {
         ActivityActualTrainingStepperItemBinding oldBinding = DataBindingUtil.findBinding(itemFloatingContainer);
         if (oldBinding != null) {
             oldBinding.setActive(false);

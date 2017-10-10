@@ -28,7 +28,7 @@ import ru.codingworkshop.gymm.service.event.outcoming.RestResumedEvent;
 import ru.codingworkshop.gymm.service.event.outcoming.RestTimeAddedEvent;
 import ru.codingworkshop.gymm.service.event.outcoming.RestTimerTickEvent;
 import ru.codingworkshop.gymm.testing.SimpleFragmentActivity;
-import ru.codingworkshop.gymm.ui.actual.Matchers;
+import ru.codingworkshop.gymm.ui.Matchers;
 
 import static android.support.test.espresso.Espresso.onView;
 import static android.support.test.espresso.action.ViewActions.click;

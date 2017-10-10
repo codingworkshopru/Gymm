@@ -25,7 +25,7 @@ import static android.support.test.espresso.matcher.ViewMatchers.withId;
 import static android.support.test.espresso.matcher.ViewMatchers.withText;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
-import static ru.codingworkshop.gymm.ui.actual.Matchers.currentPageItem;
+import static ru.codingworkshop.gymm.ui.Matchers.currentPageItem;
 
 /**
  * Created by Радик on 01.10.2017 as part of the Gymm project.

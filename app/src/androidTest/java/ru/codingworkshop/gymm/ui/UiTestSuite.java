@@ -4,6 +4,7 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 
 import ru.codingworkshop.gymm.ui.actual.ActualUiTestSuite;
+import ru.codingworkshop.gymm.ui.program.ProgramUiTestSuite;
 
 /**
  * Created by Радик on 14.09.2017 as part of the Gymm project.
@@ -11,7 +12,8 @@ import ru.codingworkshop.gymm.ui.actual.ActualUiTestSuite;
 
 @RunWith(Suite.class)
 @Suite.SuiteClasses({
-        ActualUiTestSuite.class
+        ActualUiTestSuite.class,
+        ProgramUiTestSuite.class
 })
 public class UiTestSuite {
 }

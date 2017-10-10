@@ -32,6 +32,7 @@ import ru.codingworkshop.gymm.ui.actual.set.ActualSetFragment;
 import ru.codingworkshop.gymm.ui.actual.set.ActualSetsFragmentPagerAdapter;
 import ru.codingworkshop.gymm.ui.actual.set.ActualSetsViewPager;
 import ru.codingworkshop.gymm.ui.actual.viewmodel.ActualTrainingViewModel;
+import ru.codingworkshop.gymm.ui.common.ListItemListeners;
 
 public class ActualExercisesFragment extends Fragment implements
         ActualSetFragment.OnActualSetSaveListener {
@@ -270,8 +271,9 @@ public class ActualExercisesFragment extends Fragment implements
         exerciseList = view.findViewById(R.id.actualExerciseList);
         exerciseList.setOnExerciseActivatedListener(this::onExerciseActivated);
         exerciseList.setItemFloatingContainer(setsViewPager);
-        ActualExercisesStepperAdapter exercisesAdapter = new ActualExercisesStepperAdapter(context, tree.getChildren());
-        exerciseList.setAdapter(exercisesAdapter);
+        ListItemListeners listeners = new ListItemListeners(R.layout.activity_actual_training_stepper_item)
+                .setOnClickListener(exerciseList::activateItem);
+        exerciseList.setAdapter(new ActualExercisesStepperAdapter(tree.getChildren(), listeners));
         exerciseList.setCurrentItemPosition(getSavedExercisePosition());
     }
 

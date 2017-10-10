@@ -44,6 +44,10 @@ public class ProgramTrainingRepository extends BaseRepository {
         return dao.getProgramTrainingById(id);
     }
 
+    public LiveData<ProgramTraining> getProgramTrainingByName(String name) {
+        return dao.getProgramTrainingByName(name);
+    }
+
     public LiveData<ProgramTraining> getDraftingProgramTraining() {
         return dao.getDraftingProgramTraining();
     }

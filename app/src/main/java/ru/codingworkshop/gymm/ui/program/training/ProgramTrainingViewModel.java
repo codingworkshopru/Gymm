@@ -61,8 +61,14 @@ public class ProgramTrainingViewModel extends ViewModel {
         return loader.load();
     }
 
-    public void save() {
-        ProgramTrainingSaver saver = new ProgramTrainingSaver(tree, repository);
-        saver.save();
+    public LiveData<Boolean> save() {
+        return Transformations.map(repository.getProgramTrainingByName(tree.getParent().getName()), t -> {
+            if (t == null) {
+                new ProgramTrainingSaver(tree, repository)
+                        .save();
+                return true;
+            }
+            return false;
+        });
     }
 }

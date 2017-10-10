@@ -59,6 +59,12 @@ public class ProgramTrainingRepositoryTest {
     }
 
     @Test
+    public void queryProgramTrainingByName() throws Exception {
+        repository.getProgramTrainingByName("foo");
+        verify(dao).getProgramTrainingByName("foo");
+    }
+
+    @Test
     public void queryDraftingProgramTraining() {
         repository.getDraftingProgramTraining();
         verify(dao).getDraftingProgramTraining();

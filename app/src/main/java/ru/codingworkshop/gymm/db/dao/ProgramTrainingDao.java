@@ -22,11 +22,14 @@ import static android.arch.persistence.room.OnConflictStrategy.FAIL;
 
 @Dao
 public interface ProgramTrainingDao {
-    @Query("select * from ProgramTraining")
+    @Query("select * from ProgramTraining where drafting = 0 order by name")
     LiveData<List<ProgramTraining>> getProgramTrainings();
 
     @Query("select * from ProgramTraining where id = :id")
     LiveData<ProgramTraining> getProgramTrainingById(long id);
+
+    @Query("select * from ProgramTraining where name = :name")
+    LiveData<ProgramTraining> getProgramTrainingByName(String name);
 
     @Query("select * from ProgramTraining where drafting = 1 limit 1")
     LiveData<ProgramTraining> getDraftingProgramTraining();
@@ -42,7 +45,7 @@ public interface ProgramTrainingDao {
 
     @Query("select * " +
             "from ProgramExercise " +
-            "where programTrainingId = :programTrainingId " +
+            "where programTrainingId = :programTrainingId and drafting = 0 " +
             "order by sortOrder")
     LiveData<List<ProgramExercise>> getProgramExercisesForTraining(long programTrainingId);
 

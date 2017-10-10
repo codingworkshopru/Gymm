@@ -3,16 +3,10 @@ package ru.codingworkshop.gymm.ui.actual.set;
 import android.os.Bundle;
 import android.support.annotation.IdRes;
 import android.support.annotation.StringRes;
-import android.support.design.widget.TextInputLayout;
-import android.support.test.InstrumentationRegistry;
 import android.support.test.espresso.Espresso;
 import android.support.test.rule.ActivityTestRule;
 import android.support.test.runner.AndroidJUnit4;
-import android.view.View;
 
-import org.hamcrest.BaseMatcher;
-import org.hamcrest.Description;
-import org.hamcrest.Matcher;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -37,6 +31,7 @@ import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyZeroInteractions;
+import static ru.codingworkshop.gymm.ui.Matchers.hasErrorText;
 
 /**
  * Created by Радик on 12.09.2017 as part of the Gymm project.
@@ -117,38 +112,6 @@ public class ActualSetFragmentTest {
         activityTestRule.getActivity().replaceFragment(fragment);
         onView(withId(R.id.actualSetDoneButton)).perform(click());
         onView(withId(R.id.actualSetWeightLayout)).check(matches(not(hasErrorText())));
-    }
-
-    private static Matcher<View> hasErrorText() {
-        return new BaseMatcher<View>() {
-            @Override
-            public boolean matches(Object item) {
-                return item instanceof TextInputLayout && ((TextInputLayout) item).getError() != null;
-            }
-
-            @Override
-            public void describeTo(Description description) {
-                description.appendText("matches has error text");
-            }
-        };
-    }
-
-    private static Matcher<View> hasErrorText(@StringRes int expectedErrorString) {
-        return new BaseMatcher<View>() {
-            @Override
-            public boolean matches(Object item) {
-                if (item instanceof TextInputLayout) {
-                    String expectedString = InstrumentationRegistry.getTargetContext().getString(expectedErrorString);
-                    return expectedString.equals(((TextInputLayout) item).getError());
-                }
-                return false;
-            }
-
-            @Override
-            public void describeTo(Description description) {
-                description.appendText("error text matches specified string");
-            }
-        };
     }
 
     @Test

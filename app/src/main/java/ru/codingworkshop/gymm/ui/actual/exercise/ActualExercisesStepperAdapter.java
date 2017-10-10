@@ -1,15 +1,14 @@
 package ru.codingworkshop.gymm.ui.actual.exercise;
 
-import android.content.Context;
 import android.support.annotation.Nullable;
 
 import java.util.List;
 
-import ru.codingworkshop.gymm.R;
 import ru.codingworkshop.gymm.data.tree.node.ActualExerciseNode;
 import ru.codingworkshop.gymm.data.tree.node.ProgramExerciseNode;
 import ru.codingworkshop.gymm.databinding.ActivityActualTrainingStepperItemBinding;
 import ru.codingworkshop.gymm.ui.common.ClickableBindingListAdapter;
+import ru.codingworkshop.gymm.ui.common.ListItemListeners;
 import timber.log.Timber;
 
 /**
@@ -18,8 +17,8 @@ import timber.log.Timber;
 public class ActualExercisesStepperAdapter extends
         ClickableBindingListAdapter<ActualExerciseNode, ActivityActualTrainingStepperItemBinding> {
 
-    public ActualExercisesStepperAdapter(Context context, @Nullable List<ActualExerciseNode> items) {
-        super(context, R.layout.activity_actual_training_stepper_item, items);
+    public ActualExercisesStepperAdapter(@Nullable List<ActualExerciseNode> items, ListItemListeners listeners) {
+        super(items, listeners);
     }
 
     @Override

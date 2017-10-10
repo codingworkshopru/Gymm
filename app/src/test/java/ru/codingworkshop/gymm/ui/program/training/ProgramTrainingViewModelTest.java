@@ -44,6 +44,8 @@ public class ProgramTrainingViewModelTest {
     public void setUp() {
         vm = new ProgramTrainingViewModel(repository, exercisesRepository);
 
+        when(repository.getProgramTrainingByName(any())).thenReturn(LiveDataUtil.getLive(null));
+
         when(repository.getProgramTrainingById(1L)).thenReturn(Models.createLiveProgramTraining(1L, "foo", false));
         when(repository.getProgramExercisesForTraining(1L)).thenReturn(Models.createLiveProgramExercises(3));
         when(repository.getProgramSetsForTraining(1L)).thenReturn(Models.createLiveProgramSets(2L, 3));
@@ -94,19 +96,26 @@ public class ProgramTrainingViewModelTest {
     }
 
     @Test
+    public void saveWithNonUniqueName() throws Exception {
+        when(repository.getProgramTrainingByName("foo")).thenReturn(Models.createLiveProgramTraining(1L, "foo", false));
+        LiveTest.verifyLiveData(vm.load(1L), l -> l);
+        LiveData<Boolean> savedLive = vm.save();
+        LiveTest.verifyLiveData(savedLive, saved -> !saved);
+        verify(repository, never()).updateProgramTraining(any());
+    }
+
+    @Test
     public void save() throws Exception {
         when(repository.getProgramExercisesForTraining(any())).thenReturn(Models.createLiveProgramExercises(3));
-        LiveTest.verifyLiveData(vm.load(1L), l -> {
-            ProgramTrainingTree tree = vm.getProgramTrainingTree();
-            tree.moveChild(0,1);
+        LiveTest.verifyLiveData(vm.load(1L), l -> l);
 
-            vm.save();
+        ProgramTrainingTree tree = vm.getProgramTrainingTree();
+        tree.moveChild(0,1);
 
-            verify(repository).updateProgramTraining(tree.getParent());
-            verify(repository).updateProgramExercises(argThat(toUpdate -> toUpdate.size() == 2));
+        LiveTest.verifyLiveData(vm.save(), s -> s);
 
-            return l;
-        });
+        verify(repository).updateProgramTraining(tree.getParent());
+        verify(repository).updateProgramExercises(argThat(toUpdate -> toUpdate.size() == 2));
     }
 
 }

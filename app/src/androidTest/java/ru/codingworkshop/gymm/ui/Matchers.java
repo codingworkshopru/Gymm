@@ -1,4 +1,4 @@
-package ru.codingworkshop.gymm.ui.actual;
+package ru.codingworkshop.gymm.ui;
 
 import android.content.Context;
 import android.graphics.Bitmap;
@@ -6,6 +6,9 @@ import android.graphics.Canvas;
 import android.graphics.drawable.Drawable;
 import android.support.annotation.DrawableRes;
 import android.support.annotation.IdRes;
+import android.support.annotation.StringRes;
+import android.support.design.widget.TextInputLayout;
+import android.support.test.InstrumentationRegistry;
 import android.support.test.espresso.matcher.BoundedMatcher;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.view.ViewPager;
@@ -14,6 +17,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 
+import org.hamcrest.BaseMatcher;
 import org.hamcrest.Description;
 import org.hamcrest.Matcher;
 import org.hamcrest.TypeSafeMatcher;
@@ -62,6 +66,38 @@ public final class Matchers {
             @Override
             public void describeTo(Description description) {
                 description.appendText("is matches to specified page on specified step");
+            }
+        };
+    }
+
+    public static Matcher<View> hasErrorText() {
+        return new BaseMatcher<View>() {
+            @Override
+            public boolean matches(Object item) {
+                return item instanceof TextInputLayout && ((TextInputLayout) item).getError() != null;
+            }
+
+            @Override
+            public void describeTo(Description description) {
+                description.appendText("matches has error text");
+            }
+        };
+    }
+
+    public static Matcher<View> hasErrorText(@StringRes int expectedErrorString) {
+        return new BaseMatcher<View>() {
+            @Override
+            public boolean matches(Object item) {
+                if (item instanceof TextInputLayout) {
+                    String expectedString = InstrumentationRegistry.getTargetContext().getString(expectedErrorString);
+                    return expectedString.equals(((TextInputLayout) item).getError());
+                }
+                return false;
+            }
+
+            @Override
+            public void describeTo(Description description) {
+                description.appendText("error text matches specified string");
             }
         };
     }
