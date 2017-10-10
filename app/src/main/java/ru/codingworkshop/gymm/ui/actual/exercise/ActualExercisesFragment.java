@@ -99,7 +99,7 @@ public class ActualExercisesFragment extends Fragment implements
 
         if (!TrainingForegroundService.isRunning(context)) {
             TrainingForegroundService.startService(context, tree.getParent().getId(),
-                    tree.getProgramTraining().getName());
+                    tree.getParent().getName());
         } else {
             ServiceBindController controller = new ServiceBindController(context);
             controller.bindService().observe(this, service -> {
@@ -251,7 +251,7 @@ public class ActualExercisesFragment extends Fragment implements
         Toolbar toolbar = view.findViewById(R.id.actualExercisesToolbar);
         toolbar.inflateMenu(R.menu.actual_training_menu);
         toolbar.setOnMenuItemClickListener(this::onOptionsItemSelected);
-        toolbar.setTitle(tree.getProgramTraining().getName());
+        toolbar.setTitle(tree.getParent().getName());
     }
 
     private void initSetsViewPager() {

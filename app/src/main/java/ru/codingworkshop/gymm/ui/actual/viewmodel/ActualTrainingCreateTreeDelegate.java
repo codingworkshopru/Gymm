@@ -4,6 +4,7 @@ import android.arch.lifecycle.LiveData;
 import android.arch.lifecycle.Transformations;
 
 import ru.codingworkshop.gymm.data.entity.ActualTraining;
+import ru.codingworkshop.gymm.data.entity.ProgramTraining;
 import ru.codingworkshop.gymm.data.tree.loader.builder.ActualTrainingTreeBuilder;
 import ru.codingworkshop.gymm.data.tree.node.ActualTrainingTree;
 
@@ -18,14 +19,14 @@ final class ActualTrainingCreateTreeDelegate extends ActualTrainingTreeDelegate 
 
     @Override
     LiveData<Boolean> load(ActualTrainingTree tree) {
-        ActualTraining actualTraining = new ActualTraining(id);
-        return Transformations.switchMap(actualTrainingRepository.insertActualTrainingWithResult(actualTraining), unusedId ->
-                Transformations.map(loadProgramTrainingTree(id), unused -> {
-                    ActualTrainingTreeBuilder builder = new ActualTrainingTreeBuilder(tree);
-                    builder.setParent(actualTraining);
-                    builder.setProgramTrainingTree(programTrainingTree).build();
-                    return true;
-                }
-        ));
+        return Transformations.switchMap(loadProgramTrainingTree(id), loaded -> {
+            final ProgramTraining programTraining = programTrainingTree.getParent();
+            ActualTraining actualTraining = new ActualTraining(programTraining.getId(), programTraining.getName());
+            new ActualTrainingTreeBuilder(tree)
+                    .setProgramTrainingTree(programTrainingTree)
+                    .setParent(actualTraining)
+                    .build();
+            return Transformations.map(actualTrainingRepository.insertActualTrainingWithResult(actualTraining), id -> true);
+        });
     }
 }

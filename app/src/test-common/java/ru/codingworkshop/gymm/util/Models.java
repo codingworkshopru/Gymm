@@ -116,7 +116,7 @@ public class Models {
     }
 
     public static ActualTraining createActualTraining(long id, long programTrainingId) {
-        ActualTraining training = new ActualTraining(programTrainingId);
+        ActualTraining training = new ActualTraining(programTrainingId, "foo");
         training.setId(id);
         return training;
     }

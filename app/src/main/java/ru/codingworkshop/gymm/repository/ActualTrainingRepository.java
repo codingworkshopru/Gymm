@@ -4,6 +4,7 @@ import android.arch.lifecycle.LiveData;
 import android.support.annotation.NonNull;
 
 import com.google.common.base.Preconditions;
+import com.google.common.base.Strings;
 
 import java.util.Collection;
 import java.util.List;
@@ -57,7 +58,10 @@ public class ActualTrainingRepository extends BaseRepository {
 
     private static void checkActualTraining(@NonNull ActualTraining actualTraining) {
         Preconditions.checkNotNull(actualTraining.getStartTime());
-        Preconditions.checkArgument(actualTraining.getProgramTrainingId() != null && isValidId(actualTraining.getProgramTrainingId()));
+        Preconditions.checkArgument(actualTraining.getProgramTrainingId() != null
+                && isValidId(actualTraining.getProgramTrainingId())
+                && !Strings.isNullOrEmpty(actualTraining.getName())
+        );
     }
 
     public LiveData<List<ActualExercise>> getActualExercisesForActualTraining(long actualTrainingId) {

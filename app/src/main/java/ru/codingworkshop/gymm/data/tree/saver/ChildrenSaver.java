@@ -42,38 +42,6 @@ public class ChildrenSaver<C> implements Saver {
         oldChildrenLiveData.observeForever(this::difference);
     }
 
-//    private void difference(Collection<C> oldChildren) {
-//        oldChildrenLiveData.removeObserver(this::difference);
-//
-//        if (oldChildren == null) return;
-//
-//        if (oldChildren.isEmpty()) {
-//            insert(children);
-//            return;
-//        }
-//
-//        if (children.isEmpty()) {
-//            delete(oldChildren);
-//            Timber.w("All children about to be deleted");
-//            return;
-//        }
-//
-//        Collection<C> toInsert = sub(children, oldChildren);
-//        Collection<C> toDelete = sub(oldChildren, children);
-//        Collection<C> toUpdate = Collections2.filter(children, input -> {
-//            if (toInsert.contains(input)) {
-//                return false;
-//            }
-//            return ! Iterables.tryFind(oldChildren, old ->
-//                    callback.contentsAreEqual(input, old)
-//            ).isPresent();
-//        });
-//
-//        insert(toInsert);
-//        update(toUpdate);
-//        delete(toDelete);
-//    }
-
     private void difference(List<C> oldChildren) {
         oldChildrenLiveData.removeObserver(this::difference);
 

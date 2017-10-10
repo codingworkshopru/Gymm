@@ -9,15 +9,15 @@ import ru.codingworkshop.gymm.data.tree.node.BaseNode;
  */
 
 public class ChildRestoreAdapter implements ChildRestore {
-    private BaseNode<?, ?> node;
+    private BaseNode node;
 
-    public ChildRestoreAdapter(BaseNode<?, ?> node) {
+    public ChildRestoreAdapter(BaseNode node) {
         this.node = node;
     }
 
     @Override
     public void restoreLastRemoved() {
-        ChildrenHolder<?> childrenHolder = node.getChildrenDelegate();
+        ChildrenHolder childrenHolder = node.getChildrenDelegate();
         if (childrenHolder instanceof SortableRestoreChildrenHolder) {
             ((SortableRestoreChildrenHolder) childrenHolder).restoreLastRemoved();
         } else {

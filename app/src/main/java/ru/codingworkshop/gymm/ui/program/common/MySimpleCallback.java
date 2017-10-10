@@ -1,5 +1,6 @@
 package ru.codingworkshop.gymm.ui.program.common;
 
+import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.drawable.Drawable;
@@ -11,30 +12,31 @@ import android.view.View;
 import com.google.common.base.Preconditions;
 
 import ru.codingworkshop.gymm.R;
+import ru.codingworkshop.gymm.data.tree.node.BaseNode;
 
 import static android.support.v7.widget.helper.ItemTouchHelper.ACTION_STATE_SWIPE;
 
 /**
  * Created by Радик on 08.10.2017 as part of the Gymm project.
  */
-public abstract class MySimpleCallback extends ItemTouchHelper.SimpleCallback {
-    private RecyclerView recyclerView;
+public class MySimpleCallback extends ItemTouchHelper.SimpleCallback {
+    private BaseNode node;
     private Bitmap imageDrawable;
     private int imageWidth;
     private int imageHeight;
 
-    public MySimpleCallback(RecyclerView recyclerView) {
+    public MySimpleCallback(BaseNode node) {
         super(ItemTouchHelper.UP | ItemTouchHelper.DOWN, ItemTouchHelper.LEFT | ItemTouchHelper.RIGHT);
-        this.recyclerView = recyclerView;
+        this.node = node;
     }
 
-    private void prepareImage() {
+    private void prepareImage(Context context) {
         if (imageDrawable != null && !imageDrawable.isRecycled()) {
             return;
         }
 
         Drawable d = Preconditions.checkNotNull(
-                ContextCompat.getDrawable(recyclerView.getContext(), R.drawable.ic_delete_black_24dp),
+                ContextCompat.getDrawable(context, R.drawable.ic_delete_black_24dp),
                 "Cannot create drawable from resource"
         );
 
@@ -57,21 +59,17 @@ public abstract class MySimpleCallback extends ItemTouchHelper.SimpleCallback {
     public boolean onMove(RecyclerView recyclerView, RecyclerView.ViewHolder source, RecyclerView.ViewHolder target) {
         int from = source.getAdapterPosition();
         int to = target.getAdapterPosition();
-        moveChild(from, to);
+        node.moveChild(from, to);
         recyclerView.getAdapter().notifyItemMoved(from, to);
         return from != to;
     }
 
-    public abstract void moveChild(int from, int to);
-
     @Override
     public void onSwiped(RecyclerView.ViewHolder viewHolder, int direction) {
         final int index = viewHolder.getAdapterPosition();
-        removeChild(index);
-        recyclerView.getAdapter().notifyItemRemoved(index);
+        node.removeChild(index);
+        ((RecyclerView) viewHolder.itemView.getParent()).getAdapter().notifyItemRemoved(index);
     }
-
-    public abstract void removeChild(int index);
 
     @Override
     public void onChildDraw(Canvas c, RecyclerView recyclerView,
@@ -79,7 +77,7 @@ public abstract class MySimpleCallback extends ItemTouchHelper.SimpleCallback {
                             int actionState, boolean isCurrentlyActive) {
         super.onChildDraw(c, recyclerView, viewHolder, dX, dY, actionState, isCurrentlyActive);
         if (isCurrentlyActive && actionState == ACTION_STATE_SWIPE) {
-            prepareImage();
+            prepareImage(recyclerView.getContext());
 
             final View view = viewHolder.itemView;
             final float top = view.getTop() + view.getHeight() / 2f - imageHeight / 2f;
