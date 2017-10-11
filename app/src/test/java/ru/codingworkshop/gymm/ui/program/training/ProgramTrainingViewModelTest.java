@@ -19,6 +19,7 @@ import ru.codingworkshop.gymm.util.LiveTest;
 import ru.codingworkshop.gymm.util.Models;
 
 import static junit.framework.Assert.assertEquals;
+import static junit.framework.Assert.assertFalse;
 import static junit.framework.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.argThat;
@@ -118,4 +119,42 @@ public class ProgramTrainingViewModelTest {
         verify(repository).updateProgramExercises(argThat(toUpdate -> toUpdate.size() == 2));
     }
 
+    @Test
+    public void deleteIfDraftingTest() throws Exception {
+        LiveTest.verifyLiveData(vm.load(1L), l -> l);
+        vm.deleteIfDrafting();
+        verify(repository, never()).deleteProgramTraining(any());
+        vm.getProgramTrainingTree().getParent().setDrafting(true);
+        vm.deleteIfDrafting();
+        verify(repository).deleteProgramTraining(argThat(t -> t.getId() == 1L));
+    }
+
+    @Test
+    public void parentChangedTest() throws Exception {
+        LiveTest.verifyLiveData(vm.load(1L), l -> l);
+        vm.getProgramTrainingTree().getParent().setName("bar");
+        assertTrue(vm.isChanged());
+    }
+
+    @Test
+    public void childrenChangedTest() throws Exception {
+        LiveTest.verifyLiveData(vm.load(1L), l -> l);
+        vm.setChildrenChanged(true);
+        assertTrue(vm.isChanged());
+    }
+
+    @Test
+    public void parentAndChildrenChangedTest() throws Exception {
+        LiveTest.verifyLiveData(vm.load(1L), l -> l);
+        vm.getProgramTrainingTree().getParent().setName("bar");
+        vm.setChildrenChanged(true);
+        assertTrue(vm.isChanged());
+    }
+
+    @Test
+    public void nothingChangedTest() throws Exception {
+        LiveTest.verifyLiveData(vm.load(1L), l -> l);
+        vm.getProgramTrainingTree().getParent().setName("foo");
+        assertFalse(vm.isChanged());
+    }
 }

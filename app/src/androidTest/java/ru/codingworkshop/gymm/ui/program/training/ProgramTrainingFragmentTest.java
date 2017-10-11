@@ -18,9 +18,11 @@ import org.hamcrest.Matcher;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
 
 import ru.codingworkshop.gymm.R;
 import ru.codingworkshop.gymm.data.tree.node.ProgramExerciseNode;
@@ -47,8 +49,10 @@ import static android.support.v7.widget.helper.ItemTouchHelper.LEFT;
 import static android.support.v7.widget.helper.ItemTouchHelper.RIGHT;
 import static junit.framework.Assert.assertEquals;
 import static junit.framework.Assert.assertFalse;
+import static junit.framework.Assert.assertTrue;
 import static org.hamcrest.Matchers.not;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -61,7 +65,7 @@ import static ru.codingworkshop.gymm.ui.Matchers.hasErrorText;
 public class ProgramTrainingFragmentTest {
     @Mock private ViewModelProvider.Factory viewModelFactory;
     @Mock private ProgramTrainingViewModel vm;
-    @InjectMocks private ProgramTrainingFragment fragment;
+    private ProgramTrainingFragment fragment;
 
     @Rule
     public ActivityTestRule<SimpleFragmentActivity> activityTestRule =
@@ -71,23 +75,38 @@ public class ProgramTrainingFragmentTest {
     @Before
     public void setUp() throws Exception {
         MockitoAnnotations.initMocks(this);
+
         RecyclerViewItemMatcher.setRecyclerViewId(R.id.programExerciseList);
+
         when(viewModelFactory.create(any())).thenReturn(vm);
         tree = TreeBuilders.buildProgramTrainingTree(3);
-        when(vm.getProgramTrainingTree()).thenReturn(tree);
+        when(vm.load(1L)).thenAnswer(invocation -> {
+            when(vm.getProgramTrainingTree()).thenReturn(tree);
+            return new LiveData<Boolean>() {{postValue(true);}};
+        });
+
+        fragment = ProgramTrainingFragment.newInstance(1L);
+        fragment.viewModelFactory = viewModelFactory;
         activityTestRule.getActivity().setFragment(fragment);
+
+        doAnswer(invocation -> {
+            when(vm.isChanged()).thenReturn(true);
+            return null;
+        }).when(vm).setChildrenChanged(true);
+    }
+
+    @Test
+    public void initializationTest() throws Exception {
+        onView(withId(R.id.programTrainingName)).check(matches(withText("foo")));
+        onView(withId(R.id.action_done)).check(matches(isDisplayed()));
+
     }
 
     @Test
     public void trainingListTest() throws Exception {
-        onView(withId(R.id.action_done)).check(matches(isDisplayed()));
-
-        onView(exerciseAt(R.id.programExerciseReorderImage, 0)).check(matches(not(isDisplayed())));
         onView(exerciseAt(R.id.programExerciseName, 0)).check(matches(withText("exercise100")));
         String setsCount = InstrumentationRegistry.getTargetContext().getResources().getQuantityString(R.plurals.number_of_sets, 2, 2);
         onView(exerciseAt(R.id.programSetsCount, 0)).check(matches(withText(setsCount)));
-        removeAt(2, LEFT);
-        assertEquals(3, tree.getChildren().size());
     }
 
     @Test
@@ -104,9 +123,9 @@ public class ProgramTrainingFragmentTest {
     public void restoreRemovedExercise() throws Exception {
         enterActionMode();
         removeAt(2, LEFT);
-        onView(withText(InstrumentationRegistry.getTargetContext().getString(R.string.program_training_activity_exercise_deleted_message))).check(matches(isDisplayed()));
+        onView(withText(R.string.program_training_activity_exercise_deleted_message)).check(matches(isDisplayed()));
         assertEquals(2, tree.getChildren().size());
-        onView(withText(InstrumentationRegistry.getTargetContext().getString(android.R.string.cancel))).perform(click());
+        onView(withText(android.R.string.cancel)).perform(click());
         assertEquals(3, tree.getChildren().size());
         onView(exerciseAt(R.id.programExerciseName, 2)).check(matches(withText("exercise102")));
     }
@@ -139,7 +158,7 @@ public class ProgramTrainingFragmentTest {
         removeExercise();
         removeAt(0, RIGHT);
         onView(withId(R.id.programTrainingBackground)).check(matches(isDisplayed()));
-        onView(withText(InstrumentationRegistry.getTargetContext().getString(android.R.string.cancel))).perform(click());
+        onView(withText(android.R.string.cancel)).perform(click());
         onView(withId(R.id.programTrainingBackground)).check(matches(not(isDisplayed())));
     }
 
@@ -182,6 +201,41 @@ public class ProgramTrainingFragmentTest {
         when(vm.save()).thenReturn(new LiveData<Boolean>() {{postValue(true);}});
         onView(withId(R.id.action_done)).perform(click());
         verify(vm).save();
+        verify(vm, never()).deleteIfDrafting();
+    }
+
+    @Test
+    public void closeWithoutChanges() throws Throwable {
+        checkActionModeOff(); // wait for activity start
+        CountDownLatch l = new CountDownLatch(1);
+        activityTestRule.runOnUiThread(() -> {
+            fragment.onFragmentClose();
+            l.countDown();
+        });
+        l.await(10000, TimeUnit.MILLISECONDS);
+        assertTrue(activityTestRule.getActivity().isFinishing());
+        verify(vm).deleteIfDrafting();
+    }
+
+    @Test
+    public void trainingNameChangedAssuranceMessageTest() throws Exception {
+        onView(withId(R.id.programTrainingName)).perform(clearText());
+        onView(withId(R.id.programTrainingName)).perform(typeText("bar"));
+        when(vm.isChanged()).thenReturn(true);
+        fragment.onFragmentClose();
+        onView(withText(R.string.cancel_changes_question)).check(matches(isDisplayed()));
+        onView(withText(android.R.string.ok)).perform(click());
+        verify(vm).deleteIfDrafting();
+    }
+
+    @Test
+    public void exercisesListChangedAssuranceMessageTest() throws Exception {
+        enterActionMode();
+        Espresso.pressBack();
+        fragment.onFragmentClose();
+        onView(withText(R.string.cancel_changes_question)).check(matches(isDisplayed()));
+        onView(withText(android.R.string.ok)).perform(click());
+        verify(vm).deleteIfDrafting();
     }
 
     private void checkActionModeOn() {

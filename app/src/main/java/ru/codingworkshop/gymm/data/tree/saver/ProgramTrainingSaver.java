@@ -45,6 +45,7 @@ public class ProgramTrainingSaver implements Saver,
 
     @Override
     public void updateParent(ProgramTraining parent) {
+        parent.setDrafting(false);
         repository.updateProgramTraining(parent);
     }
 

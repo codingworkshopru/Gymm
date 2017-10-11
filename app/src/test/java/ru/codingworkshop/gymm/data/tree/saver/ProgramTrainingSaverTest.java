@@ -1,6 +1,7 @@
 package ru.codingworkshop.gymm.data.tree.saver;
 
 import android.arch.core.executor.testing.InstantTaskExecutorRule;
+import android.arch.lifecycle.LiveData;
 
 import com.google.common.collect.Lists;
 
@@ -21,7 +22,6 @@ import ru.codingworkshop.gymm.data.tree.node.MutableProgramExerciseNode;
 import ru.codingworkshop.gymm.data.tree.node.MutableProgramTrainingTree;
 import ru.codingworkshop.gymm.data.tree.node.ProgramExerciseNode;
 import ru.codingworkshop.gymm.data.tree.node.ProgramTrainingTree;
-import ru.codingworkshop.gymm.data.util.LiveDataUtil;
 import ru.codingworkshop.gymm.repository.ProgramTrainingRepository;
 import ru.codingworkshop.gymm.util.Models;
 
@@ -42,10 +42,12 @@ public class ProgramTrainingSaverTest {
 
     @Mock private ProgramTrainingRepository repository;
     private ProgramTrainingTree tree;
+    private ProgramTrainingSaver saver;
 
     @Before
     public void setUp() throws Exception {
         tree = new MutableProgramTrainingTree();
+        saver = new ProgramTrainingSaver(tree, repository);
     }
 
     @Test
@@ -53,7 +55,6 @@ public class ProgramTrainingSaverTest {
         ProgramTraining programTraining = Models.createProgramTraining(0L, "foo");
         tree.setParent(programTraining);
 
-        ProgramTrainingSaver saver = new ProgramTrainingSaver(tree, repository);
         saver.saveParent();
 
         verify(repository).insertProgramTraining(programTraining);
@@ -65,7 +66,7 @@ public class ProgramTrainingSaverTest {
         ProgramTraining programTraining = Models.createProgramTraining(1L, "foo");
         tree.setParent(programTraining);
 
-        final List<ProgramExercise> oldChildren = Models.createProgramExercises(3);
+        final LiveData<List<ProgramExercise>> oldChildren = Models.createLiveProgramExercises(3);
         final List<ProgramExercise> newChildren = Models.createProgramExercises(3);
         List<ProgramExerciseNode> children = newChildren.stream().map(MutableProgramExerciseNode::new).collect(Collectors.toList());
         tree.setChildren(children);
@@ -73,9 +74,8 @@ public class ProgramTrainingSaverTest {
         tree.addChild(new MutableProgramExerciseNode(Models.createProgramExercise(9L, 1L, 109L, false)));
         tree.moveChild(0,1);
 
-        when(repository.getProgramExercisesForTraining(programTraining)).thenReturn(LiveDataUtil.getLive(oldChildren));
+        when(repository.getProgramExercisesForTraining(programTraining)).thenReturn(oldChildren);
 
-        ProgramTrainingSaver saver = new ProgramTrainingSaver(tree, repository);
         saver.save();
 
         verify(repository).getProgramExercisesForTraining(programTraining);

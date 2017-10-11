@@ -1,0 +1,63 @@
+package ru.codingworkshop.gymm.ui.program.training;
+
+import android.arch.lifecycle.LiveData;
+import android.arch.lifecycle.ViewModelProvider;
+import android.support.test.rule.ActivityTestRule;
+
+import org.junit.Before;
+import org.junit.Rule;
+import org.junit.Test;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
+
+import ru.codingworkshop.gymm.R;
+import ru.codingworkshop.gymm.data.tree.node.MutableProgramTrainingTree;
+import ru.codingworkshop.gymm.data.tree.node.ProgramTrainingTree;
+import ru.codingworkshop.gymm.testing.SimpleFragmentActivity;
+import ru.codingworkshop.gymm.util.Models;
+
+import static android.support.test.espresso.Espresso.onView;
+import static android.support.test.espresso.assertion.ViewAssertions.matches;
+import static android.support.test.espresso.matcher.ViewMatchers.isDisplayed;
+import static android.support.test.espresso.matcher.ViewMatchers.withId;
+import static android.support.test.espresso.matcher.ViewMatchers.withText;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
+/**
+ * Created by Радик on 11.10.2017 as part of the Gymm project.
+ */
+
+public class ProgramTrainingCreateFragmentTest {
+    public @Rule ActivityTestRule<SimpleFragmentActivity> activityTestRule =
+            new ActivityTestRule<>(SimpleFragmentActivity.class);
+
+    private @Mock ViewModelProvider.Factory viewModelFactory;
+    private @Mock ProgramTrainingViewModel vm;
+    private ProgramTrainingFragment fragment;
+
+    @Before
+    public void setUp() throws Exception {
+        MockitoAnnotations.initMocks(this);
+
+        when(viewModelFactory.create(any())).thenReturn(vm);
+        when(vm.create()).thenAnswer(invocation -> {
+            ProgramTrainingTree tree = new MutableProgramTrainingTree();
+            tree.setParent(Models.createLiveProgramTraining(0L, null, true).getValue());
+            when(vm.getProgramTrainingTree()).thenReturn(tree);
+            return new LiveData<Boolean>() {{postValue(true);}};
+        });
+
+        fragment = ProgramTrainingFragment.newInstance();
+        fragment.viewModelFactory = viewModelFactory;
+        activityTestRule.getActivity().setFragment(fragment);
+    }
+
+    @Test
+    public void createTest() throws Exception {
+        onView(withId(R.id.programTrainingName)).check(matches(withText("")));
+        onView(withId(R.id.programTrainingBackground)).check(matches(isDisplayed()));
+        verify(vm).create();
+    }
+}
