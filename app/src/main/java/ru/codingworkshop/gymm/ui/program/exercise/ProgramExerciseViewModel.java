@@ -1,8 +1,10 @@
 package ru.codingworkshop.gymm.ui.program.exercise;
 
 import android.arch.lifecycle.LiveData;
+import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.Transformations;
 import android.arch.lifecycle.ViewModel;
+import android.support.annotation.Nullable;
 
 import javax.inject.Inject;
 
@@ -21,18 +23,22 @@ import ru.codingworkshop.gymm.repository.ProgramTrainingRepository;
  */
 
 public class ProgramExerciseViewModel extends ViewModel {
-    private ProgramTrainingRepository programTrainingRepository;
+    private ProgramTrainingRepository repository;
     private ExercisesRepository exercisesRepository;
     private ProgramExerciseNode node;
 
     private long programTrainingId;
+    private ProgramExerciseSaver saver;
+    private boolean childrenChanged;
+    private long exerciseId;
 
     @Inject
-    public ProgramExerciseViewModel(ProgramTrainingRepository programTrainingRepository, ExercisesRepository exercisesRepository) {
-        this.programTrainingRepository = programTrainingRepository;
+    public ProgramExerciseViewModel(ProgramTrainingRepository repository, ExercisesRepository exercisesRepository) {
+        this.repository = repository;
         this.exercisesRepository = exercisesRepository;
 
         node = new MutableProgramExerciseNode();
+        saver = new ProgramExerciseSaver(node, repository);
     }
 
     public ProgramExerciseNode getProgramExerciseNode() {
@@ -47,13 +53,13 @@ public class ProgramExerciseViewModel extends ViewModel {
         ProgramExercise programExercise = new ProgramExercise();
         programExercise.setProgramTrainingId(programTrainingId);
         programExercise.setDrafting(true);
-        programTrainingRepository.insertProgramExercise(programExercise);
+        repository.insertProgramExercise(programExercise);
 
         node.setParent(programExercise);
     }
 
     public LiveData<Boolean> create() {
-        return Transformations.switchMap(programTrainingRepository.getDraftingProgramExercise(programTrainingId), input -> {
+        return Transformations.switchMap(repository.getDraftingProgramExercise(programTrainingId), input -> {
             if (input == null) {
                 initNode();
                 return LiveDataUtil.getLive(true);
@@ -64,13 +70,38 @@ public class ProgramExerciseViewModel extends ViewModel {
     }
 
     public LiveData<Boolean> load(long programExerciseId) {
-        ProgramExerciseDataSource dataSource = new ProgramExerciseDataSource(programTrainingRepository, exercisesRepository, programExerciseId);
+        ProgramExerciseDataSource dataSource = new ProgramExerciseDataSource(repository, exercisesRepository, programExerciseId);
         ProgramExerciseLoader loader = new ProgramExerciseLoader(node, dataSource);
-        return loader.load();
+        final LiveData<Boolean> liveLoaded = loader.load();
+        liveLoaded.observeForever(new Observer<Boolean>() {
+            @Override
+            public void onChanged(@Nullable Boolean loaded) {
+                if (loaded != null && loaded) {
+                    exerciseId = node.getParent().getExerciseId();
+                    liveLoaded.removeObserver(this);
+                }
+            }
+        });
+        return liveLoaded;
     }
 
     public void save() {
-        ProgramExerciseSaver saver = new ProgramExerciseSaver(node, programTrainingRepository);
         saver.save();
+    }
+
+    public void deleteIfDrafting() {
+        final ProgramExercise parent = node.getParent();
+        if (parent.isDrafting()) {
+            repository.deleteProgramExercise(parent);
+            node = null;
+        }
+    }
+
+    public void setChildrenChanged() {
+        this.childrenChanged = true;
+    }
+
+    public boolean isChanged() {
+        return childrenChanged || node.getParent().getExerciseId() != exerciseId;
     }
 }

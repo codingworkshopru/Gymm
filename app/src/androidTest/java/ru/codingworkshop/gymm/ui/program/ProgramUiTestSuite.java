@@ -3,6 +3,8 @@ package ru.codingworkshop.gymm.ui.program;
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 
+import ru.codingworkshop.gymm.ui.program.exercise.ProgramExerciseFragmentTest;
+import ru.codingworkshop.gymm.ui.program.training.ProgramTrainingCreateFragmentTest;
 import ru.codingworkshop.gymm.ui.program.training.ProgramTrainingFragmentTest;
 
 /**
@@ -11,7 +13,9 @@ import ru.codingworkshop.gymm.ui.program.training.ProgramTrainingFragmentTest;
 
 @RunWith(Suite.class)
 @Suite.SuiteClasses({
-        ProgramTrainingFragmentTest.class
+        ProgramExerciseFragmentTest.class,
+        ProgramTrainingFragmentTest.class,
+        ProgramTrainingCreateFragmentTest.class
 })
 public class ProgramUiTestSuite {
 }

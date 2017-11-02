@@ -92,21 +92,21 @@ public class ProgramTrainingFragmentTest {
         doAnswer(invocation -> {
             when(vm.isChanged()).thenReturn(true);
             return null;
-        }).when(vm).setChildrenChanged(true);
+        }).when(vm).setChildrenChanged();
     }
 
     @Test
     public void initializationTest() throws Exception {
         onView(withId(R.id.programTrainingName)).check(matches(withText("foo")));
-        onView(withId(R.id.action_done)).check(matches(isDisplayed()));
+        onView(withId(R.id.actionSaveTraining)).check(matches(isDisplayed()));
 
     }
 
     @Test
-    public void trainingListTest() throws Exception {
+    public void exercisesListTest() throws Exception {
         onView(exerciseAt(R.id.programExerciseName, 0)).check(matches(withText("exercise100")));
         String setsCount = InstrumentationRegistry.getTargetContext().getResources().getQuantityString(R.plurals.number_of_sets, 2, 2);
-        onView(exerciseAt(R.id.programSetsCount, 0)).check(matches(withText(setsCount)));
+        onView(exerciseAt(R.id.programRestTime, 0)).check(matches(withText(setsCount)));
     }
 
     @Test
@@ -174,7 +174,7 @@ public class ProgramTrainingFragmentTest {
     @Test
     public void saveWithEmptyNameTest() throws Exception {
         onView(withId(R.id.programTrainingName)).perform(clearText());
-        onView(withId(R.id.action_done)).perform(click());
+        onView(withId(R.id.actionSaveTraining)).perform(click());
         onView(withId(R.id.programTrainingNameLayout)).check(matches(hasErrorText(R.string.program_training_activity_name_empty_error)));
         verify(vm, never()).save();
     }
@@ -192,14 +192,14 @@ public class ProgramTrainingFragmentTest {
         final LiveData<Boolean> liveFalse = new LiveData<Boolean>() {{postValue(false);}};
         when(vm.save()).thenReturn(liveFalse);
         assertFalse(LiveTest.getValue(liveFalse));
-        onView(withId(R.id.action_done)).perform(click());
+        onView(withId(R.id.actionSaveTraining)).perform(click());
         onView(withId(R.id.programTrainingNameLayout)).check(matches(hasErrorText(R.string.program_training_activity_name_duplicate_error)));
     }
 
     @Test
     public void saveTest() throws Exception {
         when(vm.save()).thenReturn(new LiveData<Boolean>() {{postValue(true);}});
-        onView(withId(R.id.action_done)).perform(click());
+        onView(withId(R.id.actionSaveTraining)).perform(click());
         verify(vm).save();
         verify(vm, never()).deleteIfDrafting();
     }
@@ -225,6 +225,7 @@ public class ProgramTrainingFragmentTest {
         fragment.onFragmentClose();
         onView(withText(R.string.cancel_changes_question)).check(matches(isDisplayed()));
         onView(withText(android.R.string.ok)).perform(click());
+        verify(vm, never()).save();
         verify(vm).deleteIfDrafting();
     }
 
@@ -235,6 +236,7 @@ public class ProgramTrainingFragmentTest {
         fragment.onFragmentClose();
         onView(withText(R.string.cancel_changes_question)).check(matches(isDisplayed()));
         onView(withText(android.R.string.ok)).perform(click());
+        verify(vm, never()).save();
         verify(vm).deleteIfDrafting();
     }
 

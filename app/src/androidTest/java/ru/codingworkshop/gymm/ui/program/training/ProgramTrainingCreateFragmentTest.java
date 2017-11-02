@@ -17,11 +17,14 @@ import ru.codingworkshop.gymm.testing.SimpleFragmentActivity;
 import ru.codingworkshop.gymm.util.Models;
 
 import static android.support.test.espresso.Espresso.onView;
+import static android.support.test.espresso.action.ViewActions.click;
+import static android.support.test.espresso.action.ViewActions.typeText;
 import static android.support.test.espresso.assertion.ViewAssertions.matches;
 import static android.support.test.espresso.matcher.ViewMatchers.isDisplayed;
 import static android.support.test.espresso.matcher.ViewMatchers.withId;
 import static android.support.test.espresso.matcher.ViewMatchers.withText;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -59,5 +62,14 @@ public class ProgramTrainingCreateFragmentTest {
         onView(withId(R.id.programTrainingName)).check(matches(withText("")));
         onView(withId(R.id.programTrainingBackground)).check(matches(isDisplayed()));
         verify(vm).create();
+    }
+
+    @Test
+    public void saveWithoutExercisesTest() throws Exception {
+        onView(withId(R.id.programTrainingName)).perform(typeText("foo"));
+        onView(withId(R.id.actionSaveTraining)).perform(click());
+        verify(vm, never()).save();
+        verify(vm, never()).deleteIfDrafting();
+        onView(withText(R.string.program_training_activity_empty_list_dialog_message)).check(matches(isDisplayed()));
     }
 }

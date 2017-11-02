@@ -17,7 +17,7 @@ import ru.codingworkshop.gymm.ui.common.ListItemListeners;
 public class ProgramExercisesAdapter extends ClickableBindingListAdapter<ProgramExerciseNode, FragmentProgramTrainingListItemBinding> {
     private ObservableBoolean inActionMode;
 
-    public ProgramExercisesAdapter(ListItemListeners listItemListeners, @Nullable List<ProgramExerciseNode> items, ObservableBoolean inActionMode) {
+    ProgramExercisesAdapter(ListItemListeners listItemListeners, @Nullable List<ProgramExerciseNode> items, ObservableBoolean inActionMode) {
         super(items, listItemListeners);
         this.inActionMode = inActionMode;
     }

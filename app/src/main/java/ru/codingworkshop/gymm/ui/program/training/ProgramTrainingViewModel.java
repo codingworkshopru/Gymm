@@ -94,8 +94,8 @@ public class ProgramTrainingViewModel extends ViewModel {
         }
     }
 
-    public void setChildrenChanged(boolean childrenChanged) {
-        this.childrenChanged = childrenChanged;
+    public void setChildrenChanged() {
+        this.childrenChanged = true;
     }
 
     public boolean isChanged() {

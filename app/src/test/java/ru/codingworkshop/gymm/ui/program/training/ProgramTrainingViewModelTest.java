@@ -139,7 +139,7 @@ public class ProgramTrainingViewModelTest {
     @Test
     public void childrenChangedTest() throws Exception {
         LiveTest.verifyLiveData(vm.load(1L), l -> l);
-        vm.setChildrenChanged(true);
+        vm.setChildrenChanged();
         assertTrue(vm.isChanged());
     }
 
@@ -147,7 +147,7 @@ public class ProgramTrainingViewModelTest {
     public void parentAndChildrenChangedTest() throws Exception {
         LiveTest.verifyLiveData(vm.load(1L), l -> l);
         vm.getProgramTrainingTree().getParent().setName("bar");
-        vm.setChildrenChanged(true);
+        vm.setChildrenChanged();
         assertTrue(vm.isChanged());
     }
 

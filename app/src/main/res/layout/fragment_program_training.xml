@@ -86,14 +86,11 @@
             app:layoutManager="android.support.v7.widget.LinearLayoutManager"
             app:layout_behavior="android.support.design.widget.AppBarLayout$ScrollingViewBehavior" />
 
-
         <android.support.design.widget.FloatingActionButton
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="end|bottom"
-            android:layout_marginBottom="@dimen/fab_margin"
-            android:layout_marginEnd="@dimen/fab_margin"
-            android:layout_marginRight="@dimen/fab_margin"
+            android:layout_margin="@dimen/fab_margin"
             android:clickable="true"
             android:focusable="true"
             app:srcCompat="@drawable/ic_add_24dp" />

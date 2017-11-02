@@ -26,6 +26,10 @@ import ru.codingworkshop.gymm.data.tree.node.ProgramTrainingTree;
 
 public class TreeBuilders {
     public static ProgramTrainingTree buildProgramTrainingTree(int exercisesCount) {
+        return buildProgramTrainingTree(exercisesCount, 2);
+    }
+
+    public static ProgramTrainingTree buildProgramTrainingTree(int exercisesCount, final int setsCount) {
         ProgramTrainingTree tree = new MutableProgramTrainingTree();
         tree.setParent(Models.createProgramTraining(1L, "foo"));
         tree.setChildren(Lists.transform(Models.createProgramExercises(exercisesCount), pe -> {
@@ -34,7 +38,7 @@ public class TreeBuilders {
             long exerciseId = pe.getExerciseId();
             node.setExercise(Models.createExercise(exerciseId, "exercise" + exerciseId));
 
-            node.setChildren(Models.createProgramSets(pe.getId(), 2));
+            node.setChildren(Models.createProgramSets(pe.getId(), setsCount));
 
             return node;
         }));

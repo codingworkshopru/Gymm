@@ -63,8 +63,9 @@
     <string name="notification_rest_finished">Пора продолжить тренировку!</string>
 
     <!-- common -->
-    <string name="reps">Повторения</string>
     <string name="bullet" translatable="false">•</string>
+    <string name="colon" translatable="false">:</string>
+    <string name="reps">Повторения</string>
     <string name="no_button_text">Нет</string>
     <string name="save_button_text">Сохранить</string>
     <string name="cancel_changes_question">Отменить изменения?</string>

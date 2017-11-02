@@ -19,8 +19,10 @@ import ru.codingworkshop.gymm.util.LiveTest;
 import ru.codingworkshop.gymm.util.Models;
 
 import static junit.framework.Assert.assertEquals;
+import static junit.framework.Assert.assertFalse;
 import static junit.framework.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -91,17 +93,54 @@ public class ProgramExerciseViewModelTest {
     @Test
     public void save() throws Exception {
         when(repository.getProgramSetsForExercise(any())).thenReturn(Models.createLiveProgramSets(2L, 1));
-        LiveTest.verifyLiveData(vm.load(2L), loaded -> {
-            ProgramExerciseNode node = vm.getProgramExerciseNode();
-            node.getChildren().get(0).setReps(1);
-            node.addChild(Models.createProgramSet(4L, 2L, 10));
-            vm.save();
+        LiveTest.verifyLiveData(vm.load(2L), l -> l);
 
-            verify(repository).updateProgramExercise(node.getParent());
-            verify(repository).updateProgramSets(any());
-            verify(repository).insertProgramSets(any());
+        ProgramExerciseNode node = vm.getProgramExerciseNode();
+        node.getChildren().get(0).setReps(1);
+        node.addChild(Models.createProgramSet(4L, 2L, 10));
+        vm.save();
 
-            return loaded;
-        });
+        verify(repository).updateProgramExercise(node.getParent());
+        verify(repository).updateProgramSets(any());
+        verify(repository).insertProgramSets(any());
+    }
+
+    @Test
+    public void deleteIfDraftingTest() throws Exception {
+        LiveTest.verifyLiveData(vm.load(2L), l -> l);
+        vm.deleteIfDrafting();
+        verify(repository, never()).deleteProgramTraining(any());
+        vm.getProgramExerciseNode().getParent().setDrafting(true);
+        vm.deleteIfDrafting();
+        verify(repository).deleteProgramExercise(argThat(t -> t.getId() == 2L));
+    }
+
+    @Test
+    public void parentChangedTest() throws Exception {
+        LiveTest.verifyLiveData(vm.load(2L), l -> l);
+        vm.getProgramExerciseNode().getParent().setExerciseId(150L);
+        assertTrue(vm.isChanged());
+    }
+
+    @Test
+    public void childrenChangedTest() throws Exception {
+        LiveTest.verifyLiveData(vm.load(2L), l -> l);
+        vm.setChildrenChanged();
+        assertTrue(vm.isChanged());
+    }
+
+    @Test
+    public void parentAndChildrenChangedTest() throws Exception {
+        LiveTest.verifyLiveData(vm.load(2L), l -> l);
+        vm.getProgramExerciseNode().getParent().setExerciseId(150L);
+        vm.setChildrenChanged();
+        assertTrue(vm.isChanged());
+    }
+
+    @Test
+    public void nothingChangedTest() throws Exception {
+        LiveTest.verifyLiveData(vm.load(2L), l -> l);
+        vm.getProgramExerciseNode().getParent().setExerciseId(100L);
+        assertFalse(vm.isChanged());
     }
 }

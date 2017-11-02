@@ -5,11 +5,11 @@
 
     <data>
         <variable
-            name="exerciseName"
-            type="String" />
-        <variable
-            name="setsCount"
+            name="repsCount"
             type="int" />
+        <variable
+            name="restTime"
+            type="String" />
         <variable
             name="inActionMode"
             type="android.databinding.ObservableBoolean" />
@@ -23,17 +23,17 @@
         android:background="@android:color/background_light">
 
         <TextView
-            android:id="@+id/programExerciseName"
+            android:id="@+id/programRepsCount"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginStart="16dp"
             android:layout_marginLeft="16dp"
             android:ellipsize="end"
             android:maxLines="1"
-            android:text="@{exerciseName}"
+            android:text="@{@plurals/number_of_reps(repsCount, repsCount)}"
             android:textAppearance="@style/TextAppearance.AppCompat.Menu"
             app:layout_constraintBottom_toTopOf="@+id/programRestTime"
-            app:layout_constraintEnd_toStartOf="@+id/programExerciseReorderImage"
+            app:layout_constraintEnd_toStartOf="@+id/programSetReorderImage"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintVertical_chainStyle="packed"
@@ -47,15 +47,15 @@
             android:layout_marginLeft="16dp"
             android:ellipsize="end"
             android:maxLines="1"
-            android:text="@{@plurals/number_of_sets(setsCount, setsCount)}"
+            android:text="@{@string/program_exercise_activity_dialog_rest_time_label + ' ' + (restTime ?? @string/program_exercise_activity_rest_time_not_set)}"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toStartOf="@+id/programExerciseReorderImage"
+            app:layout_constraintEnd_toStartOf="@+id/programSetReorderImage"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/programExerciseName"
+            app:layout_constraintTop_toBottomOf="@+id/programRepsCount"
             tools:text="Very very very very very very very very very very long" />
 
         <ImageView
-            android:id="@+id/programExerciseReorderImage"
+            android:id="@+id/programSetReorderImage"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:padding="16dp"

@@ -37,7 +37,7 @@ public class ProgramSet implements Model, Sortable, Parcelable {
     private long id;
     private long programExerciseId;
     private int reps;
-    private int secondsForRest;
+    private Integer secondsForRest;
     private int sortOrder;
 
     public ProgramSet() {
@@ -73,8 +73,28 @@ public class ProgramSet implements Model, Sortable, Parcelable {
         return secondsForRest;
     }
 
-    public void setSecondsForRest(Integer secondsForRest) {
-        this.secondsForRest = secondsForRest;
+    public void setSecondsForRest(@Nullable Integer secondsForRest) {
+        if (secondsForRest != null && secondsForRest == 0) {
+            this.secondsForRest = null;
+        } else {
+            this.secondsForRest = secondsForRest;
+        }
+    }
+
+    public int getMinutes() {
+        return secondsForRest != null ? secondsForRest / 60 : 0;
+    }
+
+    public void setMinutes(int minutes) {
+        secondsForRest = minutes * 60 + getSeconds();
+    }
+
+    public int getSeconds() {
+        return secondsForRest != null ? secondsForRest % 60 : 0;
+    }
+
+    public void setSeconds(int seconds) {
+        secondsForRest = getMinutes() * 60 + seconds;
     }
 
     @Override
@@ -95,7 +115,7 @@ public class ProgramSet implements Model, Sortable, Parcelable {
         return id == that.id &&
                 programExerciseId == that.programExerciseId &&
                 reps == that.reps &&
-                secondsForRest == that.secondsForRest &&
+                secondsForRest.equals(that.secondsForRest) &&
                 sortOrder == that.sortOrder;
     }
 

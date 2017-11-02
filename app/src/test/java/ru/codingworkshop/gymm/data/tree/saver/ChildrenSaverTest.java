@@ -129,7 +129,7 @@ public class ChildrenSaverTest {
     }
 
     @Test
-    public void createUpdateDelete() throws Exception {
+    public void insertUpdateDelete() throws Exception {
         LiveData<List<SimpleModel>> oldChildren = LiveDataUtil.getLive(Models.createSimpleModels(1L,2L,3L,4L));
         List<SimpleModel> children = Models.createSimpleModels(6L,3L,4L);
         children.get(0).setName("foo");

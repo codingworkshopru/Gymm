@@ -7,6 +7,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.RecyclerView;
@@ -16,6 +17,8 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
+
+import com.google.common.base.Preconditions;
 
 import javax.inject.Inject;
 
@@ -65,10 +68,41 @@ public class ActualExercisesFragment extends Fragment implements
     private ActualSetsFragmentPagerAdapter setsPagerAdapter;
 
     @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+        this.context = context;
+        if (callback == null) {
+            if (context instanceof ActualExercisesCallback) {
+                callback = (ActualExercisesCallback) context;
+            } else {
+                throw new IllegalStateException("Activity must implement "
+                        + ActualExercisesCallback.class);
+            }
+        }
+    }
+
+    @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
         viewModel = ViewModelProviders.of(this, viewModelFactory).get(ActualTrainingViewModel.class);
+    }
+
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+                             Bundle savedInstanceState) {
+        return inflater.inflate(R.layout.fragment_actual_exercises, container, false);
+    }
+
+    @NonNull
+    @Override
+    public View getView() {
+        return Preconditions.checkNotNull(super.getView(), "getView called before onCreateView");
+    }
+
+    @Override
+    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
 
         if (viewModel.getActualTrainingTree() != null) {
             onTrainingTreeLoaded(true);
@@ -111,30 +145,7 @@ public class ActualExercisesFragment extends Fragment implements
             });
         }
 
-        initUi(getView());
-    }
-
-    @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_actual_exercises, container, false);
-
-        initUi(view);
-        return view;
-    }
-
-    @Override
-    public void onAttach(Context context) {
-        super.onAttach(context);
-        this.context = context;
-        if (callback == null) {
-            if (context instanceof ActualExercisesCallback) {
-                callback = (ActualExercisesCallback) context;
-            } else {
-                throw new IllegalStateException("Activity must implement "
-                        + ActualExercisesCallback.class);
-            }
-        }
+        initUi();
     }
 
     @Override
@@ -221,14 +232,12 @@ public class ActualExercisesFragment extends Fragment implements
         }
     }
 
-    private void initUi(View view) {
-        if (tree == null || view == null) return;
-
+    private void initUi() {
         alert = new TwoButtonAlert(getChildFragmentManager(), this::onAlertButtonClick);
 
-        initToolbar(view);
+        initToolbar();
         initSetsViewPager();
-        initExerciseList(view);
+        initExerciseList();
     }
 
     private int getSavedExercisePosition() {
@@ -248,8 +257,8 @@ public class ActualExercisesFragment extends Fragment implements
                 ? sharedPreferences.getInt(key, -1) : -1;
     }
 
-    private void initToolbar(View view) {
-        Toolbar toolbar = view.findViewById(R.id.actualExercisesToolbar);
+    private void initToolbar() {
+        Toolbar toolbar = getView().findViewById(R.id.actualExercisesToolbar);
         toolbar.inflateMenu(R.menu.actual_training_menu);
         toolbar.setOnMenuItemClickListener(this::onOptionsItemSelected);
         toolbar.setTitle(tree.getParent().getName());
@@ -267,8 +276,8 @@ public class ActualExercisesFragment extends Fragment implements
         setsViewPager.setAdapter(setsPagerAdapter);
     }
 
-    private void initExerciseList(View view) {
-        exerciseList = view.findViewById(R.id.actualExerciseList);
+    private void initExerciseList() {
+        exerciseList = getView().findViewById(R.id.actualExerciseList);
         exerciseList.setOnExerciseActivatedListener(this::onExerciseActivated);
         exerciseList.setItemFloatingContainer(setsViewPager);
         ListItemListeners listeners = new ListItemListeners(R.layout.activity_actual_training_stepper_item)

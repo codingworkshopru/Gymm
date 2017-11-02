@@ -5,10 +5,10 @@ import android.arch.lifecycle.LiveData;
 import android.arch.lifecycle.ViewModelProvider;
 import android.databinding.DataBindingUtil;
 import android.databinding.ObservableBoolean;
+import android.databinding.ViewDataBinding;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.annotation.VisibleForTesting;
-import android.support.v4.app.Fragment;
 import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
@@ -19,17 +19,21 @@ import javax.inject.Inject;
 
 import ru.codingworkshop.gymm.R;
 import ru.codingworkshop.gymm.data.tree.node.ProgramTrainingTree;
+import ru.codingworkshop.gymm.data.util.LiveDataUtil;
 import ru.codingworkshop.gymm.databinding.FragmentProgramTrainingBinding;
 import ru.codingworkshop.gymm.ui.TwoButtonAlert;
 import ru.codingworkshop.gymm.ui.common.EditTextValidator;
 import ru.codingworkshop.gymm.ui.common.ListItemListeners;
 import ru.codingworkshop.gymm.ui.program.common.ActionModeCallback;
+import ru.codingworkshop.gymm.ui.program.common.BaseFragment;
 import ru.codingworkshop.gymm.ui.program.common.MyAdapterDataObserver;
 import ru.codingworkshop.gymm.ui.program.common.MySimpleCallback;
 import ru.codingworkshop.gymm.ui.program.common.ProgramRecyclerView;
 
-public class ProgramTrainingFragment extends Fragment {
+public class ProgramTrainingFragment extends BaseFragment {
     private static final String PROGRAM_TRAINING_ID_KEY = "programTrainingId";
+    private static final int CANCEL_ALERT_ID = 0;
+    private static final int EMPTY_EXERCISE_LIST_ALERT_ID = 1;
 
     @Inject
     ViewModelProvider.Factory viewModelFactory;
@@ -42,13 +46,34 @@ public class ProgramTrainingFragment extends Fragment {
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
         viewModel = viewModelFactory.create(ProgramTrainingViewModel.class);
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
+    protected Toolbar getToolbar() {
+        Toolbar toolbar = binding.programTrainingToolbar;
+        toolbar.inflateMenu(R.menu.program_training_menu);
+        return toolbar;
+    }
+
+    @Override
+    protected ViewDataBinding createBinding(LayoutInflater inflater, ViewGroup parent) {
+        binding = DataBindingUtil.inflate(inflater, R.layout.fragment_program_training, parent, false);
+        binding.setInActionMode(new ObservableBoolean());
+
+        alert = new TwoButtonAlert(getChildFragmentManager(), (dialogId, positive) -> {
+            if (!positive) return;
+
+            switch (dialogId) {
+                case CANCEL_ALERT_ID:
+                    cleanupAndClose();
+                    break;
+
+                case EMPTY_EXERCISE_LIST_ALERT_ID:
+
+                    break;
+            }
+        });
 
         final Bundle arguments = getArguments();
         LiveData<Boolean> liveLoaded;
@@ -59,18 +84,7 @@ public class ProgramTrainingFragment extends Fragment {
         }
         liveLoaded.observe(this, this::init);
 
-        binding = DataBindingUtil.inflate(inflater, R.layout.fragment_program_training, container, false);
-        binding.setInActionMode(new ObservableBoolean());
-
-        alert = new TwoButtonAlert(getChildFragmentManager(), (dialogId, positive) -> {
-            if (positive) { cleanupAndClose(); }
-        });
-
-        Toolbar toolbar = binding.programTrainingToolbar;
-        toolbar.inflateMenu(R.menu.program_training_menu);
-        toolbar.setOnMenuItemClickListener(this::onOptionsItemSelected);
-
-        return binding.getRoot();
+        return binding;
     }
 
     private void init(boolean loaded) {
@@ -102,17 +116,17 @@ public class ProgramTrainingFragment extends Fragment {
     private void onExerciseLongClick(View v) {
         final ActionModeCallback actionModeCallback = new ActionModeCallback(binding.programExerciseList, binding.getInActionMode());
         getActivity().startActionMode(actionModeCallback);
-        viewModel.setChildrenChanged(true);
+        viewModel.setChildrenChanged();
     }
 
     private void onExerciseClick(View v) {
-
+        // TODO: 18.10.2017 open exercise editor
     }
 
     @VisibleForTesting
     void onFragmentClose() {
         if (viewModel.isChanged()) {
-            alert.showAlertWithDefaultButtons(0, R.string.cancel_changes_question);
+            alert.showAlertWithDefaultButtons(CANCEL_ALERT_ID, R.string.cancel_changes_question);
         } else {
             cleanupAndClose();
         }
@@ -130,22 +144,30 @@ public class ProgramTrainingFragment extends Fragment {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
-            case R.id.action_done:
-                final EditTextValidator editTextValidator = new EditTextValidator(binding.programTrainingNameLayout, R.string.program_training_activity_name_empty_error);
-                if (editTextValidator.validate()) {
-                    viewModel.save().observe(this, saved -> {
-                        if (saved == null) return;
-
-                        editTextValidator.addValidation(s -> saved, R.string.program_training_activity_name_duplicate_error);
-                        if (editTextValidator.validate()) {
-                            close();
-                        }
-                    });
-                }
+            case R.id.actionSaveTraining:
                 return true;
         }
 
         return false;
+    }
+
+    private LiveData<Boolean> validate() {
+        if (!tree.hasChildren()) {
+
+            return LiveDataUtil.getLive(false);
+        }
+
+        final EditTextValidator editTextValidator = new EditTextValidator(binding.programTrainingNameLayout, R.string.program_training_activity_name_empty_error);
+        if (editTextValidator.validate()) {
+            viewModel.save().observe(this, saved -> {
+                if (saved == null) return;
+
+                editTextValidator.addValidation(s -> saved, R.string.program_training_activity_name_duplicate_error);
+                if (editTextValidator.validate()) {
+                    close();
+                }
+            });
+        }
     }
 
     public static ProgramTrainingFragment newInstance() {
