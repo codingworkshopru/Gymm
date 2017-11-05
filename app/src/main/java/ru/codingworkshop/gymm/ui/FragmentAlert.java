@@ -11,12 +11,12 @@ import ru.codingworkshop.gymm.ui.util.AlertDialogFragment;
  * Created by Радик on 04.05.2017.
  */
 
-public class TwoButtonAlert {
+public class FragmentAlert {
     private FragmentManager fragmentManager;
     private AlertDialogFragment dialogFragment;
 
-    public TwoButtonAlert(@NonNull FragmentManager fragmentManager,
-                          AlertDialogFragment.OnDialogButtonClickListener listener) {
+    public FragmentAlert(@NonNull FragmentManager fragmentManager,
+                         AlertDialogFragment.OnDialogButtonClickListener listener) {
         this.fragmentManager = fragmentManager;
 
         dialogFragment = (AlertDialogFragment) fragmentManager.findFragmentByTag(AlertDialogFragment.TAG);
@@ -34,7 +34,16 @@ public class TwoButtonAlert {
         dialogFragment.show(fragmentManager, args);
     }
 
-    public void showAlertWithDefaultButtons(int dialogId, @StringRes int message) {
+    public void showOneButtonAlert(int dialogId, @StringRes int message) {
+        Bundle args = new AlertDialogFragment.ArgumentsBuilder()
+                .setMessage(message)
+                .setPositiveButtonDefaultText()
+                .build();
+
+        showAlert(dialogId, args);
+    }
+
+    public void showTwoButtonsAlert(int dialogId, @StringRes int message) {
         Bundle args = new AlertDialogFragment.ArgumentsBuilder()
                 .setMessage(message)
                 .setPositiveButtonDefaultText()

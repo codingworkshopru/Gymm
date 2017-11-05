@@ -1,4 +1,4 @@
-package ru.codingworkshop.gymm.ui.program.training;
+package ru.codingworkshop.gymm.ui.program.exercise;
 
 import android.arch.lifecycle.LiveData;
 import android.arch.lifecycle.ViewModelProvider;
@@ -11,34 +11,38 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
 import ru.codingworkshop.gymm.R;
+import ru.codingworkshop.gymm.data.tree.node.MutableProgramExerciseNode;
 import ru.codingworkshop.gymm.data.tree.node.MutableProgramTrainingTree;
+import ru.codingworkshop.gymm.data.tree.node.ProgramExerciseNode;
 import ru.codingworkshop.gymm.data.tree.node.ProgramTrainingTree;
+import ru.codingworkshop.gymm.data.util.LiveDataUtil;
 import ru.codingworkshop.gymm.testing.SimpleFragmentActivity;
 import ru.codingworkshop.gymm.util.Models;
 
 import static android.support.test.espresso.Espresso.onView;
 import static android.support.test.espresso.action.ViewActions.click;
-import static android.support.test.espresso.action.ViewActions.typeText;
 import static android.support.test.espresso.assertion.ViewAssertions.matches;
+import static android.support.test.espresso.matcher.ViewMatchers.hasBackground;
 import static android.support.test.espresso.matcher.ViewMatchers.isDisplayed;
 import static android.support.test.espresso.matcher.ViewMatchers.withId;
 import static android.support.test.espresso.matcher.ViewMatchers.withText;
+import static junit.framework.Assert.fail;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 /**
- * Created by Радик on 11.10.2017 as part of the Gymm project.
+ * Created by Radik on 04.11.2017.
  */
 
-public class ProgramTrainingCreateFragmentTest {
-    public @Rule ActivityTestRule<SimpleFragmentActivity> activityTestRule =
+public class ProgramExerciseCreateFragmentTest {
+    @Rule public ActivityTestRule<SimpleFragmentActivity> activityTestRule =
             new ActivityTestRule<>(SimpleFragmentActivity.class);
 
-    private @Mock ViewModelProvider.Factory viewModelFactory;
-    private @Mock ProgramTrainingViewModel vm;
-    private ProgramTrainingFragment fragment;
+    @Mock private ViewModelProvider.Factory viewModelFactory;
+    @Mock private ProgramExerciseViewModel vm;
+    private ProgramExerciseFragment fragment;
 
     @Before
     public void setUp() throws Exception {
@@ -46,30 +50,34 @@ public class ProgramTrainingCreateFragmentTest {
 
         when(viewModelFactory.create(any())).thenReturn(vm);
         when(vm.create()).thenAnswer(invocation -> {
-            ProgramTrainingTree tree = new MutableProgramTrainingTree();
-            tree.setParent(Models.createLiveProgramTraining(0L, null, true).getValue());
-            when(vm.getProgramTrainingTree()).thenReturn(tree);
+            ProgramExerciseNode node = new MutableProgramExerciseNode();
+            node.setParent(Models.createLiveProgramExercise(0L, 1L, true).getValue());
+            when(vm.getProgramExerciseNode()).thenReturn(node);
             return new LiveData<Boolean>() {{postValue(true);}};
         });
 
-        fragment = ProgramTrainingFragment.newInstance();
+        fragment = ProgramExerciseFragment.newInstanceForNew(1L);
         fragment.viewModelFactory = viewModelFactory;
         activityTestRule.getActivity().setFragment(fragment);
     }
 
     @Test
     public void creationTest() throws Exception {
-        onView(withId(R.id.programTrainingName)).check(matches(withText("")));
-        onView(withId(R.id.programTrainingBackground)).check(matches(isDisplayed()));
+        onView(withId(R.id.programExerciseName)).check(matches(withText(R.string.program_exercise_activity_exercise_empty_text)));
+        onView(withId(R.id.programExerciseBackground)).check(matches(isDisplayed()));
+        verify(vm).setProgramTrainingId(1L);
         verify(vm).create();
     }
 
     @Test
-    public void saveWithoutExercisesTest() throws Exception {
-        onView(withId(R.id.programTrainingName)).perform(typeText("foo"));
-        onView(withId(R.id.actionSaveTraining)).perform(click());
-        onView(withText(R.string.program_training_activity_empty_list_dialog_message)).check(matches(isDisplayed()));
+    public void saveWithoutExerciseTest() throws Exception {
+        onView(withId(R.id.actionSaveExercise)).perform(click());
+        onView(withText(R.string.program_exercise_activity_exercise_empty_text)).check(matches(isDisplayed()));
         verify(vm, never()).save();
-        verify(vm, never()).deleteIfDrafting();
+    }
+
+    @Test
+    public void saveWithoutSetsTest() throws Exception {
+
     }
 }

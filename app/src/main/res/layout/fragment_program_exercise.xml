@@ -39,7 +39,7 @@
                 android:maxLines="1"
                 android:padding="16dp"
                 android:textAppearance="@style/TextAppearance.AppCompat.Widget.ActionBar.Title"
-                android:text="@{exercise.name}"
+                android:text="@{exercise.name ?? @string/program_exercise_activity_exercise_empty_text}"
                 android:visibility="@{inActionMode ? View.GONE : View.VISIBLE}"
                 tools:text="Very very long exercise name yeah babe" />
 

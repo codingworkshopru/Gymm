@@ -6,6 +6,8 @@ import android.arch.lifecycle.Transformations;
 import android.arch.lifecycle.ViewModel;
 import android.support.annotation.Nullable;
 
+import com.google.common.base.Preconditions;
+
 import javax.inject.Inject;
 
 import ru.codingworkshop.gymm.data.entity.ProgramExercise;
@@ -15,6 +17,7 @@ import ru.codingworkshop.gymm.data.tree.node.MutableProgramExerciseNode;
 import ru.codingworkshop.gymm.data.tree.node.ProgramExerciseNode;
 import ru.codingworkshop.gymm.data.tree.saver.ProgramExerciseSaver;
 import ru.codingworkshop.gymm.data.util.LiveDataUtil;
+import ru.codingworkshop.gymm.db.GymmDatabase;
 import ru.codingworkshop.gymm.repository.ExercisesRepository;
 import ru.codingworkshop.gymm.repository.ProgramTrainingRepository;
 
@@ -59,7 +62,9 @@ public class ProgramExerciseViewModel extends ViewModel {
     }
 
     public LiveData<Boolean> create() {
-        return Transformations.switchMap(repository.getDraftingProgramExercise(programTrainingId), input -> {
+        Preconditions.checkArgument(GymmDatabase.isValidId(programTrainingId));
+        LiveData<ProgramExercise> draftingProgramExercise = repository.getDraftingProgramExercise(programTrainingId);
+        return Transformations.switchMap(draftingProgramExercise, input -> {
             if (input == null) {
                 initNode();
                 return LiveDataUtil.getLive(true);

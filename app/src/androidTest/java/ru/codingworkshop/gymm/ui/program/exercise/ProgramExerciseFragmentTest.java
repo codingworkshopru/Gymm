@@ -52,6 +52,7 @@ import static android.support.test.espresso.matcher.ViewMatchers.withText;
 import static android.support.v7.widget.helper.ItemTouchHelper.LEFT;
 import static android.support.v7.widget.helper.ItemTouchHelper.RIGHT;
 import static junit.framework.Assert.assertEquals;
+import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doAnswer;
@@ -180,8 +181,7 @@ public class ProgramExerciseFragmentTest {
     public void backgroundImageTest() throws Exception {
         onView(withId(R.id.programExerciseBackground)).check(matches(not(isDisplayed())));
         enterActionMode();
-        removeSet();
-        removeAt(0, RIGHT);
+        removeAll();
         onView(withId(R.id.programExerciseBackground)).check(matches(isDisplayed()));
         onView(withText(android.R.string.cancel)).perform(click());
         onView(withId(R.id.programExerciseBackground)).check(matches(not(isDisplayed())));
@@ -195,7 +195,14 @@ public class ProgramExerciseFragmentTest {
         Espresso.pressBack();
         checkActionModeOff();
     }
-    // TODO: 23.10.2017 make impossible saving without exercise on create
+
+    @Test
+    public void saveWithoutSetsTest() throws Exception {
+        removeAll();
+        onView(withId(R.id.actionSaveExercise)).perform(click());
+        onView(withText(R.string.program_exercise_activity_empty_list_dialog_message)).check(matches(isDisplayed()));
+        verify(vm, never()).save();
+    }
 
     @Test
     public void saveTest() throws Exception {
@@ -267,6 +274,14 @@ public class ProgramExerciseFragmentTest {
 
     private void removeAt(int position, int direction) {
         onView(setAt(R.id.programRepsCount, position)).perform(direction == LEFT ? swipeLeft() : swipeRight());
+    }
+
+    private void removeAll() {
+        enterActionMode();
+        for (int i = 2; i >= 0; i--) {
+            removeAt(i, LEFT);
+        }
+        Espresso.pressBack();
     }
 
     private Matcher<View> setAt(@LayoutRes int id, int index) {

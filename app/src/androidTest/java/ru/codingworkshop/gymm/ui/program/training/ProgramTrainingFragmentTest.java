@@ -99,7 +99,6 @@ public class ProgramTrainingFragmentTest {
     public void initializationTest() throws Exception {
         onView(withId(R.id.programTrainingName)).check(matches(withText("foo")));
         onView(withId(R.id.actionSaveTraining)).check(matches(isDisplayed()));
-
     }
 
     @Test
@@ -155,8 +154,7 @@ public class ProgramTrainingFragmentTest {
     public void backgroundImageTest() throws Exception {
         onView(withId(R.id.programTrainingBackground)).check(matches(not(isDisplayed())));
         enterActionMode();
-        removeExercise();
-        removeAt(0, RIGHT);
+        removeAll();
         onView(withId(R.id.programTrainingBackground)).check(matches(isDisplayed()));
         onView(withText(android.R.string.cancel)).perform(click());
         onView(withId(R.id.programTrainingBackground)).check(matches(not(isDisplayed())));
@@ -262,6 +260,14 @@ public class ProgramTrainingFragmentTest {
 
     private void removeAt(int position, int direction) {
         onView(exerciseAt(R.id.programExerciseName, position)).perform(direction == LEFT ? swipeLeft() : swipeRight());
+    }
+
+    private void removeAll() {
+        enterActionMode();
+        for (int i = 2; i >= 0; i--) {
+            removeAt(i, LEFT);
+        }
+        Espresso.pressBack();
     }
 
     private Matcher<View> exerciseAt(@LayoutRes int id, int index) {

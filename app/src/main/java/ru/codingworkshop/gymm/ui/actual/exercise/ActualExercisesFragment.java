@@ -28,7 +28,7 @@ import ru.codingworkshop.gymm.data.tree.node.ActualTrainingTree;
 import ru.codingworkshop.gymm.databinding.FragmentActualSetBinding;
 import ru.codingworkshop.gymm.db.GymmDatabase;
 import ru.codingworkshop.gymm.service.TrainingForegroundService;
-import ru.codingworkshop.gymm.ui.TwoButtonAlert;
+import ru.codingworkshop.gymm.ui.FragmentAlert;
 import ru.codingworkshop.gymm.ui.actual.ServiceBindController;
 import ru.codingworkshop.gymm.ui.actual.set.ActualSetDataBindingWrapper;
 import ru.codingworkshop.gymm.ui.actual.set.ActualSetFragment;
@@ -63,7 +63,7 @@ public class ActualExercisesFragment extends Fragment implements
 
     private ActualExercisesStepperView exerciseList;
     private ActualSetsViewPager setsViewPager;
-    private TwoButtonAlert alert;
+    private FragmentAlert alert;
 
     private ActualSetsFragmentPagerAdapter setsPagerAdapter;
 
@@ -181,7 +181,7 @@ public class ActualExercisesFragment extends Fragment implements
     }
 
     private void finishTraining() {
-        alert.showAlertWithDefaultButtons(0, R.string.actual_training_activity_are_you_sure_message);
+        alert.showTwoButtonsAlert(0, R.string.actual_training_activity_are_you_sure_message);
     }
 
     @Override
@@ -233,7 +233,7 @@ public class ActualExercisesFragment extends Fragment implements
     }
 
     private void initUi() {
-        alert = new TwoButtonAlert(getChildFragmentManager(), this::onAlertButtonClick);
+        alert = new FragmentAlert(getChildFragmentManager(), this::onAlertButtonClick);
 
         initToolbar();
         initSetsViewPager();

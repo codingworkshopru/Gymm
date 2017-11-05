@@ -1,6 +1,11 @@
 package ru.codingworkshop.gymm.ui.common;
 
+import android.arch.lifecycle.LifecycleObserver;
+import android.arch.lifecycle.LifecycleOwner;
+import android.arch.lifecycle.LiveData;
+import android.arch.lifecycle.Observer;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.annotation.StringRes;
 import android.support.design.widget.TextInputLayout;
 import android.text.Editable;
@@ -34,7 +39,7 @@ public class EditTextValidator {
             public void onTextChanged(CharSequence s, int start, int before, int count) {
                 if (getErrorString() == null) {
                     setError(null);
-//                    editText.removeTextChangedListener(this);
+                    editText.removeTextChangedListener(this);
                 }
             }
 

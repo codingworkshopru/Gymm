@@ -1,6 +1,7 @@
 package ru.codingworkshop.gymm.ui.program.exercise;
 
 
+import android.arch.lifecycle.LiveData;
 import android.arch.lifecycle.ViewModelProvider;
 import android.content.Intent;
 import android.databinding.DataBindingUtil;
@@ -20,7 +21,7 @@ import ru.codingworkshop.gymm.data.entity.Exercise;
 import ru.codingworkshop.gymm.data.tree.node.ProgramExerciseNode;
 import ru.codingworkshop.gymm.databinding.FragmentProgramExerciseBinding;
 import ru.codingworkshop.gymm.ui.MainActivity;
-import ru.codingworkshop.gymm.ui.TwoButtonAlert;
+import ru.codingworkshop.gymm.ui.FragmentAlert;
 import ru.codingworkshop.gymm.ui.common.ListItemListeners;
 import ru.codingworkshop.gymm.ui.program.common.ActionModeCallback;
 import ru.codingworkshop.gymm.ui.program.common.BaseFragment;
@@ -33,6 +34,9 @@ public class ProgramExerciseFragment extends BaseFragment {
     private static final String PROGRAM_TRAINING_ID_KEY = "programTrainingId";
     static final String EXERCISE_ID_KEY = "exerciseId";
     static final String EXERCISE_NAME_KEY = "exerciseName";
+    private static final int CANCEL_ALERT_ID = 0;
+    private static final int EMPTY_EXERCISE_LIST_ALERT_ID = 1;
+    private static final int EXERCISE_NOT_SELECTED_ALERT_ID = 2;
 
     @Inject
     ViewModelProvider.Factory viewModelFactory;
@@ -40,7 +44,7 @@ public class ProgramExerciseFragment extends BaseFragment {
     private FragmentProgramExerciseBinding binding;
     private ProgramExerciseNode node;
 
-    private TwoButtonAlert alert;
+    private FragmentAlert alert;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -52,11 +56,25 @@ public class ProgramExerciseFragment extends BaseFragment {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.actionSaveExercise:
-                viewModel.save();
+                if (validate()) {
+                    viewModel.save();
+                }
                 return true;
         }
 
         return false;
+    }
+
+    private boolean validate() {
+        if (node.getExercise() == null) {
+            alert.showOneButtonAlert(EXERCISE_NOT_SELECTED_ALERT_ID, R.string.program_exercise_activity_exercise_empty_text);
+            return false;
+        }
+        if (!node.hasChildren()) {
+            alert.showOneButtonAlert(EMPTY_EXERCISE_LIST_ALERT_ID, R.string.program_exercise_activity_empty_list_dialog_message);
+            return false;
+        }
+        return true;
     }
 
     @Override
@@ -90,11 +108,25 @@ public class ProgramExerciseFragment extends BaseFragment {
         binding.setInActionMode(getInActionMode());
         binding.programExerciseName.setOnClickListener(this::onExercisePick);
 
-        alert = new TwoButtonAlert(getChildFragmentManager(), (dialogId, positive) -> {
-            if (positive) { cleanupAndClose(); }
+        alert = new FragmentAlert(getChildFragmentManager(), (dialogId, positive) -> {
+            switch (dialogId) {
+                case CANCEL_ALERT_ID:
+                    cleanupAndClose();
+                    break;
+            }
         });
 
-        viewModel.load(getArguments().getLong(PROGRAM_EXERCISE_ID_KEY)).observe(this, this::init);
+        final Bundle arguments = getArguments();
+        LiveData<Boolean> liveLoaded;
+        if (arguments.containsKey(PROGRAM_EXERCISE_ID_KEY)) {
+            liveLoaded = viewModel.load(arguments.getLong(PROGRAM_EXERCISE_ID_KEY));
+        } else if (arguments.containsKey(PROGRAM_TRAINING_ID_KEY)) {
+            viewModel.setProgramTrainingId(arguments.getLong(PROGRAM_TRAINING_ID_KEY));
+            liveLoaded = viewModel.create();
+        } else {
+            throw new IllegalArgumentException("argument neither contains exercise id nor training id");
+        }
+        liveLoaded.observe(this, this::init);
 
         return binding;
     }
@@ -150,7 +182,7 @@ public class ProgramExerciseFragment extends BaseFragment {
 
     void onFragmentClose() {
         if (viewModel.isChanged()) {
-            alert.showAlertWithDefaultButtons(0, R.string.cancel_changes_question);
+            alert.showTwoButtonsAlert(0, R.string.cancel_changes_question);
         } else {
             cleanupAndClose();
         }

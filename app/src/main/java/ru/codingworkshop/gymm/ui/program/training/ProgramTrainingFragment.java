@@ -2,6 +2,7 @@ package ru.codingworkshop.gymm.ui.program.training;
 
 
 import android.arch.lifecycle.LiveData;
+import android.arch.lifecycle.Transformations;
 import android.arch.lifecycle.ViewModelProvider;
 import android.databinding.DataBindingUtil;
 import android.databinding.ObservableBoolean;
@@ -21,7 +22,7 @@ import ru.codingworkshop.gymm.R;
 import ru.codingworkshop.gymm.data.tree.node.ProgramTrainingTree;
 import ru.codingworkshop.gymm.data.util.LiveDataUtil;
 import ru.codingworkshop.gymm.databinding.FragmentProgramTrainingBinding;
-import ru.codingworkshop.gymm.ui.TwoButtonAlert;
+import ru.codingworkshop.gymm.ui.FragmentAlert;
 import ru.codingworkshop.gymm.ui.common.EditTextValidator;
 import ru.codingworkshop.gymm.ui.common.ListItemListeners;
 import ru.codingworkshop.gymm.ui.program.common.ActionModeCallback;
@@ -41,7 +42,7 @@ public class ProgramTrainingFragment extends BaseFragment {
     private ProgramTrainingTree tree;
     private FragmentProgramTrainingBinding binding;
 
-    private TwoButtonAlert alert;
+    private FragmentAlert alert;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -61,16 +62,12 @@ public class ProgramTrainingFragment extends BaseFragment {
         binding = DataBindingUtil.inflate(inflater, R.layout.fragment_program_training, parent, false);
         binding.setInActionMode(new ObservableBoolean());
 
-        alert = new TwoButtonAlert(getChildFragmentManager(), (dialogId, positive) -> {
+        alert = new FragmentAlert(getChildFragmentManager(), (dialogId, positive) -> {
             if (!positive) return;
 
             switch (dialogId) {
                 case CANCEL_ALERT_ID:
                     cleanupAndClose();
-                    break;
-
-                case EMPTY_EXERCISE_LIST_ALERT_ID:
-
                     break;
             }
         });
@@ -126,7 +123,7 @@ public class ProgramTrainingFragment extends BaseFragment {
     @VisibleForTesting
     void onFragmentClose() {
         if (viewModel.isChanged()) {
-            alert.showAlertWithDefaultButtons(CANCEL_ALERT_ID, R.string.cancel_changes_question);
+            alert.showTwoButtonsAlert(CANCEL_ALERT_ID, R.string.cancel_changes_question);
         } else {
             cleanupAndClose();
         }
@@ -145,6 +142,11 @@ public class ProgramTrainingFragment extends BaseFragment {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.actionSaveTraining:
+                validate().observe(this, valid -> {
+                    if (valid != null && valid) {
+                        close();
+                    }
+                });
                 return true;
         }
 
@@ -153,21 +155,20 @@ public class ProgramTrainingFragment extends BaseFragment {
 
     private LiveData<Boolean> validate() {
         if (!tree.hasChildren()) {
-
+            alert.showOneButtonAlert(EMPTY_EXERCISE_LIST_ALERT_ID, R.string.program_training_activity_empty_list_dialog_message);
             return LiveDataUtil.getLive(false);
         }
 
         final EditTextValidator editTextValidator = new EditTextValidator(binding.programTrainingNameLayout, R.string.program_training_activity_name_empty_error);
-        if (editTextValidator.validate()) {
-            viewModel.save().observe(this, saved -> {
-                if (saved == null) return;
 
-                editTextValidator.addValidation(s -> saved, R.string.program_training_activity_name_duplicate_error);
-                if (editTextValidator.validate()) {
-                    close();
-                }
-            });
+        if (!editTextValidator.validate()) {
+            return LiveDataUtil.getLive(false);
         }
+
+        return Transformations.map(viewModel.save(), saved -> {
+            editTextValidator.addValidation(s -> saved, R.string.program_training_activity_name_duplicate_error);
+            return editTextValidator.validate();
+        });
     }
 
     public static ProgramTrainingFragment newInstance() {
