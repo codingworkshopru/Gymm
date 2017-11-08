@@ -14,6 +14,7 @@ import android.support.test.espresso.action.CoordinatesProvider;
 import android.support.test.espresso.action.GeneralSwipeAction;
 import android.support.test.espresso.action.Press;
 import android.support.test.espresso.action.Swipe;
+import android.support.test.espresso.contrib.RecyclerViewActions;
 import android.support.test.espresso.intent.rule.IntentsTestRule;
 import android.view.View;
 
@@ -23,6 +24,8 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.mockito.invocation.InvocationOnMock;
+import org.mockito.stubbing.Answer;
 
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
@@ -43,15 +46,18 @@ import static android.support.test.espresso.action.ViewActions.click;
 import static android.support.test.espresso.action.ViewActions.longClick;
 import static android.support.test.espresso.action.ViewActions.swipeLeft;
 import static android.support.test.espresso.action.ViewActions.swipeRight;
+import static android.support.test.espresso.action.ViewActions.swipeUp;
 import static android.support.test.espresso.assertion.ViewAssertions.matches;
 import static android.support.test.espresso.intent.Intents.intending;
 import static android.support.test.espresso.intent.matcher.IntentMatchers.anyIntent;
+import static android.support.test.espresso.matcher.ViewMatchers.assertThat;
 import static android.support.test.espresso.matcher.ViewMatchers.isDisplayed;
 import static android.support.test.espresso.matcher.ViewMatchers.withId;
 import static android.support.test.espresso.matcher.ViewMatchers.withText;
 import static android.support.v7.widget.helper.ItemTouchHelper.LEFT;
 import static android.support.v7.widget.helper.ItemTouchHelper.RIGHT;
 import static junit.framework.Assert.assertEquals;
+import static junit.framework.Assert.assertNotNull;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
 import static org.mockito.ArgumentMatchers.any;
@@ -131,8 +137,8 @@ public class ProgramExerciseFragmentTest {
             String secondsStr = resources.getQuantityString(R.plurals.seconds, 25, 25);
             timeString = minutesStr + ' ' + secondsStr;
         }
-        onView(setAt(R.id.programRepsCount, position)).check(matches(withText(repsCountStr)));
-        onView(setAt(R.id.programRestTime, position)).check(matches(withText(prefix + ' ' + timeString)));
+        onView(setAt(R.id.programSetRepsCount, position)).check(matches(withText(repsCountStr)));
+        onView(setAt(R.id.programSetRestTime, position)).check(matches(withText(prefix + ' ' + timeString)));
     }
 
     @Test
@@ -197,14 +203,6 @@ public class ProgramExerciseFragmentTest {
     }
 
     @Test
-    public void saveWithoutSetsTest() throws Exception {
-        removeAll();
-        onView(withId(R.id.actionSaveExercise)).perform(click());
-        onView(withText(R.string.program_exercise_activity_empty_list_dialog_message)).check(matches(isDisplayed()));
-        verify(vm, never()).save();
-    }
-
-    @Test
     public void saveTest() throws Exception {
         onView(withId(R.id.actionSaveExercise)).perform(click());
         verify(vm).save();
@@ -252,6 +250,31 @@ public class ProgramExerciseFragmentTest {
         verify(vm).deleteIfDrafting();
     }
 
+    @Test
+    public void addSetTest() throws Exception {
+        doAnswer(invocation -> {
+            ProgramSet s = invocation.getArgument(0);
+            node.addChild(s);
+            return null;
+        }).when(vm).addProgramSet(any());
+
+        onView(withId(R.id.programExerciseAddSetButton)).perform(click());
+        onView(withId(R.id.programSetRepsPicker)).perform(swipeUp());
+        onView(withId(R.id.programSetRestMinutesPicker)).perform(swipeUp());
+        onView(withId(android.R.id.button1)).perform(click());
+        onView(setAt(R.id.programSetRepsCount, 3)).check(matches(isDisplayed()));
+    }
+
+    @Test
+    public void editSetTest() throws Exception {
+        onView(withId(R.id.programSetList)).perform(RecyclerViewActions.actionOnItemAtPosition(1, click()));
+        onView(withId(R.id.programSetRestMinutesPicker)).perform(swipeUp());
+        onView(withId(android.R.id.button1)).perform(click());
+        assertNotNull(node.getChildren().get(1));
+        String minutes = InstrumentationRegistry.getTargetContext().getResources().getQuantityString(R.plurals.minutes, 0, 0);
+        onView(setAt(R.id.programSetRestTime, 1)).check(matches(withText(not(minutes))));
+    }
+
     private void checkActionModeOn() {
         for (int i = 0; i < 3; i++) {
             onView(setAt(R.id.programSetReorderImage, i)).check(matches(isDisplayed()));
@@ -265,15 +288,16 @@ public class ProgramExerciseFragmentTest {
         }
         onView(withId(R.id.programExerciseName)).check(matches(isDisplayed()));
         removeAt(0, LEFT);
+        Espresso.pressBack();
         assertEquals(3, node.getChildren().size());
     }
 
     private void enterActionMode() {
-        onView(setAt(R.id.programRepsCount, 0)).perform(longClick());
+        onView(setAt(R.id.programSetRepsCount, 0)).perform(longClick());
     }
 
     private void removeAt(int position, int direction) {
-        onView(setAt(R.id.programRepsCount, position)).perform(direction == LEFT ? swipeLeft() : swipeRight());
+        onView(setAt(R.id.programSetRepsCount, position)).perform(direction == LEFT ? swipeLeft() : swipeRight());
     }
 
     private void removeAll() {

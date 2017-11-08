@@ -28,7 +28,7 @@ import ru.codingworkshop.gymm.ui.common.ListItemListeners;
 import ru.codingworkshop.gymm.ui.program.common.ActionModeCallback;
 import ru.codingworkshop.gymm.ui.program.common.BaseFragment;
 import ru.codingworkshop.gymm.ui.program.common.MyAdapterDataObserver;
-import ru.codingworkshop.gymm.ui.program.common.MySimpleCallback;
+import ru.codingworkshop.gymm.ui.program.common.ItemTouchHelperCallback;
 import ru.codingworkshop.gymm.ui.program.common.ProgramRecyclerView;
 
 public class ProgramTrainingFragment extends BaseFragment {
@@ -107,7 +107,7 @@ public class ProgramTrainingFragment extends BaseFragment {
                 R.string.program_training_activity_exercise_deleted_message, tree);
         adapter.registerAdapterDataObserver(observer);
         rv.setAdapter(adapter);
-        rv.setItemTouchHelperCallback(new MySimpleCallback(tree));
+        rv.setItemTouchHelperCallback(new ItemTouchHelperCallback(tree));
     }
 
     private void onExerciseLongClick(View v) {

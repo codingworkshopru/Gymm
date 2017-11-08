@@ -19,6 +19,7 @@ import org.junit.Test;
 
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Observer;
@@ -85,10 +86,8 @@ public class TrainingForegroundServiceTest {
 
     @After
     public void tearDown() throws Exception {
-        postEvent(new StopRestEvent()); // because of ServiceTestRule beta
         postedEvents.clear();
         observers.clear();
-        serviceTestRule.unbindService();
     }
 
     @Test
@@ -252,18 +251,21 @@ public class TrainingForegroundServiceTest {
 
     private void assertEventNotReceived(long timeout, Class... eventTypes) throws InterruptedException {
         List<Class> eventTypesList = Lists.newArrayList(eventTypes);
+        List<Class> receivedEvents = new LinkedList<>();
         AtomicBoolean received = new AtomicBoolean(Iterables.any(eventTypesList, c -> postedEvents.containsKey(c)));
 
         if (!received.get()) {
             CountDownLatch latch = new CountDownLatch(1);
             observers.add((o, arg) -> {
-                if (eventTypesList.contains(arg.getClass())) {
+                Class<?> receivedEventClass = arg.getClass();
+                if (eventTypesList.contains(receivedEventClass)) {
+                    receivedEvents.add(receivedEventClass);
                     received.set(true);
                 }
             });
             latch.await(timeout, TimeUnit.MILLISECONDS);
         }
 
-        assertFalse("one of events have been received in specified timeout", received.get());
+        assertFalse("one of events have been received in specified timeout " + Lists.transform(receivedEvents, cl -> cl.toString() + " "), received.get());
     }
 }

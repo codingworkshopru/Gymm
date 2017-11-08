@@ -91,8 +91,11 @@ public class ActualTrainingActivityTest {
 
     @Test
     public void stopRestTest() throws Exception {
-        startRestTest();
+        onView(withId(R.id.actualExerciseList)).perform(RecyclerViewActions.actionOnItemAtPosition(2, click()));
+        onView(both(withId(R.id.actualSetDoneButton)).and(isDisplayed())).perform(click());
+        onView(withId(R.id.restTimeLeft)).check(matches(isDisplayed()));
         onView(withId(R.id.restStopButton)).perform(click());
-        onView(withText(InstrumentationRegistry.getTargetContext().getResources().getQuantityString(R.plurals.number_of_sets, 2, 2))).check(matches(isDisplayed()));
+        String numberOfSets = InstrumentationRegistry.getTargetContext().getResources().getQuantityString(R.plurals.number_of_sets, 2, 2);
+        onView(withText(numberOfSets)).check(matches(isDisplayed()));
     }
 }

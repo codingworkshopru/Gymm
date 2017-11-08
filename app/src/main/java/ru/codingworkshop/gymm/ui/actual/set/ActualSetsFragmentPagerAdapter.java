@@ -5,6 +5,7 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
+import android.util.SparseArray;
 import android.view.ViewGroup;
 
 import com.google.common.collect.Iterables;
@@ -24,7 +25,7 @@ import timber.log.Timber;
  */
 public class ActualSetsFragmentPagerAdapter extends FragmentPagerAdapter {
     private ActualExerciseNode actualExerciseNode;
-    private ArrayList<ActualSetFragment> fragments = new ArrayList<>();
+    private SparseArray<ActualSetFragment> fragments = new SparseArray<>();
     private int childrenCount;
 
     public ActualSetsFragmentPagerAdapter(FragmentManager fm) {
@@ -37,7 +38,7 @@ public class ActualSetsFragmentPagerAdapter extends FragmentPagerAdapter {
         ActualSetFragment actualSetFragment;
         if (position >= fragments.size()) {
             actualSetFragment = ActualSetFragment.newInstance();
-            fragments.add(position, actualSetFragment);
+            fragments.append(position, actualSetFragment);
         } else {
             actualSetFragment = fragments.get(position);
         }
@@ -58,7 +59,7 @@ public class ActualSetsFragmentPagerAdapter extends FragmentPagerAdapter {
 
     @Override
     public int getItemPosition(Object object) {
-        final int index = fragments.indexOf(object);
+        final int index = fragments.indexOfValue((ActualSetFragment) object);
         return index == -1 || index >= getCount() ? POSITION_NONE : POSITION_UNCHANGED;
     }
 
@@ -101,7 +102,8 @@ public class ActualSetsFragmentPagerAdapter extends FragmentPagerAdapter {
                 .setWithWeight(programExerciseNode.getExercise().isWithWeight())
                 .build();
 
-        fragments.get(index).setArguments(arguments);
+        ActualSetFragment foundFragment = fragments.get(index);
+        foundFragment.setArguments(arguments);
     }
 
     private void findCount() {

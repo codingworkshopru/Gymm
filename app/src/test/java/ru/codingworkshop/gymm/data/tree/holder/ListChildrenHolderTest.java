@@ -35,8 +35,10 @@ public class ListChildrenHolderTest {
     @Test
     public void constructing() {
         assertFalse(childrenHolder.hasChildren());
+        assertEquals(0, childrenHolder.getChildrenCount());
         childrenHolder = new SimpleChildrenHolder<>(Lists.newArrayList(1L,2L));
         assertTrue(childrenHolder.hasChildren());
+        assertEquals(2, childrenHolder.getChildrenCount());
     }
 
     @Test
@@ -76,5 +78,12 @@ public class ListChildrenHolderTest {
         childrenHolder.setChildren(Lists.newArrayList(1L, 2L));
         childrenHolder.moveChild(0, 1);
         assertEquals(Lists.newArrayList(2L,1L), childrenHolder.getChildren());
+    }
+
+    @Test
+    public void replaceChild() throws Exception {
+        childrenHolder.setChildren(Lists.newArrayList(1L));
+        childrenHolder.replaceChild(0, 2L);
+        assertEquals(2L, childrenHolder.getChildren().get(0).longValue());
     }
 }

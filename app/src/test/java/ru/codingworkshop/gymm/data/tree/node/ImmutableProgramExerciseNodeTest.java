@@ -32,7 +32,7 @@ public class ImmutableProgramExerciseNodeTest {
 
     @Test
     public void setExercise() {
-        node.setExercise(Models.createExercise(1L, "foo"));
+        node.setExercise(Models.createExercise(100L, "foo"));
         assertEquals("foo", node.getExercise().getName());
     }
 

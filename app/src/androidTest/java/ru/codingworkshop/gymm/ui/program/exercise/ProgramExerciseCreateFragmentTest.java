@@ -43,14 +43,16 @@ public class ProgramExerciseCreateFragmentTest {
     @Mock private ViewModelProvider.Factory viewModelFactory;
     @Mock private ProgramExerciseViewModel vm;
     private ProgramExerciseFragment fragment;
+    private ProgramExerciseNode node;
 
     @Before
     public void setUp() throws Exception {
         MockitoAnnotations.initMocks(this);
 
+        node = new MutableProgramExerciseNode();
+
         when(viewModelFactory.create(any())).thenReturn(vm);
         when(vm.create()).thenAnswer(invocation -> {
-            ProgramExerciseNode node = new MutableProgramExerciseNode();
             node.setParent(Models.createLiveProgramExercise(0L, 1L, true).getValue());
             when(vm.getProgramExerciseNode()).thenReturn(node);
             return new LiveData<Boolean>() {{postValue(true);}};
@@ -78,6 +80,9 @@ public class ProgramExerciseCreateFragmentTest {
 
     @Test
     public void saveWithoutSetsTest() throws Exception {
-
+        node.setExercise(Models.createExercise(100L, "foo"));
+        onView(withId(R.id.actionSaveExercise)).perform(click());
+        onView(withText(R.string.program_exercise_activity_empty_list_dialog_message)).check(matches(isDisplayed()));
+        verify(vm, never()).save();
     }
 }

@@ -115,7 +115,7 @@ public class ProgramSet implements Model, Sortable, Parcelable {
         return id == that.id &&
                 programExerciseId == that.programExerciseId &&
                 reps == that.reps &&
-                secondsForRest.equals(that.secondsForRest) &&
+                Objects.equal(secondsForRest, that.secondsForRest) &&
                 sortOrder == that.sortOrder;
     }
 

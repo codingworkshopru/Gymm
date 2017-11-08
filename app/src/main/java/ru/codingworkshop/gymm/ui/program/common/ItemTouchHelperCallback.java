@@ -19,13 +19,13 @@ import static android.support.v7.widget.helper.ItemTouchHelper.ACTION_STATE_SWIP
 /**
  * Created by Радик on 08.10.2017 as part of the Gymm project.
  */
-public class MySimpleCallback extends ItemTouchHelper.SimpleCallback {
+public class ItemTouchHelperCallback extends ItemTouchHelper.SimpleCallback {
     private BaseNode node;
     private Bitmap imageDrawable;
     private int imageWidth;
     private int imageHeight;
 
-    public MySimpleCallback(BaseNode node) {
+    public ItemTouchHelperCallback(BaseNode node) {
         super(ItemTouchHelper.UP | ItemTouchHelper.DOWN, ItemTouchHelper.LEFT | ItemTouchHelper.RIGHT);
         this.node = node;
     }

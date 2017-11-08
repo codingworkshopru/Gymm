@@ -19,7 +19,13 @@ public interface ChildrenHolder<C> {
 
     void moveChild(int from, int to);
 
+    void replaceChild(int index, C child);
+
     default boolean hasChildren() {
         return !getChildren().isEmpty();
+    }
+
+    default int getChildrenCount() {
+        return getChildren().size();
     }
 }

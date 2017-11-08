@@ -52,8 +52,11 @@ public abstract class ListChildrenHolder<C> implements ChildrenHolder<C> {
 
     @Override
     public void moveChild(int from, int to) {
-        Preconditions.checkElementIndex(from, children.size());
-        Preconditions.checkElementIndex(to, children.size());
         children.add(to, children.remove(from));
+    }
+
+    @Override
+    public void replaceChild(int index, C child) {
+        children.set(index, child);
     }
 }

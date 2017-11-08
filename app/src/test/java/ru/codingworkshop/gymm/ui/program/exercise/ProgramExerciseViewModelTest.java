@@ -11,6 +11,7 @@ import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 
 import ru.codingworkshop.gymm.data.entity.ProgramExercise;
+import ru.codingworkshop.gymm.data.entity.ProgramSet;
 import ru.codingworkshop.gymm.data.tree.node.ProgramExerciseNode;
 import ru.codingworkshop.gymm.data.util.LiveDataUtil;
 import ru.codingworkshop.gymm.repository.ExercisesRepository;
@@ -20,6 +21,7 @@ import ru.codingworkshop.gymm.util.Models;
 
 import static junit.framework.Assert.assertEquals;
 import static junit.framework.Assert.assertFalse;
+import static junit.framework.Assert.assertSame;
 import static junit.framework.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.argThat;
@@ -113,6 +115,26 @@ public class ProgramExerciseViewModelTest {
         vm.getProgramExerciseNode().getParent().setDrafting(true);
         vm.deleteIfDrafting();
         verify(repository).deleteProgramExercise(argThat(t -> t.getId() == 2L));
+    }
+
+    @Test
+    public void addChildTest() throws Exception {
+        LiveTest.verifyLiveData(vm.load(2L), l -> l);
+        ProgramSet programSet = Models.createProgramSet(3L, 2L, 10);
+        vm.addProgramSet(programSet);
+        ProgramSet actual = vm.getProgramExerciseNode().getChildren().get(1);
+        assertSame(programSet, actual);
+        assertEquals(1, actual.getSortOrder());
+    }
+
+    @Test
+    public void replaceChildTest() throws Exception {
+        LiveTest.verifyLiveData(vm.load(2L), l -> l);
+
+        ProgramSet programSet = Models.createProgramSet(3L, 2L, 10);
+        vm.replaceProgramSet(programSet);
+        ProgramSet actual = vm.getProgramExerciseNode().getChildren().get(0);
+        assertSame(programSet, actual);
     }
 
     @Test

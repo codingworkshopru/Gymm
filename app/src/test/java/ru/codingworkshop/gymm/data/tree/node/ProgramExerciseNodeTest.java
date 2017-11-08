@@ -31,9 +31,10 @@ public class ProgramExerciseNodeTest {
 
     @Test
     public void exerciseAccessors() throws Exception {
-        final Exercise foo = Models.createExercise(100L, "foo");
+        Exercise foo = Models.createExercise(100L, "foo");
         node.setExercise(foo);
         assertEquals(foo, node.getExercise());
+        verify(exercise).setExerciseId(100L);
     }
 
     @Test
@@ -89,5 +90,4 @@ public class ProgramExerciseNodeTest {
         node.getExerciseId();
         verify(exercise).getExerciseId();
     }
-
 }

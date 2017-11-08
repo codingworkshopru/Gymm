@@ -87,6 +87,7 @@
             app:layout_behavior="android.support.design.widget.AppBarLayout$ScrollingViewBehavior" />
 
         <android.support.design.widget.FloatingActionButton
+            android:id="@+id/programTrainingAddExerciseButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="end|bottom"

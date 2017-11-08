@@ -22,10 +22,14 @@ public abstract class ProgramExerciseNode extends BaseNode<ProgramExercise, Prog
     }
 
     public void setExercise(Exercise exercise) {
-        if (this.exercise != null) {
-            setExerciseId(exercise.getId());
-        }
         this.exercise = exercise;
+
+        if (getParent() == null) return;
+
+        long exerciseId = exercise.getId();
+        if (getExerciseId() != exerciseId) {
+            setExerciseId(exerciseId);
+        }
     }
 
     @Override

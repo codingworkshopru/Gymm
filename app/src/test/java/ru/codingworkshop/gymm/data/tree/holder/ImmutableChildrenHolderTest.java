@@ -28,6 +28,11 @@ public class ImmutableChildrenHolderTest {
         assertEquals(Lists.newArrayList(1L,2L,3L), childrenHolder.getChildren());
     }
 
+    @Test
+    public void getChildrenCount() throws Exception {
+        assertEquals(3, childrenHolder.getChildrenCount());
+    }
+
     @Test(expected = UnsupportedOperationException.class)
     public void addChild() throws Exception {
         childrenHolder.addChild(4L);
@@ -48,4 +53,8 @@ public class ImmutableChildrenHolderTest {
         childrenHolder.moveChild(0, 1);
     }
 
+    @Test(expected = UnsupportedOperationException.class)
+    public void replaceChild() throws Exception {
+        childrenHolder.replaceChild(0, 2L);
+    }
 }

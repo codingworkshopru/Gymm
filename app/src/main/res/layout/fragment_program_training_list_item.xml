@@ -32,7 +32,7 @@
             android:maxLines="1"
             android:text="@{exerciseName}"
             android:textAppearance="@style/TextAppearance.AppCompat.Menu"
-            app:layout_constraintBottom_toTopOf="@+id/programRestTime"
+            app:layout_constraintBottom_toTopOf="@+id/programSetRestTime"
             app:layout_constraintEnd_toStartOf="@+id/programExerciseReorderImage"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
@@ -40,7 +40,7 @@
             tools:text="Very very very very very very very very very long text"/>
 
         <TextView
-            android:id="@+id/programRestTime"
+            android:id="@+id/programSetRestTime"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginStart="16dp"

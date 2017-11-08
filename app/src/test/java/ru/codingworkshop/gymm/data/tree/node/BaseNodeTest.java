@@ -77,4 +77,9 @@ public class BaseNodeTest {
         verify(childrenHolder).moveChild(0, 1);
     }
 
+    @Test
+    public void replaceChild() throws Exception {
+        node.replaceChild(0, "bar");
+        verify(childrenHolder).replaceChild(0, "bar");
+    }
 }

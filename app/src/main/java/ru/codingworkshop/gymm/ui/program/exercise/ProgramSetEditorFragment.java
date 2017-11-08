@@ -28,13 +28,14 @@ public class ProgramSetEditorFragment extends DialogFragment {
         void onSetReturn(ProgramSet programSet);
     }
 
-    public static ProgramSetEditorFragment newInstance() {
+    public static ProgramSetEditorFragment newInstance(long programExerciseId) {
         final ProgramSet programSet = new ProgramSet();
+        programSet.setProgramExerciseId(programExerciseId);
         programSet.setReps(1);
         return newInstance(programSet);
     }
 
-    public static ProgramSetEditorFragment newInstance(ProgramSet programSet) {
+    public static ProgramSetEditorFragment newInstance(@NonNull ProgramSet programSet) {
         ProgramSetEditorFragment fragment = new ProgramSetEditorFragment();
 
         Bundle bundle = new Bundle(1);

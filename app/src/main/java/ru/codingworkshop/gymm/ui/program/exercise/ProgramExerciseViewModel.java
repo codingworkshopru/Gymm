@@ -11,6 +11,7 @@ import com.google.common.base.Preconditions;
 import javax.inject.Inject;
 
 import ru.codingworkshop.gymm.data.entity.ProgramExercise;
+import ru.codingworkshop.gymm.data.entity.ProgramSet;
 import ru.codingworkshop.gymm.data.tree.loader.ProgramExerciseLoader;
 import ru.codingworkshop.gymm.data.tree.loader.datasource.ProgramExerciseDataSource;
 import ru.codingworkshop.gymm.data.tree.node.MutableProgramExerciseNode;
@@ -108,5 +109,14 @@ public class ProgramExerciseViewModel extends ViewModel {
 
     public boolean isChanged() {
         return childrenChanged || node.getParent().getExerciseId() != exerciseId;
+    }
+
+    public void addProgramSet(ProgramSet programSet) {
+        programSet.setSortOrder(node.getChildren().size());
+        node.addChild(programSet);
+    }
+
+    public void replaceProgramSet(ProgramSet programSet) {
+        node.replaceChild(programSet.getSortOrder(), programSet);
     }
 }

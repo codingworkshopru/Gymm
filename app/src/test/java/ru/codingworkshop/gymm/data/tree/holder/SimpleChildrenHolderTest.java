@@ -20,8 +20,10 @@ public class SimpleChildrenHolderTest {
     @Test
     public void constructing() {
         assertFalse(childrenHolder.hasChildren());
+        assertEquals(0, childrenHolder.getChildrenCount());
         childrenHolder = new SimpleChildrenHolder<>(Lists.newArrayList(1L,2L));
         assertTrue(childrenHolder.hasChildren());
+        assertEquals(2, childrenHolder.getChildrenCount());
     }
 
     @Before

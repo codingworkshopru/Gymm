@@ -27,7 +27,7 @@ public class EditTextValidator {
     private EditText editText;
     private Map<Predicate<String>, Integer> errorsWithValidators;
 
-    public EditTextValidator(TextInputLayout textInputLayout) {
+    public EditTextValidator(@NonNull TextInputLayout textInputLayout) {
         layout = textInputLayout;
         errorsWithValidators = new HashMap<>();
 
@@ -37,10 +37,7 @@ public class EditTextValidator {
         }
         editText.addTextChangedListener(new TextWatcher() {
             public void onTextChanged(CharSequence s, int start, int before, int count) {
-                if (getErrorString() == null) {
-                    setError(null);
-                    editText.removeTextChangedListener(this);
-                }
+                setError(null);
             }
 
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
@@ -78,6 +75,10 @@ public class EditTextValidator {
     }
 
     private void setError(String errorText) {
+        if (errorText == null && layout.getError() == null) {
+            return;
+        }
+
         layout.setError(errorText);
     }
 }

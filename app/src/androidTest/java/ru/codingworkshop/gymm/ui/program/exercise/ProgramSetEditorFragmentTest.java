@@ -41,7 +41,7 @@ public class ProgramSetEditorFragmentTest {
     public void setUp() throws Exception {
         MockitoAnnotations.initMocks(this);
 
-        ProgramSetEditorFragment fragment = ProgramSetEditorFragment.newInstance();
+        ProgramSetEditorFragment fragment = ProgramSetEditorFragment.newInstance(2L);
         fragment.listener = listener;
 
         fragment.show(activityTestRule.getActivity().getSupportFragmentManager());
@@ -51,21 +51,21 @@ public class ProgramSetEditorFragmentTest {
     public void repsPickerTest() throws Exception {
         checkPicker(R.id.programSetRepsPicker, "1");
         onView(withId(android.R.id.button1)).perform(click());
-        verify(listener).onSetReturn(argThat(s -> s.getReps() != 0 && s.getReps() != 1));
+        verify(listener).onSetReturn(argThat(s -> s.getProgramExerciseId() == 2L && s.getReps() != 0 && s.getReps() != 1));
     }
 
     @Test
     public void minutesPickerTest() throws Exception {
         checkPicker(R.id.programSetRestMinutesPicker, "0");
         onView(withId(android.R.id.button1)).perform(click());
-        verify(listener).onSetReturn(argThat(s -> s.getSecondsForRest() != null && s.getSecondsForRest() > 60));
+        verify(listener).onSetReturn(argThat(s -> s.getProgramExerciseId() == 2L && s.getSecondsForRest() != null && s.getSecondsForRest() > 60));
     }
 
     @Test
     public void secondsPickerTest() throws Exception {
         checkPicker(R.id.programSetRestSecondsPicker, "0");
         onView(withId(android.R.id.button1)).perform(click());
-        verify(listener).onSetReturn(argThat(s -> s.getSecondsForRest() != null && s.getSecondsForRest() > 5));
+        verify(listener).onSetReturn(argThat(s -> s.getProgramExerciseId() == 2L && s.getSecondsForRest() != null && s.getSecondsForRest() > 5));
     }
 
     @Test

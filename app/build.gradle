@@ -2,7 +2,7 @@ apply plugin: "com.android.application"
 
 android {
     compileSdkVersion 26
-    buildToolsVersion "27.0.0"
+    buildToolsVersion "27.0.1"
     defaultConfig {
         applicationId "ru.codingworkshop.gymm"
         minSdkVersion 15
@@ -34,7 +34,7 @@ android {
 ext {
     support = "26.1.0"
     constraint = "1.0.2"
-    arch = "1.0.0-rc1"
+    arch = "1.0.0"
 
     gson = "2.8.2"
     guava = "23.0-android"

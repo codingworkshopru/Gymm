@@ -60,4 +60,9 @@ public abstract class BaseNode<P,C> implements ParentHolder<P>, ChildrenHolder<C
     public void moveChild(int from, int to) {
         childrenDelegate.moveChild(from, to);
     }
+
+    @Override
+    public void replaceChild(int index, C child) {
+        childrenDelegate.replaceChild(index, child);
+    }
 }

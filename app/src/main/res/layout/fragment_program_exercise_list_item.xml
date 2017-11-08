@@ -5,14 +5,11 @@
 
     <data>
         <variable
-            name="repsCount"
-            type="int" />
-        <variable
-            name="restTime"
-            type="String" />
-        <variable
             name="inActionMode"
             type="android.databinding.ObservableBoolean" />
+        <variable
+            name="wrappedSet"
+            type="ru.codingworkshop.gymm.ui.program.exercise.ProgramSetWrapper"/>
 
         <import type="android.view.View"/>
     </data>
@@ -23,16 +20,16 @@
         android:background="@android:color/background_light">
 
         <TextView
-            android:id="@+id/programRepsCount"
+            android:id="@+id/programSetRepsCount"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginStart="16dp"
             android:layout_marginLeft="16dp"
             android:ellipsize="end"
             android:maxLines="1"
-            android:text="@{@plurals/number_of_reps(repsCount, repsCount)}"
+            android:text="@{@plurals/number_of_reps(wrappedSet.reps, wrappedSet.reps)}"
             android:textAppearance="@style/TextAppearance.AppCompat.Menu"
-            app:layout_constraintBottom_toTopOf="@+id/programRestTime"
+            app:layout_constraintBottom_toTopOf="@+id/programSetRestTime"
             app:layout_constraintEnd_toStartOf="@+id/programSetReorderImage"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
@@ -40,18 +37,18 @@
             tools:text="Very very very very very very very very very long text"/>
 
         <TextView
-            android:id="@+id/programRestTime"
+            android:id="@+id/programSetRestTime"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginStart="16dp"
             android:layout_marginLeft="16dp"
             android:ellipsize="end"
             android:maxLines="1"
-            android:text="@{@string/program_exercise_activity_dialog_rest_time_label + ' ' + (restTime ?? @string/program_exercise_activity_rest_time_not_set)}"
+            android:text="@{@string/program_exercise_activity_dialog_rest_time_label + ' ' + (wrappedSet.restTime ?? @string/program_exercise_activity_rest_time_not_set)}"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toStartOf="@+id/programSetReorderImage"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/programRepsCount"
+            app:layout_constraintTop_toBottomOf="@+id/programSetRepsCount"
             tools:text="Very very very very very very very very very very long" />
 
         <ImageView

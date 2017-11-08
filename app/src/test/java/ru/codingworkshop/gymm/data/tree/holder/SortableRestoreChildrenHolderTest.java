@@ -11,6 +11,7 @@ import java.util.List;
 import ru.codingworkshop.gymm.data.entity.common.Sortable;
 
 import static junit.framework.Assert.assertEquals;
+import static junit.framework.Assert.assertSame;
 import static junit.framework.Assert.assertTrue;
 
 
@@ -49,6 +50,13 @@ public class SortableRestoreChildrenHolderTest {
     @Test
     public void getChildren() throws Exception {
         assertTrue(childrenHolder.getChildren().isEmpty());
+    }
+
+    @Test
+    public void getChildrenCount() throws Exception {
+        assertEquals(0, childrenHolder.getChildrenCount());
+        childrenHolder.addChild(new SimpleSortable());
+        assertEquals(1, childrenHolder.getChildrenCount());
     }
 
     @Test
@@ -99,6 +107,14 @@ public class SortableRestoreChildrenHolderTest {
         childrenHolder.removeChild(0);
         childrenHolder.restoreLastRemoved();
         assertTrue(childrenHolder.hasChildren());
+    }
+
+    @Test
+    public void replaceChild() throws Exception {
+        childrenHolder.addChild(new SimpleSortable());
+        SimpleSortable child = new SimpleSortable();
+        childrenHolder.replaceChild(0, child);
+        assertSame(child, childrenHolder.getChildren().get(0));
     }
 
     @After

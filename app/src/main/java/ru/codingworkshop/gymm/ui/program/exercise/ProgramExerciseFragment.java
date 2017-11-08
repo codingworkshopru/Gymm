@@ -18,15 +18,17 @@ import javax.inject.Inject;
 
 import ru.codingworkshop.gymm.R;
 import ru.codingworkshop.gymm.data.entity.Exercise;
+import ru.codingworkshop.gymm.data.entity.ProgramSet;
 import ru.codingworkshop.gymm.data.tree.node.ProgramExerciseNode;
 import ru.codingworkshop.gymm.databinding.FragmentProgramExerciseBinding;
+import ru.codingworkshop.gymm.databinding.FragmentProgramExerciseListItemBinding;
 import ru.codingworkshop.gymm.ui.MainActivity;
 import ru.codingworkshop.gymm.ui.FragmentAlert;
 import ru.codingworkshop.gymm.ui.common.ListItemListeners;
 import ru.codingworkshop.gymm.ui.program.common.ActionModeCallback;
 import ru.codingworkshop.gymm.ui.program.common.BaseFragment;
 import ru.codingworkshop.gymm.ui.program.common.MyAdapterDataObserver;
-import ru.codingworkshop.gymm.ui.program.common.MySimpleCallback;
+import ru.codingworkshop.gymm.ui.program.common.ItemTouchHelperCallback;
 import ru.codingworkshop.gymm.ui.program.common.ProgramRecyclerView;
 
 public class ProgramExerciseFragment extends BaseFragment {
@@ -45,6 +47,7 @@ public class ProgramExerciseFragment extends BaseFragment {
     private ProgramExerciseNode node;
 
     private FragmentAlert alert;
+    private ProgramSetsAdapter programSetsAdapter;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -107,6 +110,7 @@ public class ProgramExerciseFragment extends BaseFragment {
                 false);
         binding.setInActionMode(getInActionMode());
         binding.programExerciseName.setOnClickListener(this::onExercisePick);
+        binding.programExerciseAddSetButton.setOnClickListener(this::onAddSet);
 
         alert = new FragmentAlert(getChildFragmentManager(), (dialogId, positive) -> {
             switch (dialogId) {
@@ -131,6 +135,15 @@ public class ProgramExerciseFragment extends BaseFragment {
         return binding;
     }
 
+    private void onAddSet(View view) {
+        ProgramSetEditorFragment programSetEditor = ProgramSetEditorFragment.newInstance(node.getId());
+        programSetEditor.listener = programSet -> {
+            viewModel.addProgramSet(programSet);
+            programSetsAdapter.notifyItemInserted(programSet.getSortOrder());
+        };
+        programSetEditor.show(getChildFragmentManager());
+    }
+
     private void init(boolean loaded) {
         if (!loaded) return;
 
@@ -144,13 +157,24 @@ public class ProgramExerciseFragment extends BaseFragment {
     private void initSetList() {
         final ProgramRecyclerView rv = binding.programSetList;
         ListItemListeners listeners = new ListItemListeners(R.layout.fragment_program_exercise_list_item)
+                .setOnClickListener(this::onItemClick)
                 .setOnLongClickListener(this::onItemLongClick)
                 .setOnReorderButtonDownListener(rv::startDragFromChildView, R.id.programSetReorderImage);
-        final ProgramSetsAdapter adapter = new ProgramSetsAdapter(listeners, node.getChildren(), getInActionMode());
+        programSetsAdapter = new ProgramSetsAdapter(listeners, node.getChildren(), getInActionMode());
         MyAdapterDataObserver adapterDataObserver = new MyAdapterDataObserver(rv, R.id.programExerciseBackground, R.string.program_exercise_activity_set_deleted_message, node);
-        adapter.registerAdapterDataObserver(adapterDataObserver);
-        rv.setAdapter(adapter);
-        rv.setItemTouchHelperCallback(new MySimpleCallback(node));
+        programSetsAdapter.registerAdapterDataObserver(adapterDataObserver);
+        rv.setAdapter(programSetsAdapter);
+        rv.setItemTouchHelperCallback(new ItemTouchHelperCallback(node));
+    }
+
+    private void onItemClick(View view) {
+        FragmentProgramExerciseListItemBinding binding = DataBindingUtil.getBinding(view);
+        ProgramSetEditorFragment programSetEditor = ProgramSetEditorFragment.newInstance(binding.getWrappedSet().getProgramSet());
+        programSetEditor.listener = programSet -> {
+            viewModel.replaceProgramSet(programSet);
+            programSetsAdapter.notifyItemChanged(programSet.getSortOrder());
+        };
+        programSetEditor.show(getChildFragmentManager());
     }
 
     protected void onItemLongClick(View v) {
