@@ -57,7 +57,6 @@ public class ActualExercisesFragment extends Fragment implements
     public ActualExercisesCallback callback;
     private Context context;
 
-
     private ActualTrainingViewModel viewModel;
     private ActualTrainingTree tree;
 

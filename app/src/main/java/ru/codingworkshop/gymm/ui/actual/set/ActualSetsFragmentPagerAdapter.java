@@ -30,19 +30,24 @@ public class ActualSetsFragmentPagerAdapter extends FragmentPagerAdapter {
 
     public ActualSetsFragmentPagerAdapter(FragmentManager fm) {
         super(fm);
+        Timber.d("Constructor call");
     }
 
     @Override
     public Fragment getItem(int position) {
         Timber.d("getItem: %d", position);
-        ActualSetFragment actualSetFragment;
-        if (position >= fragments.size()) {
+        Fragment fragment = getOrCreateFragment(position);
+        bindData(position);
+        return fragment;
+    }
+
+    private ActualSetFragment getOrCreateFragment(int position) {
+        ActualSetFragment actualSetFragment = fragments.get(position, null);
+        if (actualSetFragment == null) {
             actualSetFragment = ActualSetFragment.newInstance();
             fragments.append(position, actualSetFragment);
-        } else {
-            actualSetFragment = fragments.get(position);
         }
-        bindData(position);
+
         return actualSetFragment;
     }
 
@@ -85,6 +90,7 @@ public class ActualSetsFragmentPagerAdapter extends FragmentPagerAdapter {
     }
 
     private void bindData(int index) {
+        Timber.d("bindData; index: %d", index);
         final ProgramExerciseNode programExerciseNode = actualExerciseNode.getProgramExerciseNode();
         final List<ProgramSet> programSets = programExerciseNode.getChildren();
         final List<ActualSet> actualSets = actualExerciseNode.getChildren();
@@ -97,12 +103,12 @@ public class ActualSetsFragmentPagerAdapter extends FragmentPagerAdapter {
         Bundle arguments = new ActualSetFragment.ArgumentsBuilder()
                 .setActualSet(actualSet)
                 .setSetIndex(index)
-                .setSetsCount(programSets.size())
+                .setSetsCount(programSets.size()) // TODO increase dynamically if sets count more that planned
                 .setProgramSet(programSet)
                 .setWithWeight(programExerciseNode.getExercise().isWithWeight())
                 .build();
 
-        ActualSetFragment foundFragment = fragments.get(index);
+        ActualSetFragment foundFragment = getOrCreateFragment(index);
         foundFragment.setArguments(arguments);
     }
 
