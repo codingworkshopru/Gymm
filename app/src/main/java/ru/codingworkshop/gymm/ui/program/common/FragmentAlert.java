@@ -1,4 +1,4 @@
-package ru.codingworkshop.gymm.ui;
+package ru.codingworkshop.gymm.ui.program.common;
 
 import android.os.Bundle;
 import android.support.annotation.NonNull;

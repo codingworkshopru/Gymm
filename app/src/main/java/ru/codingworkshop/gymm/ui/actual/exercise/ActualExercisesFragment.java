@@ -28,7 +28,7 @@ import ru.codingworkshop.gymm.data.tree.node.ActualTrainingTree;
 import ru.codingworkshop.gymm.databinding.FragmentActualSetBinding;
 import ru.codingworkshop.gymm.db.GymmDatabase;
 import ru.codingworkshop.gymm.service.TrainingForegroundService;
-import ru.codingworkshop.gymm.ui.FragmentAlert;
+import ru.codingworkshop.gymm.ui.program.common.FragmentAlert;
 import ru.codingworkshop.gymm.ui.actual.ServiceBindController;
 import ru.codingworkshop.gymm.ui.actual.set.ActualSetDataBindingWrapper;
 import ru.codingworkshop.gymm.ui.actual.set.ActualSetFragment;

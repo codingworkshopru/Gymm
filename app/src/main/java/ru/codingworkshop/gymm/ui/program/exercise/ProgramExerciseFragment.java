@@ -18,12 +18,11 @@ import javax.inject.Inject;
 
 import ru.codingworkshop.gymm.R;
 import ru.codingworkshop.gymm.data.entity.Exercise;
-import ru.codingworkshop.gymm.data.entity.ProgramSet;
 import ru.codingworkshop.gymm.data.tree.node.ProgramExerciseNode;
 import ru.codingworkshop.gymm.databinding.FragmentProgramExerciseBinding;
 import ru.codingworkshop.gymm.databinding.FragmentProgramExerciseListItemBinding;
 import ru.codingworkshop.gymm.ui.MainActivity;
-import ru.codingworkshop.gymm.ui.FragmentAlert;
+import ru.codingworkshop.gymm.ui.program.common.FragmentAlert;
 import ru.codingworkshop.gymm.ui.common.ListItemListeners;
 import ru.codingworkshop.gymm.ui.program.common.ActionModeCallback;
 import ru.codingworkshop.gymm.ui.program.common.BaseFragment;

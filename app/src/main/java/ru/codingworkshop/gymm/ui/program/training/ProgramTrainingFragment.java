@@ -22,7 +22,7 @@ import ru.codingworkshop.gymm.R;
 import ru.codingworkshop.gymm.data.tree.node.ProgramTrainingTree;
 import ru.codingworkshop.gymm.data.util.LiveDataUtil;
 import ru.codingworkshop.gymm.databinding.FragmentProgramTrainingBinding;
-import ru.codingworkshop.gymm.ui.FragmentAlert;
+import ru.codingworkshop.gymm.ui.program.common.FragmentAlert;
 import ru.codingworkshop.gymm.ui.common.EditTextValidator;
 import ru.codingworkshop.gymm.ui.common.ListItemListeners;
 import ru.codingworkshop.gymm.ui.program.common.ActionModeCallback;
@@ -32,7 +32,7 @@ import ru.codingworkshop.gymm.ui.program.common.ItemTouchHelperCallback;
 import ru.codingworkshop.gymm.ui.program.common.ProgramRecyclerView;
 
 public class ProgramTrainingFragment extends BaseFragment {
-    private static final String PROGRAM_TRAINING_ID_KEY = "programTrainingId";
+    public static final String PROGRAM_TRAINING_ID_KEY = "programTrainingId";
     private static final int CANCEL_ALERT_ID = 0;
     private static final int EMPTY_EXERCISE_LIST_ALERT_ID = 1;
 

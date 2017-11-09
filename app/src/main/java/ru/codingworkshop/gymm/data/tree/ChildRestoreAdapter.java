@@ -21,7 +21,8 @@ public class ChildRestoreAdapter implements ChildRestore {
         if (childrenHolder instanceof SortableRestoreChildrenHolder) {
             ((SortableRestoreChildrenHolder) childrenHolder).restoreLastRemoved();
         } else {
-            throw new UnsupportedOperationException();
+            throw new UnsupportedOperationException("Children delegate must be instance of " +
+                    SortableRestoreChildrenHolder.class.getName());
         }
     }
 }

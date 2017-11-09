@@ -14,8 +14,10 @@ import ru.codingworkshop.gymm.data.tree.loader.datasource.DataSourceTestSuite;
 @Suite.SuiteClasses({
         TreeBuilderTestSuite.class,
         DataSourceTestSuite.class,
-        NodeLoaderTest.class,
-        SetAndRemoveTest.class,
+
+        LoaderDelegateTest.class,
+        BaseNodeLoaderDelegateTest.class,
+
         ProgramExerciseLoaderTest.class,
         ProgramTrainingTreeLoaderTest.class,
         ActualTrainingTreeLoaderTest.class,

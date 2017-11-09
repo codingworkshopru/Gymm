@@ -43,11 +43,13 @@ public class ProgramTrainingTreeLoaderTest {
         ProgramTrainingTree tree = new ImmutableProgramTrainingTree();
         ProgramTrainingTreeLoader loader = new ProgramTrainingTreeLoader(tree, dataSource);
 
-        LiveTest.verifyLiveData(loader.load(), b -> b);
+        LiveTest.verifyLiveData(loader.loadIt(), loadedTree -> {
+            assertEquals(1L, loadedTree.getParent().getId());
+            assertEquals(2L, loadedTree.getChildren().get(0).getId());
+            assertEquals(3L, loadedTree.getChildren().get(0).getChildren().get(0).getId());
+            assertEquals(100L, loadedTree.getChildren().get(0).getExercise().getId());
 
-        assertEquals(1L, tree.getParent().getId());
-        assertEquals(2L, tree.getChildren().get(0).getId());
-        assertEquals(3L, tree.getChildren().get(0).getChildren().get(0).getId());
-        assertEquals(100L, tree.getChildren().get(0).getExercise().getId());
+            return true;
+        });
     }
 }

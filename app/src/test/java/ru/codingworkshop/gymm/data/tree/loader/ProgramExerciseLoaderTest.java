@@ -32,11 +32,12 @@ public class ProgramExerciseLoaderTest {
         ProgramExerciseNode node = new ImmutableProgramExerciseNode();
         ProgramExerciseLoader loader = new ProgramExerciseLoader(node, dataSource);
 
-        LiveTest.verifyLiveData(loader.load(), b -> b);
+        LiveTest.verifyLiveData(loader.load(), loadedNode -> {
+            assertEquals(2L, node.getParent().getId());
+            assertEquals(1, node.getChildren().size());
+            assertEquals(100L, node.getExercise().getId());
 
-        assertEquals(2L, node.getParent().getId());
-        assertEquals(1, node.getChildren().size());
-        assertEquals(100L, node.getExercise().getId());
+            return true;
+        });
     }
-
 }

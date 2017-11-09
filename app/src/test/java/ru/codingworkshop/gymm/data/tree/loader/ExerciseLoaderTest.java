@@ -32,10 +32,12 @@ public class ExerciseLoaderTest {
         ExerciseNode node = new ExerciseNode();
         ExerciseLoader loader = new ExerciseLoader(node, dataSource);
 
-        LiveTest.verifyLiveData(loader.load(), loaded -> loaded);
+        LiveTest.verifyLiveData(loader.loadIt(), n -> {
 
-        assertEquals(100L, node.getParent().getId());
-        assertEquals(200L, node.getChildren().get(0).getId());
-        assertEquals(201L, node.getPrimaryMuscleGroup().getId());
+            assertEquals(100L, n.getParent().getId());
+            assertEquals(200L, n.getChildren().get(0).getId());
+            assertEquals(201L, n.getPrimaryMuscleGroup().getId());
+            return true;
+        });
     }
 }
