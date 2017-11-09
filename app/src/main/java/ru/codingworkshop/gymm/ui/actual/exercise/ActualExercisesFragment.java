@@ -105,7 +105,7 @@ public class ActualExercisesFragment extends Fragment implements
         super.onActivityCreated(savedInstanceState);
 
         if (viewModel.getActualTrainingTree() != null) {
-            onTrainingTreeLoaded(true);
+            onTrainingTreeLoaded(viewModel.getActualTrainingTree());
             return;
         }
 
@@ -113,22 +113,22 @@ public class ActualExercisesFragment extends Fragment implements
         long programTrainingId = arguments.getLong(EXTRA_PROGRAM_TRAINING_ID);
         long actualTrainingId = arguments.getLong(EXTRA_ACTUAL_TRAINING_ID);
 
-        LiveData<Boolean> liveLoaded;
+        LiveData<ActualTrainingTree> liveTree;
         if (actualTrainingId != 0L) {
-            liveLoaded = viewModel.loadTraining(actualTrainingId);
+            liveTree = viewModel.loadTraining(actualTrainingId);
         } else if (programTrainingId != 0L) {
-            liveLoaded = viewModel.startTraining(programTrainingId);
+            liveTree = viewModel.startTraining(programTrainingId);
         } else {
             throw new IllegalStateException("Activity must receive data id");
         }
 
-        liveLoaded.observe(this, this::onTrainingTreeLoaded);
+        liveTree.observe(this, this::onTrainingTreeLoaded);
     }
 
-    private void onTrainingTreeLoaded(boolean loaded) {
-        if (!loaded) return;
+    private void onTrainingTreeLoaded(ActualTrainingTree loadedTree) {
+        if (loadedTree == null) return;
 
-        tree = viewModel.getActualTrainingTree();
+        tree = loadedTree;
 
         callback.onLoadingFinished();
 

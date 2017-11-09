@@ -37,14 +37,14 @@ abstract class ActualTrainingTreeDelegate {
         this.exercisesRepository = exercisesRepository;
     }
 
-    abstract LiveData<Boolean> load(ActualTrainingTree tree);
+    abstract LiveData<ActualTrainingTree> load(ActualTrainingTree tree);
 
-    LiveData<Boolean> loadProgramTrainingTree(long programTrainingId) {
+    LiveData<ProgramTrainingTree> loadProgramTrainingTree(long programTrainingId) {
         programTrainingTree = new ImmutableProgramTrainingTree();
 
         ProgramTrainingDataSource dataSource = new ProgramTrainingDataSource(programTrainingRepository, exercisesRepository, programTrainingId);
         ProgramTrainingTreeLoader loader = new ProgramTrainingTreeLoader(programTrainingTree, dataSource);
 
-        return loader.load();
+        return loader.loadIt();
     }
 }

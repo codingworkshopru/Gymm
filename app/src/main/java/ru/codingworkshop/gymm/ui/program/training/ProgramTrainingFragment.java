@@ -73,7 +73,7 @@ public class ProgramTrainingFragment extends BaseFragment {
         });
 
         final Bundle arguments = getArguments();
-        LiveData<Boolean> liveLoaded;
+        LiveData<ProgramTrainingTree> liveLoaded;
         if (arguments != null) {
             liveLoaded = viewModel.load(arguments.getLong(PROGRAM_TRAINING_ID_KEY));
         } else {
@@ -84,10 +84,10 @@ public class ProgramTrainingFragment extends BaseFragment {
         return binding;
     }
 
-    private void init(boolean loaded) {
-        if (!loaded) return;
+    private void init(ProgramTrainingTree loadedTree) {
+        if (loadedTree == null) return;
 
-        tree = viewModel.getProgramTrainingTree();
+        tree = loadedTree;
 
         binding.setProgramTraining(tree.getParent());
 

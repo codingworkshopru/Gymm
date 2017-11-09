@@ -49,7 +49,7 @@ public class ProgramTrainingCreateFragmentTest {
             ProgramTrainingTree tree = new MutableProgramTrainingTree();
             tree.setParent(Models.createLiveProgramTraining(0L, null, true).getValue());
             when(vm.getProgramTrainingTree()).thenReturn(tree);
-            return new LiveData<Boolean>() {{postValue(true);}};
+            return new LiveData<ProgramTrainingTree>() {{postValue(tree);}};
         });
 
         fragment = ProgramTrainingFragment.newInstance();

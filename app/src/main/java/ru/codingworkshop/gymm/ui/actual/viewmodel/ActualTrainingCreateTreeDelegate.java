@@ -18,7 +18,7 @@ final class ActualTrainingCreateTreeDelegate extends ActualTrainingTreeDelegate 
     }
 
     @Override
-    LiveData<Boolean> load(ActualTrainingTree tree) {
+    LiveData<ActualTrainingTree> load(ActualTrainingTree tree) {
         return Transformations.switchMap(loadProgramTrainingTree(id), loaded -> {
             final ProgramTraining programTraining = programTrainingTree.getParent();
             ActualTraining actualTraining = new ActualTraining(programTraining.getId(), programTraining.getName());
@@ -26,7 +26,7 @@ final class ActualTrainingCreateTreeDelegate extends ActualTrainingTreeDelegate 
                     .setProgramTrainingTree(programTrainingTree)
                     .setParent(actualTraining)
                     .build();
-            return Transformations.map(actualTrainingRepository.insertActualTrainingWithResult(actualTraining), id -> true);
+            return Transformations.map(actualTrainingRepository.insertActualTrainingWithResult(actualTraining), id -> tree);
         });
     }
 }

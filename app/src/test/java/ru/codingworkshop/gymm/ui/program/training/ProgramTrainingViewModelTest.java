@@ -10,6 +10,8 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 
+import java.util.Objects;
+
 import ru.codingworkshop.gymm.data.entity.ProgramTraining;
 import ru.codingworkshop.gymm.data.tree.node.ProgramTrainingTree;
 import ru.codingworkshop.gymm.data.util.LiveDataUtil;
@@ -56,13 +58,12 @@ public class ProgramTrainingViewModelTest {
     @Test
     public void load() {
         vm = new ProgramTrainingViewModel(repository, exercisesRepository);
-        LiveTest.verifyLiveData(vm.load(1L), b -> {
-            ProgramTrainingTree tree = vm.getProgramTrainingTree();
+        LiveTest.verifyLiveData(vm.load(1L), tree -> {
             assertEquals(1L, tree.getParent().getId());
             assertEquals(2L, tree.getChildren().get(0).getParent().getId());
             assertEquals(3L, tree.getChildren().get(0).getChildren().get(0).getId());
 
-            return b;
+            return true;
         });
 
         verify(repository).getProgramTrainingById(1L);
@@ -76,30 +77,30 @@ public class ProgramTrainingViewModelTest {
         final LiveData<ProgramTraining> foo = Models.createLiveProgramTraining(1L, "foo", true);
         when(repository.getProgramTrainingById(1L)).thenReturn(foo);
         when(repository.getDraftingProgramTraining()).thenReturn(foo);
-        LiveTest.verifyLiveData(vm.create(), created -> {
-            assertTrue(vm.getProgramTrainingTree().getParent().isDrafting());
+        LiveTest.verifyLiveData(vm.create(), tree -> {
+            assertTrue(tree.getParent().isDrafting());
             verify(repository, never()).insertProgramTraining(any(ProgramTraining.class));
 
-            return created;
+            return true;
         });
     }
 
     @Test
     public void createWithoutDrafting() throws Exception {
         when(repository.getDraftingProgramTraining()).thenReturn(LiveDataUtil.getLive(null));
-        LiveTest.verifyLiveData(vm.create(), created -> {
-            assertEquals(0L, vm.getProgramTrainingTree().getParent().getId());
-            assertTrue(vm.getProgramTrainingTree().getParent().isDrafting());
+        LiveTest.verifyLiveData(vm.create(), tree -> {
+            assertEquals(0L, tree.getParent().getId());
+            assertTrue(tree.getParent().isDrafting());
             verify(repository).insertProgramTraining(any(ProgramTraining.class));
 
-            return created;
+            return true;
         });
     }
 
     @Test
     public void saveWithNonUniqueName() throws Exception {
         when(repository.getProgramTrainingByName("foo")).thenReturn(Models.createLiveProgramTraining(1L, "foo", false));
-        LiveTest.verifyLiveData(vm.load(1L), l -> l);
+        LiveTest.verifyLiveData(vm.load(1L), Objects::nonNull);
         LiveData<Boolean> savedLive = vm.save();
         LiveTest.verifyLiveData(savedLive, saved -> !saved);
         verify(repository, never()).updateProgramTraining(any());
@@ -108,7 +109,7 @@ public class ProgramTrainingViewModelTest {
     @Test
     public void save() throws Exception {
         when(repository.getProgramExercisesForTraining(any())).thenReturn(Models.createLiveProgramExercises(3));
-        LiveTest.verifyLiveData(vm.load(1L), l -> l);
+        LiveTest.verifyLiveData(vm.load(1L), Objects::nonNull);
 
         ProgramTrainingTree tree = vm.getProgramTrainingTree();
         tree.moveChild(0,1);
@@ -121,7 +122,7 @@ public class ProgramTrainingViewModelTest {
 
     @Test
     public void deleteIfDraftingTest() throws Exception {
-        LiveTest.verifyLiveData(vm.load(1L), l -> l);
+        LiveTest.verifyLiveData(vm.load(1L), Objects::nonNull);
         vm.deleteIfDrafting();
         verify(repository, never()).deleteProgramTraining(any());
         vm.getProgramTrainingTree().getParent().setDrafting(true);
@@ -131,21 +132,21 @@ public class ProgramTrainingViewModelTest {
 
     @Test
     public void parentChangedTest() throws Exception {
-        LiveTest.verifyLiveData(vm.load(1L), l -> l);
+        LiveTest.verifyLiveData(vm.load(1L), Objects::nonNull);
         vm.getProgramTrainingTree().getParent().setName("bar");
         assertTrue(vm.isChanged());
     }
 
     @Test
     public void childrenChangedTest() throws Exception {
-        LiveTest.verifyLiveData(vm.load(1L), l -> l);
+        LiveTest.verifyLiveData(vm.load(1L), Objects::nonNull);
         vm.setChildrenChanged();
         assertTrue(vm.isChanged());
     }
 
     @Test
     public void parentAndChildrenChangedTest() throws Exception {
-        LiveTest.verifyLiveData(vm.load(1L), l -> l);
+        LiveTest.verifyLiveData(vm.load(1L), Objects::nonNull);
         vm.getProgramTrainingTree().getParent().setName("bar");
         vm.setChildrenChanged();
         assertTrue(vm.isChanged());
@@ -153,7 +154,7 @@ public class ProgramTrainingViewModelTest {
 
     @Test
     public void nothingChangedTest() throws Exception {
-        LiveTest.verifyLiveData(vm.load(1L), l -> l);
+        LiveTest.verifyLiveData(vm.load(1L), Objects::nonNull);
         vm.getProgramTrainingTree().getParent().setName("foo");
         assertFalse(vm.isChanged());
     }

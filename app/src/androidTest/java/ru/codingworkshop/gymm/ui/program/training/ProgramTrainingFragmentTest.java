@@ -82,7 +82,7 @@ public class ProgramTrainingFragmentTest {
         tree = TreeBuilders.buildProgramTrainingTree(3);
         when(vm.load(1L)).thenAnswer(invocation -> {
             when(vm.getProgramTrainingTree()).thenReturn(tree);
-            return new LiveData<Boolean>() {{postValue(true);}};
+            return new LiveData<ProgramTrainingTree>() {{postValue(tree);}};
         });
 
         fragment = ProgramTrainingFragment.newInstance(1L);

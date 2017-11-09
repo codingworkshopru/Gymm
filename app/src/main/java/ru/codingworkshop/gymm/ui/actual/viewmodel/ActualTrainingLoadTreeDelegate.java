@@ -20,14 +20,14 @@ final class ActualTrainingLoadTreeDelegate extends ActualTrainingTreeDelegate {
     }
 
     @Override
-    LiveData<Boolean> load(ActualTrainingTree tree) {
+    LiveData<ActualTrainingTree> load(ActualTrainingTree tree) {
         return Transformations.switchMap(actualTrainingRepository.getActualTrainingById(id), input -> { // FIXME: 26.08.2017 this method invokes two times, should only one
             final Long programTrainingId = Preconditions.checkNotNull(input.getProgramTrainingId());
             return Transformations.switchMap(loadProgramTrainingTree(programTrainingId), unused -> {
                 ActualTrainingDataSource dataSource = new ActualTrainingDataSource(actualTrainingRepository, id);
                 final ActualTrainingTreeBuilder actualTrainingTreeBuilder = new ActualTrainingTreeBuilder(tree).setProgramTrainingTree(programTrainingTree);
                 ActualTrainingTreeLoader loader = new ActualTrainingTreeLoader(actualTrainingTreeBuilder, dataSource);
-                return loader.load();
+                return loader.loadIt();
             });
         });
     }

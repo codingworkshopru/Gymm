@@ -62,27 +62,27 @@ public class ProgramExerciseViewModel extends ViewModel {
         node.setParent(programExercise);
     }
 
-    public LiveData<Boolean> create() {
+    public LiveData<ProgramExerciseNode> create() {
         Preconditions.checkArgument(GymmDatabase.isValidId(programTrainingId));
         LiveData<ProgramExercise> draftingProgramExercise = repository.getDraftingProgramExercise(programTrainingId);
         return Transformations.switchMap(draftingProgramExercise, input -> {
             if (input == null) {
                 initNode();
-                return LiveDataUtil.getLive(true);
+                return LiveDataUtil.getLive(node);
             } else {
                 return load(input.getId());
             }
         });
     }
 
-    public LiveData<Boolean> load(long programExerciseId) {
+    public LiveData<ProgramExerciseNode> load(long programExerciseId) {
         ProgramExerciseDataSource dataSource = new ProgramExerciseDataSource(repository, exercisesRepository, programExerciseId);
         ProgramExerciseLoader loader = new ProgramExerciseLoader(node, dataSource);
-        final LiveData<Boolean> liveLoaded = loader.load();
-        liveLoaded.observeForever(new Observer<Boolean>() {
+        final LiveData<ProgramExerciseNode> liveLoaded = loader.loadIt();
+        liveLoaded.observeForever(new Observer<ProgramExerciseNode>() {
             @Override
-            public void onChanged(@Nullable Boolean loaded) {
-                if (loaded != null && loaded) {
+            public void onChanged(@Nullable ProgramExerciseNode loaded) {
+                if (loaded != null) {
                     exerciseId = node.getParent().getExerciseId();
                     liveLoaded.removeObserver(this);
                 }

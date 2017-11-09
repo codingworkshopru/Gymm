@@ -58,13 +58,15 @@ public class ActualTrainingTreeLoaderTest {
         builder.setProgramTrainingTree(programTree);
         ActualTrainingTreeLoader loader = new ActualTrainingTreeLoader(builder, dataSource);
 
-        LiveTest.verifyLiveData(loader.load(), b -> b);
+        LiveTest.verifyLiveData(loader.loadIt(), loadedTree -> {
+            assertEquals(11L, tree.getParent().getId());
+            assertEquals(1L, tree.getProgramTraining().getId());
+            assertEquals(2L, tree.getChildren().get(0).getProgramExerciseNode().getParent().getId());
+            assertEquals(3L, tree.getChildren().get(0).getProgramExerciseNode().getChildren().get(0).getId());
+            assertEquals(12L, tree.getChildren().get(0).getParent().getId());
+            assertEquals(13L, tree.getChildren().get(0).getChildren().get(0).getId());
 
-        assertEquals(11L, tree.getParent().getId());
-        assertEquals(1L, tree.getProgramTraining().getId());
-        assertEquals(2L, tree.getChildren().get(0).getProgramExerciseNode().getParent().getId());
-        assertEquals(3L, tree.getChildren().get(0).getProgramExerciseNode().getChildren().get(0).getId());
-        assertEquals(12L, tree.getChildren().get(0).getParent().getId());
-        assertEquals(13L, tree.getChildren().get(0).getChildren().get(0).getId());
+            return true;
+        });
     }
 }

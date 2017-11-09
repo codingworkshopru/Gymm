@@ -50,11 +50,11 @@ public class ActualTrainingViewModel extends ViewModel {
         return tree;
     }
 
-    public LiveData<Boolean> startTraining(final long programTrainingId) {
+    public LiveData<ActualTrainingTree> startTraining(final long programTrainingId) {
         return getLiveResult(new ActualTrainingCreateTreeDelegate(programTrainingId));
     }
 
-    public LiveData<Boolean> loadTraining(final long actualTrainingId) {
+    public LiveData<ActualTrainingTree> loadTraining(final long actualTrainingId) {
         return getLiveResult(new ActualTrainingLoadTreeDelegate(actualTrainingId));
     }
 
@@ -80,15 +80,15 @@ public class ActualTrainingViewModel extends ViewModel {
         delegate.setExercisesRepository(exercisesRepository);
     }
 
-    private LiveData<Boolean> getLiveResult(ActualTrainingTreeDelegate delegate) {
-        LiveData<Boolean> result;
+    private LiveData<ActualTrainingTree> getLiveResult(ActualTrainingTreeDelegate delegate) {
+        LiveData<ActualTrainingTree> result;
 
         if (tree == null) {
             tree = new ActualTrainingTree();
             setUpDelegate(delegate);
             result = delegate.load(tree);
         } else {
-            result = LiveDataUtil.getLive(true);
+            result = LiveDataUtil.getLive(tree);
         }
 
         return result;

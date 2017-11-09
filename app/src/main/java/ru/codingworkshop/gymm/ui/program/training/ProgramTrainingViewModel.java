@@ -50,25 +50,25 @@ public class ProgramTrainingViewModel extends ViewModel {
         tree.setParent(programTraining);
     }
 
-    public LiveData<Boolean> create() {
+    public LiveData<ProgramTrainingTree> create() {
         return Transformations.switchMap(repository.getDraftingProgramTraining(), input -> {
             if (input == null) {
                 initTree();
-                return LiveDataUtil.getLive(true);
+                return LiveDataUtil.getLive(tree);
             } else {
                 return load(input.getId());
             }
         });
     }
 
-    public LiveData<Boolean> load(long programTrainingId) {
+    public LiveData<ProgramTrainingTree> load(long programTrainingId) {
         ProgramTrainingDataSource dataSource = new ProgramTrainingDataSource(repository, exercisesRepository, programTrainingId);
         ProgramTrainingTreeLoader loader = new ProgramTrainingTreeLoader(tree, dataSource);
-        LiveData<Boolean> liveLoaded = loader.load();
-        liveLoaded.observeForever(new Observer<Boolean>() {
+        LiveData<ProgramTrainingTree> liveLoaded = loader.loadIt();
+        liveLoaded.observeForever(new Observer<ProgramTrainingTree>() {
             @Override
-            public void onChanged(@Nullable Boolean loaded) {
-                if (loaded != null && loaded) {
+            public void onChanged(@Nullable ProgramTrainingTree loaded) {
+                if (loaded != null) {
                     programTrainingName = tree.getParent().getName();
                     liveLoaded.removeObserver(this);
                 }

@@ -8,7 +8,6 @@ import ru.codingworkshop.gymm.data.entity.ActualSet;
 import ru.codingworkshop.gymm.data.entity.ActualTraining;
 import ru.codingworkshop.gymm.data.tree.loader.builder.ActualTrainingTreeBuilder;
 import ru.codingworkshop.gymm.data.tree.loader.common.Loader;
-import ru.codingworkshop.gymm.data.tree.loader.common.OldLoader;
 import ru.codingworkshop.gymm.data.tree.loader.common.TreeLoaderDelegate;
 import ru.codingworkshop.gymm.data.tree.loader.datasource.ActualTrainingDataSource;
 import ru.codingworkshop.gymm.data.tree.node.ActualTrainingTree;
@@ -17,7 +16,7 @@ import ru.codingworkshop.gymm.data.tree.node.ActualTrainingTree;
  * Created by Радик on 22.08.2017 as part of the Gymm project.
  */
 
-public class ActualTrainingTreeLoader implements Loader<ActualTrainingTree>, OldLoader {
+public class ActualTrainingTreeLoader implements Loader<ActualTrainingTree> {
     private TreeLoaderDelegate<ActualTraining, ActualExercise, ActualSet> treeLoaderDelegate;
     private ActualTrainingTreeBuilder treeBuilder;
 
@@ -28,11 +27,6 @@ public class ActualTrainingTreeLoader implements Loader<ActualTrainingTree>, Old
 
     @Override
     public LiveData<ActualTrainingTree> loadIt() {
-        return null;
-    }
-
-    @Override
-    public LiveData<Boolean> load() {
-        return treeLoaderDelegate.getLoaded();
+        return treeLoaderDelegate.mapLoaded(treeBuilder.getTree());
     }
 }

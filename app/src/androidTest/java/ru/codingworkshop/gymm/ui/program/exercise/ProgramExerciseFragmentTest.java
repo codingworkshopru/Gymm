@@ -100,7 +100,7 @@ public class ProgramExerciseFragmentTest {
         node.getChildren().get(0).setSecondsForRest(145);
         when(vm.load(2L)).thenAnswer(invocation -> {
             when(vm.getProgramExerciseNode()).thenReturn(node);
-            return new LiveData<Boolean>() {{postValue(true);}};
+            return new LiveData<ProgramExerciseNode>() {{postValue(node);}};
         });
 
         fragment = ProgramExerciseFragment.newInstanceForExistent(2L);

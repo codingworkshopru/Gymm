@@ -120,7 +120,7 @@ public class ProgramExerciseFragment extends BaseFragment {
         });
 
         final Bundle arguments = getArguments();
-        LiveData<Boolean> liveLoaded;
+        LiveData<ProgramExerciseNode> liveLoaded;
         if (arguments.containsKey(PROGRAM_EXERCISE_ID_KEY)) {
             liveLoaded = viewModel.load(arguments.getLong(PROGRAM_EXERCISE_ID_KEY));
         } else if (arguments.containsKey(PROGRAM_TRAINING_ID_KEY)) {
@@ -143,10 +143,10 @@ public class ProgramExerciseFragment extends BaseFragment {
         programSetEditor.show(getChildFragmentManager());
     }
 
-    private void init(boolean loaded) {
-        if (!loaded) return;
+    private void init(ProgramExerciseNode loadedNode) {
+        if (loadedNode == null) return;
 
-        node = viewModel.getProgramExerciseNode();
+        node = loadedNode;
 
         binding.setExercise(node.getExercise());
 

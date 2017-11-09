@@ -10,6 +10,8 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
+import java.util.Objects;
+
 import junitparams.JUnitParamsRunner;
 import ru.codingworkshop.gymm.data.entity.ActualExercise;
 import ru.codingworkshop.gymm.data.entity.ActualSet;
@@ -70,9 +72,9 @@ public class ActualTrainingViewModelTest {
 
     @Test
     public void startTraining() throws Exception {
-        LiveTest.verifyLiveData(vm.startTraining(1L), l -> l);
-
+        LiveTest.verifyLiveData(vm.startTraining(1L), Objects::nonNull);
         ActualTrainingTree tree = vm.getActualTrainingTree();
+
         assertEquals(1, tree.getChildren().size());
         assertEquals(11L, tree.getParent().getId());
         verify(actualRepository).insertActualTrainingWithResult(any());
@@ -80,7 +82,7 @@ public class ActualTrainingViewModelTest {
         verifyProgramLoaded();
 
         // don't start if already started
-        LiveTest.verifyLiveData(vm.startTraining(0L), l -> l);
+        LiveTest.verifyLiveData(vm.startTraining(0L), Objects::nonNull);
         assertEquals(tree, vm.getActualTrainingTree());
     }
 
@@ -88,7 +90,7 @@ public class ActualTrainingViewModelTest {
     public void loadTraining() throws Exception {
         stubActualRepository();
 
-        LiveTest.verifyLiveData(vm.loadTraining(11L), l -> l);
+        LiveTest.verifyLiveData(vm.loadTraining(11L), Objects::nonNull);
 
         ActualTrainingTree tree = vm.getActualTrainingTree();
         assertEquals(11L, tree.getParent().getId());
@@ -101,7 +103,7 @@ public class ActualTrainingViewModelTest {
 
         verifyProgramLoaded();
 
-        LiveTest.verifyLiveData(vm.loadTraining(0L), l -> l);
+        LiveTest.verifyLiveData(vm.loadTraining(0L), Objects::nonNull);
         assertEquals(tree, vm.getActualTrainingTree());
     }
 
@@ -114,7 +116,7 @@ public class ActualTrainingViewModelTest {
     @Test
     public void finishTrainingWithoutExercises() throws Exception {
         stubActualRepository();
-        LiveTest.verifyLiveData(vm.loadTraining(11L), l -> l);
+        LiveTest.verifyLiveData(vm.loadTraining(11L), Objects::nonNull);
         vm.getActualTrainingTree().getChildren().clear();
 
         vm.finishTraining();
@@ -125,7 +127,7 @@ public class ActualTrainingViewModelTest {
     @Test
     public void finishTrainingWithoutSets() throws Exception {
         stubActualRepository();
-        LiveTest.verifyLiveData(vm.loadTraining(11L), l -> l);
+        LiveTest.verifyLiveData(vm.loadTraining(11L), Objects::nonNull);
         vm.getActualTrainingTree().getChildren().get(0).getChildren().clear();
 
         vm.finishTraining();
@@ -137,7 +139,7 @@ public class ActualTrainingViewModelTest {
     @Test
     public void finishTraining() throws Exception {
         stubActualRepository();
-        LiveTest.verifyLiveData(vm.loadTraining(11L), l -> l);
+        LiveTest.verifyLiveData(vm.loadTraining(11L), Objects::nonNull);
         final ActualExercise foo = Models.createActualExercise(20L, "foo", 11L, 4L);
         vm.getActualTrainingTree().addChild(new ActualExerciseNode(foo));
 
@@ -155,15 +157,15 @@ public class ActualTrainingViewModelTest {
             return null;
         }).when(actualRepository).insertActualExercise(any(ActualExercise.class));
 
-        final LiveData<Boolean> liveLoaded = vm.startTraining(1L);
+        final LiveData<ActualTrainingTree> liveLoaded = vm.startTraining(1L);
         LiveTest.verifyLiveData(liveLoaded, l -> {
             vm.createActualExercise(0);
-            assertEquals(12L, vm.getActualTrainingTree().getChildren().get(0).getParent().getId());
+            assertEquals(12L, l.getChildren().get(0).getParent().getId());
 
             // check if actual exercise creates for the same index (it mustn't)
             vm.createActualExercise(0);
 
-            return l;
+            return true;
         });
 
         verify(actualRepository).insertActualExercise(any());
@@ -171,7 +173,7 @@ public class ActualTrainingViewModelTest {
 
     @Test
     public void createActualSet() throws Exception {
-        LiveTest.verifyLiveData(vm.startTraining(1L), l -> l);
+        LiveTest.verifyLiveData(vm.startTraining(1L), Objects::nonNull);
 
         vm.createActualExercise(0);
         final ActualSet toInsert = Models.createActualSet(0L, 0L, 10);

@@ -8,6 +8,7 @@ import android.support.v4.app.Fragment;
 import org.junit.Test;
 
 import ru.codingworkshop.gymm.R;
+import ru.codingworkshop.gymm.data.tree.node.ActualTrainingTree;
 import ru.codingworkshop.gymm.service.TrainingForegroundService;
 import ru.codingworkshop.gymm.util.Models;
 import ru.codingworkshop.gymm.util.TreeBuilders;
@@ -34,9 +35,10 @@ public class ActualExercisesFragmentStartTrainingTest extends Base {
     @Override
     void beforeFragmentSet() {
         doAnswer(invocation -> {
-            setFakeTree(TreeBuilders.buildTreeWithoutActuals(1));
+            ActualTrainingTree tree = TreeBuilders.buildTreeWithoutActuals(1);
+            setFakeTree(tree);
             fakeTree.setParent(Models.createActualTraining(11L, invocation.getArgument(0)));
-            return new LiveData<Boolean>() {{postValue(true);}};
+            return new LiveData<ActualTrainingTree>() {{postValue(tree);}};
         }).when(vm).startTraining(1L);
     }
 

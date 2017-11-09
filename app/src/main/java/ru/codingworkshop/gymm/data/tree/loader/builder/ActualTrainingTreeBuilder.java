@@ -45,6 +45,10 @@ public class ActualTrainingTreeBuilder extends TreeBuilder<ActualTraining, Actua
         return new ActualExerciseNode(child);
     }
 
+    public ActualTrainingTree getTree() {
+        return tree;
+    }
+
     @Override
     void setNodes(List<? extends BaseNode<ActualExercise, ActualSet>> baseNodes) {
         Map<Long, ? extends BaseNode<ActualExercise, ActualSet>> nodeProgramExerciseIdMap

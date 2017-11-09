@@ -55,7 +55,7 @@ public class ProgramExerciseCreateFragmentTest {
         when(vm.create()).thenAnswer(invocation -> {
             node.setParent(Models.createLiveProgramExercise(0L, 1L, true).getValue());
             when(vm.getProgramExerciseNode()).thenReturn(node);
-            return new LiveData<Boolean>() {{postValue(true);}};
+            return new LiveData<ProgramExerciseNode>() {{postValue(node);}};
         });
 
         fragment = ProgramExerciseFragment.newInstanceForNew(1L);
