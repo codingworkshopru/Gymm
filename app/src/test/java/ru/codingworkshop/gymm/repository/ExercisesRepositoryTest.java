@@ -75,5 +75,8 @@ public class ExercisesRepositoryTest {
 
         repository.getExercisesForProgramTraining(1L);
         verify(exerciseDao).getExercisesForProgramTraining(1L);
+
+        repository.getExerciseForProgramExercise(2L);
+        verify(exerciseDao).getExerciseForProgramExercise(2L);
     }
 }

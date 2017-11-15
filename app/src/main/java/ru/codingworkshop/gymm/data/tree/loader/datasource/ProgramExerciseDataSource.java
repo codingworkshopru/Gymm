@@ -21,8 +21,8 @@ public class ProgramExerciseDataSource extends NodeDataSource<ProgramExercise, P
     public ProgramExerciseDataSource(ProgramTrainingRepository repository, ExercisesRepository exercisesRepository, long programExerciseId) {
         setParent(repository.getProgramExerciseById(programExerciseId));
         setChildren(repository.getProgramSetsForExercise(programExerciseId));
-        exercise = Transformations.switchMap(getParent(), input ->
-                Preconditions.checkNotNull(exercisesRepository.getExerciseById(input.getExerciseId()))
+        exercise = Transformations.switchMap(getParent(), programExercise ->
+                Preconditions.checkNotNull(exercisesRepository.getExerciseById(programExercise.getExerciseId()))
         );
     }
 

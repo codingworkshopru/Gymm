@@ -48,4 +48,8 @@ public class ExercisesRepository {
     public LiveData<List<Exercise>> getExercisesForProgramTraining(long programTrainingId) {
         return exerciseDao.getExercisesForProgramTraining(programTrainingId);
     }
+
+    public LiveData<Exercise> getExerciseForProgramExercise(long programExerciseId) {
+        return exerciseDao.getExerciseForProgramExercise(programExerciseId);
+    }
 }

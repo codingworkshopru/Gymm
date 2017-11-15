@@ -38,4 +38,9 @@ public interface MuscleGroupDao {
                     "where l.exerciseId = :exerciseId " +
                     "order by mg.name")
     LiveData<List<MuscleGroup>> getSecondaryMuscleGroupsForExercise(long exerciseId);
+
+    @Query("select mg.* from MuscleGroup as mg " +
+            "join Exercise e on e.primaryMuscleGroupId = mg.id " +
+            "where e.id = :exerciseId")
+    LiveData<MuscleGroup> getPrimaryMuscleGroupForExercise(long exerciseId);
 }

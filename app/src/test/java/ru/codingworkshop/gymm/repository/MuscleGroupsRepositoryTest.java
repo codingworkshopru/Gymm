@@ -74,6 +74,12 @@ public class MuscleGroupsRepositoryTest {
     }
 
     @Test
+    public void getPrimaryMuscleGroupForExercise() throws Exception {
+        repository.getPrimaryMuscleGroupForExercise(100L);
+        verify(dao).getPrimaryMuscleGroupForExercise(100L);
+    }
+
+    @Test
     public void getSecondaryMuscleGroupsForExercise() throws Exception {
         final LiveData<List<MuscleGroup>> liveMuscleGroups = Models.createLiveMuscleGroups(2L);
         when(dao.getSecondaryMuscleGroupsForExercise(1L)).thenReturn(liveMuscleGroups);

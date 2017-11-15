@@ -46,6 +46,13 @@ public interface ExerciseDao {
     )
     LiveData<List<Exercise>> getExercisesForProgramTraining(long programTrainingId);
 
+    @Query(
+            "select e.* from Exercise as e " +
+                    "join ProgramExercise pe on pe.exerciseId = e.id " +
+                    "where pe.id = :programExerciseId"
+    )
+    LiveData<Exercise> getExerciseForProgramExercise(long programExerciseId);
+
     @Insert(onConflict = FAIL)
     List<Long> insertExercises(List<Exercise> entities);
 
