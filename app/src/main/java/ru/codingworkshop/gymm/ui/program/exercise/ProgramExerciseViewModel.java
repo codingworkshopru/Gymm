@@ -5,7 +5,9 @@ import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.Transformations;
 import android.arch.lifecycle.ViewModel;
 import android.support.annotation.Nullable;
+import android.support.annotation.VisibleForTesting;
 
+import com.google.common.base.Objects;
 import com.google.common.base.Preconditions;
 
 import javax.inject.Inject;
@@ -13,9 +15,10 @@ import javax.inject.Inject;
 import ru.codingworkshop.gymm.data.entity.ProgramExercise;
 import ru.codingworkshop.gymm.data.entity.ProgramSet;
 import ru.codingworkshop.gymm.data.tree.loader.ProgramExerciseLoader;
-import ru.codingworkshop.gymm.data.tree.loader.datasource.ProgramExerciseDataSource;
+import ru.codingworkshop.gymm.data.tree.loader.ProgramTrainingTreeLoader;
 import ru.codingworkshop.gymm.data.tree.node.MutableProgramExerciseNode;
 import ru.codingworkshop.gymm.data.tree.node.ProgramExerciseNode;
+import ru.codingworkshop.gymm.data.tree.repositoryadapter.ProgramExerciseAdapter;
 import ru.codingworkshop.gymm.data.tree.saver.ProgramExerciseSaver;
 import ru.codingworkshop.gymm.data.util.LiveDataUtil;
 import ru.codingworkshop.gymm.db.GymmDatabase;
@@ -27,22 +30,20 @@ import ru.codingworkshop.gymm.repository.ProgramTrainingRepository;
  */
 
 public class ProgramExerciseViewModel extends ViewModel {
+    private ProgramExerciseLoader programExerciseLoader;
     private ProgramTrainingRepository repository;
-    private ExercisesRepository exercisesRepository;
-    private ProgramExerciseNode node;
+
+    @VisibleForTesting
+    ProgramExerciseNode node;
 
     private long programTrainingId;
-    private ProgramExerciseSaver saver;
     private boolean childrenChanged;
     private long exerciseId;
 
     @Inject
-    public ProgramExerciseViewModel(ProgramTrainingRepository repository, ExercisesRepository exercisesRepository) {
+    ProgramExerciseViewModel(ProgramExerciseLoader programExerciseLoader, ProgramTrainingRepository repository) {
+        this.programExerciseLoader = programExerciseLoader;
         this.repository = repository;
-        this.exercisesRepository = exercisesRepository;
-
-        node = new MutableProgramExerciseNode();
-        saver = new ProgramExerciseSaver(node, repository);
     }
 
     public ProgramExerciseNode getProgramExerciseNode() {
@@ -54,6 +55,8 @@ public class ProgramExerciseViewModel extends ViewModel {
     }
 
     private void initNode() {
+        node = new MutableProgramExerciseNode();
+
         ProgramExercise programExercise = new ProgramExercise();
         programExercise.setProgramTrainingId(programTrainingId);
         programExercise.setDrafting(true);
@@ -63,36 +66,36 @@ public class ProgramExerciseViewModel extends ViewModel {
     }
 
     public LiveData<ProgramExerciseNode> create() {
-        Preconditions.checkArgument(GymmDatabase.isValidId(programTrainingId));
-        LiveData<ProgramExercise> draftingProgramExercise = repository.getDraftingProgramExercise(programTrainingId);
-        return Transformations.switchMap(draftingProgramExercise, input -> {
-            if (input == null) {
-                initNode();
-                return LiveDataUtil.getLive(node);
-            } else {
-                return load(input.getId());
-            }
-        });
+        if (node == null) {
+            Preconditions.checkArgument(GymmDatabase.isValidId(programTrainingId));
+            LiveData<ProgramExercise> draftingProgramExercise = repository.getDraftingProgramExercise(programTrainingId);
+            return Transformations.switchMap(draftingProgramExercise, input -> {
+                if (input == null) {
+                    initNode();
+                    return LiveDataUtil.getLive(node);
+                } else {
+                    return load(input.getId());
+                }
+            });
+        } else {
+            return LiveDataUtil.getLive(node);
+        }
     }
 
     public LiveData<ProgramExerciseNode> load(long programExerciseId) {
-        ProgramExerciseDataSource dataSource = new ProgramExerciseDataSource(repository, exercisesRepository, programExerciseId);
-        ProgramExerciseLoader loader = new ProgramExerciseLoader(node, dataSource);
-        final LiveData<ProgramExerciseNode> liveLoaded = loader.loadIt();
-        liveLoaded.observeForever(new Observer<ProgramExerciseNode>() {
-            @Override
-            public void onChanged(@Nullable ProgramExerciseNode loaded) {
-                if (loaded != null) {
-                    exerciseId = node.getParent().getExerciseId();
-                    liveLoaded.removeObserver(this);
-                }
-            }
-        });
-        return liveLoaded;
+        if (node == null) {
+            node = new MutableProgramExerciseNode();
+            return LiveDataUtil.getOnce(
+                    programExerciseLoader.loadById(node, programExerciseId),
+                    n -> exerciseId = n.getExerciseId()
+            );
+        } else {
+            return LiveDataUtil.getLive(node);
+        }
     }
 
     public void save() {
-        saver.save();
+        new ProgramExerciseSaver(node, repository).save();
     }
 
     public void deleteIfDrafting() {

@@ -4,7 +4,8 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 
 import ru.codingworkshop.gymm.data.tree.loader.builder.TreeBuilderTestSuite;
-import ru.codingworkshop.gymm.data.tree.loader.datasource.DataSourceTestSuite;
+import ru.codingworkshop.gymm.data.tree.loader.common.LoaderDelegateTest;
+import ru.codingworkshop.gymm.data.tree.loader.common.NodeLoaderDelegateTest;
 
 /**
  * Created by Радик on 21.08.2017 as part of the Gymm project.
@@ -13,10 +14,9 @@ import ru.codingworkshop.gymm.data.tree.loader.datasource.DataSourceTestSuite;
 @RunWith(Suite.class)
 @Suite.SuiteClasses({
         TreeBuilderTestSuite.class,
-        DataSourceTestSuite.class,
 
         LoaderDelegateTest.class,
-        BaseNodeLoaderDelegateTest.class,
+        NodeLoaderDelegateTest.class,
 
         ProgramExerciseLoaderTest.class,
         ProgramTrainingTreeLoaderTest.class,

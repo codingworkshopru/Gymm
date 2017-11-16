@@ -6,6 +6,7 @@ import org.junit.runners.Suite;
 import ru.codingworkshop.gymm.data.tree.holder.HolderTestSuite;
 import ru.codingworkshop.gymm.data.tree.loader.LoaderTestSuite;
 import ru.codingworkshop.gymm.data.tree.node.NodeTestSuite;
+import ru.codingworkshop.gymm.data.tree.repositoryadapter.RepositoryAdapterTestSuite;
 import ru.codingworkshop.gymm.data.tree.saver.SaverTestSuite;
 
 /**
@@ -19,7 +20,8 @@ import ru.codingworkshop.gymm.data.tree.saver.SaverTestSuite;
         SaverTestSuite.class,
         NodeTestSuite.class,
         ChildRestoreAdapterTest.class,
-        Preconditions2Test.class
+        Preconditions2Test.class,
+        RepositoryAdapterTestSuite.class
 })
 public class TreeTestSuite {
 }

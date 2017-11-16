@@ -1,4 +1,4 @@
-package ru.codingworkshop.gymm.data.tree.loader;
+package ru.codingworkshop.gymm.data.tree.loader.common;
 
 import android.arch.core.executor.testing.InstantTaskExecutorRule;
 import android.arch.lifecycle.LiveData;
@@ -13,8 +13,8 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 
-import ru.codingworkshop.gymm.data.tree.loader.common.BaseNodeLoaderDelegate;
-import ru.codingworkshop.gymm.data.tree.loader.datasource.NodeDataSource;
+import ru.codingworkshop.gymm.data.tree.repositoryadapter.ChildrenAdapter;
+import ru.codingworkshop.gymm.data.tree.repositoryadapter.ParentAdapter;
 import ru.codingworkshop.gymm.data.util.LiveDataUtil;
 import ru.codingworkshop.gymm.util.LiveTest;
 import ru.codingworkshop.gymm.util.SimpleNode;
@@ -29,9 +29,10 @@ import static org.mockito.Mockito.when;
  */
 
 @RunWith(MockitoJUnitRunner.class)
-public class BaseNodeLoaderDelegateTest {
+public class NodeLoaderDelegateTest {
     @Rule public InstantTaskExecutorRule instantTaskExecutorRule = new InstantTaskExecutorRule();
-    @Mock private NodeDataSource<Long, String> dataSource;
+    @Mock private ParentAdapter<Long> parentAdapter;
+    @Mock private ChildrenAdapter<String> childrenAdapter;
 
     private SimpleNode node;
     private MutableLiveData<Long> liveParent;
@@ -41,13 +42,13 @@ public class BaseNodeLoaderDelegateTest {
         node = new SimpleNode();
         liveParent = new MutableLiveData<Long>() {{setValue(1L);}};
 
-        when(dataSource.getParent()).thenReturn(liveParent);
-        when(dataSource.getChildren()).thenReturn(LiveDataUtil.getLive(Lists.newArrayList("foo", "bar")));
+        when(parentAdapter.getParent(1L)).thenReturn(liveParent);
+        when(childrenAdapter.getChildren(1L)).thenReturn(LiveDataUtil.getLive(Lists.newArrayList("foo", "bar")));
     }
 
     @Test
     public void loadTest() throws Exception {
-        BaseNodeLoaderDelegate<Long, String> nodeLoader = new BaseNodeLoaderDelegate<>(node, dataSource);
+        NodeLoaderDelegate<Long, String> nodeLoader = new NodeLoaderDelegate<>(node, node, parentAdapter, childrenAdapter, 1L);
         nodeLoader.addSource(LiveDataUtil.getLive(10), node::setAdditional);
 
         LiveData<SimpleNode> loaded = nodeLoader.mapLoaded(node);
@@ -66,7 +67,7 @@ public class BaseNodeLoaderDelegateTest {
             return true;
         });
 
-        verify(dataSource).getParent();
-        verify(dataSource).getChildren();
+        verify(parentAdapter).getParent(1L);
+        verify(childrenAdapter).getChildren(1L);
     }
 }

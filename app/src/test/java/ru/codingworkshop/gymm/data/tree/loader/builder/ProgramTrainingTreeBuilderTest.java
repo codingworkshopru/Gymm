@@ -28,12 +28,13 @@ public class ProgramTrainingTreeBuilderTest {
         final List<ProgramSet> programSets = Models.createProgramSets(2L, 1);
         final List<Exercise> exercises = Models.createExercises("exercises");
 
-        ProgramTrainingTree tree = (ProgramTrainingTree) new ProgramTrainingTreeBuilder(new ImmutableProgramTrainingTree())
-                .setExercises(exercises)
-                .setParent(programTraining)
-                .setChildren(programExercises)
-                .setGrandchildren(programSets)
-                .build();
+        ProgramTrainingTree tree = new ImmutableProgramTrainingTree();
+        ProgramTrainingTreeBuilder builder = new ProgramTrainingTreeBuilder(tree)
+                .setExercises(exercises);
+        builder.setParent(programTraining);
+        builder.setChildren(programExercises);
+        builder.setGrandchildren(programSets);
+        builder.build();
 
         assertEquals(programTraining, tree.getParent());
         assertEquals(programExercises, tree.getChildren().stream().map(BaseNode::getParent).collect(Collectors.toList()));

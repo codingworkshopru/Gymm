@@ -5,14 +5,15 @@ import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.Transformations;
 import android.arch.lifecycle.ViewModel;
 import android.support.annotation.Nullable;
+import android.support.annotation.VisibleForTesting;
 
 import javax.inject.Inject;
 
 import ru.codingworkshop.gymm.data.entity.ProgramTraining;
 import ru.codingworkshop.gymm.data.tree.loader.ProgramTrainingTreeLoader;
-import ru.codingworkshop.gymm.data.tree.loader.datasource.ProgramTrainingDataSource;
 import ru.codingworkshop.gymm.data.tree.node.MutableProgramTrainingTree;
 import ru.codingworkshop.gymm.data.tree.node.ProgramTrainingTree;
+import ru.codingworkshop.gymm.data.tree.repositoryadapter.ProgramTrainingAdapter;
 import ru.codingworkshop.gymm.data.tree.saver.ProgramTrainingSaver;
 import ru.codingworkshop.gymm.data.util.LiveDataUtil;
 import ru.codingworkshop.gymm.repository.ExercisesRepository;
@@ -23,19 +24,17 @@ import ru.codingworkshop.gymm.repository.ProgramTrainingRepository;
  */
 
 public class ProgramTrainingViewModel extends ViewModel {
+    private ProgramTrainingTreeLoader loader;
     private ProgramTrainingRepository repository;
-    private ExercisesRepository exercisesRepository;
-    private ProgramTrainingTree tree;
-    private ProgramTrainingSaver saver;
+    @VisibleForTesting
+    ProgramTrainingTree tree;
     private String programTrainingName;
     private boolean childrenChanged;
 
     @Inject
-    public ProgramTrainingViewModel(ProgramTrainingRepository repository, ExercisesRepository exercisesRepository) {
+    public ProgramTrainingViewModel(ProgramTrainingTreeLoader loader, ProgramTrainingRepository repository) {
+        this.loader = loader;
         this.repository = repository;
-        this.exercisesRepository = exercisesRepository;
-        tree = new MutableProgramTrainingTree();
-        saver = new ProgramTrainingSaver(tree, repository);
     }
 
     public ProgramTrainingTree getProgramTrainingTree() {
@@ -43,6 +42,8 @@ public class ProgramTrainingViewModel extends ViewModel {
     }
 
     private void initTree() {
+        tree = new MutableProgramTrainingTree();
+
         ProgramTraining programTraining = new ProgramTraining();
         programTraining.setDrafting(true); // TODO consider place drafting setter to repository
         repository.insertProgramTraining(programTraining);
@@ -51,36 +52,34 @@ public class ProgramTrainingViewModel extends ViewModel {
     }
 
     public LiveData<ProgramTrainingTree> create() {
-        return Transformations.switchMap(repository.getDraftingProgramTraining(), input -> {
-            if (input == null) {
-                initTree();
-                return LiveDataUtil.getLive(tree);
-            } else {
-                return load(input.getId());
-            }
-        });
+        if (tree == null) {
+            return Transformations.switchMap(repository.getDraftingProgramTraining(), input -> {
+                if (input == null) {
+                    initTree();
+                    return LiveDataUtil.getLive(tree);
+                } else {
+                    return load(input.getId());
+                }
+            });
+        } else {
+            return LiveDataUtil.getLive(tree);
+        }
     }
 
     public LiveData<ProgramTrainingTree> load(long programTrainingId) {
-        ProgramTrainingDataSource dataSource = new ProgramTrainingDataSource(repository, exercisesRepository, programTrainingId);
-        ProgramTrainingTreeLoader loader = new ProgramTrainingTreeLoader(tree, dataSource);
-        LiveData<ProgramTrainingTree> liveLoaded = loader.loadIt();
-        liveLoaded.observeForever(new Observer<ProgramTrainingTree>() {
-            @Override
-            public void onChanged(@Nullable ProgramTrainingTree loaded) {
-                if (loaded != null) {
-                    programTrainingName = tree.getParent().getName();
-                    liveLoaded.removeObserver(this);
-                }
-            }
-        });
-        return liveLoaded;
+        if (tree == null) {
+            tree = new MutableProgramTrainingTree();
+            LiveData<ProgramTrainingTree> liveTree = loader.loadById(tree, programTrainingId);
+            return LiveDataUtil.getOnce(liveTree, t -> programTrainingName = t.getParent().getName());
+        } else {
+            return LiveDataUtil.getLive(tree);
+        }
     }
 
     public LiveData<Boolean> save() {
         return Transformations.map(repository.getProgramTrainingByName(tree.getParent().getName()), t -> {
             if (t == null) {
-                saver.save();
+                new ProgramTrainingSaver(tree, repository).save();
             }
             return t == null;
         });

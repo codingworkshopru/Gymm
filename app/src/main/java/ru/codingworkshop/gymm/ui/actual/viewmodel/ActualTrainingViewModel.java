@@ -1,8 +1,10 @@
 package ru.codingworkshop.gymm.ui.actual.viewmodel;
 
 import android.arch.lifecycle.LiveData;
+import android.arch.lifecycle.Transformations;
 import android.arch.lifecycle.ViewModel;
 import android.support.annotation.NonNull;
+import android.support.annotation.VisibleForTesting;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Collections2;
@@ -13,9 +15,12 @@ import java.util.Date;
 
 import javax.inject.Inject;
 
+import dagger.Lazy;
 import ru.codingworkshop.gymm.data.entity.ActualExercise;
 import ru.codingworkshop.gymm.data.entity.ActualSet;
 import ru.codingworkshop.gymm.data.entity.ActualTraining;
+import ru.codingworkshop.gymm.data.tree.loader.ActualTrainingEmptyTreeLoader;
+import ru.codingworkshop.gymm.data.tree.loader.ActualTrainingTreeLoader;
 import ru.codingworkshop.gymm.data.tree.node.ActualExerciseNode;
 import ru.codingworkshop.gymm.data.tree.node.ActualTrainingTree;
 import ru.codingworkshop.gymm.data.tree.node.ProgramExerciseNode;
@@ -31,19 +36,17 @@ import ru.codingworkshop.gymm.repository.ProgramTrainingRepository;
 
 public class ActualTrainingViewModel extends ViewModel {
     private ActualTrainingRepository actualTrainingRepository;
-    private ProgramTrainingRepository programTrainingRepository;
-    private ExercisesRepository exercisesRepository;
 
-    private ActualTrainingTree tree;
+    @VisibleForTesting
+    ActualTrainingTree tree;
+    private Lazy<ActualTrainingTreeLoader> treeLoader;
+    private Lazy<ActualTrainingEmptyTreeLoader> emptyTreeLoader;
 
     @Inject
-    public ActualTrainingViewModel(ActualTrainingRepository actualTrainingRepository,
-                                   ProgramTrainingRepository programTrainingRepository,
-                                   ExercisesRepository exercisesRepository
-    ) {
+    public ActualTrainingViewModel(Lazy<ActualTrainingTreeLoader> treeLoader, Lazy<ActualTrainingEmptyTreeLoader> emptyTreeLoader, ActualTrainingRepository actualTrainingRepository) {
+        this.treeLoader = treeLoader;
+        this.emptyTreeLoader = emptyTreeLoader;
         this.actualTrainingRepository = actualTrainingRepository;
-        this.programTrainingRepository = programTrainingRepository;
-        this.exercisesRepository = exercisesRepository;
     }
 
     public ActualTrainingTree getActualTrainingTree() {
@@ -51,11 +54,28 @@ public class ActualTrainingViewModel extends ViewModel {
     }
 
     public LiveData<ActualTrainingTree> startTraining(final long programTrainingId) {
-        return getLiveResult(new ActualTrainingCreateTreeDelegate(programTrainingId));
+        if (tree == null) {
+            tree = new ActualTrainingTree();
+            LiveData<ActualTrainingTree> actualTrainingTreeLiveData = emptyTreeLoader.get().loadById(tree, programTrainingId);
+            return Transformations.switchMap(
+                    actualTrainingTreeLiveData,
+                    tree -> Transformations.map(
+                            actualTrainingRepository.insertActualTrainingWithResult(tree.getParent()),
+                            insertedId -> tree)
+            );
+        } else {
+            return LiveDataUtil.getLive(tree);
+        }
     }
 
     public LiveData<ActualTrainingTree> loadTraining(final long actualTrainingId) {
-        return getLiveResult(new ActualTrainingLoadTreeDelegate(actualTrainingId));
+        if (tree == null) {
+            tree = new ActualTrainingTree();
+            ActualTrainingTreeLoader loader = treeLoader.get();
+            return loader.loadById(tree, actualTrainingId);
+        } else {
+            return LiveDataUtil.getLive(tree);
+        }
     }
 
     public void finishTraining() {
@@ -72,26 +92,6 @@ public class ActualTrainingViewModel extends ViewModel {
         } else {
             actualTrainingRepository.deleteActualTraining(actualTraining);
         }
-    }
-
-    private void setUpDelegate(ActualTrainingTreeDelegate delegate) {
-        delegate.setActualTrainingRepository(actualTrainingRepository);
-        delegate.setProgramTrainingRepository(programTrainingRepository);
-        delegate.setExercisesRepository(exercisesRepository);
-    }
-
-    private LiveData<ActualTrainingTree> getLiveResult(ActualTrainingTreeDelegate delegate) {
-        LiveData<ActualTrainingTree> result;
-
-        if (tree == null) {
-            tree = new ActualTrainingTree();
-            setUpDelegate(delegate);
-            result = delegate.load(tree);
-        } else {
-            result = LiveDataUtil.getLive(tree);
-        }
-
-        return result;
     }
 
     public void createActualExercise(int actualExerciseNodeIndex) {

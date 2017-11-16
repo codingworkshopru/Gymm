@@ -8,15 +8,16 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 
-import ru.codingworkshop.gymm.data.tree.loader.datasource.ProgramTrainingDataSource;
 import ru.codingworkshop.gymm.data.tree.node.ImmutableProgramTrainingTree;
 import ru.codingworkshop.gymm.data.tree.node.ProgramTrainingTree;
+import ru.codingworkshop.gymm.data.tree.repositoryadapter.ProgramTrainingAdapter;
 import ru.codingworkshop.gymm.repository.ExercisesRepository;
 import ru.codingworkshop.gymm.repository.ProgramTrainingRepository;
 import ru.codingworkshop.gymm.util.LiveTest;
 import ru.codingworkshop.gymm.util.Models;
 
 import static org.junit.Assert.assertEquals;
+import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.when;
 
 /**
@@ -38,12 +39,12 @@ public class ProgramTrainingTreeLoaderTest {
         when(repository.getProgramSetsForTraining(1L)).thenReturn(Models.createLiveProgramSets(2L, 3));
         when(exercisesRepository.getExercisesForProgramTraining(1L)).thenReturn(Models.createLiveExercises("bar", "baz"));
 
-        ProgramTrainingDataSource dataSource = new ProgramTrainingDataSource(repository, exercisesRepository, 1L);
+        ProgramTrainingAdapter adapter = new ProgramTrainingAdapter(repository, exercisesRepository);
 
         ProgramTrainingTree tree = new ImmutableProgramTrainingTree();
-        ProgramTrainingTreeLoader loader = new ProgramTrainingTreeLoader(tree, dataSource);
+        ProgramTrainingTreeLoader loader = new ProgramTrainingTreeLoader(adapter);
 
-        LiveTest.verifyLiveData(loader.loadIt(), loadedTree -> {
+        LiveTest.verifyLiveData(loader.loadById(tree, 1L), loadedTree -> {
             assertEquals(1L, loadedTree.getParent().getId());
             assertEquals(2L, loadedTree.getChildren().get(0).getId());
             assertEquals(3L, loadedTree.getChildren().get(0).getChildren().get(0).getId());

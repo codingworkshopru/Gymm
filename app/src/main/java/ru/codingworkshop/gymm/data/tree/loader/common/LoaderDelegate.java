@@ -17,12 +17,8 @@ public class LoaderDelegate {
         liveLoaded = new MediatorLiveData<>();
     }
 
-    public LiveData<Boolean> getLoaded() {
-        return liveLoaded;
-    }
-
     public <T> LiveData<T> mapLoaded(T node) {
-        return Transformations.map(getLoaded(), loaded -> loaded != null && loaded ? node : null);
+        return Transformations.map(liveLoaded, loaded -> loaded != null && loaded ? node : null);
     }
 
     public <T> void addSource(LiveData<T> live, Observer<T> observer) {
@@ -37,7 +33,7 @@ public class LoaderDelegate {
     }
 
     /**
-     * call <b>super</b> after all data processing
+     * call <b>super.onAllSourcesLoaded</b> after all data processing
      */
     protected void onAllSourcesLoaded() {
         liveLoaded.setValue(true);

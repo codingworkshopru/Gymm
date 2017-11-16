@@ -1,7 +1,6 @@
 package ru.codingworkshop.gymm.util;
 
-import android.support.test.espresso.core.internal.deps.guava.base.Preconditions;
-
+import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
 
 import java.util.ArrayList;

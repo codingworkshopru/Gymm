@@ -38,7 +38,7 @@ ext {
 
     gson = "2.8.2"
     guava = "23.0-android"
-    dagger = "2.11"
+    dagger = "2.13"
     picasso = "2.5.2"
 //    leakcanary = "1.5.2"
     timber = "4.5.1"

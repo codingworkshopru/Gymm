@@ -19,7 +19,6 @@ import ru.codingworkshop.gymm.repository.ProgramTrainingRepository;
  * Created by Radik on 11.11.2017.
  */
 
-@Singleton
 public class ProgramTrainingAdapter implements ParentAdapter<ProgramTraining>,
         ChildrenAdapter<ProgramExercise>, GrandchildrenAdapter<ProgramSet> {
 

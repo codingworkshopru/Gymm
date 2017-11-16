@@ -8,7 +8,7 @@ import ru.codingworkshop.gymm.data.entity.ProgramExercise;
  * Created by Radik on 09.11.2017.
  */
 
-interface ParentAdapter<P> {
+public interface ParentAdapter<P> {
     LiveData<P> getParent(long id);
 
     void updateParent(P item);

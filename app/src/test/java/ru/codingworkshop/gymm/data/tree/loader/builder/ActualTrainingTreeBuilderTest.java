@@ -14,6 +14,7 @@ import ru.codingworkshop.gymm.data.tree.node.ImmutableProgramExerciseNode;
 import ru.codingworkshop.gymm.data.tree.node.ProgramTrainingTree;
 import ru.codingworkshop.gymm.util.Models;
 
+import static junit.framework.Assert.assertNotNull;
 import static junit.framework.Assert.assertTrue;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
@@ -25,7 +26,6 @@ import static org.mockito.Mockito.when;
  */
 
 public class ActualTrainingTreeBuilderTest {
-
     private ProgramTrainingTree programTrainingTree;
 
     @Before
@@ -42,12 +42,13 @@ public class ActualTrainingTreeBuilderTest {
 
     @Test
     public void build() throws Exception {
-        ActualTrainingTree tree = (ActualTrainingTree) new ActualTrainingTreeBuilder(new ActualTrainingTree())
-                .setProgramTrainingTree(programTrainingTree)
-                .setParent(Models.createActualTraining(11L, 1L))
-                .setChildren(Models.createActualExercises(12L))
-                .setGrandchildren(Models.createActualSets(12L, 13L))
-                .build();
+        ActualTrainingTree tree = new ActualTrainingTree();
+        ActualTrainingTreeBuilder builder = new ActualTrainingTreeBuilder(tree)
+                .setProgramTrainingTree(programTrainingTree);
+        builder.setParent(Models.createActualTraining(11L, 1L));
+        builder.setChildren(Models.createActualExercises(12L));
+        builder.setGrandchildren(Models.createActualSets(12L, 13L));
+        builder.build();
 
         assertProgramTrainingTree(tree);
 
@@ -63,7 +64,7 @@ public class ActualTrainingTreeBuilderTest {
                 .build();
 
         assertProgramTrainingTree(tree);
-        assertNull(tree.getParent());
+        assertNotNull(tree.getParent());
         List<ActualExercise> collect = tree.getChildren().stream().map(BaseNode::getParent).collect(Collectors.toList());
         assertNull(collect.get(0));
         List<ActualSet> actualSets = tree.getChildren().get(0).getChildren();

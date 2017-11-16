@@ -14,19 +14,23 @@ import java.util.Objects;
 
 import ru.codingworkshop.gymm.data.entity.ProgramExercise;
 import ru.codingworkshop.gymm.data.entity.ProgramSet;
+import ru.codingworkshop.gymm.data.tree.loader.ProgramExerciseLoader;
 import ru.codingworkshop.gymm.data.tree.node.ProgramExerciseNode;
 import ru.codingworkshop.gymm.data.util.LiveDataUtil;
 import ru.codingworkshop.gymm.repository.ExercisesRepository;
 import ru.codingworkshop.gymm.repository.ProgramTrainingRepository;
 import ru.codingworkshop.gymm.util.LiveTest;
 import ru.codingworkshop.gymm.util.Models;
+import ru.codingworkshop.gymm.util.TreeBuilders;
 
 import static junit.framework.Assert.assertEquals;
 import static junit.framework.Assert.assertFalse;
 import static junit.framework.Assert.assertSame;
 import static junit.framework.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.argThat;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -40,57 +44,52 @@ public class ProgramExerciseViewModelTest {
     @Rule
     public InstantTaskExecutorRule instantTaskExecutorRule = new InstantTaskExecutorRule();
 
+    @Mock private ProgramExerciseLoader loader;
     @Mock private ProgramTrainingRepository repository;
-    @Mock private ExercisesRepository exercisesRepository;
     private ProgramExerciseViewModel vm;
 
     @Before
     public void setUp() throws Exception {
-        vm = new ProgramExerciseViewModel(repository, exercisesRepository);
-        when(repository.getProgramExerciseById(2L)).thenReturn(Models.createLiveProgramExercise(2L,1L,false));
-        when(repository.getProgramSetsForExercise(2L)).thenReturn(Models.createLiveProgramSets(2L, 1));
-        when(exercisesRepository.getExerciseById(100L)).thenReturn(Models.createLiveExercise(100L, "foo"));
+        vm = new ProgramExerciseViewModel(loader, repository);
+        ProgramExerciseNode programExerciseNode = TreeBuilders.buildProgramTrainingTree(1).getChildren().get(0);
+        when(loader.loadById(any(), eq(2L))).thenAnswer(invocation -> {
+            vm.node = programExerciseNode;
+            return LiveDataUtil.getLive(programExerciseNode);
+        });
     }
 
     @Test
     public void load() throws Exception {
-        LiveTest.verifyLiveData(vm.load(2L), node -> {
-            assertEquals(2L, node.getId());
+        LiveTest.verifyLiveData(vm.load(2L), Objects::nonNull);
+        LiveTest.verifyLiveData(vm.load(0L), Objects::nonNull);
 
-            return true;
-        });
+        verify(loader).loadById(any(), anyLong());
     }
 
     @Test
     public void createWithoutDrafting() throws Exception {
         when(repository.getDraftingProgramExercise(1L)).thenReturn(LiveDataUtil.getLive(null));
         vm.setProgramTrainingId(1L);
-        LiveTest.verifyLiveData(vm.create(), node -> {
-            final ProgramExercise parent = node.getParent();
-            assertEquals(0L, parent.getId());
-            assertEquals(1L, parent.getProgramTrainingId());
-            assertTrue(parent.isDrafting());
-            verify(repository).insertProgramExercise(any());
+        LiveTest.verifyLiveData(vm.create(), Objects::nonNull);
 
-            return true;
-        });
+        final ProgramExercise parent = vm.getProgramExerciseNode().getParent();
+        assertEquals(0L, parent.getId());
+        assertEquals(1L, parent.getProgramTrainingId());
+        assertTrue(parent.isDrafting());
+        verify(repository).insertProgramExercise(any());
     }
 
     @Test
     public void createWithDrafting() throws Exception {
         final LiveData<ProgramExercise> liveProgramExercise = Models.createLiveProgramExercise(2L, 1L, true);
-        when(repository.getProgramExerciseById(2L)).thenReturn(liveProgramExercise);
         when(repository.getDraftingProgramExercise(1L)).thenReturn(liveProgramExercise);
 
         vm.setProgramTrainingId(1L);
-        LiveTest.verifyLiveData(vm.create(), node -> {
-            final ProgramExercise parent = node.getParent();
-            assertEquals(2L, parent.getId());
-            assertTrue(parent.isDrafting());
-            verify(repository, never()).insertProgramExercise(any());
+        LiveTest.verifyLiveData(vm.create(), Objects::nonNull);
 
-            return true;
-        });
+        final ProgramExercise parent = vm.getProgramExerciseNode().getParent();
+        assertEquals(2L, parent.getId());
+        verify(repository, never()).insertProgramExercise(any());
     }
 
     @Test
@@ -121,11 +120,13 @@ public class ProgramExerciseViewModelTest {
     @Test
     public void addChildTest() throws Exception {
         LiveTest.verifyLiveData(vm.load(2L), Objects::nonNull);
+
         ProgramSet programSet = Models.createProgramSet(3L, 2L, 10);
+
         vm.addProgramSet(programSet);
-        ProgramSet actual = vm.getProgramExerciseNode().getChildren().get(1);
+        ProgramSet actual = vm.getProgramExerciseNode().getChildren().get(2);
         assertSame(programSet, actual);
-        assertEquals(1, actual.getSortOrder());
+        assertEquals(2, actual.getSortOrder());
     }
 
     @Test

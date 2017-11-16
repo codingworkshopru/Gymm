@@ -7,28 +7,43 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.mockito.junit.MockitoJUnitRunner;
 
 import java.util.Objects;
 
+import dagger.Lazy;
 import junitparams.JUnitParamsRunner;
 import ru.codingworkshop.gymm.data.entity.ActualExercise;
 import ru.codingworkshop.gymm.data.entity.ActualSet;
 import ru.codingworkshop.gymm.data.entity.ActualTraining;
+import ru.codingworkshop.gymm.data.entity.ProgramTraining;
+import ru.codingworkshop.gymm.data.tree.loader.ActualTrainingEmptyTreeLoader;
+import ru.codingworkshop.gymm.data.tree.loader.ActualTrainingTreeLoader;
+import ru.codingworkshop.gymm.data.tree.loader.ProgramTrainingTreeLoader;
+import ru.codingworkshop.gymm.data.tree.loader.builder.TreeBuilder;
 import ru.codingworkshop.gymm.data.tree.node.ActualExerciseNode;
 import ru.codingworkshop.gymm.data.tree.node.ActualTrainingTree;
+import ru.codingworkshop.gymm.data.tree.repositoryadapter.ActualTrainingAdapter;
+import ru.codingworkshop.gymm.data.tree.repositoryadapter.ProgramTrainingAdapter;
 import ru.codingworkshop.gymm.data.util.LiveDataUtil;
 import ru.codingworkshop.gymm.repository.ActualTrainingRepository;
 import ru.codingworkshop.gymm.repository.ExercisesRepository;
 import ru.codingworkshop.gymm.repository.ProgramTrainingRepository;
 import ru.codingworkshop.gymm.util.LiveTest;
 import ru.codingworkshop.gymm.util.Models;
+import ru.codingworkshop.gymm.util.TreeBuilders;
 
 import static junit.framework.Assert.assertEquals;
+import static junit.framework.Assert.assertNotNull;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.argThat;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doAnswer;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -37,25 +52,37 @@ import static org.mockito.Mockito.when;
  * Created by Радик on 25.08.2017 as part of the Gymm project.
  */
 
-@RunWith(JUnitParamsRunner.class)
+@RunWith(MockitoJUnitRunner.class)
 public class ActualTrainingViewModelTest {
+    @Mock private ActualTrainingRepository actualRepository;
+
+    @Mock private Lazy<ActualTrainingTreeLoader> actualTrainingTreeLoaderLazy;
+    @Mock private Lazy<ActualTrainingEmptyTreeLoader> actualTrainingEmptyTreeLoaderLazy;
+
     private ActualTrainingViewModel vm;
 
-    @Mock private ProgramTrainingRepository programRepository;
-    @Mock private ActualTrainingRepository actualRepository;
-    @Mock private ExercisesRepository exercisesRepository;
+    @Mock private ActualTrainingTreeLoader actualTrainingTreeLoader;
+    @Mock private ActualTrainingEmptyTreeLoader actualTrainingEmptyTreeLoader;
 
     @Rule
     public InstantTaskExecutorRule rule = new InstantTaskExecutorRule();
 
     @Before
     public void setUp() {
-        MockitoAnnotations.initMocks(this);
-        vm = new ActualTrainingViewModel(actualRepository, programRepository, exercisesRepository);
-        when(programRepository.getProgramTrainingById(1L)).thenReturn(Models.createLiveProgramTraining(1L, "foo", false));
-        when(programRepository.getProgramExercisesForTraining(1L)).thenReturn(Models.createLiveProgramExercises(1));
-        when(programRepository.getProgramSetsForTraining(1L)).thenReturn(Models.createLiveProgramSets(2L, 1));
-        when(exercisesRepository.getExercisesForProgramTraining(1L)).thenReturn(Models.createLiveExercises("bar"));
+        vm = new ActualTrainingViewModel(actualTrainingTreeLoaderLazy, actualTrainingEmptyTreeLoaderLazy, actualRepository);
+        when(actualTrainingTreeLoader.loadById(any(), eq(11L))).thenAnswer(invocation -> {
+            ActualTrainingTree tree = TreeBuilders.buildFullPopulatedTree(1);
+            vm.tree = tree;
+            return LiveDataUtil.getLive(tree);
+        });
+        when(actualTrainingEmptyTreeLoader.loadById(any(), eq(1L))).thenAnswer(invocation -> {
+            ActualTrainingTree tree = TreeBuilders.buildTreeWithoutActuals(1);
+            vm.tree = tree;
+            return LiveDataUtil.getLive(tree);
+        });
+
+        when(actualTrainingTreeLoaderLazy.get()).thenReturn(actualTrainingTreeLoader);
+        when(actualTrainingEmptyTreeLoaderLazy.get()).thenReturn(actualTrainingEmptyTreeLoader);
 
         when(actualRepository.insertActualTrainingWithResult(any())).thenAnswer(invocation -> {
             ActualTraining actualTraining = invocation.getArgument(0);
@@ -88,7 +115,6 @@ public class ActualTrainingViewModelTest {
 
     @Test
     public void loadTraining() throws Exception {
-        stubActualRepository();
 
         LiveTest.verifyLiveData(vm.loadTraining(11L), Objects::nonNull);
 
@@ -97,25 +123,18 @@ public class ActualTrainingViewModelTest {
         assertEquals(12L, tree.getChildren().get(0).getParent().getId());
         assertEquals(13L, tree.getChildren().get(0).getChildren().get(0).getId());
 
-        verify(actualRepository, times(2)).getActualTrainingById(11L); // FIXME: 26.08.2017 should be times(1)
-        verify(actualRepository).getActualExercisesForActualTraining(11L);
-        verify(actualRepository).getActualSetsForActualTraining(11);
-
         verifyProgramLoaded();
 
         LiveTest.verifyLiveData(vm.loadTraining(0L), Objects::nonNull);
         assertEquals(tree, vm.getActualTrainingTree());
-    }
 
-    private void stubActualRepository() {
-        when(actualRepository.getActualTrainingById(11L)).thenReturn(Models.createLiveActualTraining(11L, 1L));
-        when(actualRepository.getActualExercisesForActualTraining(11L)).thenReturn(Models.createLiveActualExercises(12L));
-        when(actualRepository.getActualSetsForActualTraining(11L)).thenReturn(Models.createLiveActualSets(12L, 13L));
+        LiveTest.verifyLiveData(vm.loadTraining(11L), Objects::nonNull);
+
+        verify(actualTrainingTreeLoader).loadById(any(), anyLong());
     }
 
     @Test
     public void finishTrainingWithoutExercises() throws Exception {
-        stubActualRepository();
         LiveTest.verifyLiveData(vm.loadTraining(11L), Objects::nonNull);
         vm.getActualTrainingTree().getChildren().clear();
 
@@ -126,7 +145,6 @@ public class ActualTrainingViewModelTest {
 
     @Test
     public void finishTrainingWithoutSets() throws Exception {
-        stubActualRepository();
         LiveTest.verifyLiveData(vm.loadTraining(11L), Objects::nonNull);
         vm.getActualTrainingTree().getChildren().get(0).getChildren().clear();
 
@@ -138,7 +156,6 @@ public class ActualTrainingViewModelTest {
 
     @Test
     public void finishTraining() throws Exception {
-        stubActualRepository();
         LiveTest.verifyLiveData(vm.loadTraining(11L), Objects::nonNull);
         final ActualExercise foo = Models.createActualExercise(20L, "foo", 11L, 4L);
         vm.getActualTrainingTree().addChild(new ActualExerciseNode(foo));
@@ -192,8 +209,6 @@ public class ActualTrainingViewModelTest {
 
     @Test
     public void updateActualSet() throws Exception {
-        stubActualRepository();
-
         LiveTest.verifyLiveData(vm.loadTraining(11L), loaded -> {
             final ActualSet actualSet = Models.createActualSet(13L, 12L, 3);
             actualSet.setWeight(5.5);
@@ -203,10 +218,9 @@ public class ActualTrainingViewModelTest {
         });
     }
 
-    private void verifyProgramLoaded() throws Exception {
-        verify(programRepository).getProgramTrainingById(1L);
-        verify(programRepository).getProgramExercisesForTraining(1L);
-        verify(programRepository).getProgramSetsForTraining(1L);
-        verify(exercisesRepository).getExercisesForProgramTraining(1L);
+    private void verifyProgramLoaded() {
+        assertNotNull(vm.getActualTrainingTree().getProgramTraining());
+        assertNotNull(vm.getActualTrainingTree().getChildren().get(0).getProgramExerciseNode());
+        assertNotNull(vm.getActualTrainingTree().getChildren().get(0).getProgramExerciseNode().getChildren().get(0));
     }
 }

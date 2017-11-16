@@ -11,15 +11,19 @@ import org.mockito.junit.MockitoJUnitRunner;
 import java.util.stream.Collectors;
 
 import ru.codingworkshop.gymm.data.tree.loader.builder.ActualTrainingTreeBuilder;
-import ru.codingworkshop.gymm.data.tree.loader.datasource.ActualTrainingDataSource;
 import ru.codingworkshop.gymm.data.tree.node.ActualTrainingTree;
 import ru.codingworkshop.gymm.data.tree.node.ImmutableProgramTrainingTree;
 import ru.codingworkshop.gymm.data.tree.node.ProgramExerciseNode;
 import ru.codingworkshop.gymm.data.tree.node.ProgramTrainingTree;
+import ru.codingworkshop.gymm.data.tree.repositoryadapter.ActualTrainingAdapter;
+import ru.codingworkshop.gymm.data.util.LiveDataUtil;
 import ru.codingworkshop.gymm.util.LiveTest;
 import ru.codingworkshop.gymm.util.Models;
 
 import static junit.framework.Assert.assertEquals;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.ArgumentMatchers.longThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -50,15 +54,16 @@ public class ActualTrainingTreeLoaderTest {
 
     @Test
     public void load() throws Exception {
-        ActualTrainingDataSource dataSource = mock(ActualTrainingDataSource.class);
-        when(dataSource.getParent()).thenReturn(Models.createLiveActualTraining(11L, 1L));
-        when(dataSource.getChildren()).thenReturn(Models.createLiveActualExercises(12L));
-        when(dataSource.getGrandchildren()).thenReturn(Models.createLiveActualSets(12L, 13L));
-        ActualTrainingTreeBuilder builder = new ActualTrainingTreeBuilder(tree);
-        builder.setProgramTrainingTree(programTree);
-        ActualTrainingTreeLoader loader = new ActualTrainingTreeLoader(builder, dataSource);
+        ActualTrainingAdapter adapter = mock(ActualTrainingAdapter.class);
+        when(adapter.getParent(11L)).thenReturn(Models.createLiveActualTraining(11L, 1L));
+        when(adapter.getChildren(11L)).thenReturn(Models.createLiveActualExercises(12L));
+        when(adapter.getGrandchildren(11L)).thenReturn(Models.createLiveActualSets(12L, 13L));
 
-        LiveTest.verifyLiveData(loader.loadIt(), loadedTree -> {
+        ProgramTrainingTreeLoader programTrainingLoader = mock(ProgramTrainingTreeLoader.class);
+        when(programTrainingLoader.loadById(any(ProgramTrainingTree.class), eq(1L))).thenReturn(LiveDataUtil.getLive(programTree));
+        ActualTrainingTreeLoader loader = new ActualTrainingTreeLoader(adapter, programTrainingLoader);
+
+        LiveTest.verifyLiveData(loader.loadById(tree, 11L), loadedTree -> {
             assertEquals(11L, tree.getParent().getId());
             assertEquals(1L, tree.getProgramTraining().getId());
             assertEquals(2L, tree.getChildren().get(0).getProgramExerciseNode().getParent().getId());

@@ -13,8 +13,8 @@ import ru.codingworkshop.gymm.ui.program.training.ProgramTrainingViewModelTest;
 
 @RunWith(Suite.class)
 @Suite.SuiteClasses({
-        ProgramTrainingViewModelTest.class,
-        ProgramExerciseViewModelTest.class
+        ProgramExerciseViewModelTest.class,
+        ProgramTrainingViewModelTest.class
 })
 public class ProgramUiSuite {
 }

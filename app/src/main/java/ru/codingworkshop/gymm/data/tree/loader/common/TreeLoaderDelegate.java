@@ -2,22 +2,24 @@ package ru.codingworkshop.gymm.data.tree.loader.common;
 
 import ru.codingworkshop.gymm.data.entity.common.Model;
 import ru.codingworkshop.gymm.data.tree.loader.builder.TreeBuilder;
-import ru.codingworkshop.gymm.data.tree.loader.datasource.TreeDataSource;
+import ru.codingworkshop.gymm.data.tree.repositoryadapter.ChildrenAdapter;
+import ru.codingworkshop.gymm.data.tree.repositoryadapter.GrandchildrenAdapter;
+import ru.codingworkshop.gymm.data.tree.repositoryadapter.ParentAdapter;
 
 /**
  * Created by Radik on 09.11.2017.
  */
 
-public class TreeLoaderDelegate<P, C extends Model, GC> extends LoaderDelegate {
+public class TreeLoaderDelegate<P, C extends Model, GC> extends NodeLoaderDelegate<P, C> {
     private TreeBuilder<P, C, GC> treeBuilder;
 
-    public TreeLoaderDelegate(TreeDataSource<P, C, GC> dataSource, TreeBuilder<P, C, GC> treeBuilder) {
-        super();
+    public TreeLoaderDelegate(TreeBuilder<P, C, GC> treeBuilder, ParentAdapter<P> parentDataSource,
+                              ChildrenAdapter<C> childrenDataSource,
+                              GrandchildrenAdapter<GC> grandchildrenDataSource, long id)
+    {
+        super(treeBuilder, treeBuilder, parentDataSource, childrenDataSource, id);
         this.treeBuilder = treeBuilder;
-
-        addSource(dataSource.getParent(), treeBuilder::setParent);
-        addSource(dataSource.getChildren(), treeBuilder::setChildren);
-        addSource(dataSource.getGrandchildren(), treeBuilder::setGrandchildren);
+        addSource(grandchildrenDataSource.getGrandchildren(id), treeBuilder::setGrandchildren);
     }
 
     @Override

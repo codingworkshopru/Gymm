@@ -11,6 +11,7 @@ import java.util.List;
 import java.util.concurrent.Executor;
 
 import javax.inject.Inject;
+import javax.inject.Singleton;
 
 import ru.codingworkshop.gymm.data.entity.ActualExercise;
 import ru.codingworkshop.gymm.data.entity.ActualSet;
@@ -24,6 +25,7 @@ import static ru.codingworkshop.gymm.db.GymmDatabase.isValidId;
  * Created by Радик on 29.07.2017.
  */
 
+@Singleton
 public class ActualTrainingRepository extends BaseRepository {
     private ActualTrainingDao dao;
 

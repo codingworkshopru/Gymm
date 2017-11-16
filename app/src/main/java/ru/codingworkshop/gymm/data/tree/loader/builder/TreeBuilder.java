@@ -9,13 +9,15 @@ import java.util.Collection;
 import java.util.List;
 
 import ru.codingworkshop.gymm.data.entity.common.Model;
+import ru.codingworkshop.gymm.data.tree.holder.ChildrenHolder;
+import ru.codingworkshop.gymm.data.tree.holder.ParentHolder;
 import ru.codingworkshop.gymm.data.tree.node.BaseNode;
 
 /**
  * Created by Радик on 25.08.2017 as part of the Gymm project.
  */
 
-public abstract class TreeBuilder<P, C extends Model, GC> {
+public abstract class TreeBuilder<P, C extends Model, GC> implements ParentHolder<P>, ChildrenHolder<C> {
     private P parent;
     private List<C> children;
     private Multimap<Long, GC> grandchildren;
@@ -26,19 +28,63 @@ public abstract class TreeBuilder<P, C extends Model, GC> {
         this.tree = tree;
     }
 
-    public TreeBuilder<P, C, GC> setParent(P parent) {
+    @Override
+    public void setParent(P parent) {
         this.parent = parent;
-        return this;
     }
 
-    public TreeBuilder<P, C, GC> setChildren(List<C> children) {
+    @Override
+    public P getParent() {
+        return parent;
+    }
+
+    @Override
+    public void setChildren(List<C> children) {
         this.children = children;
-        return this;
     }
 
-    public TreeBuilder<P, C, GC> setGrandchildren(List<GC> grandchildren) {
+    @Override
+    public List<C> getChildren() {
+        return children;
+    }
+
+    @Override
+    public void addChild(C child) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public void removeChild(C child) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public void removeChild(int index) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public void moveChild(int from, int to) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public void replaceChild(int index, C child) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public boolean hasChildren() {
+        return children.isEmpty();
+    }
+
+    @Override
+    public int getChildrenCount() {
+        return children.size();
+    }
+
+    public void setGrandchildren(List<GC> grandchildren) {
         this.grandchildren = Multimaps.index(grandchildren, this::parentGetter);
-        return this;
     }
 
     public BaseNode<P, ? extends BaseNode<C, GC>> build() {

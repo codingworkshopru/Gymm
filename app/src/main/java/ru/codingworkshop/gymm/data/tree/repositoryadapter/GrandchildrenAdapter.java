@@ -10,6 +10,6 @@ import ru.codingworkshop.gymm.data.entity.ProgramSet;
  * Created by Radik on 13.11.2017.
  */
 
-interface GrandchildrenAdapter<GC> {
+public interface GrandchildrenAdapter<GC> {
     LiveData<List<GC>> getGrandchildren(long id);
 }

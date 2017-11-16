@@ -18,23 +18,23 @@ abstract class ViewModelModule {
     @Binds
     @IntoMap
     @ViewModelKey(ActualTrainingViewModel.class)
-    abstract ViewModel bindsActualTrainingViewModel(ActualTrainingViewModel actualTrainingViewModel);
+    abstract ViewModel bindActualTrainingViewModel(ActualTrainingViewModel actualTrainingViewModel);
 
 //    @Binds
 //    @IntoMap
 //    @ViewModelKey(MusclesViewModel.class)
-//    abstract ViewModel bindsMusclesViewModel(MusclesViewModel musclesViewModel);
+//    abstract ViewModel bindMusclesViewModel(MusclesViewModel musclesViewModel);
 //
 //    @Binds
 //    @IntoMap
 //    @ViewModelKey(ExercisesListViewModel.class)
-//    abstract ViewModel bindsExercisesListViewModel(ExercisesListViewModel exercisesListViewModel);
+//    abstract ViewModel bindExercisesListViewModel(ExercisesListViewModel exercisesListViewModel);
 //
 //    @Binds
 //    @IntoMap
 //    @ViewModelKey(EditorViewModel.class)
-//    abstract ViewModel bindsEditorViewModel(EditorViewModel editorViewModel);
+//    abstract ViewModel bindEditorViewModel(EditorViewModel editorViewModel);
 //
     @Binds
-    abstract ViewModelProvider.Factory bindsViewModelFactory(ViewModelFactory viewModelFactory);
+    abstract ViewModelProvider.Factory bindViewModelFactory(ViewModelFactory viewModelFactory);
 }

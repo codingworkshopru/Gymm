@@ -3,10 +3,10 @@ package ru.codingworkshop.gymm.ui.actual.viewmodel;
 import android.arch.lifecycle.LiveData;
 
 import ru.codingworkshop.gymm.data.tree.loader.ProgramTrainingTreeLoader;
-import ru.codingworkshop.gymm.data.tree.loader.datasource.ProgramTrainingDataSource;
 import ru.codingworkshop.gymm.data.tree.node.ActualTrainingTree;
 import ru.codingworkshop.gymm.data.tree.node.ImmutableProgramTrainingTree;
 import ru.codingworkshop.gymm.data.tree.node.ProgramTrainingTree;
+import ru.codingworkshop.gymm.data.tree.repositoryadapter.ProgramTrainingAdapter;
 import ru.codingworkshop.gymm.repository.ActualTrainingRepository;
 import ru.codingworkshop.gymm.repository.ExercisesRepository;
 import ru.codingworkshop.gymm.repository.ProgramTrainingRepository;
@@ -42,9 +42,9 @@ abstract class ActualTrainingTreeDelegate {
     LiveData<ProgramTrainingTree> loadProgramTrainingTree(long programTrainingId) {
         programTrainingTree = new ImmutableProgramTrainingTree();
 
-        ProgramTrainingDataSource dataSource = new ProgramTrainingDataSource(programTrainingRepository, exercisesRepository, programTrainingId);
-        ProgramTrainingTreeLoader loader = new ProgramTrainingTreeLoader(programTrainingTree, dataSource);
+        ProgramTrainingAdapter dataSource = new ProgramTrainingAdapter(programTrainingRepository, exercisesRepository);
+        ProgramTrainingTreeLoader loader = new ProgramTrainingTreeLoader(dataSource);
 
-        return loader.loadIt();
+        return loader.loadById(programTrainingTree, programTrainingId);
     }
 }

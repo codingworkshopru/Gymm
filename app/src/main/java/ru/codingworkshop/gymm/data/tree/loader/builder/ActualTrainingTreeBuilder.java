@@ -10,6 +10,7 @@ import java.util.Map;
 import ru.codingworkshop.gymm.data.entity.ActualExercise;
 import ru.codingworkshop.gymm.data.entity.ActualSet;
 import ru.codingworkshop.gymm.data.entity.ActualTraining;
+import ru.codingworkshop.gymm.data.entity.ProgramTraining;
 import ru.codingworkshop.gymm.data.tree.node.ActualExerciseNode;
 import ru.codingworkshop.gymm.data.tree.node.ActualTrainingTree;
 import ru.codingworkshop.gymm.data.tree.node.BaseNode;
@@ -37,6 +38,11 @@ public class ActualTrainingTreeBuilder extends TreeBuilder<ActualTraining, Actua
     @Override
     public BaseNode<ActualTraining, ? extends BaseNode<ActualExercise, ActualSet>> build() {
         Preconditions.checkNotNull(programTrainingTree, "Program training tree must be set");
+        if (getParent() == null) {
+            ProgramTraining training = programTrainingTree.getParent();
+            ActualTraining actualTraining = new ActualTraining(training.getId(), training.getName());
+            setParent(actualTraining);
+        }
         return super.build();
     }
 

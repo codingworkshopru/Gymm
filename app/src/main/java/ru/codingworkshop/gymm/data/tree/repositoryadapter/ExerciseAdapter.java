@@ -17,7 +17,6 @@ import ru.codingworkshop.gymm.repository.MuscleGroupsRepository;
  * Created by Radik on 11.11.2017.
  */
 
-@Singleton
 public class ExerciseAdapter implements ParentAdapter<Exercise>, ChildrenAdapter<MuscleGroup> {
     private ExercisesRepository exercisesRepository;
     private MuscleGroupsRepository muscleGroupsRepository;

@@ -18,7 +18,6 @@ import ru.codingworkshop.gymm.repository.ActualTrainingRepository;
  * Created by Radik on 13.11.2017.
  */
 
-@Singleton
 public class ActualTrainingAdapter implements ParentAdapter<ActualTraining>, ChildrenAdapter<ActualExercise>, GrandchildrenAdapter<ActualSet> {
     private ActualTrainingRepository repository;
 

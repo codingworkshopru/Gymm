@@ -11,7 +11,7 @@ import ru.codingworkshop.gymm.data.entity.ProgramSet;
  * Created by Radik on 09.11.2017.
  */
 
-interface ChildrenAdapter<C> {
+public interface ChildrenAdapter<C> {
     LiveData<List<C>> getChildren(long id);
 
     void insertChildren(Collection<C> children);
