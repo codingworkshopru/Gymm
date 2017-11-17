@@ -21,6 +21,7 @@ import ru.codingworkshop.gymm.data.tree.loader.common.NodeLoaderDelegateTest;
         ProgramExerciseLoaderTest.class,
         ProgramTrainingTreeLoaderTest.class,
         ActualTrainingTreeLoaderTest.class,
+        ActualTrainingEmptyTreeLoaderTest.class,
         ExerciseLoaderTest.class
 })
 public class LoaderTestSuite {
