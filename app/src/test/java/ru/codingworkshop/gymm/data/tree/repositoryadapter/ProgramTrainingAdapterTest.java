@@ -36,6 +36,12 @@ public class ProgramTrainingAdapterTest {
     }
 
     @Test
+    public void getDrafting() throws Exception {
+        adapter.getDrafting();
+        verify(programTrainingRepository).getDraftingProgramTraining();
+    }
+
+    @Test
     public void getParent() throws Exception {
         adapter.getParent(1L);
         verify(programTrainingRepository).getProgramTrainingById(1L);
