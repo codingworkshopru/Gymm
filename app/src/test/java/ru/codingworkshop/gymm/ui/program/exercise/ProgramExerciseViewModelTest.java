@@ -8,14 +8,18 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
+import org.mockito.invocation.InvocationOnMock;
 import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.stubbing.Answer;
 
 import java.util.Objects;
 
 import ru.codingworkshop.gymm.data.entity.ProgramExercise;
 import ru.codingworkshop.gymm.data.entity.ProgramSet;
+import ru.codingworkshop.gymm.data.tree.loader.ProgramDraftingExerciseLoader;
 import ru.codingworkshop.gymm.data.tree.loader.ProgramExerciseLoader;
 import ru.codingworkshop.gymm.data.tree.node.ProgramExerciseNode;
+import ru.codingworkshop.gymm.data.tree.node.ProgramTrainingTree;
 import ru.codingworkshop.gymm.data.util.LiveDataUtil;
 import ru.codingworkshop.gymm.repository.ExercisesRepository;
 import ru.codingworkshop.gymm.repository.ProgramTrainingRepository;
@@ -45,12 +49,13 @@ public class ProgramExerciseViewModelTest {
     public InstantTaskExecutorRule instantTaskExecutorRule = new InstantTaskExecutorRule();
 
     @Mock private ProgramExerciseLoader loader;
+    @Mock private ProgramDraftingExerciseLoader draftingLoader;
     @Mock private ProgramTrainingRepository repository;
     private ProgramExerciseViewModel vm;
 
     @Before
     public void setUp() throws Exception {
-        vm = new ProgramExerciseViewModel(loader, repository);
+        vm = new ProgramExerciseViewModel(loader, draftingLoader, repository);
         ProgramExerciseNode programExerciseNode = TreeBuilders.buildProgramTrainingTree(1).getChildren().get(0);
         when(loader.loadById(any(), eq(2L))).thenAnswer(invocation -> {
             vm.node = programExerciseNode;
@@ -68,8 +73,8 @@ public class ProgramExerciseViewModelTest {
 
     @Test
     public void createWithoutDrafting() throws Exception {
-        when(repository.getDraftingProgramExercise(1L)).thenReturn(LiveDataUtil.getLive(null));
         vm.setProgramTrainingId(1L);
+        when(draftingLoader.loadById(any(), eq(1L))).thenAnswer(invocation -> LiveDataUtil.getAbsent());
         LiveTest.verifyLiveData(vm.create(), Objects::nonNull);
 
         final ProgramExercise parent = vm.getProgramExerciseNode().getParent();
@@ -81,10 +86,13 @@ public class ProgramExerciseViewModelTest {
 
     @Test
     public void createWithDrafting() throws Exception {
-        final LiveData<ProgramExercise> liveProgramExercise = Models.createLiveProgramExercise(2L, 1L, true);
-        when(repository.getDraftingProgramExercise(1L)).thenReturn(liveProgramExercise);
-
         vm.setProgramTrainingId(1L);
+        when(draftingLoader.loadById(any(), eq(1L))).thenAnswer(invocation -> {
+            ProgramExerciseNode programExerciseNode = TreeBuilders.buildProgramTrainingTree(1).getChildren().get(0);
+            programExerciseNode.getParent().setDrafting(true);
+            vm.node = programExerciseNode;
+            return LiveDataUtil.getLive(programExerciseNode);
+        });
         LiveTest.verifyLiveData(vm.create(), Objects::nonNull);
 
         final ProgramExercise parent = vm.getProgramExerciseNode().getParent();

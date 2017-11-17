@@ -14,6 +14,7 @@ import javax.inject.Inject;
 
 import ru.codingworkshop.gymm.data.entity.ProgramExercise;
 import ru.codingworkshop.gymm.data.entity.ProgramSet;
+import ru.codingworkshop.gymm.data.tree.loader.ProgramDraftingExerciseLoader;
 import ru.codingworkshop.gymm.data.tree.loader.ProgramExerciseLoader;
 import ru.codingworkshop.gymm.data.tree.loader.ProgramTrainingTreeLoader;
 import ru.codingworkshop.gymm.data.tree.node.MutableProgramExerciseNode;
@@ -31,6 +32,7 @@ import ru.codingworkshop.gymm.repository.ProgramTrainingRepository;
 
 public class ProgramExerciseViewModel extends ViewModel {
     private ProgramExerciseLoader programExerciseLoader;
+    private ProgramDraftingExerciseLoader programDraftingExerciseLoader;
     private ProgramTrainingRepository repository;
 
     @VisibleForTesting
@@ -41,8 +43,9 @@ public class ProgramExerciseViewModel extends ViewModel {
     private long exerciseId;
 
     @Inject
-    ProgramExerciseViewModel(ProgramExerciseLoader programExerciseLoader, ProgramTrainingRepository repository) {
+    ProgramExerciseViewModel(ProgramExerciseLoader programExerciseLoader, ProgramDraftingExerciseLoader programDraftingExerciseLoader, ProgramTrainingRepository repository) {
         this.programExerciseLoader = programExerciseLoader;
+        this.programDraftingExerciseLoader = programDraftingExerciseLoader;
         this.repository = repository;
     }
 
@@ -55,8 +58,6 @@ public class ProgramExerciseViewModel extends ViewModel {
     }
 
     private void initNode() {
-        node = new MutableProgramExerciseNode();
-
         ProgramExercise programExercise = new ProgramExercise();
         programExercise.setProgramTrainingId(programTrainingId);
         programExercise.setDrafting(true);
@@ -68,13 +69,13 @@ public class ProgramExerciseViewModel extends ViewModel {
     public LiveData<ProgramExerciseNode> create() {
         if (node == null) {
             Preconditions.checkArgument(GymmDatabase.isValidId(programTrainingId));
-            LiveData<ProgramExercise> draftingProgramExercise = repository.getDraftingProgramExercise(programTrainingId);
-            return Transformations.switchMap(draftingProgramExercise, input -> {
-                if (input == null) {
+            node = new MutableProgramExerciseNode();
+            return Transformations.map(programDraftingExerciseLoader.loadById(node, programTrainingId), loadedNode -> {
+                if (loadedNode == null) {
                     initNode();
-                    return LiveDataUtil.getLive(node);
+                    return node;
                 } else {
-                    return load(input.getId());
+                    return loadedNode;
                 }
             });
         } else {
