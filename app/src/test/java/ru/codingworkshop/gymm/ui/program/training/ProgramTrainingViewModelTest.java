@@ -15,6 +15,7 @@ import org.mockito.stubbing.Answer;
 import java.util.Objects;
 
 import ru.codingworkshop.gymm.data.entity.ProgramTraining;
+import ru.codingworkshop.gymm.data.tree.loader.ProgramDraftingTrainingTreeLoader;
 import ru.codingworkshop.gymm.data.tree.loader.ProgramTrainingTreeLoader;
 import ru.codingworkshop.gymm.data.tree.node.ProgramTrainingTree;
 import ru.codingworkshop.gymm.data.util.LiveDataUtil;
@@ -43,6 +44,7 @@ public class ProgramTrainingViewModelTest {
     private ProgramTrainingViewModel vm;
 
     @Mock private ProgramTrainingTreeLoader loader;
+    @Mock private ProgramDraftingTrainingTreeLoader draftingLoader;
     @Mock private ProgramTrainingRepository repository;
 
     @Rule
@@ -50,7 +52,7 @@ public class ProgramTrainingViewModelTest {
 
     @Before
     public void setUp() {
-        vm = new ProgramTrainingViewModel(loader, repository);
+        vm = new ProgramTrainingViewModel(loader, draftingLoader, repository);
 
         when(loader.loadById(any(), anyLong())).thenAnswer(invocation -> {
             ProgramTrainingTree tree = TreeBuilders.buildProgramTrainingTree(3);
@@ -76,16 +78,27 @@ public class ProgramTrainingViewModelTest {
 
     @Test
     public void createWithDrafting() throws Exception {
-        final LiveData<ProgramTraining> foo = Models.createLiveProgramTraining(1L, "foo", true);
-        when(repository.getDraftingProgramTraining()).thenReturn(foo);
+        when(draftingLoader.load(any())).thenAnswer(invocation -> {
+            ProgramTrainingTree tree = TreeBuilders.buildProgramTrainingTree(1);
+            tree.getParent().setDrafting(true);
+            vm.tree = tree;
+
+            return LiveDataUtil.getLive(tree);
+        });
         LiveTest.verifyLiveData(vm.create(), Objects::nonNull);
+
+        ProgramTraining programTraining = vm.getProgramTrainingTree().getParent();
+        assertEquals(1L, programTraining.getId());
+        assertTrue(programTraining.isDrafting());
+        assertTrue(vm.getProgramTrainingTree().hasChildren());
+        assertTrue(vm.getProgramTrainingTree().getChildren().get(0).hasChildren());
 
         verify(repository, never()).insertProgramTraining(any(ProgramTraining.class));
     }
 
     @Test
     public void createWithoutDrafting() throws Exception {
-        when(repository.getDraftingProgramTraining()).thenReturn(LiveDataUtil.getLive(null));
+        when(draftingLoader.load(any())).thenReturn(LiveDataUtil.getAbsent());
         LiveTest.verifyLiveData(vm.create(), Objects::nonNull);
 
         ProgramTrainingTree tree = vm.getProgramTrainingTree();

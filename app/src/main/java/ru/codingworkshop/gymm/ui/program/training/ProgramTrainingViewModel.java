@@ -10,6 +10,7 @@ import android.support.annotation.VisibleForTesting;
 import javax.inject.Inject;
 
 import ru.codingworkshop.gymm.data.entity.ProgramTraining;
+import ru.codingworkshop.gymm.data.tree.loader.ProgramDraftingTrainingTreeLoader;
 import ru.codingworkshop.gymm.data.tree.loader.ProgramTrainingTreeLoader;
 import ru.codingworkshop.gymm.data.tree.node.MutableProgramTrainingTree;
 import ru.codingworkshop.gymm.data.tree.node.ProgramTrainingTree;
@@ -25,6 +26,7 @@ import ru.codingworkshop.gymm.repository.ProgramTrainingRepository;
 
 public class ProgramTrainingViewModel extends ViewModel {
     private ProgramTrainingTreeLoader loader;
+    private ProgramDraftingTrainingTreeLoader draftingLoader;
     private ProgramTrainingRepository repository;
     @VisibleForTesting
     ProgramTrainingTree tree;
@@ -32,8 +34,9 @@ public class ProgramTrainingViewModel extends ViewModel {
     private boolean childrenChanged;
 
     @Inject
-    public ProgramTrainingViewModel(ProgramTrainingTreeLoader loader, ProgramTrainingRepository repository) {
+    public ProgramTrainingViewModel(ProgramTrainingTreeLoader loader, ProgramDraftingTrainingTreeLoader draftingLoader, ProgramTrainingRepository repository) {
         this.loader = loader;
+        this.draftingLoader = draftingLoader;
         this.repository = repository;
     }
 
@@ -42,8 +45,6 @@ public class ProgramTrainingViewModel extends ViewModel {
     }
 
     private void initTree() {
-        tree = new MutableProgramTrainingTree();
-
         ProgramTraining programTraining = new ProgramTraining();
         programTraining.setDrafting(true); // TODO consider place drafting setter to repository
         repository.insertProgramTraining(programTraining);
@@ -53,12 +54,13 @@ public class ProgramTrainingViewModel extends ViewModel {
 
     public LiveData<ProgramTrainingTree> create() {
         if (tree == null) {
-            return Transformations.switchMap(repository.getDraftingProgramTraining(), input -> {
-                if (input == null) {
+            tree = new MutableProgramTrainingTree();
+            return Transformations.map(draftingLoader.load(tree), loadedTree -> {
+                if (loadedTree == null) {
                     initTree();
-                    return LiveDataUtil.getLive(tree);
+                    return tree;
                 } else {
-                    return load(input.getId());
+                    return loadedTree;
                 }
             });
         } else {

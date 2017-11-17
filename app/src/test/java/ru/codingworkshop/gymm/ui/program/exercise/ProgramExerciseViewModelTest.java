@@ -97,6 +97,7 @@ public class ProgramExerciseViewModelTest {
 
         final ProgramExercise parent = vm.getProgramExerciseNode().getParent();
         assertEquals(2L, parent.getId());
+        assertTrue(parent.isDrafting());
         verify(repository, never()).insertProgramExercise(any());
     }
 
