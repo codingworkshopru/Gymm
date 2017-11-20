@@ -4,6 +4,7 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 
 import ru.codingworkshop.gymm.ui.actual.ActualUiSuite;
+import ru.codingworkshop.gymm.ui.info.exercise.ExerciseInfoFragmentViewModelTest;
 import ru.codingworkshop.gymm.ui.program.ProgramUiSuite;
 
 /**
@@ -13,7 +14,8 @@ import ru.codingworkshop.gymm.ui.program.ProgramUiSuite;
 @RunWith(Suite.class)
 @Suite.SuiteClasses({
         ActualUiSuite.class,
-        ProgramUiSuite.class
+        ProgramUiSuite.class,
+        ExerciseInfoFragmentViewModelTest.class
 })
 public class UiSuite {
 }

@@ -2,11 +2,12 @@ package ru.codingworkshop.gymm.util;
 
 import android.arch.lifecycle.LiveData;
 
+import com.google.common.base.Function;
 import com.google.common.collect.Lists;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import ru.codingworkshop.gymm.data.entity.ActualExercise;
@@ -193,7 +194,7 @@ public class Models {
 
     private static <T> List<T> createByIds(Function<Long, T> returnsObject, Long[] ids) {
         List<Long> idsList = Lists.newArrayList(ids);
-        return idsList.stream().map(returnsObject).collect(Collectors.toList());
+        return new ArrayList<>(Lists.transform(idsList, returnsObject));
     }
 
     private static <T extends Model> List<T> createByNames(Function<String, T> returnsObject, long dx, String[] names) {
