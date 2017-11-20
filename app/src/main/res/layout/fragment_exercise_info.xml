@@ -173,7 +173,7 @@
                         app:srcCompat="@drawable/ic_lightbulb_primary_24dp" />
 
                     <TextView
-                        android:id="@+id/exerciseInfoAdvice"
+                        android:id="@+id/exerciseInfoAdvices"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginLeft="16dp"

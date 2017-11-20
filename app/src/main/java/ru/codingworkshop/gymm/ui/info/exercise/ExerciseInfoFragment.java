@@ -29,7 +29,7 @@ import ru.codingworkshop.gymm.databinding.FragmentExerciseInfoBinding;
 import static com.google.android.youtube.player.YouTubeInitializationResult.SUCCESS;
 
 public class ExerciseInfoFragment extends Fragment {
-    private static final String EXERCISE_ID_KEY = "exerciseIdKey";
+    static final String EXERCISE_ID_KEY = "exerciseIdKey";
     private static final String GOOGLE_DEVELOPER_KEY = "AIzaSyCnjhekaG5JdIEtdbeMH4iE0pZiprQZYp4";
     private static final String YOU_TUBE_PLAYER_TAG = "youTubePlayerTag";
 
@@ -37,24 +37,27 @@ public class ExerciseInfoFragment extends Fragment {
     ViewModelProvider.Factory viewModelFactory;
     private ExerciseInfoFragmentViewModel viewModel;
     private FragmentExerciseInfoBinding binding;
-    private ExerciseNode exerciseNode;
     private YouTubePlayerSupportFragment youTubePlayer;
+
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+
+        viewModel = viewModelFactory.create(ExerciseInfoFragmentViewModel.class);
+    }
 
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) {
-        viewModel = viewModelFactory.create(ExerciseInfoFragmentViewModel.class);
+        binding = DataBindingUtil.inflate(inflater, R.layout.fragment_exercise_info, container, false);
+
         LiveData<ExerciseNode> liveNode = viewModel.load(getArguments().getLong(EXERCISE_ID_KEY));
         liveNode.observe(this, this::onExerciseNodeLoaded);
-
-        binding = DataBindingUtil.inflate(inflater, R.layout.fragment_exercise_info, container, false);
 
         return binding.getRoot();
     }
 
     private void onExerciseNodeLoaded(ExerciseNode exerciseNode) {
-        this.exerciseNode = exerciseNode;
-
         Exercise exercise = exerciseNode.getParent();
         String youTubeVideoId = exercise.getYouTubeVideo();
         YouTubeInitializationResult youTubeInitializationResult = YouTubeApiServiceUtil.isYouTubeApiServiceAvailable(getContext());
