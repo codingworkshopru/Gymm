@@ -15,8 +15,12 @@ public class ListItemListeners {
     private @LayoutRes int layout;
     private View.OnClickListener onClickListener;
     private View.OnLongClickListener onLongClickListener;
+
     private View.OnTouchListener onReorderButtonDownListener;
     private @IdRes int reorderButtonId;
+
+    private View.OnClickListener onButtonClickListener;
+    private @IdRes int buttonId;
 
     public ListItemListeners(int layout) {
         this.layout = layout;
@@ -32,7 +36,17 @@ public class ListItemListeners {
         }
 
         if (onReorderButtonDownListener != null) {
-            view.findViewById(reorderButtonId).setOnTouchListener(onReorderButtonDownListener);
+            View reorderButton = view.findViewById(reorderButtonId);
+            if (reorderButton != null) {
+                reorderButton.setOnTouchListener(onReorderButtonDownListener);
+            }
+        }
+
+        if (onButtonClickListener != null) {
+            View button = view.findViewById(buttonId);
+            if (button != null) {
+                button.setOnClickListener(onButtonClickListener);
+            }
         }
     }
 
@@ -45,20 +59,12 @@ public class ListItemListeners {
         return this;
     }
 
-    public View.OnClickListener getOnClickListener() {
-        return onClickListener;
-    }
-
     public ListItemListeners setOnLongClickListener(View.OnClickListener onLongClickListener) {
         this.onLongClickListener = v -> {
             onLongClickListener.onClick(v);
             return true;
         };
         return this;
-    }
-
-    public View.OnLongClickListener getOnLongClickListener() {
-        return onLongClickListener;
     }
 
     @SuppressLint("ClickableViewAccessibility")
@@ -74,11 +80,9 @@ public class ListItemListeners {
         return this;
     }
 
-    public View.OnTouchListener getOnReorderButtonDownListener() {
-        return onReorderButtonDownListener;
-    }
-
-    public @IdRes int getReorderButtonId() {
-        return reorderButtonId;
+    public ListItemListeners setOnButtonClickListener(View.OnClickListener onButtonClickListener, @IdRes int buttonId) {
+        this.onButtonClickListener = onButtonClickListener;
+        this.buttonId = buttonId;
+        return this;
     }
 }

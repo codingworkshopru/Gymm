@@ -279,7 +279,7 @@ public class ActualExercisesFragment extends Fragment implements
         exerciseList = getView().findViewById(R.id.actualExerciseList);
         exerciseList.setOnExerciseActivatedListener(this::onExerciseActivated);
         exerciseList.setItemFloatingContainer(setsViewPager);
-        ListItemListeners listeners = new ListItemListeners(R.layout.activity_actual_training_stepper_item)
+        ListItemListeners listeners = new ListItemListeners(R.layout.fragment_actual_exercises_stepper_item)
                 .setOnClickListener(exerciseList::activateItem);
         exerciseList.setAdapter(new ActualExercisesStepperAdapter(tree.getChildren(), listeners));
         exerciseList.setCurrentItemPosition(getSavedExercisePosition());

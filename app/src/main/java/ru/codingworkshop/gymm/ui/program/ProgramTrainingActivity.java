@@ -15,7 +15,7 @@ public class ProgramTrainingActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_program_training2);
+        setContentView(R.layout.activity_program_training);
 
         programTrainingFragment = ProgramTrainingFragment.newInstance();
         programTrainingFragment.setArguments(getIntent().getExtras());

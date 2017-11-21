@@ -174,6 +174,21 @@ public class Models {
         return createByNames(name -> createExercise(0L, name), 100L, exerciseNames);
     }
 
+    public static LiveData<List<Exercise>> createLiveExercises(int count, long primaryMuscleGroupId) {
+        return LiveDataUtil.getLive(createExercises(count, primaryMuscleGroupId));
+    }
+
+    public static List<Exercise> createExercises(int count, long primaryMuscleGroupId) {
+        List<Exercise> result = new ArrayList<>(count);
+        for (int i = 0; i < count; i++) {
+            long id = 100 + i;
+            Exercise exercise = createExercise(id, "exercise" + id);
+            exercise.setPrimaryMuscleGroupId(primaryMuscleGroupId);
+            result.add(exercise);
+        }
+        return result;
+    }
+
     public static LiveData<List<MuscleGroup>> createLiveMuscleGroups(Long... muscleGroupIds) {
         return LiveDataUtil.getLive(createMuscleGroups(muscleGroupIds));
     }

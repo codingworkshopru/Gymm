@@ -28,7 +28,6 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-
         <activity
             android:name=".ui.actual.ActualTrainingActivity"
             android:label=""
@@ -37,18 +36,9 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="ru.codingworkshop.gymm.ui.MainActivity" />
         </activity>
+        <activity android:name=".ui.program.ProgramTrainingActivity" />
 
-        <activity android:name=".ui.program.ProgramTrainingActivity"/>
-
-        <activity
-            android:name=".ui.program.exercise.picker.MuscleGroupsActivity"
-            android:label="@string/muscles_activity_title"
-            android:parentActivityName=".ui.program.ProgramTrainingActivity"
-            android:theme="@style/AppTheme.NoActionBar">
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value="ru.codingworkshop.gymm.ui.program.ProgramTrainingActivity" />
-        </activity>
+        <activity android:name=".ui.program.exercise.picker.ExercisePickerActivity"/>
     </application>
 
 </manifest>

@@ -10,7 +10,7 @@ import android.view.ViewParent;
 import android.widget.FrameLayout;
 
 import ru.codingworkshop.gymm.R;
-import ru.codingworkshop.gymm.databinding.ActivityActualTrainingStepperItemBinding;
+import ru.codingworkshop.gymm.databinding.FragmentActualExercisesStepperItemBinding;
 
 /**
  * Created by Радик on 04.10.2017 as part of the Gymm project.
@@ -82,11 +82,11 @@ public class ActualExercisesStepperView extends RecyclerView {
     }
 
     void activateItem(View itemView) {
-        ActivityActualTrainingStepperItemBinding oldBinding = DataBindingUtil.findBinding(itemFloatingContainer);
+        FragmentActualExercisesStepperItemBinding oldBinding = DataBindingUtil.findBinding(itemFloatingContainer);
         if (oldBinding != null) {
             oldBinding.setActive(false);
         }
-        ActivityActualTrainingStepperItemBinding binding = DataBindingUtil.getBinding(itemView);
+        FragmentActualExercisesStepperItemBinding binding = DataBindingUtil.getBinding(itemView);
         binding.setActive(true);
         moveFloatingContainer(itemView);
 

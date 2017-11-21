@@ -26,6 +26,7 @@ import static org.mockito.Mockito.when;
  * Created by Радик on 07.10.2017 as part of the Gymm project.
  */
 
+// TODO delete or finish this test
 public class ProgramTrainingActivityTest {
     @Mock private ProgramTrainingViewModel vm;
     @Mock private ViewModelProvider.Factory viewModelFactory;
