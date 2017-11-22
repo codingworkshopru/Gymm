@@ -110,6 +110,7 @@ public class ProgramExerciseViewModelTest {
         node.getChildren().get(0).setReps(1);
         node.addChild(Models.createProgramSet(4L, 2L, 10));
         vm.save();
+        assertFalse(node.getParent().isDrafting());
 
         verify(repository).updateProgramExercise(node.getParent());
         verify(repository).updateProgramSets(any());

@@ -1,5 +1,6 @@
 package ru.codingworkshop.gymm.integration;
 
+import android.content.Context;
 import android.support.test.InstrumentationRegistry;
 import android.support.test.espresso.contrib.RecyclerViewActions;
 import android.support.test.rule.ActivityTestRule;
@@ -15,6 +16,7 @@ import ru.codingworkshop.gymm.util.RecyclerViewItemMatcher;
 
 import static android.support.test.espresso.Espresso.onView;
 import static android.support.test.espresso.action.ViewActions.click;
+import static android.support.test.espresso.action.ViewActions.typeText;
 import static android.support.test.espresso.assertion.ViewAssertions.matches;
 import static android.support.test.espresso.matcher.ViewMatchers.isDisplayed;
 import static android.support.test.espresso.matcher.ViewMatchers.withId;
@@ -33,9 +35,18 @@ public class ProgramTrainingIntegrationTest {
     @Test
     public void addProgramTraining() throws Exception {
         onView(withId(R.id.action_add_program)).perform(click());
+        onView(withId(R.id.programTrainingName)).perform(typeText("monday workout"));
         onView(withId(R.id.programTrainingAddExerciseButton)).perform(click());
-        addProgramSet();
+        addProgramExercise();
+        onView(withId(R.id.actionSaveTraining)).perform(click());
+        onView(RecyclerViewItemMatcher.itemAtPosition(R.id.rv_test_main, R.id.mainActivityTrainingItem, 0)).check(matches(withText("monday workout")));
+    }
+
+    private void addProgramExercise() {
         pickExercise();
+        addProgramSet();
+        onView(withId(R.id.actionSaveExercise)).perform(click());
+        onView(RecyclerViewItemMatcher.itemAtPosition(R.id.programExerciseList, R.id.programSetRestTime, 0)).check(matches(withText(InstrumentationRegistry.getTargetContext().getResources().getQuantityString(R.plurals.number_of_sets, 1, 1))));
     }
 
     private void addProgramSet() {

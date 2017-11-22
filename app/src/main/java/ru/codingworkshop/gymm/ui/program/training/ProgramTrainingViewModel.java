@@ -81,6 +81,7 @@ public class ProgramTrainingViewModel extends ViewModel {
     public LiveData<Boolean> save() {
         return Transformations.map(repository.getProgramTrainingByName(tree.getParent().getName()), t -> {
             if (t == null) {
+                tree.getParent().setDrafting(false);
                 new ProgramTrainingSaver(tree, repository).save();
             }
             return t == null;

@@ -24,7 +24,7 @@ public abstract class ProgramExerciseNode extends BaseNode<ProgramExercise, Prog
     public void setExercise(Exercise exercise) {
         this.exercise = exercise;
 
-        if (getParent() == null) return;
+        if (getParent() == null || exercise == null) return;
 
         long exerciseId = exercise.getId();
         if (getExerciseId() == null || getExerciseId() != exerciseId) {

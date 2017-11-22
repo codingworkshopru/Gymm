@@ -126,6 +126,7 @@ public class ProgramTrainingViewModelTest {
         tree.moveChild(0,1);
 
         LiveTest.verifyLiveData(vm.save(), s -> s);
+        assertFalse(tree.getParent().isDrafting());
 
         verify(repository).updateProgramTraining(tree.getParent());
         verify(repository).updateProgramExercises(argThat(toUpdate -> toUpdate.size() == 2));

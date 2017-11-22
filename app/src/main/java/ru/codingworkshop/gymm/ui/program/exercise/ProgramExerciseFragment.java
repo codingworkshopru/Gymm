@@ -66,6 +66,7 @@ public class ProgramExerciseFragment extends BaseFragment {
             case R.id.actionSaveExercise:
                 if (validate()) {
                     viewModel.save();
+                    getFragmentManager().popBackStack();
                 }
                 return true;
         }

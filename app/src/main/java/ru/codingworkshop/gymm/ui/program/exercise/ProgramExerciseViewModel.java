@@ -105,6 +105,7 @@ public class ProgramExerciseViewModel extends ViewModel {
     }
 
     public void save() {
+        node.getParent().setDrafting(false);
         new ProgramExerciseSaver(node, repository).save();
     }
 

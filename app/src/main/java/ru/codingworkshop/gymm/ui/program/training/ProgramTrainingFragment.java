@@ -158,8 +158,10 @@ public class ProgramTrainingFragment extends BaseFragment {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.actionSaveTraining:
-                validate().observe(this, valid -> {
+                final LiveData<Boolean> liveValid = validate();
+                liveValid.observe(this, valid -> {
                     if (valid != null && valid) {
+                        liveValid.removeObservers(this);
                         close();
                     }
                 });
