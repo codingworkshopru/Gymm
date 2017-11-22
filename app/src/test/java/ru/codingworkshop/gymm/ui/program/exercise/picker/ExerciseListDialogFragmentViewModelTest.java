@@ -8,7 +8,6 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
 import org.mockito.junit.MockitoJUnitRunner;
 
 import java.util.List;
@@ -26,18 +25,18 @@ import static org.mockito.Mockito.when;
  */
 
 @RunWith(MockitoJUnitRunner.class)
-public class ExercisePickerExerciseListFragmentViewModelTest {
+public class ExerciseListDialogFragmentViewModelTest {
     @Rule public InstantTaskExecutorRule instantTaskExecutorRule = new InstantTaskExecutorRule();
 
     @Mock private ExercisesRepository repository;
-    private ExercisePickerExerciseListFragmentViewModel vm;
+    private ExerciseListDialogFragmentViewModel vm;
 
     @Before
     public void setUp() throws Exception {
         when(repository.getExercisesForMuscleGroup(200L))
                 .thenReturn(Models.createLiveExercises("foo"))
                 .thenReturn(Models.createLiveExercises("bar"));
-        vm = new ExercisePickerExerciseListFragmentViewModel(repository);
+        vm = new ExerciseListDialogFragmentViewModel(repository);
     }
 
     @Test

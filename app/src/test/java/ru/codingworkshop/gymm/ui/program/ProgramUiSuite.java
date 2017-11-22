@@ -4,6 +4,8 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 
 import ru.codingworkshop.gymm.ui.program.exercise.ProgramExerciseViewModelTest;
+import ru.codingworkshop.gymm.ui.program.exercise.picker.ExerciseListDialogFragmentViewModelTest;
+import ru.codingworkshop.gymm.ui.program.exercise.picker.MuscleGroupPickerFragmentViewModelTest;
 import ru.codingworkshop.gymm.ui.program.training.ProgramTrainingViewModelTest;
 
 /**
@@ -14,7 +16,9 @@ import ru.codingworkshop.gymm.ui.program.training.ProgramTrainingViewModelTest;
 @RunWith(Suite.class)
 @Suite.SuiteClasses({
         ProgramExerciseViewModelTest.class,
-        ProgramTrainingViewModelTest.class
+        ProgramTrainingViewModelTest.class,
+        ExerciseListDialogFragmentViewModelTest.class,
+        MuscleGroupPickerFragmentViewModelTest.class
 })
 public class ProgramUiSuite {
 }

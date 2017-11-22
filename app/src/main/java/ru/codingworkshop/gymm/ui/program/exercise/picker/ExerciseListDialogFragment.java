@@ -23,7 +23,7 @@ import ru.codingworkshop.gymm.ui.common.ListItemListeners;
  * Created by Radik on 21.11.2017.
  */
 
-public class ExercisePickerExerciseListFragment extends BottomSheetDialogFragment {
+public class ExerciseListDialogFragment extends BottomSheetDialogFragment {
     private static final String MUSCLE_GROUP_ID_KEY = "muscleGroupIdKey";
     private static final String MUSCLE_GROUP_NAME_KEY = "muscleGroupNameKey";
 
@@ -35,14 +35,14 @@ public class ExercisePickerExerciseListFragment extends BottomSheetDialogFragmen
     ViewModelProvider.Factory viewModelFactory;
     @VisibleForTesting
     OnExerciseClickListener exerciseClickListener;
-    private ExercisePickerExerciseListFragmentViewModel viewModel;
+    private ExerciseListDialogFragmentViewModel viewModel;
     private RecyclerView recyclerView;
 
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
 
-        viewModel = viewModelFactory.create(ExercisePickerExerciseListFragmentViewModel.class);
+        viewModel = viewModelFactory.create(ExerciseListDialogFragmentViewModel.class);
 
         if (exerciseClickListener == null) {
             if (context instanceof OnExerciseClickListener) {
@@ -89,11 +89,11 @@ public class ExercisePickerExerciseListFragment extends BottomSheetDialogFragmen
         }
     }
 
-    public static ExercisePickerExerciseListFragment newInstance(long muscleGroupId, String title) {
+    public static ExerciseListDialogFragment newInstance(long muscleGroupId, String title) {
         Bundle args = new Bundle();
         args.putLong(MUSCLE_GROUP_ID_KEY, muscleGroupId);
         args.putString(MUSCLE_GROUP_NAME_KEY, title);
-        ExercisePickerExerciseListFragment fragment = new ExercisePickerExerciseListFragment();
+        ExerciseListDialogFragment fragment = new ExerciseListDialogFragment();
         fragment.setArguments(args);
         return fragment;
     }

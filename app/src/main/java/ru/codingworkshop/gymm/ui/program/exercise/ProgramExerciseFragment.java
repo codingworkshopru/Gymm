@@ -31,10 +31,10 @@ import ru.codingworkshop.gymm.ui.program.common.ItemTouchHelperCallback;
 import ru.codingworkshop.gymm.ui.program.common.ProgramRecyclerView;
 
 public class ProgramExerciseFragment extends BaseFragment {
+    public static final String EXERCISE_ID_KEY = "exerciseId";
+    public static final String EXERCISE_NAME_KEY = "exerciseName";
     private static final String PROGRAM_EXERCISE_ID_KEY = "programExerciseId";
     private static final String PROGRAM_TRAINING_ID_KEY = "programTrainingId";
-    static final String EXERCISE_ID_KEY = "exerciseId";
-    static final String EXERCISE_NAME_KEY = "exerciseName";
     private static final int CANCEL_ALERT_ID = 0;
     private static final int EMPTY_EXERCISE_LIST_ALERT_ID = 1;
     private static final int EXERCISE_NOT_SELECTED_ALERT_ID = 2;
@@ -86,8 +86,6 @@ public class ProgramExerciseFragment extends BaseFragment {
             exercise.setId(data.getLongExtra(EXERCISE_ID_KEY, 0L));
             exercise.setName(data.getStringExtra(EXERCISE_NAME_KEY));
             setExercise(exercise);
-        } else {
-            throw new IllegalArgumentException("Activity must return id and name of exercise");
         }
     }
 

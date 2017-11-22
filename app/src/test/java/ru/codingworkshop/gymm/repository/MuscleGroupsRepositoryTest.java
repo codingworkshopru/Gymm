@@ -59,6 +59,14 @@ public class MuscleGroupsRepositoryTest {
     }
 
     @Test
+    public void getMuscleGroupsBySide() throws Exception {
+        LiveData<List<MuscleGroup>> muscleGroups = Models.createLiveMuscleGroups(1L);
+        when(dao.getMuscleGroups(true)).thenReturn(muscleGroups);
+        assertEquals(muscleGroups, repository.getMuscleGroups(true));
+        verify(dao).getMuscleGroups(true);
+    }
+
+    @Test
     public void insertMuscleGroups() throws Exception {
         final List<MuscleGroup> muscleGroups = Models.createMuscleGroups(1L);
         repository.insertMuscleGroups(muscleGroups);

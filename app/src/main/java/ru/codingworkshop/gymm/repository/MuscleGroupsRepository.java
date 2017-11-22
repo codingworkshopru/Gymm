@@ -32,6 +32,10 @@ public class MuscleGroupsRepository {
         return dao.getAllMuscleGroups();
     }
 
+    public LiveData<List<MuscleGroup>> getMuscleGroups(boolean isAnterior) {
+        return dao.getMuscleGroups(isAnterior);
+    }
+
     public void insertMuscleGroups(Collection<MuscleGroup> muscleGroups) {
         dao.insertMuscleGroups(muscleGroups);
     }

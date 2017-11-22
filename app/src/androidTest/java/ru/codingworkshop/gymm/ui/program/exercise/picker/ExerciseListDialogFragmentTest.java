@@ -37,15 +37,15 @@ import static org.mockito.Mockito.when;
  * Created by Radik on 21.11.2017.
  */
 
-public class ExercisePickerExerciseListFragmentTest {
+public class ExerciseListDialogFragmentTest {
     @Rule public ActivityTestRule<SimpleFragmentActivity> activityTestRule =
             new ActivityTestRule<>(SimpleFragmentActivity.class);
 
     @Rule public InstantTaskExecutorRule instantTaskExecutorRule = new InstantTaskExecutorRule();
 
     @Mock private ViewModelProvider.Factory viewModelFactory;
-    @Mock private ExercisePickerExerciseListFragmentViewModel vm;
-    @Mock private ExercisePickerExerciseListFragment.OnExerciseClickListener listener;
+    @Mock private ExerciseListDialogFragmentViewModel vm;
+    @Mock private ExerciseListDialogFragment.OnExerciseClickListener listener;
 
     @Before
     public void setUp() throws Exception {
@@ -56,10 +56,10 @@ public class ExercisePickerExerciseListFragmentTest {
         when(vm.load(200L)).thenReturn(Models.createLiveExercises(30, 200L));
         when(viewModelFactory.create(any())).thenReturn(vm);
 
-        ExercisePickerExerciseListFragment exercisePickerExerciseListFragment = ExercisePickerExerciseListFragment.newInstance(200L, "muscle group");
-        exercisePickerExerciseListFragment.viewModelFactory = viewModelFactory;
-        exercisePickerExerciseListFragment.exerciseClickListener = listener;
-        exercisePickerExerciseListFragment.show(activityTestRule.getActivity().getSupportFragmentManager(), "tag");
+        ExerciseListDialogFragment exerciseListDialogFragment = ExerciseListDialogFragment.newInstance(200L, "muscle group");
+        exerciseListDialogFragment.viewModelFactory = viewModelFactory;
+        exerciseListDialogFragment.exerciseClickListener = listener;
+        exerciseListDialogFragment.show(activityTestRule.getActivity().getSupportFragmentManager(), "tag");
     }
 
     @Test

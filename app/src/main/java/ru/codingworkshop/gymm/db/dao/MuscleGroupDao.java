@@ -24,6 +24,9 @@ public interface MuscleGroupDao {
     @Query("select * from MuscleGroup order by name")
     List<MuscleGroup> getAllMuscleGroupsSync();
 
+    @Query("select * from MuscleGroup where isAnterior = :isAnterior order by name")
+    LiveData<List<MuscleGroup>> getMuscleGroups(boolean isAnterior);
+
     @Query("select count(*) from MuscleGroup")
     int getMuscleGroupsCount();
 
@@ -36,7 +39,7 @@ public interface MuscleGroupDao {
     @Query("select mg.* from MuscleGroup as mg " +
                     "join SecondaryMuscleGroupLink as l on l.muscleGroupId = mg.id " +
                     "where l.exerciseId = :exerciseId " +
-                    "order by mg.name")
+                    "order by name")
     LiveData<List<MuscleGroup>> getSecondaryMuscleGroupsForExercise(long exerciseId);
 
     @Query("select mg.* from MuscleGroup as mg " +

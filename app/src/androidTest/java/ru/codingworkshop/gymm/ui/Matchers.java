@@ -33,6 +33,7 @@ public final class Matchers {
 
     }
 
+    // this is only for actual training testing
     public static Matcher<View> currentPageItem(@IdRes int itemId) {
         return new TypeSafeMatcher<View>() {
             private View desiredView;
@@ -131,6 +132,10 @@ public final class Matchers {
     }
 
     static private boolean drawablesAreEqual(Drawable actual, @DrawableRes int expectedDrawableId, Context context) {
+        if (actual == null) {
+            return false;
+        }
+
         Bitmap actualBitmap = Bitmap.createBitmap(actual.getBounds().width(), actual.getBounds().height(), Bitmap.Config.ARGB_8888);
         Canvas canvas = new Canvas(actualBitmap);
         actual.draw(canvas);
