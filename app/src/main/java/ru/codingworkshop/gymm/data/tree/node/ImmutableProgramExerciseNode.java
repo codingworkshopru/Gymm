@@ -52,7 +52,7 @@ public class ImmutableProgramExerciseNode extends ProgramExerciseNode {
     }
 
     @Override
-    public void setExerciseId(long exerciseId) {
+    public void setExerciseId(Long exerciseId) {
         throw new UnsupportedOperationException();
     }
 }

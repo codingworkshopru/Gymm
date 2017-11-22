@@ -9,7 +9,6 @@ import android.support.annotation.ColorInt;
 import android.support.annotation.Nullable;
 import android.support.annotation.VisibleForTesting;
 import android.support.v4.app.Fragment;
-import android.support.v7.widget.AppCompatImageView;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
@@ -21,9 +20,11 @@ import com.google.common.collect.Iterables;
 
 import java.util.List;
 
+import javax.inject.Inject;
+
+import dagger.android.support.AndroidSupportInjection;
 import ru.codingworkshop.gymm.R;
 import ru.codingworkshop.gymm.data.entity.MuscleGroup;
-import timber.log.Timber;
 
 /**
  * Created by Radik on 22.11.2017.
@@ -36,15 +37,16 @@ public class MuscleGroupPickerFragment extends Fragment {
         void onMuscleGroupPick(MuscleGroup muscleGroup);
     }
 
-    @VisibleForTesting
+    @Inject
     ViewModelProvider.Factory viewModelFactory;
     @VisibleForTesting
     OnMuscleGroupPickListener listener;
-    private MuscleGroupPickerFragmentViewModel viewModel;
+    private MuscleGroupPickerViewModel viewModel;
     private ImageView mapImage;
 
     @Override
     public void onAttach(Context context) {
+        AndroidSupportInjection.inject(this);
         super.onAttach(context);
 
         if (listener == null) {
@@ -57,7 +59,7 @@ public class MuscleGroupPickerFragment extends Fragment {
             }
         }
 
-        viewModel = viewModelFactory.create(MuscleGroupPickerFragmentViewModel.class);
+        viewModel = viewModelFactory.create(MuscleGroupPickerViewModel.class);
     }
 
     @Nullable

@@ -1,6 +1,7 @@
 package ru.codingworkshop.gymm.ui.program.exercise;
 
 import android.arch.lifecycle.LiveData;
+import android.arch.lifecycle.MutableLiveData;
 import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.Transformations;
 import android.arch.lifecycle.ViewModel;
@@ -67,20 +68,28 @@ public class ProgramExerciseViewModel extends ViewModel {
     }
 
     public LiveData<ProgramExerciseNode> create() {
+        MutableLiveData<ProgramExerciseNode> liveNode = new MutableLiveData<>();
         if (node == null) {
             Preconditions.checkArgument(GymmDatabase.isValidId(programTrainingId));
             node = new MutableProgramExerciseNode();
-            return Transformations.map(programDraftingExerciseLoader.loadById(node, programTrainingId), loadedNode -> {
-                if (loadedNode == null) {
-                    initNode();
-                    return node;
-                } else {
-                    return loadedNode;
+            LiveData<ProgramExerciseNode> draftingLiveLoaded = programDraftingExerciseLoader.loadById(node, programTrainingId);
+            draftingLiveLoaded.observeForever(new Observer<ProgramExerciseNode>() {
+                @Override
+                public void onChanged(@Nullable ProgramExerciseNode loadedNode) {
+                    if (loadedNode != null) {
+                        liveNode.setValue(loadedNode);
+                    } else {
+                        initNode();
+                        liveNode.setValue(node);
+                    }
+                    draftingLiveLoaded.removeObserver(this);
                 }
             });
         } else {
-            return LiveDataUtil.getLive(node);
+            liveNode.setValue(node);
         }
+
+        return liveNode;
     }
 
     public LiveData<ProgramExerciseNode> load(long programExerciseId) {

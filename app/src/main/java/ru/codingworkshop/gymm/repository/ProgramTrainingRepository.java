@@ -52,9 +52,7 @@ public class ProgramTrainingRepository extends BaseRepository {
         return dao.getDraftingProgramTraining();
     }
 
-    // TODO training name must be unique; write feature to throw exception up from dao (insertChildren, updateChildren)
     public void insertProgramTraining(@NonNull ProgramTraining programTraining) {
-        checkName(programTraining);
         checkIsDrafting(programTraining);
         insert(programTraining, dao::insertProgramTraining);
     }
@@ -90,7 +88,7 @@ public class ProgramTrainingRepository extends BaseRepository {
     }
 
     public void insertProgramExercise(ProgramExercise programExercise) {
-        checkProgramExercise(programExercise);
+        checkProgramTrainingInProgramExercise(programExercise);
         checkIsDrafting(programExercise);
         insert(programExercise, dao::insertProgramExercise);
     }
@@ -100,18 +98,26 @@ public class ProgramTrainingRepository extends BaseRepository {
     }
 
     public void updateProgramExercise(ProgramExercise programExercise) {
-        checkProgramExercise(programExercise);
+        checkProgramTrainingInProgramExercise(programExercise);
+        checkExerciseInProgramExercise(programExercise);
         update(programExercise, dao::updateProgramExercise);
     }
 
     public void updateProgramExercises(Collection<ProgramExercise> exerciseEntities) {
-        applyToEach(exerciseEntities, ProgramTrainingRepository::checkProgramExercise);
+        applyToEach(exerciseEntities, pe -> {
+            checkProgramTrainingInProgramExercise(pe);
+            checkExerciseInProgramExercise(pe);
+        });
         update(exerciseEntities, dao::updateProgramExercises);
     }
 
-    private static void checkProgramExercise(ProgramExercise programExercise) {
+    private static void checkProgramTrainingInProgramExercise(ProgramExercise programExercise) {
         Preconditions.checkArgument(isValidId(programExercise.getProgramTrainingId()));
-        Preconditions.checkArgument(isValidId(programExercise.getExerciseId()));
+    }
+
+    private static void checkExerciseInProgramExercise(ProgramExercise programExercise) {
+        Long exerciseId = programExercise.getExerciseId();
+        Preconditions.checkArgument(exerciseId != null && isValidId(exerciseId));
     }
 
     public void deleteProgramExercise(ProgramExercise programExercise) {

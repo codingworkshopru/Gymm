@@ -4,21 +4,15 @@ import android.arch.core.executor.testing.InstantTaskExecutorRule;
 import android.arch.lifecycle.LiveData;
 import android.arch.lifecycle.ViewModelProvider;
 import android.graphics.Bitmap;
-import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Point;
-import android.graphics.PointF;
 import android.graphics.Rect;
-import android.graphics.RectF;
-import android.graphics.drawable.Drawable;
 import android.support.annotation.IdRes;
 import android.support.test.espresso.action.CoordinatesProvider;
 import android.support.test.espresso.action.GeneralClickAction;
-import android.support.test.espresso.action.GeneralLocation;
 import android.support.test.espresso.action.Press;
 import android.support.test.espresso.action.Tap;
 import android.support.test.rule.ActivityTestRule;
-import android.support.v4.graphics.ColorUtils;
 import android.util.Log;
 import android.view.InputDevice;
 import android.view.MotionEvent;
@@ -31,7 +25,6 @@ import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import ru.codingworkshop.gymm.R;
@@ -44,7 +37,6 @@ import static android.support.test.espresso.Espresso.onView;
 import static android.support.test.espresso.action.ViewActions.click;
 import static android.support.test.espresso.assertion.ViewAssertions.matches;
 import static android.support.test.espresso.matcher.ViewMatchers.withId;
-import static org.junit.Assert.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.Mockito.verify;
@@ -61,7 +53,7 @@ public class MuscleGroupPickerFragmentTest {
     @Rule public InstantTaskExecutorRule instantTaskExecutorRule = new InstantTaskExecutorRule();
 
     @Mock private ViewModelProvider.Factory viewModelFactory;
-    @Mock private MuscleGroupPickerFragmentViewModel vm;
+    @Mock private MuscleGroupPickerViewModel vm;
     @Mock private MuscleGroupPickerFragment.OnMuscleGroupPickListener listener;
 
     @Before
@@ -86,15 +78,18 @@ public class MuscleGroupPickerFragmentTest {
 
     @Test
     public void tapOnMuscleGroupTest() throws Exception {
-        GeneralClickAction clickAction = new GeneralClickAction(
+        onView(withId(R.id.muscleGroupPickerHumanMuscles)).perform(clickOnMuscleGroupWithColor("#0066CC"));
+        verify(listener).onMuscleGroupPick(argThat(mg -> mg.getId() == 200L));
+    }
+
+    public static GeneralClickAction clickOnMuscleGroupWithColor(String color) {
+        return new GeneralClickAction(
                 Tap.SINGLE,
-                getCoordinatesForColor("#0066CC", R.id.muscleGroupPickerMap),
+                getCoordinatesForColor(color, R.id.muscleGroupPickerMap),
                 Press.FINGER,
                 InputDevice.SOURCE_UNKNOWN,
                 MotionEvent.BUTTON_PRIMARY
         );
-        onView(withId(R.id.muscleGroupPickerHumanMuscles)).perform(clickAction);
-        verify(listener).onMuscleGroupPick(argThat(mg -> mg.getId() == 200L));
     }
 
     private static CoordinatesProvider getCoordinatesForColor(final String htmlRgbColor, @IdRes int searchImageView) {

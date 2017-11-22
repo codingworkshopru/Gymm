@@ -14,12 +14,12 @@ import ru.codingworkshop.gymm.repository.ExercisesRepository;
  * Created by Radik on 21.11.2017.
  */
 
-public class ExerciseListDialogFragmentViewModel extends ViewModel {
+public class ExerciseListDialogViewModel extends ViewModel {
     private ExercisesRepository exercisesRepository;
     private LiveData<List<Exercise>> liveExercises;
 
     @Inject
-    public ExerciseListDialogFragmentViewModel(ExercisesRepository exercisesRepository) {
+    ExerciseListDialogViewModel(ExercisesRepository exercisesRepository) {
         this.exercisesRepository = exercisesRepository;
     }
 

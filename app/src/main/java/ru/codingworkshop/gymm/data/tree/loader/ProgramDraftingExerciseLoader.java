@@ -5,6 +5,8 @@ import android.arch.lifecycle.LiveData;
 import android.arch.lifecycle.Transformations;
 import android.support.annotation.NonNull;
 
+import javax.inject.Inject;
+
 import ru.codingworkshop.gymm.data.entity.ProgramExercise;
 import ru.codingworkshop.gymm.data.tree.node.ProgramExerciseNode;
 import ru.codingworkshop.gymm.data.tree.repositoryadapter.ProgramExerciseAdapter;
@@ -17,6 +19,7 @@ import ru.codingworkshop.gymm.data.util.LiveDataUtil;
 public class ProgramDraftingExerciseLoader extends ProgramExerciseLoader {
     private ProgramExerciseAdapter dataSource;
 
+    @Inject
     public ProgramDraftingExerciseLoader(@NonNull ProgramExerciseAdapter dataSource) {
         super(dataSource);
         this.dataSource = dataSource;

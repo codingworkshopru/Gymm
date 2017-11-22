@@ -38,7 +38,7 @@ public class ProgramExercise implements IProgramExercise {
     @PrimaryKey(autoGenerate = true)
     private long id;
     private long programTrainingId;
-    private long exerciseId;
+    private Long exerciseId;
     private int sortOrder;
     private boolean drafting;
 
@@ -60,11 +60,11 @@ public class ProgramExercise implements IProgramExercise {
         this.programTrainingId = programTrainingId;
     }
 
-    public long getExerciseId() {
+    public Long getExerciseId() {
         return exerciseId;
     }
 
-    public void setExerciseId(long exerciseId) {
+    public void setExerciseId(Long exerciseId) {
         this.exerciseId = exerciseId;
     }
 

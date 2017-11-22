@@ -32,13 +32,13 @@ foreignKeys = @ForeignKey(
 public class Exercise implements Model, Named {
     @PrimaryKey(autoGenerate = true)
     private long id;
-    private String name;
-    private ExerciseDifficulty difficulty;
+    @NonNull private String name;
+    @NonNull private ExerciseDifficulty difficulty;
     private long primaryMuscleGroupId;
     @SerializedName("isWithWeight")
     private boolean withWeight;
     private String youTubeVideo;
-    private String steps;
+    @NonNull private String steps;
     private String advices;
     private String variations;
     private String caution;

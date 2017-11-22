@@ -44,7 +44,7 @@ public class ExerciseListDialogFragmentTest {
     @Rule public InstantTaskExecutorRule instantTaskExecutorRule = new InstantTaskExecutorRule();
 
     @Mock private ViewModelProvider.Factory viewModelFactory;
-    @Mock private ExerciseListDialogFragmentViewModel vm;
+    @Mock private ExerciseListDialogViewModel vm;
     @Mock private ExerciseListDialogFragment.OnExerciseClickListener listener;
 
     @Before

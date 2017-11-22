@@ -25,18 +25,18 @@ import static org.mockito.Mockito.when;
  */
 
 @RunWith(MockitoJUnitRunner.class)
-public class ExerciseListDialogFragmentViewModelTest {
+public class ExerciseListDialogViewModelTest {
     @Rule public InstantTaskExecutorRule instantTaskExecutorRule = new InstantTaskExecutorRule();
 
     @Mock private ExercisesRepository repository;
-    private ExerciseListDialogFragmentViewModel vm;
+    private ExerciseListDialogViewModel vm;
 
     @Before
     public void setUp() throws Exception {
         when(repository.getExercisesForMuscleGroup(200L))
                 .thenReturn(Models.createLiveExercises("foo"))
                 .thenReturn(Models.createLiveExercises("bar"));
-        vm = new ExerciseListDialogFragmentViewModel(repository);
+        vm = new ExerciseListDialogViewModel(repository);
     }
 
     @Test

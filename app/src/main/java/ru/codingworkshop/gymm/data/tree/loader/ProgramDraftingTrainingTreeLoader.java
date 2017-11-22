@@ -4,6 +4,8 @@ import android.arch.lifecycle.LiveData;
 import android.arch.lifecycle.Transformations;
 import android.support.annotation.NonNull;
 
+import javax.inject.Inject;
+
 import ru.codingworkshop.gymm.data.tree.node.ProgramTrainingTree;
 import ru.codingworkshop.gymm.data.tree.repositoryadapter.ProgramTrainingAdapter;
 import ru.codingworkshop.gymm.data.util.LiveDataUtil;
@@ -15,6 +17,7 @@ import ru.codingworkshop.gymm.data.util.LiveDataUtil;
 public class ProgramDraftingTrainingTreeLoader extends ProgramTrainingTreeLoader {
     private ProgramTrainingAdapter dataSource;
 
+    @Inject
     public ProgramDraftingTrainingTreeLoader(@NonNull ProgramTrainingAdapter dataSource) {
         super(dataSource);
         this.dataSource = dataSource;

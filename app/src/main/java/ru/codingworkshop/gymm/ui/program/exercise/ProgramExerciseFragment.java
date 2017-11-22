@@ -3,6 +3,7 @@ package ru.codingworkshop.gymm.ui.program.exercise;
 
 import android.arch.lifecycle.LiveData;
 import android.arch.lifecycle.ViewModelProvider;
+import android.content.Context;
 import android.content.Intent;
 import android.databinding.DataBindingUtil;
 import android.databinding.ViewDataBinding;
@@ -16,8 +17,10 @@ import android.view.ViewGroup;
 
 import javax.inject.Inject;
 
+import dagger.android.support.AndroidSupportInjection;
 import ru.codingworkshop.gymm.R;
 import ru.codingworkshop.gymm.data.entity.Exercise;
+import ru.codingworkshop.gymm.data.entity.ProgramSet;
 import ru.codingworkshop.gymm.data.tree.node.ProgramExerciseNode;
 import ru.codingworkshop.gymm.databinding.FragmentProgramExerciseBinding;
 import ru.codingworkshop.gymm.databinding.FragmentProgramExerciseListItemBinding;
@@ -29,6 +32,7 @@ import ru.codingworkshop.gymm.ui.program.common.BaseFragment;
 import ru.codingworkshop.gymm.ui.program.common.MyAdapterDataObserver;
 import ru.codingworkshop.gymm.ui.program.common.ItemTouchHelperCallback;
 import ru.codingworkshop.gymm.ui.program.common.ProgramRecyclerView;
+import ru.codingworkshop.gymm.ui.program.exercise.picker.ExercisePickerActivity;
 
 public class ProgramExerciseFragment extends BaseFragment {
     public static final String EXERCISE_ID_KEY = "exerciseId";
@@ -38,6 +42,7 @@ public class ProgramExerciseFragment extends BaseFragment {
     private static final int CANCEL_ALERT_ID = 0;
     private static final int EMPTY_EXERCISE_LIST_ALERT_ID = 1;
     private static final int EXERCISE_NOT_SELECTED_ALERT_ID = 2;
+    public static final String TAG = "programExerciseFragmentTag";
 
     @Inject
     ViewModelProvider.Factory viewModelFactory;
@@ -49,8 +54,9 @@ public class ProgramExerciseFragment extends BaseFragment {
     private ProgramSetsAdapter programSetsAdapter;
 
     @Override
-    public void onCreate(@Nullable Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
+    public void onAttach(Context context) {
+        AndroidSupportInjection.inject(this);
+        super.onAttach(context);
         viewModel = viewModelFactory.create(ProgramExerciseViewModel.class);
     }
 
@@ -134,7 +140,7 @@ public class ProgramExerciseFragment extends BaseFragment {
 
     private void onAddSet(View view) {
         ProgramSetEditorFragment programSetEditor = ProgramSetEditorFragment.newInstance(node.getId());
-        programSetEditor.listener = programSet -> {
+        programSetEditor.listener = programSet -> { // FIXME: 22.11.2017 this shouldn't be set here
             viewModel.addProgramSet(programSet);
             programSetsAdapter.notifyItemInserted(programSet.getSortOrder());
         };
@@ -167,7 +173,7 @@ public class ProgramExerciseFragment extends BaseFragment {
     private void onItemClick(View view) {
         FragmentProgramExerciseListItemBinding binding = DataBindingUtil.getBinding(view);
         ProgramSetEditorFragment programSetEditor = ProgramSetEditorFragment.newInstance(binding.getWrappedSet().getProgramSet());
-        programSetEditor.listener = programSet -> {
+        programSetEditor.listener = programSet -> { // FIXME: 22.11.2017 this shouldn't be set here
             viewModel.replaceProgramSet(programSet);
             programSetsAdapter.notifyItemChanged(programSet.getSortOrder());
         };
@@ -197,7 +203,7 @@ public class ProgramExerciseFragment extends BaseFragment {
     }
 
     private void onExercisePick(View view) {
-        Intent pickerIntent = new Intent(getContext(), MainActivity.class);
+        Intent pickerIntent = new Intent(getContext(), ExercisePickerActivity.class);
         startActivityForResult(pickerIntent, 0);
     }
 

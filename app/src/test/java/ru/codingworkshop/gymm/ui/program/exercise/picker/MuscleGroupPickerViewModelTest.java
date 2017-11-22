@@ -2,7 +2,6 @@ package ru.codingworkshop.gymm.ui.program.exercise.picker;
 
 import android.arch.core.executor.testing.InstantTaskExecutorRule;
 import android.arch.lifecycle.LiveData;
-import android.arch.lifecycle.ViewModelProvider;
 
 import org.junit.Before;
 import org.junit.Rule;
@@ -21,7 +20,6 @@ import static junit.framework.Assert.assertNotNull;
 import static junit.framework.Assert.assertNotSame;
 import static junit.framework.Assert.assertSame;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -30,11 +28,11 @@ import static org.mockito.Mockito.when;
  */
 
 @RunWith(MockitoJUnitRunner.class)
-public class MuscleGroupPickerFragmentViewModelTest {
+public class MuscleGroupPickerViewModelTest {
     @Rule public InstantTaskExecutorRule instantTaskExecutorRule = new InstantTaskExecutorRule();
 
     @Mock private MuscleGroupsRepository repository;
-    private MuscleGroupPickerFragmentViewModel vm;
+    private MuscleGroupPickerViewModel vm;
 
     @Before
     public void setUp() throws Exception {
@@ -46,7 +44,7 @@ public class MuscleGroupPickerFragmentViewModelTest {
                 .thenReturn(Models.createLiveMuscleGroups(3L))
                 .thenReturn(Models.createLiveMuscleGroups(4L));
 
-        vm = new MuscleGroupPickerFragmentViewModel(repository);
+        vm = new MuscleGroupPickerViewModel(repository);
     }
 
     @Test

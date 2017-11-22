@@ -11,20 +11,30 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
 
+import javax.inject.Inject;
+
+import dagger.android.AndroidInjection;
+import dagger.android.AndroidInjector;
+import dagger.android.DispatchingAndroidInjector;
+import dagger.android.support.HasSupportFragmentInjector;
 import ru.codingworkshop.gymm.R;
 import ru.codingworkshop.gymm.data.entity.Exercise;
 import ru.codingworkshop.gymm.data.entity.MuscleGroup;
 import ru.codingworkshop.gymm.ui.program.exercise.ProgramExerciseFragment;
 
 public class ExercisePickerActivity extends AppCompatActivity implements
+        HasSupportFragmentInjector,
         MuscleGroupPickerFragment.OnMuscleGroupPickListener,
         ExerciseListDialogFragment.OnExerciseClickListener
 {
+
+    @Inject DispatchingAndroidInjector<Fragment> fragmentInjector;
 
     private static final String EXERCISE_LIST_DIALOG_TAG = "exerciseListDialogTag";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        AndroidInjection.inject(this);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_muscles);
 
@@ -68,5 +78,10 @@ public class ExercisePickerActivity extends AppCompatActivity implements
         resultIntent.putExtra(ProgramExerciseFragment.EXERCISE_NAME_KEY, exercise.getName());
         setResult(RESULT_OK, resultIntent);
         finish();
+    }
+
+    @Override
+    public AndroidInjector<Fragment> supportFragmentInjector() {
+        return fragmentInjector;
     }
 }

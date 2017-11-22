@@ -15,7 +15,8 @@ import ru.codingworkshop.gymm.ui.program.ProgramUiSuite;
 @Suite.SuiteClasses({
         ActualUiSuite.class,
         ProgramUiSuite.class,
-        ExerciseInfoFragmentViewModelTest.class
+        ExerciseInfoFragmentViewModelTest.class,
+        MainActivityViewModelTest.class
 })
 public class UiSuite {
 }

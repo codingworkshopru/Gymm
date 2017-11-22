@@ -1,5 +1,7 @@
 package ru.codingworkshop.gymm.data.entity;
 
+import javax.annotation.Nullable;
+
 import ru.codingworkshop.gymm.data.entity.common.Draftable;
 import ru.codingworkshop.gymm.data.entity.common.Model;
 import ru.codingworkshop.gymm.data.entity.common.Sortable;
@@ -13,7 +15,8 @@ public interface IProgramExercise extends Model, Sortable, Draftable {
 
     void setProgramTrainingId(long programTrainingId);
 
-    long getExerciseId();
+    @Nullable
+    Long getExerciseId();
 
-    void setExerciseId(long exerciseId);
+    void setExerciseId(@Nullable Long exerciseId);
 }

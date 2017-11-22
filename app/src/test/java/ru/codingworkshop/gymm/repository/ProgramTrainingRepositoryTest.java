@@ -159,7 +159,7 @@ public class ProgramTrainingRepositoryTest {
     @Test
     public void insertProgramExercise() {
         ProgramExercise exercise = Models.createProgramExercise(2L, 1L, 100L, true);
-        exercise.setExerciseId(10);
+        exercise.setExerciseId(10L);
         when(dao.insertProgramExercise(exercise)).thenReturn(1L);
 
         repository.insertProgramExercise(exercise);
@@ -175,7 +175,7 @@ public class ProgramTrainingRepositoryTest {
 
     private ProgramExercise[] invalidProgramExercises() {
         ProgramExercise exercise = new ProgramExercise();
-        exercise.setExerciseId(10);
+        exercise.setExerciseId(10L);
         ProgramExercise exerciseWithoutExercise = new ProgramExercise();
         exerciseWithoutExercise.setProgramTrainingId(1);
         return new ProgramExercise[] {
@@ -187,7 +187,7 @@ public class ProgramTrainingRepositoryTest {
     @Test
     public void updateProgramExercise() {
         ProgramExercise exercise = Models.createLiveProgramExercise(2, 1, false).getValue();
-        exercise.setExerciseId(10);
+        exercise.setExerciseId(10L);
         when(dao.updateProgramExercise(exercise)).thenReturn(1);
 
         repository.updateProgramExercise(exercise);
@@ -199,7 +199,7 @@ public class ProgramTrainingRepositoryTest {
     public void updateProgramExercises() {
         List<ProgramExercise> exercisesToUpdate = Lists.newArrayList(2,3,4,5).stream().map(id -> {
             ProgramExercise exercise = Models.createLiveProgramExercise(id, 1, false).getValue();
-            exercise.setExerciseId(10);
+            exercise.setExerciseId(10L);
             return exercise;
         }).collect(Collectors.toList());
 
@@ -230,7 +230,7 @@ public class ProgramTrainingRepositoryTest {
     public void deleteProgramExercises() {
         List<ProgramExercise> exercisesToDelete = Lists.newArrayList(2,3,4,5).stream().map(id -> {
             ProgramExercise exercise = Models.createLiveProgramExercise(id, 1, false).getValue();
-            exercise.setExerciseId(10);
+            exercise.setExerciseId(10L);
             return exercise;
         }).collect(Collectors.toList());
 

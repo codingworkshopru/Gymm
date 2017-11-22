@@ -1,9 +1,9 @@
 package ru.codingworkshop.gymm.ui.program.training;
 
-
 import android.arch.lifecycle.LiveData;
 import android.arch.lifecycle.Transformations;
 import android.arch.lifecycle.ViewModelProvider;
+import android.content.Context;
 import android.databinding.DataBindingUtil;
 import android.databinding.ObservableBoolean;
 import android.databinding.ViewDataBinding;
@@ -18,6 +18,9 @@ import android.view.ViewGroup;
 
 import javax.inject.Inject;
 
+import dagger.android.AndroidInjection;
+import dagger.android.AndroidInjectionModule;
+import dagger.android.support.AndroidSupportInjection;
 import ru.codingworkshop.gymm.R;
 import ru.codingworkshop.gymm.data.tree.node.ProgramTrainingTree;
 import ru.codingworkshop.gymm.data.util.LiveDataUtil;
@@ -30,9 +33,12 @@ import ru.codingworkshop.gymm.ui.program.common.BaseFragment;
 import ru.codingworkshop.gymm.ui.program.common.MyAdapterDataObserver;
 import ru.codingworkshop.gymm.ui.program.common.ItemTouchHelperCallback;
 import ru.codingworkshop.gymm.ui.program.common.ProgramRecyclerView;
+import ru.codingworkshop.gymm.ui.program.exercise.ProgramExerciseFragment;
 
 public class ProgramTrainingFragment extends BaseFragment {
     public static final String PROGRAM_TRAINING_ID_KEY = "programTrainingId";
+    public static final String TAG = "programTrainingFragmentTag";
+
     private static final int CANCEL_ALERT_ID = 0;
     private static final int EMPTY_EXERCISE_LIST_ALERT_ID = 1;
 
@@ -45,8 +51,9 @@ public class ProgramTrainingFragment extends BaseFragment {
     private FragmentAlert alert;
 
     @Override
-    public void onCreate(@Nullable Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
+    public void onAttach(Context context) {
+        AndroidSupportInjection.inject(this);
+        super.onAttach(context);
         viewModel = viewModelFactory.create(ProgramTrainingViewModel.class);
     }
 
@@ -61,6 +68,7 @@ public class ProgramTrainingFragment extends BaseFragment {
     protected ViewDataBinding createBinding(LayoutInflater inflater, ViewGroup parent) {
         binding = DataBindingUtil.inflate(inflater, R.layout.fragment_program_training, parent, false);
         binding.setInActionMode(new ObservableBoolean());
+        binding.programTrainingAddExerciseButton.setOnClickListener(this::onAddExerciseButtonClick);
 
         alert = new FragmentAlert(getChildFragmentManager(), (dialogId, positive) -> {
             if (!positive) return;
@@ -114,6 +122,14 @@ public class ProgramTrainingFragment extends BaseFragment {
         final ActionModeCallback actionModeCallback = new ActionModeCallback(binding.programExerciseList, binding.getInActionMode());
         getActivity().startActionMode(actionModeCallback);
         viewModel.setChildrenChanged();
+    }
+
+    private void onAddExerciseButtonClick(View v) {
+        getFragmentManager()
+                .beginTransaction()
+                .replace(R.id.programTrainingFragmentContainer, ProgramExerciseFragment.newInstanceForNew(tree.getParent().getId()))
+                .addToBackStack(null)
+                .commit();
     }
 
     private void onExerciseClick(View v) {

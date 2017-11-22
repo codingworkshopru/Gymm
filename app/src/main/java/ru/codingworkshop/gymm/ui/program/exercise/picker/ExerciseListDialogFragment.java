@@ -13,6 +13,9 @@ import android.support.v7.widget.Toolbar;
 
 import java.util.List;
 
+import javax.inject.Inject;
+
+import dagger.android.support.AndroidSupportInjection;
 import ru.codingworkshop.gymm.R;
 import ru.codingworkshop.gymm.data.entity.Exercise;
 import ru.codingworkshop.gymm.databinding.FragmentExercisePickerListItemBinding;
@@ -31,18 +34,19 @@ public class ExerciseListDialogFragment extends BottomSheetDialogFragment {
         void onExerciseClick(Exercise exercise);
     }
 
-    @VisibleForTesting
+    @Inject
     ViewModelProvider.Factory viewModelFactory;
     @VisibleForTesting
     OnExerciseClickListener exerciseClickListener;
-    private ExerciseListDialogFragmentViewModel viewModel;
+    private ExerciseListDialogViewModel viewModel;
     private RecyclerView recyclerView;
 
     @Override
     public void onAttach(Context context) {
+        AndroidSupportInjection.inject(this);
         super.onAttach(context);
 
-        viewModel = viewModelFactory.create(ExerciseListDialogFragmentViewModel.class);
+        viewModel = viewModelFactory.create(ExerciseListDialogViewModel.class);
 
         if (exerciseClickListener == null) {
             if (context instanceof OnExerciseClickListener) {

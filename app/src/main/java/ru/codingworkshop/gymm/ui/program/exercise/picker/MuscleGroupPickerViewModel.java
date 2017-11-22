@@ -16,12 +16,12 @@ import ru.codingworkshop.gymm.repository.MuscleGroupsRepository;
  * Created by Radik on 22.11.2017.
  */
 
-public class MuscleGroupPickerFragmentViewModel extends ViewModel {
+public class MuscleGroupPickerViewModel extends ViewModel {
     private MuscleGroupsRepository repository;
     private Map<Boolean, LiveData<List<MuscleGroup>>> muscleGroups;
 
     @Inject
-    public MuscleGroupPickerFragmentViewModel(MuscleGroupsRepository repository) {
+    public MuscleGroupPickerViewModel(MuscleGroupsRepository repository) {
         this.repository = repository;
         muscleGroups = new HashMap<>(2);
     }

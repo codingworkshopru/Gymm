@@ -9,6 +9,7 @@ android {
         targetSdkVersion 26
         versionCode 1
         versionName "1.0"
+//        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
         testInstrumentationRunner "ru.codingworkshop.gymm.util.GymmTestRunner"
         vectorDrawables.useSupportLibrary true
     }
@@ -18,6 +19,7 @@ android {
     }
     sourceSets {
         androidTest.java.srcDirs += "src/test-common/java"
+        androidTest.java.srcDirs += "src/test-integration/java"
         test.java.srcDirs += "src/test-common/java"
     }
     buildTypes {
@@ -31,6 +33,8 @@ android {
     }
 }
 
+
+
 ext {
     support = "26.1.0"
     constraint = "1.0.2"
@@ -39,7 +43,7 @@ ext {
     gson = "2.8.2"
     guava = "23.0-android"
     dagger = "2.13"
-    picasso = "2.5.2"
+//    picasso = "2.5.2"
 //    leakcanary = "1.5.2"
     timber = "4.5.1"
 
@@ -48,11 +52,6 @@ ext {
     junit = "4.12"
     junit_params = "1.1.0"
 }
-
-
-
-
-
 
 
 dependencies {
@@ -74,7 +73,8 @@ dependencies {
     implementation "com.google.code.gson:gson:$gson"
     implementation "com.google.dagger:dagger:$dagger"
     implementation "com.google.dagger:dagger-android:$dagger"
-    implementation "com.squareup.picasso:picasso:$picasso"
+    implementation "com.google.dagger:dagger-android-support:$dagger"
+//    implementation "com.squareup.picasso:picasso:$picasso"
     implementation "com.jakewharton.timber:timber:$timber"
 
 //    debugImplementation "com.squareup.leakcanary:leakcanary-android:$leakcanary"

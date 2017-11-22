@@ -27,7 +27,7 @@ public abstract class ProgramExerciseNode extends BaseNode<ProgramExercise, Prog
         if (getParent() == null) return;
 
         long exerciseId = exercise.getId();
-        if (getExerciseId() != exerciseId) {
+        if (getExerciseId() == null || getExerciseId() != exerciseId) {
             setExerciseId(exerciseId);
         }
     }
@@ -73,12 +73,15 @@ public abstract class ProgramExerciseNode extends BaseNode<ProgramExercise, Prog
     }
 
     @Override
-    public long getExerciseId() {
-        return getParent().getExerciseId();
+    public Long getExerciseId() {
+        ProgramExercise parent = getParent();
+        return parent != null ? parent.getExerciseId() : null;
     }
 
     @Override
-    public void setExerciseId(long exerciseId) {
-        getParent().setExerciseId(exerciseId);
+    public void setExerciseId(Long exerciseId) {
+        if (getParent() != null) {
+            getParent().setExerciseId(exerciseId);
+        }
     }
 }
