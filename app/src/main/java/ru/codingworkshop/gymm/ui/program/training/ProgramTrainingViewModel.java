@@ -78,11 +78,12 @@ public class ProgramTrainingViewModel extends ViewModel {
 
     public LiveData<Boolean> save() {
         return Transformations.map(repository.getProgramTrainingByName(tree.getParent().getName()), t -> {
-            if (t == null) {
+            boolean trainingWithNameNotExists = t == null || t.getId() == tree.getParent().getId();
+            if (trainingWithNameNotExists) {
                 tree.getParent().setDrafting(false);
                 new ProgramTrainingSaver(tree, repository).save();
             }
-            return t == null;
+            return trainingWithNameNotExists;
         });
     }
 

@@ -2,6 +2,7 @@ package ru.codingworkshop.gymm.ui;
 
 import android.arch.lifecycle.ViewModelProvider;
 import android.content.Intent;
+import android.databinding.DataBindingUtil;
 import android.databinding.ViewDataBinding;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
@@ -10,6 +11,7 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.View;
 
 import java.util.List;
 
@@ -22,6 +24,7 @@ import ru.codingworkshop.gymm.databinding.ActivityMainListItemBinding;
 import ru.codingworkshop.gymm.ui.common.ClickableBindingListAdapter;
 import ru.codingworkshop.gymm.ui.common.ListItemListeners;
 import ru.codingworkshop.gymm.ui.program.ProgramTrainingActivity;
+import ru.codingworkshop.gymm.ui.program.training.ProgramTrainingFragment;
 
 public class MainActivity extends AppCompatActivity {
     @Inject
@@ -43,14 +46,22 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void onProgramTrainingLoaded(List<ProgramTraining> programTrainings) {
-        RecyclerView programTrainingsView = findViewById(R.id.rv_test_main);
         ListItemListeners listItemListeners = new ListItemListeners(R.layout.activity_main_list_item);
+        listItemListeners.setOnClickListener(this::onProgramTrainingClick);
+
+        RecyclerView programTrainingsView = findViewById(R.id.rv_test_main);
         programTrainingsView.setAdapter(new ClickableBindingListAdapter<ProgramTraining, ActivityMainListItemBinding>(programTrainings, listItemListeners) {
             @Override
             protected void bind(ActivityMainListItemBinding binding, ProgramTraining item) {
                 binding.setProgramTraining(item);
             }
         });
+    }
+
+    private void onProgramTrainingClick(View v) {
+        ActivityMainListItemBinding b = DataBindingUtil.findBinding(v);
+        long programTrainingId = b.getProgramTraining().getId();
+        startActivity(programTrainingActivityIntent(programTrainingId));
     }
 
     // menu
@@ -66,8 +77,7 @@ public class MainActivity extends AppCompatActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.action_add_program:
-                Intent startProgramTrainingActivity = new Intent(this, ProgramTrainingActivity.class);
-                startActivity(startProgramTrainingActivity);
+                startActivity(programTrainingActivityIntent());
                 return true;
 
             default:
@@ -75,4 +85,14 @@ public class MainActivity extends AppCompatActivity {
         }
     }
     //-----------------------------------------
+
+    private Intent programTrainingActivityIntent(long programTrainingId) {
+        Intent startProgramTrainingActivity = programTrainingActivityIntent();
+        startProgramTrainingActivity.putExtra(ProgramTrainingFragment.PROGRAM_TRAINING_ID_KEY, programTrainingId);
+        return startProgramTrainingActivity;
+    }
+
+    private Intent programTrainingActivityIntent() {
+        return new Intent(this, ProgramTrainingActivity.class);
+    }
 }

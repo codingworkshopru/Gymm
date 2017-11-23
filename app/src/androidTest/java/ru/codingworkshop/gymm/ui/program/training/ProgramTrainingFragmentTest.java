@@ -105,7 +105,7 @@ public class ProgramTrainingFragmentTest {
     public void exercisesListTest() throws Exception {
         onView(exerciseAt(R.id.programExerciseName, 0)).check(matches(withText("exercise100")));
         String setsCount = InstrumentationRegistry.getTargetContext().getResources().getQuantityString(R.plurals.number_of_sets, 2, 2);
-        onView(exerciseAt(R.id.programSetRestTime, 0)).check(matches(withText(setsCount)));
+        onView(exerciseAt(R.id.programExerciseSetsCount, 0)).check(matches(withText(setsCount)));
     }
 
     @Test
@@ -250,8 +250,6 @@ public class ProgramTrainingFragmentTest {
             onView(exerciseAt(R.id.programExerciseReorderImage, i)).check(matches(not(isDisplayed())));
         }
         onView(withId(R.id.programTrainingNameLayout)).check(matches(isDisplayed()));
-        removeAt(0, LEFT);
-        assertEquals(3, tree.getChildren().size());
     }
 
     private void enterActionMode() {

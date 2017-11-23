@@ -9,6 +9,7 @@ import android.databinding.ObservableBoolean;
 import android.databinding.ViewDataBinding;
 import android.os.Bundle;
 import android.support.annotation.VisibleForTesting;
+import android.support.v4.app.Fragment;
 import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
@@ -19,9 +20,11 @@ import javax.inject.Inject;
 
 import dagger.android.support.AndroidSupportInjection;
 import ru.codingworkshop.gymm.R;
+import ru.codingworkshop.gymm.data.tree.node.ProgramExerciseNode;
 import ru.codingworkshop.gymm.data.tree.node.ProgramTrainingTree;
 import ru.codingworkshop.gymm.data.util.LiveDataUtil;
 import ru.codingworkshop.gymm.databinding.FragmentProgramTrainingBinding;
+import ru.codingworkshop.gymm.databinding.FragmentProgramTrainingListItemBinding;
 import ru.codingworkshop.gymm.ui.program.common.FragmentAlert;
 import ru.codingworkshop.gymm.ui.common.EditTextValidator;
 import ru.codingworkshop.gymm.ui.common.ListItemListeners;
@@ -47,6 +50,7 @@ public class ProgramTrainingFragment extends BaseFragment {
     private FragmentProgramTrainingBinding binding;
 
     private FragmentAlert alert;
+    private ProgramRecyclerView programExerciseList;
 
     @Override
     public void onAttach(Context context) {
@@ -115,19 +119,19 @@ public class ProgramTrainingFragment extends BaseFragment {
     }
 
     private void initExerciseList() {
-        ProgramRecyclerView rv = binding.programExerciseList;
+        programExerciseList = binding.programExerciseList;
         final ObservableBoolean inActionMode = binding.getInActionMode();
         ListItemListeners listeners = new ListItemListeners(R.layout.fragment_program_training_list_item)
                 .setOnClickListener(this::onExerciseClick)
                 .setOnLongClickListener(this::onExerciseLongClick)
-                .setOnReorderButtonDownListener(rv::startDragFromChildView, R.id.programExerciseReorderImage);
+                .setOnReorderButtonDownListener(programExerciseList::startDragFromChildView, R.id.programExerciseReorderImage);
         ProgramExercisesAdapter adapter = new ProgramExercisesAdapter(listeners, tree.getChildren(), inActionMode);
         MyAdapterDataObserver observer = new MyAdapterDataObserver(
-                rv, R.id.programTrainingBackground,
+                programExerciseList, R.id.programTrainingBackground,
                 R.string.program_training_activity_exercise_deleted_message, tree);
         adapter.registerAdapterDataObserver(observer);
-        rv.setAdapter(adapter);
-        rv.setItemTouchHelperCallback(new ItemTouchHelperCallback(tree));
+        programExerciseList.setAdapter(adapter);
+        programExerciseList.setItemTouchHelperCallback(new ItemTouchHelperCallback(tree));
     }
 
     private void onExerciseLongClick(View v) {
@@ -137,15 +141,20 @@ public class ProgramTrainingFragment extends BaseFragment {
     }
 
     private void onAddExerciseButtonClick(View v) {
-        getFragmentManager()
-                .beginTransaction()
-                .replace(R.id.programTrainingFragmentContainer, ProgramExerciseFragment.newInstanceForNew(tree.getParent().getId()))
-                .addToBackStack(null)
-                .commit();
+        openExerciseEditor(ProgramExerciseFragment.newInstanceForNew(tree.getParent().getId()));
     }
 
     private void onExerciseClick(View v) {
-        // TODO: 18.10.2017 open exercise editor
+        ProgramExerciseNode n = tree.getChildren().get(programExerciseList.getChildAdapterPosition(v));
+        openExerciseEditor(ProgramExerciseFragment.newInstanceForExistent(n.getId()));
+    }
+
+    private void openExerciseEditor(Fragment exerciseEditor) {
+        getFragmentManager()
+                .beginTransaction()
+                .replace(R.id.programTrainingFragmentContainer, exerciseEditor)
+                .addToBackStack(null)
+                .commit();
     }
 
     @VisibleForTesting
@@ -173,7 +182,6 @@ public class ProgramTrainingFragment extends BaseFragment {
                 final LiveData<Boolean> liveValid = validate();
                 LiveDataUtil.getOnce(liveValid, valid -> {
                     if (valid != null && valid) {
-                        viewModel.create().removeObservers(this);
                         close();
                     }
                 });

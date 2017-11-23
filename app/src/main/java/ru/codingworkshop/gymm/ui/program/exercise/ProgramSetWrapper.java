@@ -32,11 +32,11 @@ public class ProgramSetWrapper {
             return null;
         }
 
-        return getPlural(context, R.plurals.minutes, programSet.getMinutes()) + ' ' +
-                getPlural(context, R.plurals.seconds, programSet.getSeconds());
+        return getPlural(R.plurals.minutes, programSet.getMinutes()) + ' ' +
+                getPlural(R.plurals.seconds, programSet.getSeconds());
     }
 
-    private String getPlural(Context context, @PluralsRes int plural, int arg) {
+    private String getPlural(@PluralsRes int plural, int arg) {
         return context.getResources().getQuantityString(plural, arg, arg);
     }
 }

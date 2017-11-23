@@ -86,7 +86,7 @@ public class ProgramSet implements Model, Sortable, Parcelable {
     }
 
     public void setMinutes(int minutes) {
-        secondsForRest = minutes * 60 + getSeconds();
+        setSecondsForRest(minutes * 60 + getSeconds());
     }
 
     public int getSeconds() {
@@ -94,7 +94,7 @@ public class ProgramSet implements Model, Sortable, Parcelable {
     }
 
     public void setSeconds(int seconds) {
-        secondsForRest = getMinutes() * 60 + seconds;
+        setSecondsForRest(getMinutes() * 60 + seconds);
     }
 
     @Override

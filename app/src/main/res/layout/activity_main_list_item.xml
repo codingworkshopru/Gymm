@@ -12,7 +12,7 @@
         android:layout_height="@dimen/list_item_height">
 
         <TextView
-            android:id="@+id/mainActivityTrainingItem"
+            android:id="@+id/mainActivityTrainingName"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginLeft="16dp"

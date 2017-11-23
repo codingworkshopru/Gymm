@@ -109,7 +109,7 @@ public class ProgramTrainingViewModelTest {
 
     @Test
     public void saveWithNonUniqueName() throws Exception {
-        when(repository.getProgramTrainingByName("foo")).thenReturn(Models.createLiveProgramTraining(1L, "foo", false));
+        when(repository.getProgramTrainingByName("foo")).thenReturn(Models.createLiveProgramTraining(2L, "foo", false));
         LiveTest.verifyLiveData(vm.load(1L), Objects::nonNull);
         LiveData<Boolean> savedLive = vm.save();
         LiveTest.verifyLiveData(savedLive, saved -> !saved);

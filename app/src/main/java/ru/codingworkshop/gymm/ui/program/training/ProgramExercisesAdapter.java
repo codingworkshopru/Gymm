@@ -24,9 +24,7 @@ public class ProgramExercisesAdapter extends ClickableBindingListAdapter<Program
 
     @Override
     protected void bind(FragmentProgramTrainingListItemBinding binding, ProgramExerciseNode item) {
-        if (item.getExercise() != null) {
-            binding.setExerciseName(item.getExercise().getName());
-        }
+        binding.setExercise(item.getExercise());
         binding.setSetsCount(item.getChildren().size());
         binding.setInActionMode(inActionMode);
     }
