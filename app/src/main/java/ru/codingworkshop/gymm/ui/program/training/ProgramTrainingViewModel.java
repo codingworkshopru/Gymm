@@ -30,6 +30,7 @@ public class ProgramTrainingViewModel extends ViewModel {
     private ProgramTrainingRepository repository;
     @VisibleForTesting
     ProgramTrainingTree tree;
+    private LiveData<ProgramTrainingTree> liveTree;
     private String programTrainingName;
     private boolean childrenChanged;
 
@@ -53,29 +54,26 @@ public class ProgramTrainingViewModel extends ViewModel {
     }
 
     public LiveData<ProgramTrainingTree> create() {
-        if (tree == null) {
+        if (liveTree == null) {
             tree = new MutableProgramTrainingTree();
-            return Transformations.map(draftingLoader.load(tree), loadedTree -> {
+            liveTree = Transformations.map(draftingLoader.load(tree), loadedTree -> {
                 if (loadedTree == null) {
                     initTree();
-                    return tree;
-                } else {
-                    return loadedTree;
                 }
+                return loadedTree;
             });
-        } else {
-            return LiveDataUtil.getLive(tree);
         }
+
+        return liveTree;
     }
 
     public LiveData<ProgramTrainingTree> load(long programTrainingId) {
-        if (tree == null) {
+        if (liveTree == null) {
             tree = new MutableProgramTrainingTree();
-            LiveData<ProgramTrainingTree> liveTree = loader.loadById(tree, programTrainingId);
-            return LiveDataUtil.getOnce(liveTree, t -> programTrainingName = t.getParent().getName());
-        } else {
-            return LiveDataUtil.getLive(tree);
+            liveTree = loader.loadById(tree, programTrainingId);
+            LiveDataUtil.getOnce(liveTree, t -> programTrainingName = t.getParent().getName());
         }
+        return liveTree;
     }
 
     public LiveData<Boolean> save() {

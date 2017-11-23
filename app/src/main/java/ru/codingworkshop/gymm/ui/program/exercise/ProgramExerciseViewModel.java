@@ -38,6 +38,7 @@ public class ProgramExerciseViewModel extends ViewModel {
 
     @VisibleForTesting
     ProgramExerciseNode node;
+    private LiveData<ProgramExerciseNode> liveNode;
 
     private long programTrainingId;
     private boolean childrenChanged;
@@ -68,40 +69,30 @@ public class ProgramExerciseViewModel extends ViewModel {
     }
 
     public LiveData<ProgramExerciseNode> create() {
-        MutableLiveData<ProgramExerciseNode> liveNode = new MutableLiveData<>();
-        if (node == null) {
+        if (liveNode == null) {
             Preconditions.checkArgument(GymmDatabase.isValidId(programTrainingId));
             node = new MutableProgramExerciseNode();
-            LiveData<ProgramExerciseNode> draftingLiveLoaded = programDraftingExerciseLoader.loadById(node, programTrainingId);
-            draftingLiveLoaded.observeForever(new Observer<ProgramExerciseNode>() {
-                @Override
-                public void onChanged(@Nullable ProgramExerciseNode loadedNode) {
-                    if (loadedNode != null) {
-                        liveNode.setValue(loadedNode);
-                    } else {
-                        initNode();
-                        liveNode.setValue(node);
-                    }
-                    draftingLiveLoaded.removeObserver(this);
+            liveNode = Transformations.map(programDraftingExerciseLoader.loadById(node, programTrainingId), loadedNode -> {
+                if (loadedNode == null) {
+                    initNode();
                 }
+                return loadedNode;
             });
-        } else {
-            liveNode.setValue(node);
         }
 
         return liveNode;
     }
 
     public LiveData<ProgramExerciseNode> load(long programExerciseId) {
-        if (node == null) {
+        if (liveNode == null) {
             node = new MutableProgramExerciseNode();
-            return LiveDataUtil.getOnce(
+            liveNode = LiveDataUtil.getOnce(
                     programExerciseLoader.loadById(node, programExerciseId),
                     n -> exerciseId = n.getExerciseId()
             );
-        } else {
-            return LiveDataUtil.getLive(node);
         }
+
+        return liveNode;
     }
 
     public void save() {

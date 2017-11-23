@@ -3,6 +3,8 @@ package ru.codingworkshop.gymm;
 import android.app.Activity;
 import android.app.Application;
 
+import com.squareup.leakcanary.LeakCanary;
+
 import javax.inject.Inject;
 
 import dagger.android.AndroidInjector;
@@ -40,9 +42,9 @@ public class App extends Application implements HasActivityInjector {
     }
 
     private void installLeakCanary() {
-//        if (!LeakCanary.isInAnalyzerProcess(this)) {
-//            LeakCanary.install(this);
-//        }
+        if (!LeakCanary.isInAnalyzerProcess(this)) {
+            LeakCanary.install(this);
+        }
     }
 
     @Override

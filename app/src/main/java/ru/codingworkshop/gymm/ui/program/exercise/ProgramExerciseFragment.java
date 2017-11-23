@@ -8,7 +8,6 @@ import android.content.Intent;
 import android.databinding.DataBindingUtil;
 import android.databinding.ViewDataBinding;
 import android.os.Bundle;
-import android.support.annotation.Nullable;
 import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
@@ -20,11 +19,9 @@ import javax.inject.Inject;
 import dagger.android.support.AndroidSupportInjection;
 import ru.codingworkshop.gymm.R;
 import ru.codingworkshop.gymm.data.entity.Exercise;
-import ru.codingworkshop.gymm.data.entity.ProgramSet;
 import ru.codingworkshop.gymm.data.tree.node.ProgramExerciseNode;
 import ru.codingworkshop.gymm.databinding.FragmentProgramExerciseBinding;
 import ru.codingworkshop.gymm.databinding.FragmentProgramExerciseListItemBinding;
-import ru.codingworkshop.gymm.ui.MainActivity;
 import ru.codingworkshop.gymm.ui.program.common.FragmentAlert;
 import ru.codingworkshop.gymm.ui.common.ListItemListeners;
 import ru.codingworkshop.gymm.ui.program.common.ActionModeCallback;
@@ -33,6 +30,7 @@ import ru.codingworkshop.gymm.ui.program.common.MyAdapterDataObserver;
 import ru.codingworkshop.gymm.ui.program.common.ItemTouchHelperCallback;
 import ru.codingworkshop.gymm.ui.program.common.ProgramRecyclerView;
 import ru.codingworkshop.gymm.ui.program.exercise.picker.ExercisePickerActivity;
+import timber.log.Timber;
 
 public class ProgramExerciseFragment extends BaseFragment {
     public static final String EXERCISE_ID_KEY = "exerciseId";
@@ -57,7 +55,20 @@ public class ProgramExerciseFragment extends BaseFragment {
     public void onAttach(Context context) {
         AndroidSupportInjection.inject(this);
         super.onAttach(context);
+        Timber.d("onAttach");
         viewModel = viewModelFactory.create(ProgramExerciseViewModel.class);
+    }
+
+    @Override
+    public void onDetach() {
+        super.onDetach();
+        Timber.d("onDetach");
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        Timber.d("onDestroyView");
     }
 
     @Override
@@ -110,6 +121,7 @@ public class ProgramExerciseFragment extends BaseFragment {
 
     @Override
     protected ViewDataBinding createBinding(LayoutInflater inflater, ViewGroup parent) {
+        Timber.d("createBinding");
         binding = DataBindingUtil.inflate(inflater, R.layout.fragment_program_exercise, parent,
                 false);
         binding.setInActionMode(getInActionMode());
@@ -134,7 +146,7 @@ public class ProgramExerciseFragment extends BaseFragment {
         } else {
             throw new IllegalArgumentException("argument neither contains exercise id nor training id");
         }
-        liveLoaded.observe(this, this::init);
+        liveLoaded.observe(this, this::initData);
 
         return binding;
     }
@@ -148,9 +160,9 @@ public class ProgramExerciseFragment extends BaseFragment {
         programSetEditor.show(getChildFragmentManager());
     }
 
-    private void init(ProgramExerciseNode loadedNode) {
+    private void initData(ProgramExerciseNode loadedNode) {
         if (loadedNode == null) return;
-
+        Timber.d("initData");
         node = loadedNode;
 
         binding.setExercise(node.getExercise());

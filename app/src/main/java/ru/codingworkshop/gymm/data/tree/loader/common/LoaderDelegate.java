@@ -24,12 +24,10 @@ public class LoaderDelegate {
     public <T> void addSource(LiveData<T> live, Observer<T> observer) {
         sourcesCounter++;
         liveLoaded.addSource(live, t -> {
-            if (t != null) {
-                observer.onChanged(t);
-                sourcesCounter--;
-                if (sourcesCounter <= 0) {
-                    onAllSourcesLoaded();
-                }
+            observer.onChanged(t);
+            sourcesCounter--;
+            if (sourcesCounter <= 0) {
+                onAllSourcesLoaded();
             }
         });
     }

@@ -9,8 +9,8 @@ android {
         targetSdkVersion 26
         versionCode 1
         versionName "1.0"
-//        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
-        testInstrumentationRunner "ru.codingworkshop.gymm.util.GymmTestRunner"
+        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+//        testInstrumentationRunner "ru.codingworkshop.gymm.util.GymmTestRunner"
         vectorDrawables.useSupportLibrary true
     }
     compileOptions {
@@ -43,8 +43,7 @@ ext {
     gson = "2.8.2"
     guava = "23.0-android"
     dagger = "2.13"
-//    picasso = "2.5.2"
-//    leakcanary = "1.5.2"
+    leakcanary = "1.5.4"
     timber = "4.5.1"
 
     espresso = "3.0.1"
@@ -74,17 +73,11 @@ dependencies {
     implementation "com.google.dagger:dagger:$dagger"
     implementation "com.google.dagger:dagger-android:$dagger"
     implementation "com.google.dagger:dagger-android-support:$dagger"
-//    implementation "com.squareup.picasso:picasso:$picasso"
     implementation "com.jakewharton.timber:timber:$timber"
 
-//    debugImplementation "com.squareup.leakcanary:leakcanary-android:$leakcanary"
-//    releaseImplementation "com.squareup.leakcanary:leakcanary-android-no-op:$leakcanary"
+    debugImplementation "com.squareup.leakcanary:leakcanary-android:$leakcanary"
+    releaseImplementation "com.squareup.leakcanary:leakcanary-android-no-op:$leakcanary"
 
-    implementation 'com.android.support:support-v4:26.1.0'
-//    annotationProcessor "android.arch.lifecycle:compiler:$arch" // not needed if you are using the DefaultLifecycleObserver from common-java8 artifact.
-    implementation 'com.android.support.constraint:constraint-layout:1.0.2'
-    implementation 'com.android.support:recyclerview-v7:26.1.0'
-    implementation 'com.android.support:design:26.1.0'
     annotationProcessor "android.arch.persistence.room:compiler:$arch"
     annotationProcessor "com.google.dagger:dagger-android-processor:$dagger"
     annotationProcessor "com.google.dagger:dagger-compiler:$dagger"
@@ -92,7 +85,6 @@ dependencies {
     testImplementation "junit:junit:$junit"
     testImplementation "pl.pragmatists:JUnitParams:$junit_params"
     testImplementation "org.mockito:mockito-core:$mockito"
-//    testImplementation "com.squareup.leakcanary:leakcanary-android-no-op:$leakcanary"
     testImplementation "android.arch.core:core-testing:$arch"
     testImplementation "android.arch.lifecycle:extensions:$arch"
 

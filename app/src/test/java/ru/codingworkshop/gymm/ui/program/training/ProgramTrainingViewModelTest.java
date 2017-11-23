@@ -99,7 +99,7 @@ public class ProgramTrainingViewModelTest {
     @Test
     public void createWithoutDrafting() throws Exception {
         when(draftingLoader.load(any())).thenReturn(LiveDataUtil.getAbsent());
-        LiveTest.verifyLiveData(vm.create(), Objects::nonNull);
+        LiveTest.verifyLiveData(vm.create(), Objects::isNull);
 
         ProgramTrainingTree tree = vm.getProgramTrainingTree();
         assertEquals(0L, tree.getParent().getId());

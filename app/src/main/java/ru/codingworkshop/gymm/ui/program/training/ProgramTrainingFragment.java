@@ -8,7 +8,6 @@ import android.databinding.DataBindingUtil;
 import android.databinding.ObservableBoolean;
 import android.databinding.ViewDataBinding;
 import android.os.Bundle;
-import android.support.annotation.Nullable;
 import android.support.annotation.VisibleForTesting;
 import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
@@ -18,8 +17,6 @@ import android.view.ViewGroup;
 
 import javax.inject.Inject;
 
-import dagger.android.AndroidInjection;
-import dagger.android.AndroidInjectionModule;
 import dagger.android.support.AndroidSupportInjection;
 import ru.codingworkshop.gymm.R;
 import ru.codingworkshop.gymm.data.tree.node.ProgramTrainingTree;
@@ -34,6 +31,7 @@ import ru.codingworkshop.gymm.ui.program.common.MyAdapterDataObserver;
 import ru.codingworkshop.gymm.ui.program.common.ItemTouchHelperCallback;
 import ru.codingworkshop.gymm.ui.program.common.ProgramRecyclerView;
 import ru.codingworkshop.gymm.ui.program.exercise.ProgramExerciseFragment;
+import timber.log.Timber;
 
 public class ProgramTrainingFragment extends BaseFragment {
     public static final String PROGRAM_TRAINING_ID_KEY = "programTrainingId";
@@ -54,7 +52,20 @@ public class ProgramTrainingFragment extends BaseFragment {
     public void onAttach(Context context) {
         AndroidSupportInjection.inject(this);
         super.onAttach(context);
+        Timber.d("onAttach");
         viewModel = viewModelFactory.create(ProgramTrainingViewModel.class);
+    }
+
+    @Override
+    public void onDetach() {
+        super.onDetach();
+        Timber.d("onDetach");
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        Timber.d("onDestroyView");
     }
 
     @Override
@@ -66,6 +77,7 @@ public class ProgramTrainingFragment extends BaseFragment {
 
     @Override
     protected ViewDataBinding createBinding(LayoutInflater inflater, ViewGroup parent) {
+        Timber.d("createBinding");
         binding = DataBindingUtil.inflate(inflater, R.layout.fragment_program_training, parent, false);
         binding.setInActionMode(new ObservableBoolean());
         binding.programTrainingAddExerciseButton.setOnClickListener(this::onAddExerciseButtonClick);
@@ -87,14 +99,14 @@ public class ProgramTrainingFragment extends BaseFragment {
         } else {
             liveLoaded = viewModel.create();
         }
-        liveLoaded.observe(this, this::init);
+        liveLoaded.observe(this, this::initData);
 
         return binding;
     }
 
-    private void init(ProgramTrainingTree loadedTree) {
+    private void initData(ProgramTrainingTree loadedTree) {
         if (loadedTree == null) return;
-
+        Timber.d("initData");
         tree = loadedTree;
 
         binding.setProgramTraining(tree.getParent());
@@ -159,9 +171,9 @@ public class ProgramTrainingFragment extends BaseFragment {
         switch (item.getItemId()) {
             case R.id.actionSaveTraining:
                 final LiveData<Boolean> liveValid = validate();
-                liveValid.observe(this, valid -> {
+                LiveDataUtil.getOnce(liveValid, valid -> {
                     if (valid != null && valid) {
-                        liveValid.removeObservers(this);
+                        viewModel.create().removeObservers(this);
                         close();
                     }
                 });

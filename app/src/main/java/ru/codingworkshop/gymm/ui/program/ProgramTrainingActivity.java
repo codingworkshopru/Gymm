@@ -16,6 +16,7 @@ import dagger.android.support.HasSupportFragmentInjector;
 import ru.codingworkshop.gymm.R;
 import ru.codingworkshop.gymm.ui.program.exercise.ProgramExerciseFragment;
 import ru.codingworkshop.gymm.ui.program.training.ProgramTrainingFragment;
+import timber.log.Timber;
 
 public class ProgramTrainingActivity extends AppCompatActivity implements HasSupportFragmentInjector {
     @Inject DispatchingAndroidInjector<Fragment> fragmentInjector;
@@ -29,6 +30,8 @@ public class ProgramTrainingActivity extends AppCompatActivity implements HasSup
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_program_training);
 
+        Timber.d("onCreate");
+
         FragmentManager fragmentManager = getSupportFragmentManager();
         programTrainingFragment = (ProgramTrainingFragment) fragmentManager.findFragmentByTag(ProgramTrainingFragment.TAG);
         if (programTrainingFragment == null) {
@@ -39,6 +42,12 @@ public class ProgramTrainingActivity extends AppCompatActivity implements HasSup
                     .add(R.id.programTrainingFragmentContainer, programTrainingFragment, ProgramTrainingFragment.TAG)
                     .commit();
         }
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        Timber.d("onStop");
     }
 
     @Override

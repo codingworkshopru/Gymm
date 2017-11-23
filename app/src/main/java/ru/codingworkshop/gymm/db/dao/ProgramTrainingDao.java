@@ -79,7 +79,7 @@ public interface ProgramTrainingDao {
     @Query("select ps.* " +
             "from ProgramSet ps " +
             "join ProgramExercise pe on pe.id = ps.programExerciseId " +
-            "where pe.programTrainingId = :programTrainingId " +
+            "where pe.programTrainingId = :programTrainingId and pe.drafting == 0 " +
             "order by pe.sortOrder, ps.sortOrder")
     LiveData<List<ProgramSet>> getProgramSetsForTraining(long programTrainingId);
 

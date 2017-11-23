@@ -131,4 +131,10 @@ public final class AlertDialogFragment extends DialogFragment {
 
         return builder.create();
     }
+
+    @Override
+    public void onDetach() {
+        super.onDetach();
+        setListener(null);
+    }
 }

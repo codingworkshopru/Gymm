@@ -75,7 +75,7 @@ public class ProgramExerciseViewModelTest {
     public void createWithoutDrafting() throws Exception {
         vm.setProgramTrainingId(1L);
         when(draftingLoader.loadById(any(), eq(1L))).thenAnswer(invocation -> LiveDataUtil.getAbsent());
-        LiveTest.verifyLiveData(vm.create(), Objects::nonNull);
+        LiveTest.verifyLiveData(vm.create(), Objects::isNull);
 
         final ProgramExercise parent = vm.getProgramExerciseNode().getParent();
         assertEquals(0L, parent.getId());

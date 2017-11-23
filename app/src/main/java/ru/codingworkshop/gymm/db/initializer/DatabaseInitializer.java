@@ -3,6 +3,7 @@ package ru.codingworkshop.gymm.db.initializer;
 import android.arch.persistence.room.Room;
 import android.arch.persistence.room.RoomDatabase.Builder;
 import android.content.Context;
+import android.support.annotation.VisibleForTesting;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
@@ -16,7 +17,8 @@ import ru.codingworkshop.gymm.db.GymmDatabase;
 
 @Singleton
 public final class DatabaseInitializer implements Initializer {
-    private static final String DATABASE_NAME = "ExerciseEditor.db";
+    @VisibleForTesting
+    public static final String DATABASE_NAME = "ExerciseEditor.db";
 
     private GymmDatabase db;
     private Context context;
@@ -33,10 +35,6 @@ public final class DatabaseInitializer implements Initializer {
 
     @Override
     public void initialize() {
-        if (BuildConfig.DEBUG) {
-            this.context.deleteDatabase(DATABASE_NAME);
-        }
-
         Builder<GymmDatabase> dbBuilder = Room.databaseBuilder(this.context, GymmDatabase.class, DATABASE_NAME);
         db = dbBuilder.build();
     }

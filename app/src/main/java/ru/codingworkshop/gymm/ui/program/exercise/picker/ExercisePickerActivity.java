@@ -21,6 +21,7 @@ import ru.codingworkshop.gymm.R;
 import ru.codingworkshop.gymm.data.entity.Exercise;
 import ru.codingworkshop.gymm.data.entity.MuscleGroup;
 import ru.codingworkshop.gymm.ui.program.exercise.ProgramExerciseFragment;
+import timber.log.Timber;
 
 public class ExercisePickerActivity extends AppCompatActivity implements
         HasSupportFragmentInjector,
@@ -37,7 +38,7 @@ public class ExercisePickerActivity extends AppCompatActivity implements
         AndroidInjection.inject(this);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_muscles);
-
+        Timber.d("onCreate");
         ViewPager viewPager = findViewById(R.id.exercisePickerHumanBodyContainer);
         viewPager.setAdapter(new FragmentPagerAdapter(getSupportFragmentManager()) {
             @Override
