@@ -11,6 +11,7 @@ import com.google.common.collect.Lists;
 import java.util.Collection;
 import java.util.List;
 
+import ru.codingworkshop.gymm.data.util.LiveDataUtil;
 import timber.log.Timber;
 
 /**
@@ -39,12 +40,10 @@ public class ChildrenSaver<C> implements Saver {
 
     @Override
     public void save() {
-        oldChildrenLiveData.observeForever(this::difference);
+        LiveDataUtil.getOnce(oldChildrenLiveData, this::difference);
     }
 
     private void difference(List<C> oldChildren) {
-        oldChildrenLiveData.removeObserver(this::difference);
-
         if (oldChildren == null || children == null) return;
 
         if (oldChildren.isEmpty()) {

@@ -8,6 +8,7 @@ import android.databinding.DataBindingUtil;
 import android.databinding.ObservableBoolean;
 import android.databinding.ViewDataBinding;
 import android.os.Bundle;
+import android.support.annotation.Nullable;
 import android.support.annotation.VisibleForTesting;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.Toolbar;
@@ -58,6 +59,15 @@ public class ProgramTrainingFragment extends BaseFragment {
         super.onAttach(context);
         Timber.d("onAttach");
         viewModel = viewModelFactory.create(ProgramTrainingViewModel.class);
+
+        final Bundle arguments = getArguments();
+        LiveData<ProgramTrainingTree> liveLoaded;
+        if (arguments != null) {
+            liveLoaded = viewModel.load(arguments.getLong(PROGRAM_TRAINING_ID_KEY));
+        } else {
+            liveLoaded = viewModel.create();
+        }
+        liveLoaded.observe(this, this::initData);
     }
 
     @Override
@@ -96,22 +106,16 @@ public class ProgramTrainingFragment extends BaseFragment {
             }
         });
 
-        final Bundle arguments = getArguments();
-        LiveData<ProgramTrainingTree> liveLoaded;
-        if (arguments != null) {
-            liveLoaded = viewModel.load(arguments.getLong(PROGRAM_TRAINING_ID_KEY));
-        } else {
-            liveLoaded = viewModel.create();
-        }
-        liveLoaded.observe(this, this::initData);
+        initData(tree);
 
         return binding;
     }
 
     private void initData(ProgramTrainingTree loadedTree) {
-        if (loadedTree == null) return;
-        Timber.d("initData");
         tree = loadedTree;
+        if (binding == null || tree == null) return;
+
+        Timber.d("initData");
 
         binding.setProgramTraining(tree.getParent());
 

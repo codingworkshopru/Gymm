@@ -4,6 +4,8 @@ import android.arch.lifecycle.LiveData;
 import android.arch.lifecycle.MediatorLiveData;
 import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.Transformations;
+import android.support.annotation.CallSuper;
+import android.support.annotation.Nullable;
 
 /**
  * Created by Radik on 09.11.2017.
@@ -23,11 +25,22 @@ public class LoaderDelegate {
 
     public <T> void addSource(LiveData<T> live, Observer<T> observer) {
         sourcesCounter++;
-        liveLoaded.addSource(live, t -> {
-            observer.onChanged(t);
-            sourcesCounter--;
-            if (sourcesCounter <= 0) {
-                onAllSourcesLoaded();
+        liveLoaded.addSource(live, new Observer<T>() {
+            private T data;
+
+            @Override
+            public void onChanged(@Nullable T t) {
+                if (t != null && data == t) {
+                    return;
+                }
+                data = t;
+                sourcesCounter--;
+                observer.onChanged(t);
+                if (liveLoaded.hasActiveObservers()) {
+                    if (sourcesCounter <= 0) {
+                        LoaderDelegate.this.onAllSourcesLoaded();
+                    }
+                }
             }
         });
     }

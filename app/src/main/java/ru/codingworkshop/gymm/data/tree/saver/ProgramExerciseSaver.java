@@ -9,6 +9,7 @@ import ru.codingworkshop.gymm.data.entity.ProgramExercise;
 import ru.codingworkshop.gymm.data.entity.ProgramSet;
 import ru.codingworkshop.gymm.data.tree.node.ProgramExerciseNode;
 import ru.codingworkshop.gymm.repository.ProgramTrainingRepository;
+import timber.log.Timber;
 
 /**
  * Created by Радик on 18.08.2017 as part of the Gymm project.
@@ -28,6 +29,7 @@ public class ProgramExerciseSaver implements Saver,
 
     @Override
     public void save() {
+        Timber.d("save");
         LiveData<List<ProgramSet>> programSetsForExercise = repository.getProgramSetsForExercise(node.getParent());
         new ChildrenSaver<>(node.getChildren(), programSetsForExercise, this).save();
 
@@ -40,11 +42,13 @@ public class ProgramExerciseSaver implements Saver,
 
     @Override
     public void updateParent(ProgramExercise parent) {
+        Timber.d("updateParent");
         repository.updateProgramExercise(parent);
     }
 
     @Override
     public void insertParent(ProgramExercise parent) {
+        Timber.d("insertParent");
         repository.insertProgramExercise(parent);
     }
 
@@ -60,16 +64,19 @@ public class ProgramExerciseSaver implements Saver,
 
     @Override
     public void insertChildren(Collection<ProgramSet> children) {
+        Timber.d("insertChildren");
         repository.insertProgramSets(children);
     }
 
     @Override
     public void updateChildren(Collection<ProgramSet> children) {
+        Timber.d("updateChildren");
         repository.updateProgramSets(children);
     }
 
     @Override
     public void deleteChildren(Collection<ProgramSet> children) {
+        Timber.d("deleteChildren");
         repository.deleteProgramSets(children);
     }
 }

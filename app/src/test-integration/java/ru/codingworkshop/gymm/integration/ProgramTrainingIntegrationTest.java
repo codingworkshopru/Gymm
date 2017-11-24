@@ -60,9 +60,9 @@ public class ProgramTrainingIntegrationTest {
     @Test
     public void editProgramTraining() throws Exception {
         onView(withId(R.id.rv_test_main)).perform(RecyclerViewActions.actionOnItemAtPosition(0, click()));
-//        onView(withId(R.id.programTrainingName))
-//                .perform(clearText())
-//                .perform(typeText("tuesday workout"));
+        onView(withId(R.id.programTrainingName))
+                .perform(clearText())
+                .perform(typeText("tuesday workout"));
         onView(withId(R.id.programExerciseList)).perform(RecyclerViewActions.actionOnItemAtPosition(0, click()));
         onView(withId(R.id.programSetList)).perform(RecyclerViewActions.actionOnItemAtPosition(0, click()));
         typeSet(5, 5, 0);
@@ -76,7 +76,7 @@ public class ProgramTrainingIntegrationTest {
         onView(withId(R.id.actionSaveExercise)).perform(click());
         rvItemAt(R.id.programExerciseList, R.id.programExerciseSetsCount, 0).check(matches(withText(InstrumentationRegistry.getTargetContext().getResources().getQuantityString(R.plurals.number_of_sets, 2, 2))));
         onView(withId(R.id.actionSaveTraining)).perform(click());
-//        rvItemAt(R.id.rv_test_main, R.id.mainActivityTrainingName, 0).check(matches(withText("tuesday workout")));
+        rvItemAt(R.id.rv_test_main, R.id.mainActivityTrainingName, 0).check(matches(withText("tuesday workout")));
     }
 
     private void typeSet(int reps, int minutes, int seconds) {

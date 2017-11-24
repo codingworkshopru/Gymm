@@ -70,8 +70,9 @@ public class ProgramTrainingViewModel extends ViewModel {
     public LiveData<ProgramTrainingTree> load(long programTrainingId) {
         if (liveTree == null) {
             tree = new MutableProgramTrainingTree();
-            liveTree = loader.loadById(tree, programTrainingId);
-            LiveDataUtil.getOnce(liveTree, t -> programTrainingName = t.getParent().getName());
+            liveTree = LiveDataUtil.getOnce(
+                    loader.loadById(tree, programTrainingId),
+                    t -> programTrainingName = t.getParent().getName());
         }
         return liveTree;
     }
