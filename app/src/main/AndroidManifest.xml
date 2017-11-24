@@ -28,17 +28,32 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
         <activity
             android:name=".ui.actual.ActualTrainingActivity"
-            android:label=""
             android:parentActivityName=".ui.MainActivity">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="ru.codingworkshop.gymm.ui.MainActivity" />
         </activity>
-        <activity android:name=".ui.program.ProgramTrainingActivity" />
 
-        <activity android:name=".ui.program.exercise.picker.ExercisePickerActivity"/>
+        <activity
+            android:name=".ui.program.ProgramTrainingActivity"
+            android:parentActivityName=".ui.MainActivity"
+            android:launchMode="singleTop">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="ru.codingworkshop.gymm.ui.MainActivity" />
+        </activity>
+
+        <activity
+            android:name=".ui.program.exercise.picker.ExercisePickerActivity"
+            android:launchMode="singleTop"
+            android:parentActivityName=".ui.program.ProgramTrainingActivity">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".ui.program.ProgramTrainingActivity" />
+        </activity>
     </application>
 
 </manifest>

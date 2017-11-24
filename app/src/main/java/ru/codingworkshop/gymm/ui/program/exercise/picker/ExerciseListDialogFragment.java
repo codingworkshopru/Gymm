@@ -4,12 +4,15 @@ import android.app.Dialog;
 import android.arch.lifecycle.ViewModelProvider;
 import android.content.Context;
 import android.databinding.DataBindingUtil;
+import android.databinding.ViewDataBinding;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.annotation.VisibleForTesting;
 import android.support.design.widget.BottomSheetDialog;
 import android.support.design.widget.BottomSheetDialogFragment;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.view.View;
 
 import java.util.List;
 
@@ -21,6 +24,7 @@ import ru.codingworkshop.gymm.data.entity.Exercise;
 import ru.codingworkshop.gymm.databinding.FragmentExercisePickerListItemBinding;
 import ru.codingworkshop.gymm.ui.common.ClickableBindingListAdapter;
 import ru.codingworkshop.gymm.ui.common.ListItemListeners;
+import ru.codingworkshop.gymm.ui.info.exercise.ExerciseInfoFragment;
 
 /**
  * Created by Radik on 21.11.2017.
@@ -47,6 +51,7 @@ public class ExerciseListDialogFragment extends BottomSheetDialogFragment {
         super.onAttach(context);
 
         viewModel = viewModelFactory.create(ExerciseListDialogViewModel.class);
+        viewModel.load(getArguments().getLong(MUSCLE_GROUP_ID_KEY)).observe(this, this::onExercisesLoaded);
 
         if (exerciseClickListener == null) {
             if (context instanceof OnExerciseClickListener) {
@@ -59,6 +64,7 @@ public class ExerciseListDialogFragment extends BottomSheetDialogFragment {
         }
     }
 
+    @NonNull
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
         final BottomSheetDialog dialog = (BottomSheetDialog) super.onCreateDialog(savedInstanceState);
@@ -69,8 +75,6 @@ public class ExerciseListDialogFragment extends BottomSheetDialogFragment {
             toolbar.setTitle(getArguments().getString(MUSCLE_GROUP_NAME_KEY));
         }
 
-        viewModel.load(getArguments().getLong(MUSCLE_GROUP_ID_KEY)).observe(this, this::onExercisesLoaded);
-
         recyclerView = dialog.findViewById(R.id.fragment_exercise_picker_exercises);
 
         return dialog;
@@ -79,10 +83,8 @@ public class ExerciseListDialogFragment extends BottomSheetDialogFragment {
     private void onExercisesLoaded(List<Exercise> exercises) {
         if (exercises != null && !exercises.isEmpty()) {
             ListItemListeners listItemListeners = new ListItemListeners(R.layout.fragment_exercise_picker_list_item);
-            listItemListeners.setOnClickListener(v -> {
-                Exercise exercise = ((FragmentExercisePickerListItemBinding) DataBindingUtil.getBinding(v)).getExercise();
-                exerciseClickListener.onExerciseClick(exercise);
-            });
+            listItemListeners.setOnClickListener(this::onExerciseClick);
+            listItemListeners.setOnButtonClickListener(this::onExerciseInfoButtonClick, R.id.exerciseListItemInfoButton);
             ClickableBindingListAdapter<Exercise, FragmentExercisePickerListItemBinding> adapter = new ClickableBindingListAdapter<Exercise, FragmentExercisePickerListItemBinding>(exercises, listItemListeners) {
                 @Override
                 protected void bind(FragmentExercisePickerListItemBinding binding, Exercise item) {
@@ -91,6 +93,17 @@ public class ExerciseListDialogFragment extends BottomSheetDialogFragment {
             };
             recyclerView.setAdapter(adapter);
         }
+    }
+
+    private void onExerciseInfoButtonClick(View view) {
+        FragmentExercisePickerListItemBinding binding = DataBindingUtil.findBinding(view);
+        ExerciseInfoFragment fragment = ExerciseInfoFragment.newInstance(binding.getExercise().getId());
+        fragment.show(getChildFragmentManager(), ExerciseInfoFragment.TAG);
+    }
+
+    private void onExerciseClick(View v) {
+        Exercise exercise = ((FragmentExercisePickerListItemBinding) DataBindingUtil.getBinding(v)).getExercise();
+        exerciseClickListener.onExerciseClick(exercise);
     }
 
     public static ExerciseListDialogFragment newInstance(long muscleGroupId, String title) {

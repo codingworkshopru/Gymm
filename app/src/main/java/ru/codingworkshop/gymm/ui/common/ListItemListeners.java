@@ -26,7 +26,7 @@ public class ListItemListeners {
         this.layout = layout;
     }
 
-    public void setListenersToView(View view) {
+    void setListenersToView(View view) {
         if (onClickListener != null) {
             view.setOnClickListener(onClickListener);
         }

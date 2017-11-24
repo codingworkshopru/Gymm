@@ -32,6 +32,8 @@ import ru.codingworkshop.gymm.ui.program.common.ProgramRecyclerView;
 import ru.codingworkshop.gymm.ui.program.exercise.picker.ExercisePickerActivity;
 import timber.log.Timber;
 
+import static android.app.Activity.RESULT_OK;
+
 public class ProgramExerciseFragment extends BaseFragment {
     public static final String EXERCISE_ID_KEY = "exerciseId";
     public static final String EXERCISE_NAME_KEY = "exerciseName";
@@ -57,6 +59,18 @@ public class ProgramExerciseFragment extends BaseFragment {
         super.onAttach(context);
         Timber.d("onAttach");
         viewModel = viewModelFactory.create(ProgramExerciseViewModel.class);
+
+        final Bundle arguments = getArguments();
+        LiveData<ProgramExerciseNode> liveLoaded;
+        if (arguments.containsKey(PROGRAM_EXERCISE_ID_KEY)) {
+            liveLoaded = viewModel.load(arguments.getLong(PROGRAM_EXERCISE_ID_KEY));
+        } else if (arguments.containsKey(PROGRAM_TRAINING_ID_KEY)) {
+            viewModel.setProgramTrainingId(arguments.getLong(PROGRAM_TRAINING_ID_KEY));
+            liveLoaded = viewModel.create();
+        } else {
+            throw new IllegalArgumentException("argument neither contains exercise id nor training id");
+        }
+        liveLoaded.observe(this, this::initData);
     }
 
     @Override
@@ -99,7 +113,7 @@ public class ProgramExerciseFragment extends BaseFragment {
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (data.hasExtra(EXERCISE_ID_KEY) && data.hasExtra(EXERCISE_NAME_KEY)) {
+        if (resultCode == RESULT_OK && data != null && data.hasExtra(EXERCISE_ID_KEY) && data.hasExtra(EXERCISE_NAME_KEY)) {
             Exercise exercise = new Exercise();
             exercise.setId(data.getLongExtra(EXERCISE_ID_KEY, 0L));
             exercise.setName(data.getStringExtra(EXERCISE_NAME_KEY));
@@ -108,7 +122,7 @@ public class ProgramExerciseFragment extends BaseFragment {
     }
 
     private void setExercise(Exercise exercise) {
-        node.setExercise(exercise);
+        viewModel.getProgramExerciseNode().setExercise(exercise);
         binding.setExercise(exercise);
     }
 
@@ -135,18 +149,6 @@ public class ProgramExerciseFragment extends BaseFragment {
                     break;
             }
         });
-
-        final Bundle arguments = getArguments();
-        LiveData<ProgramExerciseNode> liveLoaded;
-        if (arguments.containsKey(PROGRAM_EXERCISE_ID_KEY)) {
-            liveLoaded = viewModel.load(arguments.getLong(PROGRAM_EXERCISE_ID_KEY));
-        } else if (arguments.containsKey(PROGRAM_TRAINING_ID_KEY)) {
-            viewModel.setProgramTrainingId(arguments.getLong(PROGRAM_TRAINING_ID_KEY));
-            liveLoaded = viewModel.create();
-        } else {
-            throw new IllegalArgumentException("argument neither contains exercise id nor training id");
-        }
-        liveLoaded.observe(this, this::initData);
 
         return binding;
     }

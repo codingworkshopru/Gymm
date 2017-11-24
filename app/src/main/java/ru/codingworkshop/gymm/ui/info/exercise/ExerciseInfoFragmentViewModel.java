@@ -3,6 +3,8 @@ package ru.codingworkshop.gymm.ui.info.exercise;
 import android.arch.lifecycle.LiveData;
 import android.arch.lifecycle.ViewModel;
 
+import javax.inject.Inject;
+
 import ru.codingworkshop.gymm.data.tree.loader.ExerciseLoader;
 import ru.codingworkshop.gymm.data.tree.node.ExerciseNode;
 import ru.codingworkshop.gymm.data.util.LiveDataUtil;
@@ -13,18 +15,22 @@ import ru.codingworkshop.gymm.data.util.LiveDataUtil;
 
 public class ExerciseInfoFragmentViewModel extends ViewModel {
     private ExerciseLoader loader;
-    private ExerciseNode node;
+    private LiveData<ExerciseNode> liveNode;
 
-    public ExerciseInfoFragmentViewModel(ExerciseLoader loader) {
+    @Inject
+    ExerciseInfoFragmentViewModel(ExerciseLoader loader) {
         this.loader = loader;
     }
 
+    public LiveData<ExerciseNode> getLiveNode() {
+        return liveNode;
+    }
+
     public LiveData<ExerciseNode> load(long exerciseId) {
-        if (node == null) {
-            node = new ExerciseNode();
-            return loader.loadById(node, exerciseId);
-        } else {
-            return LiveDataUtil.getLive(node);
+        if (liveNode == null) {
+            liveNode = loader.loadById(new ExerciseNode(), exerciseId);
         }
+
+        return liveNode;
     }
 }

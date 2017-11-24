@@ -60,6 +60,9 @@ public class MuscleGroupPickerFragment extends Fragment {
         }
 
         viewModel = viewModelFactory.create(MuscleGroupPickerViewModel.class);
+
+        viewModel.load(getArguments().getBoolean(ANTERIOR_KEY))
+                .observe(this, this::onMuscleGroupsLoaded);
     }
 
     @Nullable
@@ -75,12 +78,12 @@ public class MuscleGroupPickerFragment extends Fragment {
         mapImage = root.findViewById(R.id.muscleGroupPickerMap);
         mapImage.setImageResource(isAnterior ? R.drawable.muscle_labels_map_anterior : R.drawable.muscle_labels_map_posterior);
 
-        viewModel.load(isAnterior).observe(this, this::onMuscleGroupsLoaded);
-
         return root;
     }
 
     private void onMuscleGroupsLoaded(List<MuscleGroup> muscleGroups) {
+        if (muscleGroups == null || muscleGroups.isEmpty()) return;
+
         getView().setOnTouchListener((v, event) -> {
             switch (event.getAction()) {
                 case MotionEvent.ACTION_UP:

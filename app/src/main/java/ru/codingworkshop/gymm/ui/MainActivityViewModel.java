@@ -19,7 +19,7 @@ public class MainActivityViewModel extends ViewModel {
     private LiveData<List<ProgramTraining>> programTrainings;
 
     @Inject
-    public MainActivityViewModel(ProgramTrainingRepository programTrainingRepository) {
+    MainActivityViewModel(ProgramTrainingRepository programTrainingRepository) {
         this.programTrainingRepository = programTrainingRepository;
     }
 

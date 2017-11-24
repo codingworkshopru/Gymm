@@ -106,16 +106,13 @@ public class ProgramTrainingFragment extends BaseFragment {
             }
         });
 
-        initData(tree);
-
         return binding;
     }
 
     private void initData(ProgramTrainingTree loadedTree) {
-        tree = loadedTree;
-        if (binding == null || tree == null) return;
-
+        if (loadedTree == null) return;
         Timber.d("initData");
+        tree = loadedTree;
 
         binding.setProgramTraining(tree.getParent());
 

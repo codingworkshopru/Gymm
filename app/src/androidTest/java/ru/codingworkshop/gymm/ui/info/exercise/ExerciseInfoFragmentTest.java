@@ -95,7 +95,7 @@ public class ExerciseInfoFragmentTest {
         ExerciseInfoFragment fragment = ExerciseInfoFragment.newInstance(100L);
         fragment.viewModelFactory = viewModelFactory;
 
-        activityTestRule.getActivity().setFragment(fragment);
+        fragment.show(activityTestRule.getActivity().getSupportFragmentManager(), "");
     }
 
     private ExerciseNode createExerciseNode(Exercise exercise) {

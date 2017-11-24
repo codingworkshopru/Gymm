@@ -8,7 +8,8 @@
 
     <data>
         <import type="android.view.View" />
-        <import type="ru.codingworkshop.gymm.data.ExerciseDifficulty"/>
+        <import type="ru.codingworkshop.gymm.data.ExerciseDifficulty" />
+        <import type="ru.codingworkshop.gymm.ui.info.exercise.ExerciseInfoFragment" />
 
         <variable
             name="primaryMuscleGroup"
@@ -44,10 +45,10 @@
                 android:fitsSystemWindows="true"
                 android:scaleType="centerCrop"
                 android:visibility="gone"
-                app:srcCompat="@drawable/sporty_woman"
-                app:layout_constraintTop_toTopOf="parent"
                 app:layout_constraintLeft_toLeftOf="parent"
-                app:layout_constraintRight_toRightOf="parent"/>
+                app:layout_constraintRight_toRightOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:srcCompat="@drawable/sporty_woman" />
 
         </FrameLayout>
 
@@ -55,7 +56,6 @@
             android:id="@+id/exerciseInfoContentScrollView"
             android:layout_width="0dp"
             android:layout_height="0dp"
-            android:paddingTop="16dp"
             android:paddingBottom="16dp"
             android:scrollbars="vertical"
             app:layout_constraintBottom_toBottomOf="parent"
@@ -149,7 +149,7 @@
                         android:layout_height="wrap_content"
                         android:layout_marginLeft="16dp"
                         android:layout_marginStart="16dp"
-                        android:text="@{exercise.steps}"
+                        android:text="@{ExerciseInfoFragment.insertBullets(exercise.steps)}"
                         android:textAppearance="@style/TextAppearance.AppCompat.Body1"
                         tools:text="Встаньте с прямой спиной, держа в руках штангу хватом на ширине плеч. Гриф держите ладонями вверх, локти близко к торсу. " />
                 </LinearLayout>
@@ -178,7 +178,7 @@
                         android:layout_height="wrap_content"
                         android:layout_marginLeft="16dp"
                         android:layout_marginStart="16dp"
-                        android:text="@{exercise.advices}"
+                        android:text="@{ExerciseInfoFragment.insertBullets(exercise.advices)}"
                         android:textAppearance="@style/TextAppearance.AppCompat.Body1"
                         tools:text="Не изменяйте положения локтей во время выполнения упражнения. " />
                 </LinearLayout>
@@ -206,7 +206,7 @@
                         android:layout_height="wrap_content"
                         android:layout_marginLeft="16dp"
                         android:layout_marginStart="16dp"
-                        android:text="@{exercise.caution}"
+                        android:text="@{ExerciseInfoFragment.insertBullets(exercise.caution)}"
                         android:textAppearance="@style/TextAppearance.AppCompat.Body1"
                         tools:text="Поскольку упражнение существенно нагружает сухожилия рук, вам нужно хорошо разогреть мышцы, перед тем как приступить к нему." />
                 </LinearLayout>
@@ -234,7 +234,7 @@
                         android:layout_height="wrap_content"
                         android:layout_marginLeft="16dp"
                         android:layout_marginStart="16dp"
-                        android:text="@{exercise.variations}"
+                        android:text="@{ExerciseInfoFragment.insertBullets(exercise.variations)}"
                         android:textAppearance="@style/TextAppearance.AppCompat.Body1"
                         tools:text="При использовании EZ-грифа уменьшается нагрузка на мышцы предплечий. При использовании EZ-грифа уменьшается нагрузка на мышцы предплечий. При использовании EZ-грифа уменьшается нагрузка на мышцы предплечий. При использовании EZ-грифа уменьшается нагрузка на мышцы предплечий. При использовании EZ-грифа уменьшается нагрузка на мышцы предплечий. При использовании EZ-грифа уменьшается нагрузка на мышцы предплечий. При использовании EZ-грифа уменьшается нагрузка на мышцы предплечий. При использовании EZ-грифа уменьшается нагрузка на мышцы предплечий. При использовании EZ-грифа уменьшается нагрузка на мышцы предплечий. При использовании EZ-грифа уменьшается нагрузка на мышцы предплечий. При использовании EZ-грифа уменьшается нагрузка на мышцы предплечий. При использовании EZ-грифа уменьшается нагрузка на мышцы предплечий. При использовании EZ-грифа уменьшается нагрузка на мышцы предплечий. При использовании EZ-грифа уменьшается нагрузка на мышцы предплечий. При использовании EZ-грифа уменьшается нагрузка на мышцы предплечий. При использовании EZ-грифа уменьшается нагрузка на мышцы предплечий. При использовании EZ-грифа уменьшается нагрузка на мышцы предплечий. При использовании EZ-грифа уменьшается нагрузка на мышцы предплечий." />
                 </LinearLayout>

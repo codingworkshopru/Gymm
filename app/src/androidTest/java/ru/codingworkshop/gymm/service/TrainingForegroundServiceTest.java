@@ -88,6 +88,7 @@ public class TrainingForegroundServiceTest {
     public void tearDown() throws Exception {
         postedEvents.clear();
         observers.clear();
+        serviceTestRule.unbindService();
     }
 
     @Test

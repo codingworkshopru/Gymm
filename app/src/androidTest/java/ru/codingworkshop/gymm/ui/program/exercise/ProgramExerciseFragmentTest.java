@@ -15,10 +15,13 @@ import android.support.test.espresso.action.GeneralSwipeAction;
 import android.support.test.espresso.action.Press;
 import android.support.test.espresso.action.Swipe;
 import android.support.test.espresso.contrib.RecyclerViewActions;
+import android.support.test.espresso.intent.Intents;
+import android.support.test.espresso.intent.ResettingStubber;
 import android.support.test.espresso.intent.rule.IntentsTestRule;
 import android.view.View;
 
 import org.hamcrest.Matcher;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -35,10 +38,12 @@ import ru.codingworkshop.gymm.data.entity.Exercise;
 import ru.codingworkshop.gymm.data.entity.ProgramSet;
 import ru.codingworkshop.gymm.data.tree.node.ProgramExerciseNode;
 import ru.codingworkshop.gymm.testing.SimpleFragmentActivity;
+import ru.codingworkshop.gymm.ui.program.exercise.picker.ExercisePickerActivity;
 import ru.codingworkshop.gymm.util.Models;
 import ru.codingworkshop.gymm.util.RecyclerViewItemMatcher;
 import ru.codingworkshop.gymm.util.TreeBuilders;
 
+import static android.app.Activity.RESULT_OK;
 import static android.support.test.espresso.Espresso.onView;
 import static android.support.test.espresso.action.GeneralLocation.CENTER;
 import static android.support.test.espresso.action.ViewActions.actionWithAssertions;
@@ -48,8 +53,10 @@ import static android.support.test.espresso.action.ViewActions.swipeLeft;
 import static android.support.test.espresso.action.ViewActions.swipeRight;
 import static android.support.test.espresso.action.ViewActions.swipeUp;
 import static android.support.test.espresso.assertion.ViewAssertions.matches;
+import static android.support.test.espresso.intent.Intents.init;
 import static android.support.test.espresso.intent.Intents.intending;
 import static android.support.test.espresso.intent.matcher.IntentMatchers.anyIntent;
+import static android.support.test.espresso.intent.matcher.IntentMatchers.hasComponent;
 import static android.support.test.espresso.matcher.ViewMatchers.assertThat;
 import static android.support.test.espresso.matcher.ViewMatchers.isDisplayed;
 import static android.support.test.espresso.matcher.ViewMatchers.withId;
@@ -81,17 +88,17 @@ public class ProgramExerciseFragmentTest {
     public IntentsTestRule<SimpleFragmentActivity> activityTestRule =
             new IntentsTestRule<>(SimpleFragmentActivity.class);
     private ProgramExerciseNode node;
+    private Instrumentation.ActivityResult activityResult;
 
     @Before
     public void setUp() throws Exception {
         MockitoAnnotations.initMocks(this);
 
-        Intent intent = new Intent();
         Exercise e = Models.createExercise(101L, "exercise101");
+        Intent intent = new Intent();
         intent.putExtra(EXERCISE_ID_KEY, e.getId());
         intent.putExtra(EXERCISE_NAME_KEY, e.getName());
-        Instrumentation.ActivityResult result = new Instrumentation.ActivityResult(0, intent);
-        intending(anyIntent()).respondWith(result);// TODO: 26.10.2017 specify particular intent
+        activityResult = new Instrumentation.ActivityResult(RESULT_OK, intent);
 
         RecyclerViewItemMatcher.setRecyclerViewId(R.id.programSetList);
 
@@ -112,6 +119,11 @@ public class ProgramExerciseFragmentTest {
             return null;
         }).when(vm).setChildrenChanged();
     }
+
+//    @After
+//    public void tearDown() throws Exception {
+//        Intents.release();
+//    }
 
     @Test
     public void initializationTest() throws Exception {
@@ -223,13 +235,23 @@ public class ProgramExerciseFragmentTest {
 
     @Test
     public void pickExerciseTest() throws Exception {
+        intending(hasComponent(ExercisePickerActivity.class.getName())).respondWith(activityResult);
         onView(withId(R.id.programExerciseName)).perform(click());
         onView(withId(R.id.programExerciseName)).check(matches(withText("exercise101")));
         assertEquals(101L, node.getExercise().getId());
     }
 
     @Test
+    public void pickExerciseWithoutResultTest() throws Exception {
+        Instrumentation.ActivityResult result = new Instrumentation.ActivityResult(0, null);
+        intending(hasComponent(ExercisePickerActivity.class.getName())).respondWith(result);
+
+        onView(withId(R.id.programExerciseName)).perform(click());
+    }
+
+    @Test
     public void exerciseChangedAssuranceMessageTest() throws Exception {
+        intending(hasComponent(ExercisePickerActivity.class.getName())).respondWith(activityResult);
         onView(withId(R.id.programExerciseName)).perform(click());
         when(vm.isChanged()).thenReturn(true);
         fragment.onFragmentClose();
