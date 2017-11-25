@@ -61,6 +61,7 @@ dependencies {
     implementation "com.android.support:recyclerview-v7:$support"
     implementation "com.android.support:design:$support"
     implementation "com.android.support:support-v4:$support"
+    implementation "com.android.support:cardview-v7:$support"
     implementation "com.android.support.constraint:constraint-layout:$constraint"
 
 //    implementation "android.arch.lifecycle:runtime:$arch" // not necessary if you are using Support Library 26.1+

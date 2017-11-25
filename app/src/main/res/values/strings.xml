@@ -68,6 +68,9 @@
     <string name="reps">Повторения</string>
     <string name="no_button_text">Нет</string>
     <string name="save_button_text">Сохранить</string>
+    <string name="delete_button_text">Удалить</string>
+    <string name="edit_button_text">Изменить</string>
+    <string name="start_button_text">Начать</string>
     <string name="cancel_changes_question">Отменить изменения?</string>
     <string name="add_button_text">Добавить</string>
     <string name="select_button_text">Выбрать</string>

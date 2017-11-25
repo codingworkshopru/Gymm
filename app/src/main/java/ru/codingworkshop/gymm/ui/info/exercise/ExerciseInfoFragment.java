@@ -5,6 +5,8 @@ import android.arch.lifecycle.ViewModelProvider;
 import android.arch.lifecycle.ViewModelProviders;
 import android.content.Context;
 import android.databinding.DataBindingUtil;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -36,12 +38,13 @@ import ru.codingworkshop.gymm.databinding.FragmentExerciseInfoBinding;
 
 import static android.view.ViewGroup.LayoutParams.MATCH_PARENT;
 import static com.google.android.youtube.player.YouTubeInitializationResult.SUCCESS;
+import static com.google.android.youtube.player.YouTubePlayer.FULLSCREEN_FLAG_CUSTOM_LAYOUT;
 
 public class ExerciseInfoFragment extends DialogFragment {
     public static final String TAG = "exerciseInfoFragmentTag";
     static final String EXERCISE_ID_KEY = "exerciseIdKey";
     private static final String GOOGLE_DEVELOPER_KEY = "AIzaSyCnjhekaG5JdIEtdbeMH4iE0pZiprQZYp4";
-    private static final String YOU_TUBE_PLAYER_FRAGMENT_TAG = "youTubePlayerFragmentTag";
+    private static final String YOUTUBE_PLAYER_FRAGMENT_TAG = "youTubePlayerFragmentTag";
 
     @Inject
     ViewModelProvider.Factory viewModelFactory;
@@ -59,8 +62,7 @@ public class ExerciseInfoFragment extends DialogFragment {
         super.onCreate(savedInstanceState);
 
         ExerciseInfoFragmentViewModel viewModel = ViewModelProviders.of(this, viewModelFactory).get(ExerciseInfoFragmentViewModel.class);
-        viewModel.load(getArguments().getLong(EXERCISE_ID_KEY))
-                .observe(this, this::onExerciseNodeLoaded);
+        viewModel.load(getArguments().getLong(EXERCISE_ID_KEY)).observe(this, this::onExerciseNodeLoaded);
     }
 
     @Nullable
@@ -97,6 +99,7 @@ public class ExerciseInfoFragment extends DialogFragment {
             Window window = dialog.getWindow();
             if (window != null) {
                 window.setLayout(MATCH_PARENT, MATCH_PARENT);
+                window.setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
             }
         }
         super.onStart();
@@ -117,13 +120,13 @@ public class ExerciseInfoFragment extends DialogFragment {
     }
 
     private void initYouTubePlayerFragment() {
-        youTubePlayerFragment = (YouTubePlayerSupportFragment) getChildFragmentManager().findFragmentByTag(YOU_TUBE_PLAYER_FRAGMENT_TAG);
+        youTubePlayerFragment = (YouTubePlayerSupportFragment) getChildFragmentManager().findFragmentByTag(YOUTUBE_PLAYER_FRAGMENT_TAG);
         if (youTubePlayerFragment == null) {
             youTubePlayerFragment = YouTubePlayerSupportFragment.newInstance();
 
             getChildFragmentManager()
                     .beginTransaction()
-                    .add(R.id.exerciseInfoYouTubePlayerContainer, youTubePlayerFragment, YOU_TUBE_PLAYER_FRAGMENT_TAG)
+                    .add(R.id.exerciseInfoYouTubePlayerContainer, youTubePlayerFragment, YOUTUBE_PLAYER_FRAGMENT_TAG)
                     .commit();
         }
     }
@@ -133,7 +136,9 @@ public class ExerciseInfoFragment extends DialogFragment {
             @Override
             public void onInitializationSuccess(YouTubePlayer.Provider provider, YouTubePlayer youTubePlayer, boolean wasRestored) {
 //                youTubePlayerFragment.setFullscreen(false);
-                youTubePlayer.cueVideo(videoId);
+                if (!wasRestored) {
+                    youTubePlayer.cueVideo(videoId);
+                }
                 youTubePlayer.setPlayerStateChangeListener(new YouTubePlayer.PlayerStateChangeListener() {
                     public void onError(YouTubePlayer.ErrorReason errorReason) {
                         invalidateYouTubePlayer();

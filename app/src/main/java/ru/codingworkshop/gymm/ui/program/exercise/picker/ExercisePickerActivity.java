@@ -62,7 +62,7 @@ public class ExercisePickerActivity extends AppCompatActivity implements
 
             @Override
             public CharSequence getPageTitle(int position) {
-                return getString(position == 0 ? R.string.muscles_activity_anterior : R.string.muscles_activity_anterior);
+                return getString(position == 0 ? R.string.muscles_activity_anterior : R.string.muscles_activity_posterior);
             }
         });
 
