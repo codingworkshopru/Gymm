@@ -6,6 +6,7 @@ import android.arch.lifecycle.ViewModel;
 import android.support.annotation.VisibleForTesting;
 
 import com.google.common.base.Preconditions;
+import com.google.common.collect.Iterables;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -106,8 +107,6 @@ public class ProgramExerciseViewModel extends ViewModel {
         final ProgramExercise parent = node.getParent();
         if (parent.isDrafting()) {
             repository.deleteProgramExercise(parent);
-            node = null;
-            liveNode = null;
         }
     }
 

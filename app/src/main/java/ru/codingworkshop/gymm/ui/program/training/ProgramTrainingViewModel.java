@@ -1,11 +1,10 @@
 package ru.codingworkshop.gymm.ui.program.training;
 
 import android.arch.lifecycle.LiveData;
-import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.Transformations;
 import android.arch.lifecycle.ViewModel;
-import android.support.annotation.Nullable;
 import android.support.annotation.VisibleForTesting;
+import android.text.TextUtils;
 
 import javax.inject.Inject;
 
@@ -14,10 +13,8 @@ import ru.codingworkshop.gymm.data.tree.loader.ProgramDraftingTrainingTreeLoader
 import ru.codingworkshop.gymm.data.tree.loader.ProgramTrainingTreeLoader;
 import ru.codingworkshop.gymm.data.tree.node.MutableProgramTrainingTree;
 import ru.codingworkshop.gymm.data.tree.node.ProgramTrainingTree;
-import ru.codingworkshop.gymm.data.tree.repositoryadapter.ProgramTrainingAdapter;
 import ru.codingworkshop.gymm.data.tree.saver.ProgramTrainingSaver;
 import ru.codingworkshop.gymm.data.util.LiveDataUtil;
-import ru.codingworkshop.gymm.repository.ExercisesRepository;
 import ru.codingworkshop.gymm.repository.ProgramTrainingRepository;
 
 /**
@@ -31,7 +28,7 @@ public class ProgramTrainingViewModel extends ViewModel {
     @VisibleForTesting
     ProgramTrainingTree tree;
     private LiveData<ProgramTrainingTree> liveTree;
-    private String programTrainingName;
+    private String oldTrainingName;
     private boolean childrenChanged;
 
     @Inject
@@ -76,7 +73,7 @@ public class ProgramTrainingViewModel extends ViewModel {
             tree = new MutableProgramTrainingTree();
             liveTree = LiveDataUtil.getOnce(
                     loader.loadById(tree, programTrainingId),
-                    t -> programTrainingName = t.getParent().getName());
+                    t -> oldTrainingName = t.getParent().getName());
         }
         return liveTree;
     }
@@ -96,8 +93,6 @@ public class ProgramTrainingViewModel extends ViewModel {
         final ProgramTraining parent = tree.getParent();
         if (parent.isDrafting()) {
             repository.deleteProgramTraining(parent);
-            tree = null;
-            liveTree = null;
         }
     }
 
@@ -106,6 +101,7 @@ public class ProgramTrainingViewModel extends ViewModel {
     }
 
     public boolean isChanged() {
-        return childrenChanged || !tree.getParent().getName().equals(programTrainingName);
+        String newName = tree.getParent().getName();
+        return childrenChanged || !TextUtils.equals(newName, oldTrainingName);
     }
 }
