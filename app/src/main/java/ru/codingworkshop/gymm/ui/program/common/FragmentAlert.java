@@ -15,15 +15,13 @@ public class FragmentAlert {
     private FragmentManager fragmentManager;
     private AlertDialogFragment dialogFragment;
 
-    public FragmentAlert(@NonNull FragmentManager fragmentManager,
-                         AlertDialogFragment.OnDialogButtonClickListener listener) {
+    public FragmentAlert(@NonNull FragmentManager fragmentManager) {
         this.fragmentManager = fragmentManager;
 
         dialogFragment = (AlertDialogFragment) fragmentManager.findFragmentByTag(AlertDialogFragment.TAG);
         if (dialogFragment == null) {
             dialogFragment = AlertDialogFragment.newInstance();
         }
-        dialogFragment.setListener(listener);
     }
 
     public void showAlert(int dialogId, @NonNull Bundle args) {

@@ -3,11 +3,13 @@ package ru.codingworkshop.gymm.ui.program.exercise;
 
 import android.arch.lifecycle.LiveData;
 import android.arch.lifecycle.ViewModelProvider;
+import android.arch.lifecycle.ViewModelProviders;
 import android.content.Context;
 import android.content.Intent;
 import android.databinding.DataBindingUtil;
 import android.databinding.ViewDataBinding;
 import android.os.Bundle;
+import android.support.annotation.Nullable;
 import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
@@ -22,6 +24,7 @@ import ru.codingworkshop.gymm.data.entity.Exercise;
 import ru.codingworkshop.gymm.data.tree.node.ProgramExerciseNode;
 import ru.codingworkshop.gymm.databinding.FragmentProgramExerciseBinding;
 import ru.codingworkshop.gymm.databinding.FragmentProgramExerciseListItemBinding;
+import ru.codingworkshop.gymm.ui.program.ProgramTrainingActivity;
 import ru.codingworkshop.gymm.ui.program.common.FragmentAlert;
 import ru.codingworkshop.gymm.ui.common.ListItemListeners;
 import ru.codingworkshop.gymm.ui.program.common.ActionModeCallback;
@@ -30,11 +33,15 @@ import ru.codingworkshop.gymm.ui.program.common.MyAdapterDataObserver;
 import ru.codingworkshop.gymm.ui.program.common.ItemTouchHelperCallback;
 import ru.codingworkshop.gymm.ui.program.common.ProgramRecyclerView;
 import ru.codingworkshop.gymm.ui.program.exercise.picker.ExercisePickerActivity;
+import ru.codingworkshop.gymm.ui.util.AlertDialogFragment;
 import timber.log.Timber;
 
 import static android.app.Activity.RESULT_OK;
 
-public class ProgramExerciseFragment extends BaseFragment {
+public class ProgramExerciseFragment extends BaseFragment implements
+        AlertDialogFragment.OnDialogButtonClickListener,
+        ProgramTrainingActivity.OnSystemBackPressedListener
+{
     public static final String EXERCISE_ID_KEY = "exerciseId";
     public static final String EXERCISE_NAME_KEY = "exerciseName";
     private static final String PROGRAM_EXERCISE_ID_KEY = "programExerciseId";
@@ -58,7 +65,13 @@ public class ProgramExerciseFragment extends BaseFragment {
         AndroidSupportInjection.inject(this);
         super.onAttach(context);
         Timber.d("onAttach");
-        viewModel = viewModelFactory.create(ProgramExerciseViewModel.class);
+    }
+
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        Timber.d("onCreate");
+        viewModel = ViewModelProviders.of(this, viewModelFactory).get(ProgramExerciseViewModel.class);
 
         final Bundle arguments = getArguments();
         LiveData<ProgramExerciseNode> liveLoaded;
@@ -91,7 +104,7 @@ public class ProgramExerciseFragment extends BaseFragment {
             case R.id.actionSaveExercise:
                 if (validate()) {
                     viewModel.save();
-                    getFragmentManager().popBackStack();
+                    close();
                 }
                 return true;
         }
@@ -141,16 +154,22 @@ public class ProgramExerciseFragment extends BaseFragment {
         binding.setInActionMode(getInActionMode());
         binding.programExerciseName.setOnClickListener(this::onExercisePick);
         binding.programExerciseAddSetButton.setOnClickListener(this::onAddSet);
+        binding.programExerciseToolbar.setNavigationOnClickListener(v -> onFragmentClose());
 
-        alert = new FragmentAlert(getChildFragmentManager(), (dialogId, positive) -> {
-            switch (dialogId) {
-                case CANCEL_ALERT_ID:
-                    cleanupAndClose();
-                    break;
-            }
-        });
+        alert = new FragmentAlert(getChildFragmentManager());
 
         return binding;
+    }
+
+    @Override
+    public void onDialogButtonClick(int dialogId, boolean positive) {
+        if (!positive) return;
+
+        switch (dialogId) {
+            case CANCEL_ALERT_ID:
+                cleanupAndClose();
+                break;
+        }
     }
 
     private void onAddSet(View view) {
@@ -198,7 +217,29 @@ public class ProgramExerciseFragment extends BaseFragment {
     protected void onItemLongClick(View v) {
         ActionModeCallback actionModeCallback = new ActionModeCallback(binding.programSetList, getInActionMode());
         getActivity().startActionMode(actionModeCallback);
-        viewModel.setChildrenChanged();
+    }
+
+    private void onExercisePick(View view) {
+        Intent pickerIntent = new Intent(getContext(), ExercisePickerActivity.class);
+        startActivityForResult(pickerIntent, 0);
+    }
+
+    @Override
+    public void onFragmentClose() {
+        if (viewModel.isChanged()) {
+            alert.showTwoButtonsAlert(0, R.string.cancel_changes_question);
+        } else {
+            cleanupAndClose();
+        }
+    }
+
+    private void cleanupAndClose() {
+        viewModel.deleteIfDrafting();
+        close();
+    }
+
+    private void close() {
+        getFragmentManager().popBackStack();
     }
 
     public static ProgramExerciseFragment newInstanceForNew(long programTrainingId) {
@@ -215,26 +256,5 @@ public class ProgramExerciseFragment extends BaseFragment {
         ProgramExerciseFragment fragment = new ProgramExerciseFragment();
         fragment.setArguments(args);
         return fragment;
-    }
-
-    private void onExercisePick(View view) {
-        Intent pickerIntent = new Intent(getContext(), ExercisePickerActivity.class);
-        startActivityForResult(pickerIntent, 0);
-    }
-
-    void onFragmentClose() {
-        if (viewModel.isChanged()) {
-            alert.showTwoButtonsAlert(0, R.string.cancel_changes_question);
-        } else {
-            cleanupAndClose();
-        }
-    }
-
-    private void cleanupAndClose() {
-        viewModel.deleteIfDrafting();
-        close();
-    }
-
-    private void close() {
     }
 }

@@ -100,6 +100,7 @@ public class ActualTrainingRestFragment extends Fragment {
         Timber.d("onDetach");
         super.onDetach();
 
+        callback = null;
         progressBarAnimation.stop();
         restEventBus.unregister(this);
         restEventBus = null;

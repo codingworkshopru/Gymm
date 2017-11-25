@@ -12,6 +12,7 @@ import org.mockito.invocation.InvocationOnMock;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.mockito.stubbing.Answer;
 
+import java.util.ArrayList;
 import java.util.Objects;
 
 import ru.codingworkshop.gymm.data.entity.ProgramExercise;
@@ -56,8 +57,9 @@ public class ProgramExerciseViewModelTest {
     @Before
     public void setUp() throws Exception {
         vm = new ProgramExerciseViewModel(loader, draftingLoader, repository);
-        ProgramExerciseNode programExerciseNode = TreeBuilders.buildProgramTrainingTree(1).getChildren().get(0);
+        when(repository.getProgramSetsForExercise(2L)).thenReturn(LiveDataUtil.getLive(new ArrayList<>(TreeBuilders.buildProgramTrainingTree(1).getChildren().get(0).getChildren())));
         when(loader.loadById(any(), eq(2L))).thenAnswer(invocation -> {
+            ProgramExerciseNode programExerciseNode = TreeBuilders.buildProgramTrainingTree(1).getChildren().get(0);
             vm.node = programExerciseNode;
             return LiveDataUtil.getLive(programExerciseNode);
         });
@@ -158,16 +160,23 @@ public class ProgramExerciseViewModelTest {
 
     @Test
     public void childrenChangedTest() throws Exception {
-        LiveTest.verifyLiveData(vm.load(2L), Objects::nonNull);
-        vm.setChildrenChanged();
+        LiveTest.verifyLiveData(vm.load(2L), node -> {
+            node.addChild(Models.createProgramSet(50L, 2L, 10));
+            node.removeChild(0);
+
+            ProgramSet set = node.getChildren().get(0);
+            set.setSecondsForRest(200);
+            vm.replaceProgramSet(set);
+            return true;
+        });
         assertTrue(vm.isChanged());
     }
 
     @Test
     public void parentAndChildrenChangedTest() throws Exception {
         LiveTest.verifyLiveData(vm.load(2L), Objects::nonNull);
+        vm.getProgramExerciseNode().removeChild(0);
         vm.getProgramExerciseNode().getParent().setExerciseId(150L);
-        vm.setChildrenChanged();
         assertTrue(vm.isChanged());
     }
 

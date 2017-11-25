@@ -2,11 +2,13 @@ package ru.codingworkshop.gymm.ui.program.exercise.picker;
 
 import android.app.Dialog;
 import android.arch.lifecycle.ViewModelProvider;
+import android.arch.lifecycle.ViewModelProviders;
 import android.content.Context;
 import android.databinding.DataBindingUtil;
 import android.databinding.ViewDataBinding;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.annotation.VisibleForTesting;
 import android.support.design.widget.BottomSheetDialog;
 import android.support.design.widget.BottomSheetDialogFragment;
@@ -42,16 +44,12 @@ public class ExerciseListDialogFragment extends BottomSheetDialogFragment {
     ViewModelProvider.Factory viewModelFactory;
     @VisibleForTesting
     OnExerciseClickListener exerciseClickListener;
-    private ExerciseListDialogViewModel viewModel;
     private RecyclerView recyclerView;
 
     @Override
     public void onAttach(Context context) {
         AndroidSupportInjection.inject(this);
         super.onAttach(context);
-
-        viewModel = viewModelFactory.create(ExerciseListDialogViewModel.class);
-        viewModel.load(getArguments().getLong(MUSCLE_GROUP_ID_KEY)).observe(this, this::onExercisesLoaded);
 
         if (exerciseClickListener == null) {
             if (context instanceof OnExerciseClickListener) {
@@ -62,6 +60,14 @@ public class ExerciseListDialogFragment extends BottomSheetDialogFragment {
                 throw new IllegalStateException("Parent must implement " + OnExerciseClickListener.class + " interface");
             }
         }
+    }
+
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+
+        ExerciseListDialogViewModel viewModel = ViewModelProviders.of(this, viewModelFactory).get(ExerciseListDialogViewModel.class);
+        viewModel.load(getArguments().getLong(MUSCLE_GROUP_ID_KEY)).observe(this, this::onExercisesLoaded);
     }
 
     @NonNull

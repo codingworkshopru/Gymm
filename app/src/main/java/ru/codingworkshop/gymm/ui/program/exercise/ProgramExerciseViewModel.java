@@ -1,15 +1,17 @@
 package ru.codingworkshop.gymm.ui.program.exercise;
 
 import android.arch.lifecycle.LiveData;
-import android.arch.lifecycle.MutableLiveData;
-import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.Transformations;
 import android.arch.lifecycle.ViewModel;
-import android.support.annotation.Nullable;
 import android.support.annotation.VisibleForTesting;
 
-import com.google.common.base.Objects;
 import com.google.common.base.Preconditions;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 import javax.inject.Inject;
 
@@ -17,14 +19,11 @@ import ru.codingworkshop.gymm.data.entity.ProgramExercise;
 import ru.codingworkshop.gymm.data.entity.ProgramSet;
 import ru.codingworkshop.gymm.data.tree.loader.ProgramDraftingExerciseLoader;
 import ru.codingworkshop.gymm.data.tree.loader.ProgramExerciseLoader;
-import ru.codingworkshop.gymm.data.tree.loader.ProgramTrainingTreeLoader;
 import ru.codingworkshop.gymm.data.tree.node.MutableProgramExerciseNode;
 import ru.codingworkshop.gymm.data.tree.node.ProgramExerciseNode;
-import ru.codingworkshop.gymm.data.tree.repositoryadapter.ProgramExerciseAdapter;
 import ru.codingworkshop.gymm.data.tree.saver.ProgramExerciseSaver;
 import ru.codingworkshop.gymm.data.util.LiveDataUtil;
 import ru.codingworkshop.gymm.db.GymmDatabase;
-import ru.codingworkshop.gymm.repository.ExercisesRepository;
 import ru.codingworkshop.gymm.repository.ProgramTrainingRepository;
 
 /**
@@ -41,8 +40,8 @@ public class ProgramExerciseViewModel extends ViewModel {
     private LiveData<ProgramExerciseNode> liveNode;
 
     private long programTrainingId;
-    private boolean childrenChanged;
-    private long exerciseId;
+    private Long oldExerciseId;
+    private List<ProgramSet> oldChildren;
 
     @Inject
     ProgramExerciseViewModel(ProgramExerciseLoader programExerciseLoader, ProgramDraftingExerciseLoader programDraftingExerciseLoader, ProgramTrainingRepository repository) {
@@ -88,7 +87,10 @@ public class ProgramExerciseViewModel extends ViewModel {
             node = new MutableProgramExerciseNode();
             liveNode = LiveDataUtil.getOnce(
                     programExerciseLoader.loadById(node, programExerciseId),
-                    n -> exerciseId = n.getExerciseId()
+                    n -> {
+                        oldExerciseId = n.getExerciseId();
+                        LiveDataUtil.getOnce(repository.getProgramSetsForExercise(n.getId()), sets -> oldChildren = sets);
+                    }
             );
         }
 
@@ -105,15 +107,15 @@ public class ProgramExerciseViewModel extends ViewModel {
         if (parent.isDrafting()) {
             repository.deleteProgramExercise(parent);
             node = null;
+            liveNode = null;
         }
     }
 
-    public void setChildrenChanged() {
-        this.childrenChanged = true;
-    }
-
     public boolean isChanged() {
-        return childrenChanged || node.getParent().getExerciseId() != exerciseId;
+        long oldEx = oldExerciseId == null ? 0 : oldExerciseId;
+        long newEx = node.getExerciseId() == null ? 0 : node.getExerciseId();
+
+        return oldEx != newEx || !(oldChildren == null && !node.hasChildren()) && !node.getChildren().equals(oldChildren);
     }
 
     public void addProgramSet(ProgramSet programSet) {

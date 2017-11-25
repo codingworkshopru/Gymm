@@ -56,21 +56,6 @@ abstract class ViewModelModule {
     @ViewModelKey(ExerciseInfoFragmentViewModel.class)
     abstract ViewModel bindExerciseInfoFragmentViewModel(ExerciseInfoFragmentViewModel exerciseInfoFragmentViewModel);
 
-//    @Binds
-//    @IntoMap
-//    @ViewModelKey(MusclesViewModel.class)
-//    abstract ViewModel bindMusclesViewModel(MusclesViewModel musclesViewModel);
-//
-//    @Binds
-//    @IntoMap
-//    @ViewModelKey(ExercisesListViewModel.class)
-//    abstract ViewModel bindExercisesListViewModel(ExercisesListViewModel exercisesListViewModel);
-//
-//    @Binds
-//    @IntoMap
-//    @ViewModelKey(EditorViewModel.class)
-//    abstract ViewModel bindEditorViewModel(EditorViewModel editorViewModel);
-//
     @Binds
     abstract ViewModelProvider.Factory bindViewModelFactory(ViewModelFactory viewModelFactory);
 }

@@ -2,6 +2,8 @@ package ru.codingworkshop.gymm.ui.info.exercise;
 
 import android.app.Dialog;
 import android.arch.lifecycle.ViewModelProvider;
+import android.arch.lifecycle.ViewModelProviders;
+import android.content.Context;
 import android.databinding.DataBindingUtil;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -47,11 +49,16 @@ public class ExerciseInfoFragment extends DialogFragment {
     private YouTubePlayerSupportFragment youTubePlayerFragment;
 
     @Override
-    public void onCreate(@Nullable Bundle savedInstanceState) {
+    public void onAttach(Context context) {
         AndroidSupportInjection.inject(this);
+        super.onAttach(context);
+    }
+
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        ExerciseInfoFragmentViewModel viewModel = viewModelFactory.create(ExerciseInfoFragmentViewModel.class);
+        ExerciseInfoFragmentViewModel viewModel = ViewModelProviders.of(this, viewModelFactory).get(ExerciseInfoFragmentViewModel.class);
         viewModel.load(getArguments().getLong(EXERCISE_ID_KEY))
                 .observe(this, this::onExerciseNodeLoaded);
     }

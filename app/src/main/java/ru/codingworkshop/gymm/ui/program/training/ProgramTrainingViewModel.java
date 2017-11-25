@@ -45,6 +45,10 @@ public class ProgramTrainingViewModel extends ViewModel {
         return tree;
     }
 
+    public LiveData<ProgramTrainingTree> getLiveTree() {
+        return liveTree;
+    }
+
     private void initTree() {
         ProgramTraining programTraining = new ProgramTraining();
         programTraining.setDrafting(true); // TODO consider place drafting setter to repository
@@ -93,6 +97,7 @@ public class ProgramTrainingViewModel extends ViewModel {
         if (parent.isDrafting()) {
             repository.deleteProgramTraining(parent);
             tree = null;
+            liveTree = null;
         }
     }
 

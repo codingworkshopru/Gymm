@@ -2,6 +2,7 @@ package ru.codingworkshop.gymm.ui.util;
 
 import android.app.AlertDialog;
 import android.app.Dialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -81,13 +82,22 @@ public final class AlertDialogFragment extends DialogFragment {
 
     private OnDialogButtonClickListener listener;
 
-    public void setListener(OnDialogButtonClickListener l) {
-        listener = l;
-    }
-
     public void show(@NonNull FragmentManager fragmentManager, @NonNull Bundle args) {
         setArguments(args);
         show(fragmentManager, TAG);
+    }
+
+    @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+
+        if (context instanceof OnDialogButtonClickListener) {
+            listener = (OnDialogButtonClickListener) context;
+        } else if (getParentFragment() instanceof OnDialogButtonClickListener) {
+            listener = (OnDialogButtonClickListener) getParentFragment();
+        } else {
+            throw new IllegalStateException("Parent activity or fragment must implement " + OnDialogButtonClickListener.class);
+        }
     }
 
     @NonNull
@@ -100,10 +110,6 @@ public final class AlertDialogFragment extends DialogFragment {
         @StringRes int positiveButton = args.getInt(POSITIVE_BUTTON_RESOURCE_KEY);
         @StringRes int negativeButton = args.getInt(NEGATIVE_BUTTON_RESOURCE_KEY);
 
-        if (listener == null) {
-            throw new NullPointerException("Listener is not set");
-        }
-
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
         if (title != 0) {
             builder.setTitle(title);
@@ -115,11 +121,8 @@ public final class AlertDialogFragment extends DialogFragment {
 
         DialogInterface.OnClickListener dialogInterfaceListener = null;
         if (listener != null) {
-            dialogInterfaceListener = new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialog, int which) {
-                    listener.onDialogButtonClick(dialogId, which == DialogInterface.BUTTON_POSITIVE);
-                }
+            dialogInterfaceListener = (dialog, which) -> {
+                listener.onDialogButtonClick(dialogId, which == DialogInterface.BUTTON_POSITIVE);
             };
         }
 
@@ -135,6 +138,6 @@ public final class AlertDialogFragment extends DialogFragment {
     @Override
     public void onDetach() {
         super.onDetach();
-        setListener(null);
+        listener = null;
     }
 }

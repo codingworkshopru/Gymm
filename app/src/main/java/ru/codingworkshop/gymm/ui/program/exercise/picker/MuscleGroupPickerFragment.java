@@ -1,6 +1,7 @@
 package ru.codingworkshop.gymm.ui.program.exercise.picker;
 
 import android.arch.lifecycle.ViewModelProvider;
+import android.arch.lifecycle.ViewModelProviders;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Color;
@@ -58,8 +59,13 @@ public class MuscleGroupPickerFragment extends Fragment {
                 throw new IllegalStateException("parent must implement " + OnMuscleGroupPickListener.class + " interface");
             }
         }
+    }
 
-        viewModel = viewModelFactory.create(MuscleGroupPickerViewModel.class);
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+
+        viewModel = ViewModelProviders.of(this, viewModelFactory).get(MuscleGroupPickerViewModel.class);
 
         viewModel.load(getArguments().getBoolean(ANTERIOR_KEY))
                 .observe(this, this::onMuscleGroupsLoaded);

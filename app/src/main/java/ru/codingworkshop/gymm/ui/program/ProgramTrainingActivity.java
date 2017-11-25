@@ -51,7 +51,22 @@ public class ProgramTrainingActivity extends AppCompatActivity implements HasSup
     }
 
     @Override
+    public void onBackPressed() {
+        for (Fragment f : getSupportFragmentManager().getFragments()) {
+            if (f.isResumed() && f instanceof OnSystemBackPressedListener) {
+                ((OnSystemBackPressedListener) f).onFragmentClose();
+                return;
+            }
+        }
+        super.onBackPressed();
+    }
+
+    @Override
     public AndroidInjector<Fragment> supportFragmentInjector() {
         return fragmentInjector;
+    }
+
+    public interface OnSystemBackPressedListener {
+        void onFragmentClose();
     }
 }

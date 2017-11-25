@@ -36,9 +36,11 @@ import ru.codingworkshop.gymm.ui.actual.set.ActualSetsFragmentPagerAdapter;
 import ru.codingworkshop.gymm.ui.actual.set.ActualSetsViewPager;
 import ru.codingworkshop.gymm.ui.actual.viewmodel.ActualTrainingViewModel;
 import ru.codingworkshop.gymm.ui.common.ListItemListeners;
+import ru.codingworkshop.gymm.ui.util.AlertDialogFragment;
 
 public class ActualExercisesFragment extends Fragment implements
-        ActualSetFragment.OnActualSetSaveListener {
+        ActualSetFragment.OnActualSetSaveListener,
+        AlertDialogFragment.OnDialogButtonClickListener {
 
     public static final String EXTRA_ACTUAL_TRAINING_ID = "extraActualTrainingId";
     public static final String EXTRA_PROGRAM_TRAINING_ID = "extraProgramTrainingId";
@@ -156,6 +158,12 @@ public class ActualExercisesFragment extends Fragment implements
         saveExerciseAndSetPosition();
     }
 
+    @Override
+    public void onDetach() {
+        super.onDetach();
+        callback = null;
+    }
+
     private void saveExerciseAndSetPosition() {
         getSharedPreferences()
                 .edit()
@@ -232,7 +240,7 @@ public class ActualExercisesFragment extends Fragment implements
     }
 
     private void initUi() {
-        alert = new FragmentAlert(getChildFragmentManager(), this::onAlertButtonClick);
+        alert = new FragmentAlert(getChildFragmentManager());
 
         initToolbar();
         initSetsViewPager();
@@ -285,7 +293,8 @@ public class ActualExercisesFragment extends Fragment implements
         exerciseList.setCurrentItemPosition(getSavedExercisePosition());
     }
 
-    public void onAlertButtonClick(int dialogId, boolean positive) {
+    @Override
+    public void onDialogButtonClick(int dialogId, boolean positive) {
         if (dialogId == 0) {
             if (positive) {
                 viewModel.finishTraining();
