@@ -4,6 +4,7 @@ import android.arch.lifecycle.LiveData;
 import android.arch.persistence.room.Dao;
 import android.arch.persistence.room.Insert;
 import android.arch.persistence.room.Query;
+import android.support.annotation.VisibleForTesting;
 
 import java.util.Collection;
 import java.util.List;
@@ -26,6 +27,10 @@ public interface MuscleGroupDao {
 
     @Query("select * from MuscleGroup where isAnterior = :isAnterior order by name")
     LiveData<List<MuscleGroup>> getMuscleGroups(boolean isAnterior);
+
+    @VisibleForTesting
+    @Query("select mg.* from MuscleGroup mg join Exercise e on e.primaryMuscleGroupId = mg.id where e.name = :exerciseName")
+    MuscleGroup getMuscleGroupByExerciseNameSync(String exerciseName);
 
     @Query("select count(*) from MuscleGroup")
     int getMuscleGroupsCount();
