@@ -6,6 +6,7 @@ import android.databinding.DataBindingUtil;
 import android.databinding.ViewDataBinding;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.PopupMenu;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
@@ -21,6 +22,8 @@ import dagger.android.AndroidInjection;
 import ru.codingworkshop.gymm.R;
 import ru.codingworkshop.gymm.data.entity.ProgramTraining;
 import ru.codingworkshop.gymm.databinding.ActivityMainListItemBinding;
+import ru.codingworkshop.gymm.ui.actual.ActualTrainingActivity;
+import ru.codingworkshop.gymm.ui.actual.exercise.ActualExercisesFragment;
 import ru.codingworkshop.gymm.ui.common.ClickableBindingListAdapter;
 import ru.codingworkshop.gymm.ui.common.ListItemListeners;
 import ru.codingworkshop.gymm.ui.program.ProgramTrainingActivity;
@@ -54,6 +57,16 @@ public class MainActivity extends AppCompatActivity {
             @Override
             protected void bind(ActivityMainListItemBinding binding, ProgramTraining item) {
                 binding.setProgramTraining(item);
+                binding.mainActivityPopupMenuButton.setOnClickListener(v -> {
+                    PopupMenu popupMenu = new PopupMenu(MainActivity.this, v);
+                    popupMenu.inflate(R.menu.program_training_item_popup_menu);
+                    popupMenu.show();
+                });
+                binding.button.setOnClickListener(v -> {
+                    Intent startTraining = new Intent(MainActivity.this, ActualTrainingActivity.class);
+                    startTraining.putExtra(ActualExercisesFragment.EXTRA_PROGRAM_TRAINING_ID, item.getId());
+                    startActivity(startTraining);
+                });
             }
         });
     }

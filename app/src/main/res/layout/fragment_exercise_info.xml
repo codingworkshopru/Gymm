@@ -26,222 +26,181 @@
 
     <android.support.constraint.ConstraintLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:background="@android:color/background_light">
+        android:layout_height="wrap_content"
+        android:paddingBottom="16dp">
 
-        <FrameLayout
-            android:id="@+id/exerciseInfoYouTubePlayerContainer"
+        <TextView
+            android:id="@+id/exerciseInfoName"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:orientation="vertical"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent">
+            android:layout_marginEnd="16dp"
+            android:layout_marginLeft="16dp"
+            android:layout_marginRight="16dp"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="8dp"
+            android:text="@{exercise.name}"
+            android:textAppearance="@style/TextAppearance.AppCompat.Headline"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:text="Сгибание рук со штангой" />
+
+        <TextView
+            android:id="@+id/exerciseInfoMainMuscleGroup"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:text="@{primaryMuscleGroup.name}"
+            android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+            app:layout_constraintLeft_toLeftOf="@+id/exerciseInfoName"
+            app:layout_constraintTop_toBottomOf="@+id/exerciseInfoName"
+            tools:text="Бицепс" />
+
+        <TextView
+            android:id="@+id/exerciseInfoSecondaryMuscleGroups"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="7dp"
+            android:text="@{secondaryMuscleGroups}"
+            app:layout_constraintLeft_toLeftOf="@+id/exerciseInfoMainMuscleGroup"
+            app:layout_constraintTop_toBottomOf="@+id/exerciseInfoMainMuscleGroup"
+            tools:text="Предплечья • Плечи" />
+
+        <ImageView
+            android:id="@+id/exerciseInfoFragmentDivider"
+            android:layout_width="0dp"
+            android:layout_height="1dp"
+            android:layout_marginTop="16dp"
+            android:alpha="0.12"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/exerciseInfoSecondaryMuscleGroups"
+            app:srcCompat="@android:color/black" />
+
+        <ImageView
+            android:id="@+id/exerciseInfoDifficulty"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:layout_marginEnd="16dp"
+            android:layout_marginRight="16dp"
+            android:background="@{exercise.difficulty == ExerciseDifficulty.EASY ? @drawable/ic_signal_cellular_0_bar_primary_24dp : exercise.difficulty == ExerciseDifficulty.INTERMEDIATE ? @drawable/ic_signal_cellular_2_bar_primary_24dp : @drawable/ic_signal_cellular_4_bar_primary_24dp}"
+            app:layout_constraintBottom_toBottomOf="@+id/exerciseInfoMainMuscleGroup"
+            app:layout_constraintRight_toRightOf="parent"
+            app:srcCompat="@drawable/ic_signal_cellular_0_bar_primary_24dp" />
+
+        <LinearLayout
+            android:id="@+id/exerciseInfoStepsLayout"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="16dp"
+            android:layout_marginRight="16dp"
+            android:layout_marginTop="16dp"
+            android:orientation="horizontal"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/exerciseInfoFragmentDivider">
 
             <ImageView
-                android:id="@+id/exerciseInfoStubImage"
-                android:layout_width="match_parent"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:adjustViewBounds="true"
-                android:fitsSystemWindows="true"
-                android:scaleType="centerCrop"
-                android:visibility="gone"
-                app:layout_constraintLeft_toLeftOf="parent"
-                app:layout_constraintRight_toRightOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
-                app:srcCompat="@drawable/sporty_woman" />
+                app:srcCompat="@drawable/ic_info_primary_24dp" />
 
-        </FrameLayout>
+            <TextView
+                android:id="@+id/exerciseInfoSteps"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="16dp"
+                android:layout_marginStart="16dp"
+                android:text="@{ExerciseInfoFragment.insertBullets(exercise.steps)}"
+                android:textAppearance="@style/TextAppearance.AppCompat.Body1"
+                tools:text="Встаньте с прямой спиной, держа в руках штангу хватом на ширине плеч. Гриф держите ладонями вверх, локти близко к торсу. " />
+        </LinearLayout>
 
-        <android.support.v4.widget.NestedScrollView
-            android:id="@+id/exerciseInfoContentScrollView"
+        <LinearLayout
+            android:id="@+id/exerciseInfoAdviceLayout"
             android:layout_width="0dp"
-            android:layout_height="0dp"
-            android:paddingBottom="16dp"
-            android:scrollbars="vertical"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/exerciseInfoYouTubePlayerContainer">
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="16dp"
+            android:layout_marginRight="16dp"
+            android:layout_marginTop="16dp"
+            android:orientation="horizontal"
+            android:visibility="@{exercise.advices == null ? View.GONE : View.VISIBLE}"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/exerciseInfoStepsLayout">
 
-            <android.support.constraint.ConstraintLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content">
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:srcCompat="@drawable/ic_lightbulb_primary_24dp" />
 
-                <TextView
-                    android:id="@+id/exerciseInfoName"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_marginEnd="16dp"
-                    android:layout_marginLeft="16dp"
-                    android:layout_marginRight="16dp"
-                    android:layout_marginStart="16dp"
-                    android:layout_marginTop="8dp"
-                    android:text="@{exercise.name}"
-                    android:textAppearance="@style/TextAppearance.AppCompat.Headline"
-                    app:layout_constraintLeft_toLeftOf="parent"
-                    app:layout_constraintRight_toRightOf="parent"
-                    app:layout_constraintTop_toTopOf="parent"
-                    tools:text="Сгибание рук со штангой" />
+            <TextView
+                android:id="@+id/exerciseInfoAdvices"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="16dp"
+                android:layout_marginStart="16dp"
+                android:text="@{ExerciseInfoFragment.insertBullets(exercise.advices)}"
+                android:textAppearance="@style/TextAppearance.AppCompat.Body1"
+                tools:text="Не изменяйте положения локтей во время выполнения упражнения. " />
+        </LinearLayout>
 
-                <TextView
-                    android:id="@+id/exerciseInfoMainMuscleGroup"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="8dp"
-                    android:text="@{primaryMuscleGroup.name}"
-                    android:textAppearance="@style/TextAppearance.AppCompat.Medium"
-                    app:layout_constraintLeft_toLeftOf="@+id/exerciseInfoName"
-                    app:layout_constraintTop_toBottomOf="@+id/exerciseInfoName"
-                    tools:text="Бицепс" />
+        <LinearLayout
+            android:id="@+id/exerciseInfoCautionLayout"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="16dp"
+            android:layout_marginRight="16dp"
+            android:layout_marginTop="16dp"
+            android:visibility="@{exercise.caution == null ? View.GONE : View.VISIBLE}"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/exerciseInfoAdviceLayout">
 
-                <TextView
-                    android:id="@+id/exerciseInfoSecondaryMuscleGroups"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="7dp"
-                    android:text="@{secondaryMuscleGroups}"
-                    app:layout_constraintLeft_toLeftOf="@+id/exerciseInfoMainMuscleGroup"
-                    app:layout_constraintTop_toBottomOf="@+id/exerciseInfoMainMuscleGroup"
-                    tools:text="Предплечья • Плечи" />
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:srcCompat="@drawable/ic_warning_primary_24dp" />
 
-                <ImageView
-                    android:id="@+id/exerciseInfoActivityDivider"
-                    android:layout_width="0dp"
-                    android:layout_height="1dp"
-                    android:layout_marginTop="16dp"
-                    android:alpha="0.12"
-                    app:layout_constraintLeft_toLeftOf="parent"
-                    app:layout_constraintRight_toRightOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/exerciseInfoSecondaryMuscleGroups"
-                    app:srcCompat="@android:color/black" />
+            <TextView
+                android:id="@+id/exerciseInfoCaution"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="16dp"
+                android:layout_marginStart="16dp"
+                android:text="@{ExerciseInfoFragment.insertBullets(exercise.caution)}"
+                android:textAppearance="@style/TextAppearance.AppCompat.Body1"
+                tools:text="Поскольку упражнение существенно нагружает сухожилия рук, вам нужно хорошо разогреть мышцы, перед тем как приступить к нему." />
+        </LinearLayout>
 
-                <ImageView
-                    android:id="@+id/exerciseInfoDifficulty"
-                    android:layout_width="24dp"
-                    android:layout_height="24dp"
-                    android:layout_marginEnd="16dp"
-                    android:layout_marginRight="16dp"
-                    android:background="@{exercise.difficulty == ExerciseDifficulty.EASY ? @drawable/ic_signal_cellular_0_bar_primary_24dp : exercise.difficulty == ExerciseDifficulty.INTERMEDIATE ? @drawable/ic_signal_cellular_2_bar_primary_24dp : @drawable/ic_signal_cellular_4_bar_primary_24dp}"
-                    app:layout_constraintBottom_toBottomOf="@+id/exerciseInfoMainMuscleGroup"
-                    app:layout_constraintRight_toRightOf="parent"
-                    app:srcCompat="@drawable/ic_signal_cellular_0_bar_primary_24dp" />
+        <LinearLayout
+            android:id="@+id/exerciseInfoVariationsLayout"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="16dp"
+            android:layout_marginRight="16dp"
+            android:layout_marginTop="16dp"
+            android:visibility="@{exercise.variations == null ? View.GONE : View.VISIBLE}"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/exerciseInfoCautionLayout">
 
-                <LinearLayout
-                    android:id="@+id/exerciseInfoStepsLayout"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_marginLeft="16dp"
-                    android:layout_marginRight="16dp"
-                    android:layout_marginTop="16dp"
-                    android:orientation="horizontal"
-                    app:layout_constraintLeft_toLeftOf="parent"
-                    app:layout_constraintRight_toRightOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/exerciseInfoActivityDivider">
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:srcCompat="@drawable/ic_call_split_primary_24dp" />
 
-                    <ImageView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        app:srcCompat="@drawable/ic_info_primary_24dp" />
+            <TextView
+                android:id="@+id/exerciseInfoVariations"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="16dp"
+                android:layout_marginStart="16dp"
+                android:text="@{ExerciseInfoFragment.insertBullets(exercise.variations)}"
+                android:textAppearance="@style/TextAppearance.AppCompat.Body1"
+                tools:text="При использовании EZ-грифа уменьшается нагрузка на мышцы предплечий. При использовании EZ-грифа уменьшается нагрузка на мышцы предплечий. При использовании EZ-грифа уменьшается нагрузка на мышцы предплечий. При использовании EZ-грифа уменьшается нагрузка на мышцы предплечий. При использовании EZ-грифа уменьшается нагрузка на мышцы предплечий. При использовании EZ-грифа уменьшается нагрузка на мышцы предплечий. При использовании EZ-грифа уменьшается нагрузка на мышцы предплечий. При использовании EZ-грифа уменьшается нагрузка на мышцы предплечий. При использовании EZ-грифа уменьшается нагрузка на мышцы предплечий. При использовании EZ-грифа уменьшается нагрузка на мышцы предплечий. При использовании EZ-грифа уменьшается нагрузка на мышцы предплечий. При использовании EZ-грифа уменьшается нагрузка на мышцы предплечий. При использовании EZ-грифа уменьшается нагрузка на мышцы предплечий. При использовании EZ-грифа уменьшается нагрузка на мышцы предплечий. При использовании EZ-грифа уменьшается нагрузка на мышцы предплечий. При использовании EZ-грифа уменьшается нагрузка на мышцы предплечий. При использовании EZ-грифа уменьшается нагрузка на мышцы предплечий. При использовании EZ-грифа уменьшается нагрузка на мышцы предплечий." />
+        </LinearLayout>
 
-                    <TextView
-                        android:id="@+id/exerciseInfoSteps"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginLeft="16dp"
-                        android:layout_marginStart="16dp"
-                        android:text="@{ExerciseInfoFragment.insertBullets(exercise.steps)}"
-                        android:textAppearance="@style/TextAppearance.AppCompat.Body1"
-                        tools:text="Встаньте с прямой спиной, держа в руках штангу хватом на ширине плеч. Гриф держите ладонями вверх, локти близко к торсу. " />
-                </LinearLayout>
-
-                <LinearLayout
-                    android:id="@+id/exerciseInfoAdviceLayout"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_marginLeft="16dp"
-                    android:layout_marginRight="16dp"
-                    android:layout_marginTop="16dp"
-                    android:orientation="horizontal"
-                    android:visibility="@{exercise.advices == null ? View.GONE : View.VISIBLE}"
-                    app:layout_constraintLeft_toLeftOf="parent"
-                    app:layout_constraintRight_toRightOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/exerciseInfoStepsLayout">
-
-                    <ImageView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        app:srcCompat="@drawable/ic_lightbulb_primary_24dp" />
-
-                    <TextView
-                        android:id="@+id/exerciseInfoAdvices"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginLeft="16dp"
-                        android:layout_marginStart="16dp"
-                        android:text="@{ExerciseInfoFragment.insertBullets(exercise.advices)}"
-                        android:textAppearance="@style/TextAppearance.AppCompat.Body1"
-                        tools:text="Не изменяйте положения локтей во время выполнения упражнения. " />
-                </LinearLayout>
-
-                <LinearLayout
-                    android:id="@+id/exerciseInfoCautionLayout"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_marginLeft="16dp"
-                    android:layout_marginRight="16dp"
-                    android:layout_marginTop="16dp"
-                    android:visibility="@{exercise.caution == null ? View.GONE : View.VISIBLE}"
-                    app:layout_constraintLeft_toLeftOf="parent"
-                    app:layout_constraintRight_toRightOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/exerciseInfoAdviceLayout">
-
-                    <ImageView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        app:srcCompat="@drawable/ic_warning_primary_24dp" />
-
-                    <TextView
-                        android:id="@+id/exerciseInfoCaution"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginLeft="16dp"
-                        android:layout_marginStart="16dp"
-                        android:text="@{ExerciseInfoFragment.insertBullets(exercise.caution)}"
-                        android:textAppearance="@style/TextAppearance.AppCompat.Body1"
-                        tools:text="Поскольку упражнение существенно нагружает сухожилия рук, вам нужно хорошо разогреть мышцы, перед тем как приступить к нему." />
-                </LinearLayout>
-
-                <LinearLayout
-                    android:id="@+id/exerciseInfoVariationsLayout"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_marginLeft="16dp"
-                    android:layout_marginRight="16dp"
-                    android:layout_marginTop="16dp"
-                    android:visibility="@{exercise.variations == null ? View.GONE : View.VISIBLE}"
-                    app:layout_constraintLeft_toLeftOf="parent"
-                    app:layout_constraintRight_toRightOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/exerciseInfoCautionLayout">
-
-                    <ImageView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        app:srcCompat="@drawable/ic_call_split_primary_24dp" />
-
-                    <TextView
-                        android:id="@+id/exerciseInfoVariations"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginLeft="16dp"
-                        android:layout_marginStart="16dp"
-                        android:text="@{ExerciseInfoFragment.insertBullets(exercise.variations)}"
-                        android:textAppearance="@style/TextAppearance.AppCompat.Body1"
-                        tools:text="При использовании EZ-грифа уменьшается нагрузка на мышцы предплечий. При использовании EZ-грифа уменьшается нагрузка на мышцы предплечий. При использовании EZ-грифа уменьшается нагрузка на мышцы предплечий. При использовании EZ-грифа уменьшается нагрузка на мышцы предплечий. При использовании EZ-грифа уменьшается нагрузка на мышцы предплечий. При использовании EZ-грифа уменьшается нагрузка на мышцы предплечий. При использовании EZ-грифа уменьшается нагрузка на мышцы предплечий. При использовании EZ-грифа уменьшается нагрузка на мышцы предплечий. При использовании EZ-грифа уменьшается нагрузка на мышцы предплечий. При использовании EZ-грифа уменьшается нагрузка на мышцы предплечий. При использовании EZ-грифа уменьшается нагрузка на мышцы предплечий. При использовании EZ-грифа уменьшается нагрузка на мышцы предплечий. При использовании EZ-грифа уменьшается нагрузка на мышцы предплечий. При использовании EZ-грифа уменьшается нагрузка на мышцы предплечий. При использовании EZ-грифа уменьшается нагрузка на мышцы предплечий. При использовании EZ-грифа уменьшается нагрузка на мышцы предплечий. При использовании EZ-грифа уменьшается нагрузка на мышцы предплечий. При использовании EZ-грифа уменьшается нагрузка на мышцы предплечий." />
-                </LinearLayout>
-
-            </android.support.constraint.ConstraintLayout>
-        </android.support.v4.widget.NestedScrollView>
     </android.support.constraint.ConstraintLayout>
 
 </layout>

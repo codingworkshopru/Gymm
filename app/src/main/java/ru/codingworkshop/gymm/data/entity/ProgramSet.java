@@ -154,7 +154,7 @@ public class ProgramSet implements Model, Sortable, Parcelable {
         dest.writeLong(id);
         dest.writeLong(programExerciseId);
         dest.writeInt(reps);
-        dest.writeInt(secondsForRest);
+        dest.writeInt(secondsForRest == null ? 0 : secondsForRest);
         dest.writeInt(sortOrder);
     }
 }

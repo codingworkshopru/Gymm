@@ -3,6 +3,8 @@ package ru.codingworkshop.gymm.testing;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 
+import dagger.android.AndroidInjector;
+import dagger.android.support.HasSupportFragmentInjector;
 import ru.codingworkshop.gymm.ui.actual.ActualTrainingActivity;
 
 /**
@@ -16,5 +18,10 @@ public class ActualTrainingActivityInjectedFragments extends ActualTrainingActiv
     protected void onCreate(Bundle savedInstanceState) {
         actualExercisesFragment = fragment;
         super.onCreate(savedInstanceState);
+    }
+
+    @Override
+    public AndroidInjector<Fragment> supportFragmentInjector() {
+        return instance -> {};
     }
 }

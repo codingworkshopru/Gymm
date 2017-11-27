@@ -1,5 +1,6 @@
 package ru.codingworkshop.gymm.ui.program.training;
 
+import android.arch.core.executor.testing.InstantTaskExecutorRule;
 import android.arch.lifecycle.LiveData;
 import android.arch.lifecycle.ViewModelProvider;
 import android.support.test.rule.ActivityTestRule;
@@ -13,6 +14,7 @@ import org.mockito.MockitoAnnotations;
 import ru.codingworkshop.gymm.R;
 import ru.codingworkshop.gymm.data.tree.node.MutableProgramTrainingTree;
 import ru.codingworkshop.gymm.data.tree.node.ProgramTrainingTree;
+import ru.codingworkshop.gymm.data.util.LiveDataUtil;
 import ru.codingworkshop.gymm.testing.SimpleFragmentActivity;
 import ru.codingworkshop.gymm.util.Models;
 
@@ -33,11 +35,13 @@ import static org.mockito.Mockito.when;
  */
 
 public class ProgramTrainingCreateFragmentTest {
-    public @Rule ActivityTestRule<SimpleFragmentActivity> activityTestRule =
+    @Rule public ActivityTestRule<SimpleFragmentActivity> activityTestRule =
             new ActivityTestRule<>(SimpleFragmentActivity.class);
 
-    private @Mock ViewModelProvider.Factory viewModelFactory;
-    private @Mock ProgramTrainingViewModel vm;
+    @Rule public InstantTaskExecutorRule instantTaskExecutorRule = new InstantTaskExecutorRule();
+
+    @Mock private ViewModelProvider.Factory viewModelFactory;
+    @Mock private ProgramTrainingViewModel vm;
     private ProgramTrainingFragment fragment;
 
     @Before
@@ -45,12 +49,13 @@ public class ProgramTrainingCreateFragmentTest {
         MockitoAnnotations.initMocks(this);
 
         when(viewModelFactory.create(any())).thenReturn(vm);
-        when(vm.create()).thenAnswer(invocation -> {
-            ProgramTrainingTree tree = new MutableProgramTrainingTree();
-            tree.setParent(Models.createLiveProgramTraining(0L, null, true).getValue());
-            when(vm.getProgramTrainingTree()).thenReturn(tree);
-            return new LiveData<ProgramTrainingTree>() {{postValue(tree);}};
-        });
+        ProgramTrainingTree tree = new MutableProgramTrainingTree();
+        tree.setParent(Models.createLiveProgramTraining(0L, null, true).getValue());
+        when(vm.getProgramTrainingTree()).thenReturn(tree);
+        LiveData<ProgramTrainingTree> liveTree = LiveDataUtil.getLive(tree);
+
+        when(vm.create()).thenReturn(liveTree);
+        when(vm.getLiveTree()).thenReturn(liveTree);
 
         fragment = ProgramTrainingFragment.newInstance();
         fragment.viewModelFactory = viewModelFactory;

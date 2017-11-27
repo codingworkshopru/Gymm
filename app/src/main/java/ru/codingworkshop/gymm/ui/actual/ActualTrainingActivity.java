@@ -5,6 +5,12 @@ import android.support.annotation.VisibleForTesting;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AppCompatActivity;
 
+import javax.inject.Inject;
+
+import dagger.android.AndroidInjection;
+import dagger.android.AndroidInjector;
+import dagger.android.DispatchingAndroidInjector;
+import dagger.android.support.HasSupportFragmentInjector;
 import ru.codingworkshop.gymm.R;
 import ru.codingworkshop.gymm.ui.actual.exercise.ActualExercisesFragment;
 import ru.codingworkshop.gymm.ui.actual.rest.ActualTrainingRestFragment;
@@ -13,15 +19,21 @@ import timber.log.Timber;
 
 public class ActualTrainingActivity extends AppCompatActivity implements
         ActualExercisesFragment.ActualExercisesCallback,
-        ActualTrainingRestFragment.ActualTrainingRestCallback{
+        ActualTrainingRestFragment.ActualTrainingRestCallback,
+        HasSupportFragmentInjector
+{
 
     private LoadingFragment loadingFragment;
+
+    @Inject
+    DispatchingAndroidInjector<Fragment> fragmentInjector;
 
     @VisibleForTesting
     public Fragment actualExercisesFragment;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        AndroidInjection.inject(this);
         setContentView(R.layout.activity_actual_training);
         super.onCreate(savedInstanceState);
 
@@ -67,5 +79,10 @@ public class ActualTrainingActivity extends AppCompatActivity implements
                 .beginTransaction()
                 .replace(R.id.actualTrainingFragmentContainer, actualExercisesFragment)
                 .commit();
+    }
+
+    @Override
+    public AndroidInjector<Fragment> supportFragmentInjector() {
+        return fragmentInjector;
     }
 }

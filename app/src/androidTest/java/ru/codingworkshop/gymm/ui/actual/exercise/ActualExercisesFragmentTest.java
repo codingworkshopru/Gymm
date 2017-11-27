@@ -233,6 +233,8 @@ public class ActualExercisesFragmentTest extends Base {
 
         Thread.sleep(100);
 
+        fragment.callback = callback; // onAttach
+
         activityTestRule
                 .getActivity()
                 .getSupportFragmentManager()

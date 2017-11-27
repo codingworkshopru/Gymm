@@ -9,6 +9,7 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.annotation.VisibleForTesting;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
@@ -22,6 +23,7 @@ import com.google.common.base.Preconditions;
 
 import javax.inject.Inject;
 
+import dagger.android.support.AndroidSupportInjection;
 import ru.codingworkshop.gymm.R;
 import ru.codingworkshop.gymm.data.entity.ActualSet;
 import ru.codingworkshop.gymm.data.tree.node.ActualTrainingTree;
@@ -56,7 +58,8 @@ public class ActualExercisesFragment extends Fragment implements
 
     @Inject
     ViewModelProvider.Factory viewModelFactory;
-    public ActualExercisesCallback callback;
+    @VisibleForTesting
+    ActualExercisesCallback callback;
     private Context context;
 
     private ActualTrainingViewModel viewModel;
@@ -70,8 +73,10 @@ public class ActualExercisesFragment extends Fragment implements
 
     @Override
     public void onAttach(Context context) {
+        AndroidSupportInjection.inject(this);
         super.onAttach(context);
         this.context = context;
+
         if (callback == null) {
             if (context instanceof ActualExercisesCallback) {
                 callback = (ActualExercisesCallback) context;

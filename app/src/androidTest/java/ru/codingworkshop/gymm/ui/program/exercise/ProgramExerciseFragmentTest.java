@@ -113,17 +113,7 @@ public class ProgramExerciseFragmentTest {
         fragment = ProgramExerciseFragment.newInstanceForExistent(2L);
         fragment.viewModelFactory = viewModelFactory;
         activityTestRule.getActivity().setFragment(fragment);
-
-        doAnswer(invocation -> {
-            when(vm.isChanged()).thenReturn(true);
-            return null;
-        }).when(vm).setChildrenChanged();
     }
-
-//    @After
-//    public void tearDown() throws Exception {
-//        Intents.release();
-//    }
 
     @Test
     public void initializationTest() throws Exception {
@@ -263,8 +253,8 @@ public class ProgramExerciseFragmentTest {
 
     @Test
     public void setsListChangedAssuranceMessageTest() throws Exception {
-        enterActionMode();
-        Espresso.pressBack();
+        Thread.sleep(100);
+        when(vm.isChanged()).thenReturn(true);
         fragment.onFragmentClose();
         onView(withText(R.string.cancel_changes_question)).check(matches(isDisplayed()));
         onView(withText(android.R.string.ok)).perform(click());

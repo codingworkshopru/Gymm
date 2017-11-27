@@ -43,13 +43,14 @@ import static com.google.android.youtube.player.YouTubePlayer.FULLSCREEN_FLAG_CU
 public class ExerciseInfoFragment extends DialogFragment {
     public static final String TAG = "exerciseInfoFragmentTag";
     static final String EXERCISE_ID_KEY = "exerciseIdKey";
-    private static final String GOOGLE_DEVELOPER_KEY = "AIzaSyCnjhekaG5JdIEtdbeMH4iE0pZiprQZYp4";
-    private static final String YOUTUBE_PLAYER_FRAGMENT_TAG = "youTubePlayerFragmentTag";
+
+    public interface OnYouTubeVideoIdReadyCallback {
+        void youTubeVideoIdReady(String videoId);
+    }
 
     @Inject
     ViewModelProvider.Factory viewModelFactory;
     private FragmentExerciseInfoBinding binding;
-    private YouTubePlayerSupportFragment youTubePlayerFragment;
 
     @Override
     public void onAttach(Context context) {
@@ -69,19 +70,7 @@ public class ExerciseInfoFragment extends DialogFragment {
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) {
         binding = DataBindingUtil.inflate(inflater, R.layout.fragment_exercise_info, container, false);
-        YouTubeInitializationResult youTubeInitializationResult = YouTubeApiServiceUtil.isYouTubeApiServiceAvailable(getContext());
-        if (youTubeInitializationResult != SUCCESS) {
-            invalidateYouTubePlayer();
-        } else {
-            initYouTubePlayerFragment();
-        }
         return binding.getRoot();
-    }
-
-    @Override
-    public void onDestroyView() {
-        super.onDestroyView();
-        youTubePlayerFragment = null;
     }
 
     @NonNull
@@ -108,10 +97,8 @@ public class ExerciseInfoFragment extends DialogFragment {
     private void onExerciseNodeLoaded(ExerciseNode exerciseNode) {
         Exercise exercise = exerciseNode.getParent();
         String youTubeVideoId = exercise.getYouTubeVideo();
-        if (youTubePlayerFragment == null || TextUtils.isEmpty(youTubeVideoId)) {
-            invalidateYouTubePlayer();
-        } else {
-            initYouTubePlayerWithVideo(youTubeVideoId);
+        if (!TextUtils.isEmpty(youTubeVideoId) && getActivity() instanceof OnYouTubeVideoIdReadyCallback) {
+            ((OnYouTubeVideoIdReadyCallback) getActivity()).youTubeVideoIdReady(youTubeVideoId);
         }
         binding.setExercise(exercise);
         binding.setPrimaryMuscleGroup(exerciseNode.getPrimaryMuscleGroup());
@@ -119,56 +106,6 @@ public class ExerciseInfoFragment extends DialogFragment {
         binding.setSecondaryMuscleGroups(TextUtils.join(" • ", secondaryMuscleGroupNames));
     }
 
-    private void initYouTubePlayerFragment() {
-        youTubePlayerFragment = (YouTubePlayerSupportFragment) getChildFragmentManager().findFragmentByTag(YOUTUBE_PLAYER_FRAGMENT_TAG);
-        if (youTubePlayerFragment == null) {
-            youTubePlayerFragment = YouTubePlayerSupportFragment.newInstance();
-
-            getChildFragmentManager()
-                    .beginTransaction()
-                    .add(R.id.exerciseInfoYouTubePlayerContainer, youTubePlayerFragment, YOUTUBE_PLAYER_FRAGMENT_TAG)
-                    .commit();
-        }
-    }
-
-    private void initYouTubePlayerWithVideo(String videoId) {
-        youTubePlayerFragment.initialize(GOOGLE_DEVELOPER_KEY, new YouTubePlayer.OnInitializedListener() {
-            @Override
-            public void onInitializationSuccess(YouTubePlayer.Provider provider, YouTubePlayer youTubePlayer, boolean wasRestored) {
-//                youTubePlayerFragment.setFullscreen(false);
-                if (!wasRestored) {
-                    youTubePlayer.cueVideo(videoId);
-                }
-                youTubePlayer.setPlayerStateChangeListener(new YouTubePlayer.PlayerStateChangeListener() {
-                    public void onError(YouTubePlayer.ErrorReason errorReason) {
-                        invalidateYouTubePlayer();
-                    }
-
-                    public void onLoading() {}
-                    public void onLoaded(String s) {}
-                    public void onAdStarted() {}
-                    public void onVideoStarted() {}
-                    public void onVideoEnded() {}
-                });
-            }
-
-            @Override
-            public void onInitializationFailure(YouTubePlayer.Provider provider, YouTubeInitializationResult youTubeInitializationResult) {
-                invalidateYouTubePlayer();
-            }
-        });
-    }
-
-    private void invalidateYouTubePlayer() {
-        if (youTubePlayerFragment != null) {
-            getChildFragmentManager()
-                    .beginTransaction()
-                    .remove(youTubePlayerFragment)
-                    .commit();
-        }
-
-        binding.exerciseInfoStubImage.setVisibility(View.VISIBLE);
-    }
 
     public static ExerciseInfoFragment newInstance(long exerciseId) {
         Bundle args = new Bundle(1);

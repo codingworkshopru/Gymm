@@ -2,6 +2,7 @@ package ru.codingworkshop.gymm.ui.program.training;
 
 import android.arch.core.executor.testing.InstantTaskExecutorRule;
 import android.arch.lifecycle.LiveData;
+import android.text.TextUtils;
 
 import org.junit.Before;
 import org.junit.Rule;

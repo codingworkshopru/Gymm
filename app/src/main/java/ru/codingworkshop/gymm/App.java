@@ -13,8 +13,6 @@ import dagger.android.HasActivityInjector;
 import ru.codingworkshop.gymm.di.DaggerApplicationComponent;
 import timber.log.Timber;
 
-//import com.squareup.leakcanary.LeakCanary;
-
 /**
  * Created by Радик on 19.04.2017.
  */

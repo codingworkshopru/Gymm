@@ -3,6 +3,8 @@ package ru.codingworkshop.gymm.di;
 import dagger.Module;
 import dagger.android.ContributesAndroidInjector;
 import ru.codingworkshop.gymm.ui.MainActivity;
+import ru.codingworkshop.gymm.ui.actual.ActualTrainingActivity;
+import ru.codingworkshop.gymm.ui.info.exercise.ExerciseInfoActivity;
 import ru.codingworkshop.gymm.ui.program.ProgramTrainingActivity;
 import ru.codingworkshop.gymm.ui.program.exercise.picker.ExercisePickerActivity;
 
@@ -11,7 +13,7 @@ import ru.codingworkshop.gymm.ui.program.exercise.picker.ExercisePickerActivity;
  */
 
 @Module
-public abstract class ActivityModule {
+abstract class ActivityModule {
     @ContributesAndroidInjector
     abstract MainActivity contributeMainActivityInjector();
 
@@ -20,4 +22,10 @@ public abstract class ActivityModule {
 
     @ContributesAndroidInjector
     abstract ExercisePickerActivity contributeExercisePickerActivityInjector();
+
+    @ContributesAndroidInjector
+    abstract ExerciseInfoActivity contributeExerciseInfoActivity();
+
+    @ContributesAndroidInjector
+    abstract ActualTrainingActivity contributeActualTrainingActivity();
 }

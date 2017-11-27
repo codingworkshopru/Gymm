@@ -40,19 +40,15 @@
         </android.support.design.widget.CollapsingToolbarLayout>
     </android.support.design.widget.AppBarLayout>
 
-    <FrameLayout
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/rv_test_main"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        app:layout_behavior="@string/appbar_scrolling_view_behavior">
-
-        <android.support.v7.widget.RecyclerView
-            android:id="@+id/rv_test_main"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:background="?android:attr/colorButtonNormal"
-            android:clipToPadding="false"
-            app:layoutManager="android.support.v7.widget.LinearLayoutManager"
-            tools:listitem="@layout/activity_main_list_item" />
-    </FrameLayout>
+        android:background="?attr/colorButtonNormal"
+        android:clipToPadding="false"
+        android:paddingBottom="8dp"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior"
+        app:layoutManager="android.support.v7.widget.LinearLayoutManager"
+        tools:listitem="@layout/activity_main_list_item" />
 
 </android.support.design.widget.CoordinatorLayout>

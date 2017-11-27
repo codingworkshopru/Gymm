@@ -30,10 +30,10 @@
 
     <style name="AppTheme.NoActionBar.SpinnerInAppBar" parent="AppTheme.NoActionBar">
         <item name="android:spinnerStyle">@style/Widget.AppCompat.Spinner.Underlined</item>
-        <item name="spinnerDropDownItemStyle">@style/hui</item>
+        <item name="spinnerDropDownItemStyle">@style/SpinnerWithBlackTextColor</item>
     </style>
 
-    <style name="hui" parent="Widget.AppCompat.DropDownItem.Spinner">
+    <style name="SpinnerWithBlackTextColor" parent="Widget.AppCompat.DropDownItem.Spinner">
         <item name="android:textColor">@android:color/black</item>
     </style>
 

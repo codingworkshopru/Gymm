@@ -1,5 +1,6 @@
 package ru.codingworkshop.gymm.ui.program.training;
 
+import android.arch.core.executor.testing.InstantTaskExecutorRule;
 import android.arch.lifecycle.LiveData;
 import android.arch.lifecycle.ViewModelProvider;
 import android.graphics.Rect;
@@ -27,6 +28,7 @@ import java.util.concurrent.TimeUnit;
 import ru.codingworkshop.gymm.R;
 import ru.codingworkshop.gymm.data.tree.node.ProgramExerciseNode;
 import ru.codingworkshop.gymm.data.tree.node.ProgramTrainingTree;
+import ru.codingworkshop.gymm.data.util.LiveDataUtil;
 import ru.codingworkshop.gymm.testing.SimpleFragmentActivity;
 import ru.codingworkshop.gymm.util.LiveTest;
 import ru.codingworkshop.gymm.util.RecyclerViewItemMatcher;
@@ -68,6 +70,9 @@ public class ProgramTrainingFragmentTest {
     private ProgramTrainingFragment fragment;
 
     @Rule
+    public InstantTaskExecutorRule instantTaskExecutorRule = new InstantTaskExecutorRule();
+
+    @Rule
     public ActivityTestRule<SimpleFragmentActivity> activityTestRule =
             new ActivityTestRule<>(SimpleFragmentActivity.class);
     private ProgramTrainingTree tree;
@@ -80,10 +85,12 @@ public class ProgramTrainingFragmentTest {
 
         when(viewModelFactory.create(any())).thenReturn(vm);
         tree = TreeBuilders.buildProgramTrainingTree(3);
+        LiveData<ProgramTrainingTree> liveTree = LiveDataUtil.getLive(tree);
         when(vm.load(1L)).thenAnswer(invocation -> {
             when(vm.getProgramTrainingTree()).thenReturn(tree);
-            return new LiveData<ProgramTrainingTree>() {{postValue(tree);}};
+            return liveTree;
         });
+        when(vm.getLiveTree()).thenReturn(liveTree);
 
         fragment = ProgramTrainingFragment.newInstance(1L);
         fragment.viewModelFactory = viewModelFactory;

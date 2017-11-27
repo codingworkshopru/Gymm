@@ -4,7 +4,8 @@ import android.arch.lifecycle.LiveData;
 import android.arch.lifecycle.Transformations;
 import android.arch.lifecycle.ViewModel;
 import android.support.annotation.VisibleForTesting;
-import android.text.TextUtils;
+
+import com.google.common.base.Objects;
 
 import javax.inject.Inject;
 
@@ -102,6 +103,6 @@ public class ProgramTrainingViewModel extends ViewModel {
 
     public boolean isChanged() {
         String newName = tree.getParent().getName();
-        return childrenChanged || !TextUtils.equals(newName, oldTrainingName);
+        return childrenChanged || !Objects.equal(newName, oldTrainingName);
     }
 }

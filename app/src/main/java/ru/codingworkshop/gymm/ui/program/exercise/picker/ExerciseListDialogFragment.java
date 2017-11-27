@@ -4,6 +4,7 @@ import android.app.Dialog;
 import android.arch.lifecycle.ViewModelProvider;
 import android.arch.lifecycle.ViewModelProviders;
 import android.content.Context;
+import android.content.Intent;
 import android.databinding.DataBindingUtil;
 import android.databinding.ViewDataBinding;
 import android.os.Bundle;
@@ -26,6 +27,7 @@ import ru.codingworkshop.gymm.data.entity.Exercise;
 import ru.codingworkshop.gymm.databinding.FragmentExercisePickerListItemBinding;
 import ru.codingworkshop.gymm.ui.common.ClickableBindingListAdapter;
 import ru.codingworkshop.gymm.ui.common.ListItemListeners;
+import ru.codingworkshop.gymm.ui.info.exercise.ExerciseInfoActivity;
 import ru.codingworkshop.gymm.ui.info.exercise.ExerciseInfoFragment;
 
 /**
@@ -103,8 +105,9 @@ public class ExerciseListDialogFragment extends BottomSheetDialogFragment {
 
     private void onExerciseInfoButtonClick(View view) {
         FragmentExercisePickerListItemBinding binding = DataBindingUtil.findBinding(view);
-        ExerciseInfoFragment fragment = ExerciseInfoFragment.newInstance(binding.getExercise().getId());
-        fragment.show(getChildFragmentManager(), ExerciseInfoFragment.TAG);
+        Intent exerciseInfoStart = new Intent(getContext(), ExerciseInfoActivity.class);
+        exerciseInfoStart.putExtra(ExerciseInfoActivity.EXERCISE_ID_KEY, binding.getExercise().getId());
+        startActivity(exerciseInfoStart);
     }
 
     private void onExerciseClick(View v) {

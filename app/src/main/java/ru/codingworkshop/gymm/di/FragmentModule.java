@@ -2,6 +2,7 @@ package ru.codingworkshop.gymm.di;
 
 import dagger.Module;
 import dagger.android.ContributesAndroidInjector;
+import ru.codingworkshop.gymm.ui.actual.exercise.ActualExercisesFragment;
 import ru.codingworkshop.gymm.ui.info.exercise.ExerciseInfoFragment;
 import ru.codingworkshop.gymm.ui.program.exercise.ProgramExerciseFragment;
 import ru.codingworkshop.gymm.ui.program.exercise.picker.ExerciseListDialogFragment;
@@ -28,4 +29,7 @@ abstract class FragmentModule {
 
     @ContributesAndroidInjector
     abstract ExerciseInfoFragment contributeExerciseInfoFragment();
+
+    @ContributesAndroidInjector
+    abstract ActualExercisesFragment contributeActualExercisesFragment();
 }

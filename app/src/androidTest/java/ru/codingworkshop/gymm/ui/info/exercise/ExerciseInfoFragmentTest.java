@@ -67,12 +67,6 @@ public class ExerciseInfoFragmentTest {
     }
 
     @Test
-    public void withYouTubeVideoTest() throws Exception {
-        initFragmentWithExercise(createExercise());
-        onView(withId(R.id.exerciseInfoStubImage)).check(matches(not(isDisplayed())));
-    }
-
-    @Test
     public void withoutYouTubeVideoTest() throws Exception {
         initFragmentWithExercise(createExerciseWithoutYouTubeVideo());
         onView(withId(R.id.exerciseInfoDifficulty)).check(matches(isDisplayed()));

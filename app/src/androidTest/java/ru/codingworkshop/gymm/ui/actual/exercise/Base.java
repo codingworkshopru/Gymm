@@ -47,6 +47,7 @@ public abstract class Base {
     @Before
     public void setUp() throws Exception {
         MockitoAnnotations.initMocks(this);
+
         RecyclerViewItemMatcher.setRecyclerViewId(R.id.actualExerciseList);
         InstrumentationRegistry
                 .getTargetContext()
