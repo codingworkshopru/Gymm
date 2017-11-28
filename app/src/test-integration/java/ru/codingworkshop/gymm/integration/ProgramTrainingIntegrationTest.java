@@ -1,9 +1,8 @@
 package ru.codingworkshop.gymm.integration;
 
 import android.arch.persistence.room.Room;
-import android.content.res.Resources;
 import android.support.test.InstrumentationRegistry;
-import android.support.test.espresso.contrib.RecyclerViewActions;
+import android.support.test.espresso.Espresso;
 import android.support.test.rule.ActivityTestRule;
 
 import org.junit.AfterClass;
@@ -17,9 +16,9 @@ import ru.codingworkshop.gymm.db.GymmDatabase;
 import ru.codingworkshop.gymm.ui.MainActivity;
 
 import static android.support.test.espresso.Espresso.onView;
-import static android.support.test.espresso.action.ViewActions.*;
-import static android.support.test.espresso.assertion.ViewAssertions.matches;
-import static android.support.test.espresso.matcher.ViewMatchers.*;
+import static android.support.test.espresso.action.ViewActions.click;
+import static android.support.test.espresso.matcher.ViewMatchers.withText;
+import static junit.framework.Assert.fail;
 import static ru.codingworkshop.gymm.db.initializer.DatabaseInitializer.DATABASE_NAME;
 import static ru.codingworkshop.gymm.integration.Operation.*;
 
@@ -59,7 +58,7 @@ public class ProgramTrainingIntegrationTest {
         addProgramExerciseClick();
         pickExercise(db, exerciseName);
         addProgramSetClick();
-        typeSet(1, 0, 0);
+        typeSetAndSaveIt(1, 0, 0);
         checkSet(0, 1, 0, 0);
         saveProgramExerciseClick();
         checkProgramExercise(0, exerciseName, 1);
@@ -76,16 +75,117 @@ public class ProgramTrainingIntegrationTest {
         typeProgramTrainingName("tuesday workout");
         editProgramExerciseClick("Приседания в гакк-тренажере");
         editProgramSetClick(0);
-        typeSet(5, 5, 0);
+        typeSetAndSaveIt(5, 5, 0);
         checkSet(0, 5, 5, 0);
         editProgramSetClick(0);
-        typeSet(1, 0, 0);
+        typeSetAndSaveIt(1, 0, 0);
         checkSet(0, 1, 0, 0);
         addProgramSetClick();
-        typeSet(1, 0, 0);
+        typeSetAndSaveIt(1, 0, 0);
         saveProgramExerciseClick();
         checkProgramExercise(0, "Приседания в гакк-тренажере", 2);
         saveProgramTrainingClick();
         checkProgramTraining("tuesday workout");
+    }
+
+    @Test
+    public void deleteProgramExercise() throws Exception {
+        addProgramTrainingClick();
+        typeProgramTrainingName("my workout");
+
+        addProgramExerciseClick();
+        pickExercise(db, "Приседания со штангой");
+
+        addProgramSetClick();
+        typeSetAndSaveIt(1, 0, 0);
+        saveProgramExerciseClick();
+
+        addProgramExerciseClick();
+        pickExercise(db, "Жим штанги лёжа");
+
+        addProgramSetClick();
+        typeSetAndSaveIt(1, 0, 0);
+        saveProgramExerciseClick();
+
+        enterActionMode(R.id.programExerciseList);
+        deleteProgramExerciseAt(1);
+        exitActionMode();
+
+        addProgramExerciseClick();
+        Espresso.pressBack();
+        checkExerciseNotPresented("Жим штанги лёжа");
+    }
+
+    @Test
+    public void checkSetsSortOrder() throws Exception {
+        addProgramTrainingClick();
+        addProgramExerciseClick();
+
+        pickExercise(db, "Отжимания от пола");
+
+        addProgramSetClick();
+        typeSetAndSaveIt(1, 0, 0);
+
+        addProgramSetClick();
+        typeSetAndSaveIt(2, 3, 5);
+
+        addProgramSetClick();
+        typeSetAndSaveIt(3, 4, 10);
+        saveProgramExerciseClick();
+
+        editProgramExerciseClick("Отжимания от пола");
+
+        checkSet(1, 2, 3, 5);
+        checkSet(2, 3, 4, 10);
+    }
+
+    @Test
+    public void checkExercisesSortOrder() throws Exception {
+        addProgramTrainingClick();
+
+        addProgramExerciseClick();
+        pickExercise(db, "Отжимания от пола");
+        addProgramSetClick();
+        typeSetAndSaveIt(1, 0, 0);
+        saveProgramExerciseClick();
+
+        addProgramExerciseClick();
+        pickExercise(db, "Жим штанги лёжа");
+        addProgramSetClick();
+        typeSetAndSaveIt(1, 0, 0);
+        saveProgramExerciseClick();
+
+        addProgramExerciseClick();
+        pickExercise(db, "Приседания со штангой");
+        addProgramSetClick();
+        typeSetAndSaveIt(1, 0, 0);
+        saveProgramExerciseClick();
+
+        enterActionMode(R.id.programExerciseList);
+        deleteProgramExerciseAt(2);
+        onView(withText(android.R.string.cancel));
+
+        checkProgramExercise(0, "Отжимания от пола", 1);
+        checkProgramExercise(1, "Жим штанги лёжа", 1);
+        checkProgramExercise(2, "Приседания со штангой", 1);
+    }
+
+    @Test
+    public void undoChangesAfterExerciseAddition() throws Exception {
+        addOneProgramTraining("workout is ruined", "Отжимания от пола");
+
+        editProgramTrainingClick("workout is ruined");
+
+        addProgramExerciseClick();
+        pickExercise(db, "Приседания со штангой");
+        addProgramSetClick();
+        typeSetAndSaveIt(1, 0, 0);
+        saveProgramExerciseClick();
+
+        Espresso.pressBack();
+        onView(withText(android.R.string.ok)).perform(click());
+
+        editProgramTrainingClick("workout is ruined");
+        checkExerciseNotPresented("Приседания со штангой");
     }
 }
