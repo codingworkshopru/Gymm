@@ -10,6 +10,7 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -23,7 +24,9 @@ import ru.codingworkshop.gymm.db.dao.ProgramTrainingDao;
 import ru.codingworkshop.gymm.util.LiveTest;
 import ru.codingworkshop.gymm.util.Models;
 
+import static org.mockito.ArgumentMatchers.anyCollection;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -165,6 +168,28 @@ public class ProgramTrainingRepositoryTest {
         repository.insertProgramExercise(exercise);
 
         verify(dao).insertProgramExercise(exercise);
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void insertProgramExercisesWithoutParentId() throws Exception {
+        ProgramExercise exercise = Models.createProgramExercise(0L, 0L, 100L, false);
+        ArrayList<ProgramExercise> programExercises = Lists.newArrayList(exercise);
+        repository.insertProgramExercises(programExercises);
+        verify(dao, never()).insertProgramExercises(programExercises);
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void insertExercisesWithoutExerciseId() throws Exception {
+        ProgramExercise exercise = Models.createProgramExercise(0L, 2L, 0L, false);
+        ArrayList<ProgramExercise> programExercises = Lists.newArrayList(exercise);
+        repository.insertProgramExercises(programExercises);
+        verify(dao, never()).insertProgramExercises(programExercises);
+    }
+
+    @Test
+    public void insertExercises() throws Exception {
+        repository.insertProgramExercises(Models.createProgramExercises(1));
+        verify(dao).insertProgramExercises(anyCollection());
     }
 
     @Test(expected = IllegalArgumentException.class)

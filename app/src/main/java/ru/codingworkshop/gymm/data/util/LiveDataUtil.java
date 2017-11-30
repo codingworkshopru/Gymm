@@ -26,10 +26,8 @@ public final class LiveDataUtil {
         liveData.observeForever(new Observer<T>() {
             @Override
             public void onChanged(@Nullable T t) {
-                if (t != null) {
-                    a.accept(t);
-                    liveData.removeObserver(this);
-                }
+                a.accept(t);
+                liveData.removeObserver(this);
             }
         });
 

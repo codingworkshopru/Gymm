@@ -69,4 +69,19 @@ public class ActualTrainingAdapter implements ParentAdapter<ActualTraining>, Chi
     public LiveData<List<ActualSet>> getGrandchildren(long id) {
         return repository.getActualSetsForActualTraining(id);
     }
+
+    @Override
+    public void insertGrandchildren(Collection<ActualSet> grandchildren) {
+
+    }
+
+    @Override
+    public void updateGrandchildren(Collection<ActualSet> grandchildren) {
+
+    }
+
+    @Override
+    public void deleteGrandchildren(Collection<ActualSet> grandchildren) {
+
+    }
 }

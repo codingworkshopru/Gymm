@@ -7,7 +7,7 @@ import ru.codingworkshop.gymm.data.tree.holder.HolderTestSuite;
 import ru.codingworkshop.gymm.data.tree.loader.LoaderTestSuite;
 import ru.codingworkshop.gymm.data.tree.node.NodeTestSuite;
 import ru.codingworkshop.gymm.data.tree.repositoryadapter.RepositoryAdapterTestSuite;
-import ru.codingworkshop.gymm.data.tree.saver.SaverTestSuite;
+import ru.codingworkshop.gymm.data.tree.saver2.SaverTestSuite;
 
 /**
  * Created by Радик on 21.08.2017 as part of the Gymm project.

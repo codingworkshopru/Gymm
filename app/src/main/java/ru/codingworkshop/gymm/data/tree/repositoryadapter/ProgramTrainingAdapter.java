@@ -39,6 +39,10 @@ public class ProgramTrainingAdapter implements ParentAdapter<ProgramTraining>,
         return programTrainingRepository.getDraftingProgramTraining();
     }
 
+    public LiveData<ProgramTraining> getProgramTrainingByName(String programTrainingName) {
+        return programTrainingRepository.getProgramTrainingByName(programTrainingName);
+    }
+
     @Override
     public LiveData<ProgramTraining> getParent(long id) {
         return programTrainingRepository.getProgramTrainingById(id);
@@ -66,7 +70,7 @@ public class ProgramTrainingAdapter implements ParentAdapter<ProgramTraining>,
 
     @Override
     public void insertChildren(Collection<ProgramExercise> children) {
-
+        programTrainingRepository.insertProgramExercises(children);
     }
 
     @Override
@@ -82,5 +86,20 @@ public class ProgramTrainingAdapter implements ParentAdapter<ProgramTraining>,
     @Override
     public LiveData<List<ProgramSet>> getGrandchildren(long id) {
         return programTrainingRepository.getProgramSetsForTraining(id);
+    }
+
+    @Override
+    public void insertGrandchildren(Collection<ProgramSet> grandchildren) {
+        programTrainingRepository.insertProgramSets(grandchildren);
+    }
+
+    @Override
+    public void updateGrandchildren(Collection<ProgramSet> grandchildren) {
+        programTrainingRepository.updateProgramSets(grandchildren);
+    }
+
+    @Override
+    public void deleteGrandchildren(Collection<ProgramSet> grandchildren) {
+        programTrainingRepository.deleteProgramSets(grandchildren);
     }
 }

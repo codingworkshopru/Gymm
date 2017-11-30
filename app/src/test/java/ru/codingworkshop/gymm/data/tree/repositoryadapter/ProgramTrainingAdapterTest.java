@@ -17,6 +17,7 @@ import ru.codingworkshop.gymm.repository.ProgramTrainingRepository;
 import ru.codingworkshop.gymm.util.Models;
 
 import static org.junit.Assert.*;
+import static org.mockito.ArgumentMatchers.anyCollection;
 import static org.mockito.Mockito.verify;
 
 /**
@@ -39,6 +40,12 @@ public class ProgramTrainingAdapterTest {
     public void getDrafting() throws Exception {
         adapter.getDrafting();
         verify(programTrainingRepository).getDraftingProgramTraining();
+    }
+
+    @Test
+    public void getProgramTrainingByName() throws Exception {
+        adapter.getProgramTrainingByName("foo");
+        verify(programTrainingRepository).getProgramTrainingByName("foo");
     }
 
     @Test
@@ -75,6 +82,13 @@ public class ProgramTrainingAdapterTest {
     }
 
     @Test
+    public void insertChildren() throws Exception {
+        Collection<ProgramExercise> programExercises = Models.createProgramExercises(1);
+        adapter.insertChildren(programExercises);
+        verify(programTrainingRepository).insertProgramExercises(programExercises);
+    }
+
+    @Test
     public void updateChildren() throws Exception {
         Collection<ProgramExercise> programExercises = Models.createProgramExercises(1);
         adapter.updateChildren(programExercises);
@@ -89,8 +103,29 @@ public class ProgramTrainingAdapterTest {
     }
 
     @Test
-    public void getGrandchildren() throws Exception {
+    public void getGrandchildren()  {
         adapter.getGrandchildren(1L);
         verify(programTrainingRepository).getProgramSetsForTraining(1L);
+    }
+
+    @Test
+    public void insertGrandchildren() throws Exception {
+        List<ProgramSet> programSets = Models.createProgramSets(2L, 1);
+        adapter.insertGrandchildren(programSets);
+        verify(programTrainingRepository).insertProgramSets(programSets);
+    }
+
+    @Test
+    public void updateGrandchildren() throws Exception {
+        List<ProgramSet> programSets = Models.createProgramSets(2L, 1);
+        adapter.updateGrandchildren(programSets);
+        verify(programTrainingRepository).updateProgramSets(programSets);
+    }
+
+    @Test
+    public void deleteGrandchildren() throws Exception {
+        List<ProgramSet> programSets = Models.createProgramSets(2L, 1);
+        adapter.deleteGrandchildren(programSets);
+        verify(programTrainingRepository).deleteProgramSets(programSets);
     }
 }

@@ -76,7 +76,7 @@ public class Models {
     }
 
     public static List<ProgramExercise> createProgramExercises(int count) {
-        List<ProgramExercise> exercises = Lists.newArrayListWithCapacity(count);
+        List<ProgramExercise> exercises = new ArrayList<>(count);
         for (int i = 0; i < count; i++) {
             ProgramExercise programExercise = createProgramExercise(i + 2, 1L, i + 100, false);
             programExercise.setSortOrder(i);

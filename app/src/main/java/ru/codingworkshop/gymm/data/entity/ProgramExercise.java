@@ -38,7 +38,7 @@ public class ProgramExercise implements IProgramExercise {
     @PrimaryKey(autoGenerate = true)
     private long id;
     private long programTrainingId;
-    private Long exerciseId;
+    private Long exerciseId; // TODO entity validations in repostory; make it long, but not Long
     private int sortOrder;
     private boolean drafting;
 
@@ -86,5 +86,27 @@ public class ProgramExercise implements IProgramExercise {
     @Override
     public void setDrafting(boolean drafting) {
         this.drafting = drafting;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        ProgramExercise that = (ProgramExercise) o;
+
+        if (id != that.id) return false;
+        if (programTrainingId != that.programTrainingId) return false;
+        if (sortOrder != that.sortOrder) return false;
+        return exerciseId != null ? exerciseId.equals(that.exerciseId) : that.exerciseId == null;
+    }
+
+    @Override
+    public int hashCode() {
+        int result = (int) (id ^ (id >>> 32));
+        result = 31 * result + (int) (programTrainingId ^ (programTrainingId >>> 32));
+        result = 31 * result + (exerciseId != null ? exerciseId.hashCode() : 0);
+        result = 31 * result + sortOrder;
+        return result;
     }
 }

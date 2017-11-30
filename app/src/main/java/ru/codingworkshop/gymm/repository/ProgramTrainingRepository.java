@@ -93,6 +93,14 @@ public class ProgramTrainingRepository extends BaseRepository {
         insert(programExercise, dao::insertProgramExercise);
     }
 
+    public void insertProgramExercises(@NonNull Collection<ProgramExercise> programExercises) {
+        applyToEach(programExercises, pe -> {
+            checkProgramTrainingInProgramExercise(pe);
+            checkExerciseInProgramExercise(pe);
+        });
+        insert(programExercises, dao::insertProgramExercises);
+    }
+
     private void checkIsDrafting(Draftable draftable) {
         Preconditions.checkArgument(draftable.isDrafting());
     }

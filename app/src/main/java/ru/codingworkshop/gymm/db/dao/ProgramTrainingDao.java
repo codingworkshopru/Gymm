@@ -7,6 +7,7 @@ import android.arch.persistence.room.Insert;
 import android.arch.persistence.room.Query;
 import android.arch.persistence.room.Update;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
@@ -57,6 +58,9 @@ public interface ProgramTrainingDao {
 
     @Insert
     long insertProgramExercise(ProgramExercise programExercise);
+
+    @Insert
+    List<Long> insertProgramExercises(Collection<ProgramExercise> programExercises);
 
     @Delete
     int deleteProgramExercise(ProgramExercise programExercise);
