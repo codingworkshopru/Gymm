@@ -10,10 +10,10 @@ import android.view.ViewGroup;
 import ru.codingworkshop.gymm.R;
 
 public class LoadingFragment extends Fragment {
+    public static final String TAG = LoadingFragment.class.getCanonicalName();
 
 
     public LoadingFragment() {
-        // Required empty public constructor
     }
 
 

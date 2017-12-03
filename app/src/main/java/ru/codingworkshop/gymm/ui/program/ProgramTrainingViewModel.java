@@ -3,10 +3,15 @@ package ru.codingworkshop.gymm.ui.program;
 import android.arch.lifecycle.LiveData;
 import android.arch.lifecycle.MutableLiveData;
 import android.arch.lifecycle.Transformations;
+import android.arch.lifecycle.ViewModel;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
+import com.google.common.base.Objects;
 import com.google.common.base.Preconditions;
+import com.google.common.base.Strings;
+
+import javax.inject.Inject;
 
 import ru.codingworkshop.gymm.data.entity.ProgramExercise;
 import ru.codingworkshop.gymm.data.entity.ProgramSet;
@@ -14,6 +19,7 @@ import ru.codingworkshop.gymm.data.entity.ProgramTraining;
 import ru.codingworkshop.gymm.data.tree.ChildRestoreAdapter;
 import ru.codingworkshop.gymm.data.tree.loader.ProgramTrainingTreeLoader;
 import ru.codingworkshop.gymm.data.tree.loader.common.Loader;
+import ru.codingworkshop.gymm.data.tree.loader.common.LoaderDelegate;
 import ru.codingworkshop.gymm.data.tree.node.MutableProgramExerciseNode;
 import ru.codingworkshop.gymm.data.tree.node.MutableProgramTrainingTree;
 import ru.codingworkshop.gymm.data.tree.node.ProgramExerciseNode;
@@ -21,12 +27,14 @@ import ru.codingworkshop.gymm.data.tree.node.ProgramTrainingTree;
 import ru.codingworkshop.gymm.data.tree.repositoryadapter.ProgramTrainingAdapter;
 import ru.codingworkshop.gymm.data.tree.saver2.ProgramTrainingTreeSaver;
 import ru.codingworkshop.gymm.data.tree.saver2.Saver;
+import ru.codingworkshop.gymm.data.util.LiveDataUtil;
+import ru.codingworkshop.gymm.db.GymmDatabase;
 
 /**
  * Created by Radik on 28.11.2017.
  */
 
-public class ProgramTrainingViewModel {
+public class ProgramTrainingViewModel extends ViewModel {
     private final Loader<ProgramTrainingTree> loader;
     private final Saver<ProgramTrainingTree> saver;
     private final ProgramTrainingAdapter repositoryAdapter;
@@ -35,6 +43,7 @@ public class ProgramTrainingViewModel {
     private final MutableLiveData<ProgramExerciseNode> currentProgramExercise;
     private final MutableLiveData<ProgramSet> currentProgramSet;
 
+    @Inject
     public ProgramTrainingViewModel(ProgramTrainingTreeLoader loader, ProgramTrainingTreeSaver saver, ProgramTrainingAdapter repositoryAdapter) {
         this.loader = loader;
         this.saver = saver;
@@ -55,7 +64,7 @@ public class ProgramTrainingViewModel {
         saver.save(tree);
     }
 
-    public @Nullable ProgramTrainingTree getProgramTrainingTree() {
+    public @NonNull ProgramTrainingTree getProgramTrainingTree() {
         return tree;
     }
 
@@ -109,6 +118,22 @@ public class ProgramTrainingViewModel {
         return currentProgramExercise;
     }
 
+    public LiveData<Boolean> isProgramTrainingChanged() {
+        ProgramTraining newParent = tree.getParent();
+        if (!GymmDatabase.isValidId(newParent)) {
+            return LiveDataUtil.getLive(!Strings.isNullOrEmpty(newParent.getName()));
+        }
+        return Transformations.map(
+                repositoryAdapter.getParent(newParent.getId()),
+                oldParent -> !Objects.equal(newParent.getName(), oldParent.getName()));
+    }
+
+    public LiveData<Boolean> areProgramExercisesChanged() {
+        return Transformations.map(
+                repositoryAdapter.getChildren(tree.getParent().getId()),
+                exercises -> !Objects.equal(tree.getProgramExercises(), exercises));
+    }
+
     /**
      * creates {@link ProgramSet} instance and adds it in tree
      * @return index
@@ -154,5 +179,13 @@ public class ProgramTrainingViewModel {
 
     @NonNull public LiveData<ProgramSet> getProgramSet() {
         return currentProgramSet;
+    }
+
+    public LiveData<Boolean> areProgramSetsChanged() {
+        ProgramExerciseNode exerciseNode = Preconditions.checkNotNull(getProgramExercise().getValue(), "program exercise has not been set");
+        return Transformations.map(
+                repositoryAdapter.getProgramSetsForExercise(exerciseNode.getId()),
+                sets -> !exerciseNode.getChildren().equals(sets));
+
     }
 }

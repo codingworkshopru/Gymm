@@ -43,14 +43,11 @@ public class ChildrenSaverTest {
 
         when(adapter.getChildren(1L)).thenReturn(LiveDataUtil.getLive(oldChildren));
 
-        ChildrenSaver<SimpleModel> saver = new ChildrenSaver<>(
-                adapter,
-                1L,
-                (m1, m2) -> m1.getSortOrder() == m2.getSortOrder());
+        ChildrenSaver<SimpleModel> saver = new ChildrenSaver<>(adapter, 1L);
         saver.save(newChildren);
 
         verify(adapter).insertChildren(argThat(actual -> Iterables.elementsEqual(actual, newChildren.subList(2, 3))));
-        verify(adapter).updateChildren(argThat(actual -> Iterables.elementsEqual(actual, newChildren.subList(1, 1))));
+        verify(adapter).updateChildren(argThat(actual -> Iterables.elementsEqual(actual, newChildren.subList(1, 2))));
         verify(adapter).deleteChildren(argThat(actual -> Iterables.elementsEqual(actual, oldChildren.subList(2, 3))));
     }
 
@@ -61,23 +58,21 @@ public class ChildrenSaverTest {
 
         List<SimpleModel> models2 = Models.createSimpleModels("foo", "bak", "buk", "bum");
 
-        BiPredicate<SimpleModel> contentsEqual = (a, b) -> Objects.equals(a.getName(), b.getName());
-
         // new only
-        ChildrenSaver.ListsDiffResult<SimpleModel> result = ChildrenSaver.containersDiff(new ArrayList<>(), models2, contentsEqual);
+        ChildrenSaver.ContainersDiffResult<SimpleModel> result = ChildrenSaver.containersDiff(new ArrayList<>(), models2);
         assertNull(result.getToDelete());
         assertNull(result.getToUpdate());
         assertEquals(models2, result.getToInsert());
 
         // old only
-        result = ChildrenSaver.containersDiff(models1, new ArrayList<>(), contentsEqual);
+        result = ChildrenSaver.containersDiff(models1, new ArrayList<>());
         assertNull(result.getToInsert());
         assertNull(result.getToUpdate());
         assertEquals(models1, result.getToDelete());
 
         // new, old and updated
 
-        result = ChildrenSaver.containersDiff(models1, models2, contentsEqual);
+        result = ChildrenSaver.containersDiff(models1, models2);
         assertEquals(models2.subList(2, 4), result.getToInsert());
         assertEquals(models1.subList(2, 3), result.getToDelete());
         assertEquals(models2.subList(1, 2), result.getToUpdate());

@@ -43,6 +43,10 @@ public class ProgramTrainingAdapter implements ParentAdapter<ProgramTraining>,
         return programTrainingRepository.getProgramTrainingByName(programTrainingName);
     }
 
+    public LiveData<List<ProgramSet>> getProgramSetsForExercise(long programExerciseId) {
+        return programTrainingRepository.getProgramSetsForExercise(programExerciseId);
+    }
+
     @Override
     public LiveData<ProgramTraining> getParent(long id) {
         return programTrainingRepository.getProgramTrainingById(id);

@@ -29,6 +29,8 @@ import ru.codingworkshop.gymm.ui.common.ListItemListeners;
 import ru.codingworkshop.gymm.ui.program.ProgramTrainingActivity;
 import ru.codingworkshop.gymm.ui.program.training.ProgramTrainingFragment;
 
+import static ru.codingworkshop.gymm.ui.program.ProgramTrainingActivity.PROGRAM_TRAINING_ID_KEY;
+
 public class MainActivity extends AppCompatActivity {
     @Inject
     ViewModelProvider.Factory viewModelFactory;
@@ -101,7 +103,7 @@ public class MainActivity extends AppCompatActivity {
 
     private Intent programTrainingActivityIntent(long programTrainingId) {
         Intent startProgramTrainingActivity = programTrainingActivityIntent();
-        startProgramTrainingActivity.putExtra(ProgramTrainingFragment.PROGRAM_TRAINING_ID_KEY, programTrainingId);
+        startProgramTrainingActivity.putExtra(PROGRAM_TRAINING_ID_KEY, programTrainingId);
         return startProgramTrainingActivity;
     }
 

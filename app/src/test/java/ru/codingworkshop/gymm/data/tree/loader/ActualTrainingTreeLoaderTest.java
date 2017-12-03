@@ -10,7 +10,6 @@ import org.mockito.junit.MockitoJUnitRunner;
 
 import java.util.stream.Collectors;
 
-import ru.codingworkshop.gymm.data.tree.loader.builder.ActualTrainingTreeBuilder;
 import ru.codingworkshop.gymm.data.tree.node.ActualTrainingTree;
 import ru.codingworkshop.gymm.data.tree.node.ImmutableProgramTrainingTree;
 import ru.codingworkshop.gymm.data.tree.node.ProgramExerciseNode;
@@ -23,7 +22,6 @@ import ru.codingworkshop.gymm.util.Models;
 import static junit.framework.Assert.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.ArgumentMatchers.longThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 

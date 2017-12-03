@@ -10,13 +10,14 @@ import android.databinding.ObservableBoolean;
 import android.databinding.ViewDataBinding;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.support.annotation.VisibleForTesting;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+
+import com.google.common.base.Preconditions;
 
 import javax.inject.Inject;
 
@@ -26,15 +27,16 @@ import ru.codingworkshop.gymm.data.tree.node.ProgramExerciseNode;
 import ru.codingworkshop.gymm.data.tree.node.ProgramTrainingTree;
 import ru.codingworkshop.gymm.data.util.LiveDataUtil;
 import ru.codingworkshop.gymm.databinding.FragmentProgramTrainingBinding;
-import ru.codingworkshop.gymm.databinding.FragmentProgramTrainingListItemBinding;
-import ru.codingworkshop.gymm.ui.program.ProgramTrainingActivity;
-import ru.codingworkshop.gymm.ui.program.common.FragmentAlert;
 import ru.codingworkshop.gymm.ui.common.EditTextValidator;
 import ru.codingworkshop.gymm.ui.common.ListItemListeners;
+
+import ru.codingworkshop.gymm.ui.program.ProgramTrainingActivity;
+import ru.codingworkshop.gymm.ui.program.ProgramTrainingViewModel;
 import ru.codingworkshop.gymm.ui.program.common.ActionModeCallback;
 import ru.codingworkshop.gymm.ui.program.common.BaseFragment;
-import ru.codingworkshop.gymm.ui.program.common.MyAdapterDataObserver;
+import ru.codingworkshop.gymm.ui.program.common.FragmentAlert;
 import ru.codingworkshop.gymm.ui.program.common.ItemTouchHelperCallback;
+import ru.codingworkshop.gymm.ui.program.common.MyAdapterDataObserver;
 import ru.codingworkshop.gymm.ui.program.common.ProgramRecyclerView;
 import ru.codingworkshop.gymm.ui.program.exercise.ProgramExerciseFragment;
 import ru.codingworkshop.gymm.ui.util.AlertDialogFragment;
@@ -44,7 +46,6 @@ public class ProgramTrainingFragment extends BaseFragment implements
         AlertDialogFragment.OnDialogButtonClickListener,
         ProgramTrainingActivity.OnSystemBackPressedListener {
 
-    public static final String PROGRAM_TRAINING_ID_KEY = "programTrainingId";
     public static final String TAG = "programTrainingFragmentTag";
 
     private static final int CANCEL_ALERT_ID = 0;
@@ -57,7 +58,6 @@ public class ProgramTrainingFragment extends BaseFragment implements
     private FragmentProgramTrainingBinding binding;
 
     private FragmentAlert alert;
-    private ProgramRecyclerView programExerciseList;
 
     @Override
     public void onAttach(Context context) {
@@ -71,14 +71,6 @@ public class ProgramTrainingFragment extends BaseFragment implements
         super.onCreate(savedInstanceState);
         Timber.d("onCreate");
         viewModel = ViewModelProviders.of(this, viewModelFactory).get(ProgramTrainingViewModel.class);
-
-        final Bundle arguments = getArguments();
-        LiveData<ProgramTrainingTree> liveLoaded;
-        if (arguments != null) {
-            liveLoaded = viewModel.load(arguments.getLong(PROGRAM_TRAINING_ID_KEY));
-        } else {
-            liveLoaded = viewModel.create();
-        }
     }
 
     @Override
@@ -97,6 +89,7 @@ public class ProgramTrainingFragment extends BaseFragment implements
     protected Toolbar getToolbar() {
         Toolbar toolbar = binding.programTrainingToolbar;
         toolbar.inflateMenu(R.menu.program_training_menu);
+        toolbar.setNavigationOnClickListener(v -> onFragmentClose());
         return toolbar;
     }
 
@@ -106,26 +99,20 @@ public class ProgramTrainingFragment extends BaseFragment implements
         binding = DataBindingUtil.inflate(inflater, R.layout.fragment_program_training, parent, false);
         binding.setInActionMode(new ObservableBoolean());
         binding.programTrainingAddExerciseButton.setOnClickListener(this::onAddExerciseButtonClick);
-        binding.programTrainingToolbar.setNavigationOnClickListener(v -> onFragmentClose());
 
         alert = new FragmentAlert(getChildFragmentManager());
+        Timber.d("alert created");
 
-        viewModel.getLiveTree().observe(this, this::initData);
-        return binding;
-    }
-
-    private void initData(ProgramTrainingTree loadedTree) {
-        if (loadedTree == null) return;
-        Timber.d("initData");
-        tree = loadedTree;
-
+        tree = Preconditions.checkNotNull(viewModel.getProgramTrainingTree(), "tree is null");
         binding.setProgramTraining(tree.getParent());
 
         initExerciseList();
+
+        return binding;
     }
 
     private void initExerciseList() {
-        programExerciseList = binding.programExerciseList;
+        ProgramRecyclerView programExerciseList = binding.programExerciseList;
         final ObservableBoolean inActionMode = binding.getInActionMode();
         ListItemListeners listeners = new ListItemListeners(R.layout.fragment_program_training_list_item)
                 .setOnClickListener(this::onExerciseClick)
@@ -146,7 +133,7 @@ public class ProgramTrainingFragment extends BaseFragment implements
 
         switch (dialogId) {
             case CANCEL_ALERT_ID:
-                cleanupAndClose();
+                close();
                 break;
         }
     }
@@ -154,7 +141,6 @@ public class ProgramTrainingFragment extends BaseFragment implements
     private void onExerciseLongClick(View v) {
         final ActionModeCallback actionModeCallback = new ActionModeCallback(binding.programExerciseList, binding.getInActionMode());
         getActivity().startActionMode(actionModeCallback);
-        viewModel.setChildrenChanged();
     }
 
     private void onAddExerciseButtonClick(View v) {
@@ -169,7 +155,7 @@ public class ProgramTrainingFragment extends BaseFragment implements
     }
 
     private void onExerciseClick(View v) {
-        ProgramExerciseNode n = tree.getChildren().get(programExerciseList.getChildAdapterPosition(v));
+        ProgramExerciseNode n = tree.getChildren().get(binding.programExerciseList.getChildAdapterPosition(v));
 
         ProgramExerciseFragment programExerciseFragment =
                 (ProgramExerciseFragment) getFragmentManager().findFragmentByTag(ProgramExerciseFragment.TAG);
@@ -191,16 +177,21 @@ public class ProgramTrainingFragment extends BaseFragment implements
 
     @Override
     public void onFragmentClose() {
-        if (viewModel.isChanged()) {
-            alert.showTwoButtonsAlert(CANCEL_ALERT_ID, R.string.cancel_changes_question);
-        } else {
-            cleanupAndClose();
-        }
+        Transformations.switchMap(viewModel.isProgramTrainingChanged(), changed -> {
+            return changed
+                    ? LiveDataUtil.getLive(true)
+                    : viewModel.areProgramExercisesChanged();
+        }).observe(this, this::showAlertIfChangedOrClose);
     }
 
-    private void cleanupAndClose() {
-        viewModel.deleteIfDrafting();
-        close();
+    private void showAlertIfChangedOrClose(Boolean changed) {
+        if (changed != null && changed) {
+            if (!alert.isShown()) {
+                alert.showTwoButtonsAlert(CANCEL_ALERT_ID, R.string.cancel_changes_question);
+            }
+        } else {
+            close();
+        }
     }
 
     private void close() {
@@ -211,46 +202,39 @@ public class ProgramTrainingFragment extends BaseFragment implements
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.actionSaveTraining:
-                final LiveData<Boolean> liveValid = validate();
-                LiveDataUtil.getOnce(liveValid, valid -> {
-                    if (valid != null && valid) {
-                        close();
-                    }
-                });
+                save();
                 return true;
         }
 
         return false;
     }
 
-    private LiveData<Boolean> validate() {
+    private void save() {
+        final EditTextValidator editTextValidator =
+            new EditTextValidator(binding.programTrainingNameLayout, R.string.program_training_activity_name_empty_error);
+        if (syncValidate(editTextValidator)) {
+            LiveDataUtil.getOnce(asyncValidate(editTextValidator), valid -> {
+                if (valid != null && valid) {
+                    viewModel.saveTree();
+                    close();
+                }
+            });
+        }
+    }
+
+    private boolean syncValidate(EditTextValidator editTextValidator) {
         if (!tree.hasChildren()) {
             alert.showOneButtonAlert(EMPTY_EXERCISE_LIST_ALERT_ID, R.string.program_training_activity_empty_list_dialog_message);
-            return LiveDataUtil.getLive(false);
+            return false;
         }
 
-        final EditTextValidator editTextValidator = new EditTextValidator(binding.programTrainingNameLayout, R.string.program_training_activity_name_empty_error);
+        return editTextValidator.validate();
+    }
 
-        if (!editTextValidator.validate()) {
-            return LiveDataUtil.getLive(false);
-        }
-
-        return Transformations.map(viewModel.save(), saved -> {
-            editTextValidator.addValidation(s -> saved, R.string.program_training_activity_name_duplicate_error);
+    private LiveData<Boolean> asyncValidate(EditTextValidator editTextValidator) {
+        return Transformations.map(viewModel.validateProgramTraining(), valid -> {
+            editTextValidator.addValidation(s -> valid, R.string.program_training_activity_name_duplicate_error);
             return editTextValidator.validate();
         });
-    }
-
-    public static ProgramTrainingFragment newInstance() {
-        return new ProgramTrainingFragment();
-    }
-
-    public static ProgramTrainingFragment newInstance(long programTrainingId) {
-        Bundle args = new Bundle();
-        args.putLong(PROGRAM_TRAINING_ID_KEY, programTrainingId);
-
-        ProgramTrainingFragment fragment = newInstance();
-        fragment.setArguments(args);
-        return fragment;
     }
 }

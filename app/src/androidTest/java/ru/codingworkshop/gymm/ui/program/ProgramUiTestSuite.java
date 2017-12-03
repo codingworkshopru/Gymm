@@ -8,7 +8,6 @@ import ru.codingworkshop.gymm.ui.program.exercise.ProgramExerciseFragmentTest;
 import ru.codingworkshop.gymm.ui.program.exercise.ProgramSetEditorFragmentTest;
 import ru.codingworkshop.gymm.ui.program.exercise.picker.ExerciseListDialogFragmentTest;
 import ru.codingworkshop.gymm.ui.program.exercise.picker.MuscleGroupPickerFragmentTest;
-import ru.codingworkshop.gymm.ui.program.training.ProgramTrainingCreateFragmentTest;
 import ru.codingworkshop.gymm.ui.program.training.ProgramTrainingFragmentTest;
 
 /**
@@ -21,7 +20,6 @@ import ru.codingworkshop.gymm.ui.program.training.ProgramTrainingFragmentTest;
         ProgramExerciseFragmentTest.class,
         ProgramExerciseCreateFragmentTest.class,
         ProgramTrainingFragmentTest.class,
-        ProgramTrainingCreateFragmentTest.class,
 
         ExerciseListDialogFragmentTest.class,
         MuscleGroupPickerFragmentTest.class

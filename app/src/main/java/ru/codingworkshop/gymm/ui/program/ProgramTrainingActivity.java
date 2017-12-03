@@ -1,28 +1,34 @@
 package ru.codingworkshop.gymm.ui.program;
 
-import android.support.annotation.VisibleForTesting;
+import android.arch.lifecycle.ViewModelProvider;
+import android.arch.lifecycle.ViewModelProviders;
+import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
 
 import javax.inject.Inject;
 
 import dagger.android.AndroidInjection;
 import dagger.android.AndroidInjector;
 import dagger.android.DispatchingAndroidInjector;
-import dagger.android.HasFragmentInjector;
 import dagger.android.support.HasSupportFragmentInjector;
 import ru.codingworkshop.gymm.R;
-import ru.codingworkshop.gymm.ui.program.exercise.ProgramExerciseFragment;
+import ru.codingworkshop.gymm.data.util.LiveDataUtil;
+import ru.codingworkshop.gymm.db.GymmDatabase;
+import ru.codingworkshop.gymm.ui.common.LoadingFragment;
 import ru.codingworkshop.gymm.ui.program.training.ProgramTrainingFragment;
 import timber.log.Timber;
 
 public class ProgramTrainingActivity extends AppCompatActivity implements HasSupportFragmentInjector {
-    @Inject DispatchingAndroidInjector<Fragment> fragmentInjector;
+    public static final String PROGRAM_TRAINING_ID_KEY = "programTrainingId";
 
-    @VisibleForTesting
-    ProgramTrainingFragment programTrainingFragment;
+    @Inject DispatchingAndroidInjector<Fragment> fragmentInjector;
+    @Inject ViewModelProvider.Factory viewModelFactory;
+
+    public interface OnSystemBackPressedListener {
+        void onFragmentClose();
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -32,14 +38,30 @@ public class ProgramTrainingActivity extends AppCompatActivity implements HasSup
 
         Timber.d("onCreate");
 
+        getSupportFragmentManager()
+                .beginTransaction()
+                .add(R.id.programTrainingFragmentContainer, new LoadingFragment(), LoadingFragment.TAG)
+                .commitNowAllowingStateLoss();
+
+        ProgramTrainingViewModel vm = ViewModelProviders.of(this, viewModelFactory).get(ProgramTrainingViewModel.class);
+
+        long programTrainingId = getIntent().getLongExtra(PROGRAM_TRAINING_ID_KEY, 0L);
+        if (GymmDatabase.isValidId(vm.getProgramTrainingTree().getParent()) || programTrainingId == 0L) {
+            addProgramTrainingFragment();
+        } else {
+            LiveDataUtil.getOnce(vm.loadTree(programTrainingId), unused -> addProgramTrainingFragment());
+        }
+    }
+
+    private void addProgramTrainingFragment() {
         FragmentManager fragmentManager = getSupportFragmentManager();
-        programTrainingFragment = (ProgramTrainingFragment) fragmentManager.findFragmentByTag(ProgramTrainingFragment.TAG);
+        ProgramTrainingFragment programTrainingFragment = (ProgramTrainingFragment) fragmentManager.findFragmentByTag(ProgramTrainingFragment.TAG);
         if (programTrainingFragment == null) {
-            programTrainingFragment = ProgramTrainingFragment.newInstance();
+            programTrainingFragment = new ProgramTrainingFragment();
             programTrainingFragment.setArguments(getIntent().getExtras());
             fragmentManager
                     .beginTransaction()
-                    .add(R.id.programTrainingFragmentContainer, programTrainingFragment, ProgramTrainingFragment.TAG)
+                    .replace(R.id.programTrainingFragmentContainer, programTrainingFragment, ProgramTrainingFragment.TAG)
                     .commit();
         }
     }
@@ -64,9 +86,5 @@ public class ProgramTrainingActivity extends AppCompatActivity implements HasSup
     @Override
     public AndroidInjector<Fragment> supportFragmentInjector() {
         return fragmentInjector;
-    }
-
-    public interface OnSystemBackPressedListener {
-        void onFragmentClose();
     }
 }

@@ -5,6 +5,10 @@ import android.arch.lifecycle.Observer;
 
 import org.mockito.ArgumentMatcher;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
 import java.util.function.Predicate;
 
 import static org.mockito.ArgumentMatchers.argThat;
@@ -12,7 +16,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 
 /**
- * Created by Радик on 26.06.2017.
+ * Created by Radik on 03.12.2017.
  */
 
 public class LiveTest {
@@ -28,5 +32,20 @@ public class LiveTest {
                 return check.test(argument);
             }
         }));
+    }
+
+    public static <T> T getValue(LiveData<T> liveData) throws InterruptedException {
+        List<T> result = new ArrayList<>(1);
+
+        CountDownLatch countDownLatch = new CountDownLatch(1);
+
+        liveData.observeForever(value -> {
+            result.add(value);
+            countDownLatch.countDown();
+        });
+
+        countDownLatch.await(2, TimeUnit.SECONDS);
+
+        return result.get(0);
     }
 }

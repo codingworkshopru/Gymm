@@ -11,22 +11,20 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-import ru.codingworkshop.gymm.data.entity.ProgramExercise;
 import ru.codingworkshop.gymm.data.entity.ProgramSet;
+import ru.codingworkshop.gymm.data.entity.ProgramTraining;
 import ru.codingworkshop.gymm.data.tree.loader.ProgramTrainingTreeLoader;
 import ru.codingworkshop.gymm.data.tree.node.ImmutableProgramExerciseNode;
-import ru.codingworkshop.gymm.data.tree.node.MutableProgramExerciseNode;
 import ru.codingworkshop.gymm.data.tree.node.MutableProgramTrainingTree;
 import ru.codingworkshop.gymm.data.tree.node.ProgramExerciseNode;
 import ru.codingworkshop.gymm.data.tree.node.ProgramTrainingTree;
 import ru.codingworkshop.gymm.data.tree.repositoryadapter.ProgramTrainingAdapter;
-import ru.codingworkshop.gymm.data.tree.saver.Saver;
 import ru.codingworkshop.gymm.data.tree.saver2.ProgramTrainingTreeSaver;
 import ru.codingworkshop.gymm.data.util.LiveDataUtil;
-import ru.codingworkshop.gymm.repository.ProgramTrainingRepository;
 import ru.codingworkshop.gymm.util.LiveTest;
 import ru.codingworkshop.gymm.util.Models;
 import ru.codingworkshop.gymm.util.TreeBuilders;
@@ -52,8 +50,11 @@ public class ProgramTrainingViewModelTest {
     @Before
     public void setUp() throws Exception {
         when(loader.loadById(any(), anyLong())).thenAnswer(invocation -> {
-            ProgramTrainingTree tree = invocation.getArgument(0);
-            return LiveDataUtil.getLive(tree);
+            ProgramTrainingTree originalTree = invocation.getArgument(0);
+            ProgramTrainingTree donorTree = TreeBuilders.buildProgramTrainingTree(1);
+            originalTree.setParent(donorTree.getParent());
+            originalTree.setChildren(donorTree.getChildren());
+            return LiveDataUtil.getLive(originalTree);
         });
     }
 
@@ -156,6 +157,29 @@ public class ProgramTrainingViewModelTest {
     }
 
     @Test
+    public void isProgramTrainingChanged() throws Exception {
+        assertFalse(LiveTest.getValue(vm.isProgramTrainingChanged()));
+
+        when(adapter.getParent(1L)).thenReturn(Models.createLiveProgramTraining(1L, "foo", false));
+        ProgramTrainingTree tree = LiveTest.getValue(vm.loadTree(1L));
+
+        assertFalse(LiveTest.getValue(vm.isProgramTrainingChanged()));
+
+        tree.getParent().setName("bar");
+        assertTrue(LiveTest.getValue(vm.isProgramTrainingChanged()));
+    }
+
+    @Test
+    public void areProgramExercisesChanged() throws Exception {
+        when(adapter.getChildren(anyLong()))
+                .thenReturn(LiveDataUtil.getLive(new ArrayList<>()))
+                .thenReturn(Models.createLiveProgramExercises(1));
+
+        LiveTest.verifyLiveData(vm.areProgramExercisesChanged(), changed -> !changed);
+        LiveTest.verifyLiveData(vm.loadTree(1L), Objects::nonNull);
+    }
+
+    @Test
     public void createProgramSet() throws Exception {
         vm.createProgramExercise();
         vm.getProgramExercise().getValue().setId(2L);
@@ -215,4 +239,18 @@ public class ProgramTrainingViewModelTest {
         LiveTest.verifyLiveData(vm.getProgramSet(), set -> set == programSet);
     }
 
+    @Test
+    public void areProgramSetsChanged() throws Exception {
+        when(adapter.getProgramSetsForExercise(anyLong()))
+                .thenReturn(LiveDataUtil.getLive(new ArrayList<>()))
+                .thenReturn(Models.createLiveProgramSets(2L, 2));
+
+        ProgramTrainingTree tree = TreeBuilders.buildProgramTrainingTree(1);
+        tree.getChildren().get(0).moveChild(0, 1);
+
+        vm.createProgramExercise();
+        LiveTest.verifyLiveData(vm.areProgramSetsChanged(), changed -> !changed);
+        LiveTest.verifyLiveData(vm.loadTree(1L), Objects::nonNull);
+        LiveTest.verifyLiveData(vm.areProgramSetsChanged(), changed -> changed);
+    }
 }

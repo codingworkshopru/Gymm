@@ -9,7 +9,6 @@ import org.junit.Test;
 
 import java.util.concurrent.atomic.AtomicLong;
 
-import ru.codingworkshop.gymm.data.tree.loader.common.LoaderDelegate;
 import ru.codingworkshop.gymm.util.LiveTest;
 
 /**

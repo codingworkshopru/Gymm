@@ -49,6 +49,12 @@ public class ProgramTrainingAdapterTest {
     }
 
     @Test
+    public void getProgramSetsForExercise() throws Exception {
+        adapter.getProgramSetsForExercise(2L);
+        verify(programTrainingRepository).getProgramSetsForExercise(2L);
+    }
+
+    @Test
     public void getParent() throws Exception {
         adapter.getParent(1L);
         verify(programTrainingRepository).getProgramTrainingById(1L);

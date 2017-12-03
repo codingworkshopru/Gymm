@@ -1,7 +1,11 @@
 package ru.codingworkshop.gymm.data.tree.node;
 
+import com.google.common.collect.Lists;
+
+import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 
 import ru.codingworkshop.gymm.data.entity.ProgramExercise;
@@ -20,58 +24,16 @@ public abstract class ProgramTrainingTree extends BaseNode<ProgramTraining, Prog
 
     public abstract ProgramExerciseNode createChildNode(ProgramExercise programExercise);
 
-    public ChildrenIterator childrenIterator() {
-        return new ChildrenIterator(getChildren());
+    public List<ProgramExercise> getProgramExercises() {
+        return Lists.transform(getChildren(), BaseNode::getParent);
     }
 
-    public GrandchildrenIterator grandchildrenIterator() {
-        return new GrandchildrenIterator(getChildren());
-    }
-
-    public static class ChildrenIterator implements Iterator<ProgramExercise> {
-        private Iterator<ProgramExerciseNode> iterator;
-
-        public ChildrenIterator(List<ProgramExerciseNode> children) {
-            this.iterator = children.iterator();
+    public List<ProgramSet> getAllProgramSets() {
+        List<ProgramSet> sets = new LinkedList<>();
+        for (ProgramExerciseNode n : getChildren()) {
+            sets.addAll(n.getChildren());
         }
 
-        @Override
-        public boolean hasNext() {
-            return iterator.hasNext();
-        }
-
-        @Override
-        public ProgramExercise next() {
-            return iterator.next().getParent();
-        }
-    }
-
-    public static class GrandchildrenIterator implements Iterator<ProgramSet> {
-        private Iterator<ProgramExerciseNode> iterator;
-        private Iterator<ProgramSet> gcIterator;
-
-        public GrandchildrenIterator(List<ProgramExerciseNode> children) {
-            iterator = children.iterator();
-            nextGc();
-        }
-
-        private void nextGc() {
-            if (iterator.hasNext()) {
-                gcIterator = iterator.next().getChildren().iterator();
-            }
-        }
-
-        @Override
-        public boolean hasNext() {
-            return iterator.hasNext() || gcIterator.hasNext();
-        }
-
-        @Override
-        public ProgramSet next() {
-            if (!gcIterator.hasNext()) {
-                nextGc();
-            }
-            return gcIterator.next();
-        }
+        return sets;
     }
 }

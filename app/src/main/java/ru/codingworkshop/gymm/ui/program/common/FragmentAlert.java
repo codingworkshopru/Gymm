@@ -51,6 +51,10 @@ public class FragmentAlert {
         showAlert(dialogId, args);
     }
 
+    public boolean isShown() {
+        return dialogFragment.isVisible();
+    }
+
     public void hideAlert() {
         dialogFragment.dismiss();
     }

@@ -12,16 +12,12 @@ import org.mockito.junit.MockitoJUnitRunner;
 import java.util.Objects;
 
 import ru.codingworkshop.gymm.data.tree.node.ImmutableProgramExerciseNode;
-import ru.codingworkshop.gymm.data.tree.node.MutableProgramExerciseNode;
 import ru.codingworkshop.gymm.data.tree.node.ProgramExerciseNode;
 import ru.codingworkshop.gymm.data.tree.repositoryadapter.ProgramExerciseAdapter;
 import ru.codingworkshop.gymm.data.util.LiveDataUtil;
 import ru.codingworkshop.gymm.util.LiveTest;
 import ru.codingworkshop.gymm.util.Models;
 
-import static org.junit.Assert.*;
-import static org.mockito.Mockito.reset;
-import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 

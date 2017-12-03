@@ -14,11 +14,13 @@ import android.support.test.espresso.action.Press;
 import android.support.test.espresso.action.Swipe;
 import android.support.test.rule.ActivityTestRule;
 import android.view.View;
+import android.widget.ImageButton;
 
 import org.hamcrest.Matcher;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
+import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
@@ -33,6 +35,7 @@ import ru.codingworkshop.gymm.testing.SimpleFragmentActivity;
 import ru.codingworkshop.gymm.util.LiveTest;
 import ru.codingworkshop.gymm.util.RecyclerViewItemMatcher;
 import ru.codingworkshop.gymm.util.TreeBuilders;
+import ru.codingworkshop.gymm.ui.program.ProgramTrainingViewModel;
 
 import static android.support.test.espresso.Espresso.onView;
 import static android.support.test.espresso.action.GeneralLocation.CENTER;
@@ -44,17 +47,19 @@ import static android.support.test.espresso.action.ViewActions.swipeLeft;
 import static android.support.test.espresso.action.ViewActions.swipeRight;
 import static android.support.test.espresso.action.ViewActions.typeText;
 import static android.support.test.espresso.assertion.ViewAssertions.matches;
+import static android.support.test.espresso.matcher.ViewMatchers.isAssignableFrom;
 import static android.support.test.espresso.matcher.ViewMatchers.isDisplayed;
 import static android.support.test.espresso.matcher.ViewMatchers.withId;
+import static android.support.test.espresso.matcher.ViewMatchers.withParent;
 import static android.support.test.espresso.matcher.ViewMatchers.withText;
 import static android.support.v7.widget.helper.ItemTouchHelper.LEFT;
 import static android.support.v7.widget.helper.ItemTouchHelper.RIGHT;
 import static junit.framework.Assert.assertEquals;
 import static junit.framework.Assert.assertFalse;
 import static junit.framework.Assert.assertTrue;
+import static org.hamcrest.Matchers.both;
 import static org.hamcrest.Matchers.not;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -67,7 +72,7 @@ import static ru.codingworkshop.gymm.ui.Matchers.hasErrorText;
 public class ProgramTrainingFragmentTest {
     @Mock private ViewModelProvider.Factory viewModelFactory;
     @Mock private ProgramTrainingViewModel vm;
-    private ProgramTrainingFragment fragment;
+    @InjectMocks private ProgramTrainingFragment fragment;
 
     @Rule
     public InstantTaskExecutorRule instantTaskExecutorRule = new InstantTaskExecutorRule();
@@ -85,21 +90,8 @@ public class ProgramTrainingFragmentTest {
 
         when(viewModelFactory.create(any())).thenReturn(vm);
         tree = TreeBuilders.buildProgramTrainingTree(3);
-        LiveData<ProgramTrainingTree> liveTree = LiveDataUtil.getLive(tree);
-        when(vm.load(1L)).thenAnswer(invocation -> {
-            when(vm.getProgramTrainingTree()).thenReturn(tree);
-            return liveTree;
-        });
-        when(vm.getLiveTree()).thenReturn(liveTree);
-
-        fragment = ProgramTrainingFragment.newInstance(1L);
-        fragment.viewModelFactory = viewModelFactory;
+        when(vm.getProgramTrainingTree()).thenReturn(tree);
         activityTestRule.getActivity().setFragment(fragment);
-
-        doAnswer(invocation -> {
-            when(vm.isChanged()).thenReturn(true);
-            return null;
-        }).when(vm).setChildrenChanged();
     }
 
     @Test
@@ -181,7 +173,7 @@ public class ProgramTrainingFragmentTest {
         onView(withId(R.id.programTrainingName)).perform(clearText());
         onView(withId(R.id.actionSaveTraining)).perform(click());
         onView(withId(R.id.programTrainingNameLayout)).check(matches(hasErrorText(R.string.program_training_activity_name_empty_error)));
-        verify(vm, never()).save();
+        verify(vm, never()).saveTree();
     }
 
     @Test
@@ -194,55 +186,53 @@ public class ProgramTrainingFragmentTest {
 
     @Test
     public void saveDuplicateTest() throws Exception {
-        final LiveData<Boolean> liveFalse = new LiveData<Boolean>() {{postValue(false);}};
-        when(vm.save()).thenReturn(liveFalse);
-        assertFalse(LiveTest.getValue(liveFalse));
+        when(vm.validateProgramTraining()).thenReturn(LiveDataUtil.getLive(false));
         onView(withId(R.id.actionSaveTraining)).perform(click());
         onView(withId(R.id.programTrainingNameLayout)).check(matches(hasErrorText(R.string.program_training_activity_name_duplicate_error)));
+        verify(vm, never()).saveTree();
+    }
+
+    @Test
+    public void saveWithoutExercisesTest() throws Exception {
+        when(vm.validateProgramTraining()).thenReturn(LiveDataUtil.getLive(false));
+        enterActionMode();
+        removeAll();
+        onView(withId(R.id.actionSaveTraining)).perform(click());
+        onView(withText(R.string.program_training_activity_empty_list_dialog_message)).check(matches(isDisplayed()));
+        verify(vm, never()).saveTree();
     }
 
     @Test
     public void saveTest() throws Exception {
-        when(vm.save()).thenReturn(new LiveData<Boolean>() {{postValue(true);}});
+        when(vm.validateProgramTraining()).thenReturn(LiveDataUtil.getLive(true));
         onView(withId(R.id.actionSaveTraining)).perform(click());
-        verify(vm).save();
-        verify(vm, never()).deleteIfDrafting();
-    }
-
-    @Test
-    public void closeWithoutChanges() throws Throwable {
-        checkActionModeOff(); // wait for activity start
-        CountDownLatch l = new CountDownLatch(1);
-        activityTestRule.runOnUiThread(() -> {
-            fragment.onFragmentClose();
-            l.countDown();
-        });
-        l.await(10000, TimeUnit.MILLISECONDS);
-        assertTrue(activityTestRule.getActivity().isFinishing());
-        verify(vm).deleteIfDrafting();
+        verify(vm).saveTree();
     }
 
     @Test
     public void trainingNameChangedAssuranceMessageTest() throws Exception {
-        onView(withId(R.id.programTrainingName)).perform(clearText());
-        onView(withId(R.id.programTrainingName)).perform(typeText("bar"));
-        when(vm.isChanged()).thenReturn(true);
-        fragment.onFragmentClose();
+        when(vm.areProgramExercisesChanged()).thenReturn(LiveDataUtil.getLive(false));
+        when(vm.isProgramTrainingChanged()).thenReturn(LiveDataUtil.getLive(true));
+
+        onView(both(isAssignableFrom(ImageButton.class)).and(withParent(withId(R.id.programTrainingToolbar)))).perform(click());
         onView(withText(R.string.cancel_changes_question)).check(matches(isDisplayed()));
         onView(withText(android.R.string.ok)).perform(click());
-        verify(vm, never()).save();
-        verify(vm).deleteIfDrafting();
+
+        verify(vm).isProgramTrainingChanged();
+        verify(vm, never()).saveTree();
     }
 
     @Test
     public void exercisesListChangedAssuranceMessageTest() throws Exception {
-        enterActionMode();
-        Espresso.pressBack();
-        fragment.onFragmentClose();
+        when(vm.isProgramTrainingChanged()).thenReturn(LiveDataUtil.getLive(false));
+        when(vm.areProgramExercisesChanged()).thenReturn(LiveDataUtil.getLive(true));
+
+        onView(both(isAssignableFrom(ImageButton.class)).and(withParent(withId(R.id.programTrainingToolbar)))).perform(click());
         onView(withText(R.string.cancel_changes_question)).check(matches(isDisplayed()));
         onView(withText(android.R.string.ok)).perform(click());
-        verify(vm, never()).save();
-        verify(vm).deleteIfDrafting();
+
+        verify(vm).areProgramExercisesChanged();
+        verify(vm, never()).saveTree();
     }
 
     private void checkActionModeOn() {
