@@ -1,5 +1,6 @@
 package ru.codingworkshop.gymm.ui.program.exercise;
 
+import android.arch.core.executor.testing.InstantTaskExecutorRule;
 import android.arch.lifecycle.LiveData;
 import android.arch.lifecycle.ViewModelProvider;
 import android.support.test.rule.ActivityTestRule;
@@ -7,6 +8,7 @@ import android.support.test.rule.ActivityTestRule;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
+import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
@@ -17,6 +19,7 @@ import ru.codingworkshop.gymm.data.tree.node.ProgramExerciseNode;
 import ru.codingworkshop.gymm.data.tree.node.ProgramTrainingTree;
 import ru.codingworkshop.gymm.data.util.LiveDataUtil;
 import ru.codingworkshop.gymm.testing.SimpleFragmentActivity;
+import ru.codingworkshop.gymm.ui.program.ProgramTrainingViewModel;
 import ru.codingworkshop.gymm.util.Models;
 
 import static android.support.test.espresso.Espresso.onView;
@@ -37,12 +40,13 @@ import static org.mockito.Mockito.when;
  */
 
 public class ProgramExerciseCreateFragmentTest {
+    @Rule public InstantTaskExecutorRule instantTaskExecutorRule = new InstantTaskExecutorRule();
     @Rule public ActivityTestRule<SimpleFragmentActivity> activityTestRule =
             new ActivityTestRule<>(SimpleFragmentActivity.class);
 
     @Mock private ViewModelProvider.Factory viewModelFactory;
-    @Mock private ProgramExerciseViewModel vm;
-    private ProgramExerciseFragment fragment;
+    @Mock private ProgramTrainingViewModel vm;
+    @InjectMocks private ProgramExerciseFragment fragment;
     private ProgramExerciseNode node;
 
     @Before
@@ -52,14 +56,10 @@ public class ProgramExerciseCreateFragmentTest {
         node = new MutableProgramExerciseNode();
 
         when(viewModelFactory.create(any())).thenReturn(vm);
-        when(vm.create()).thenAnswer(invocation -> {
+        when(vm.getProgramExercise()).thenAnswer(invocation -> {
             node.setParent(Models.createLiveProgramExercise(0L, 1L, true).getValue());
-            when(vm.getProgramExerciseNode()).thenReturn(node);
             return new LiveData<ProgramExerciseNode>() {{postValue(node);}};
         });
-
-        fragment = ProgramExerciseFragment.newInstanceForNew(1L);
-        fragment.viewModelFactory = viewModelFactory;
         activityTestRule.getActivity().setFragment(fragment);
     }
 
@@ -67,15 +67,12 @@ public class ProgramExerciseCreateFragmentTest {
     public void creationTest() throws Exception {
         onView(withId(R.id.programExerciseName)).check(matches(withText(R.string.program_exercise_activity_exercise_empty_text)));
         onView(withId(R.id.programExerciseBackground)).check(matches(isDisplayed()));
-        verify(vm).setProgramTrainingId(1L);
-        verify(vm).create();
     }
 
     @Test
     public void saveWithoutExerciseTest() throws Exception {
         onView(withId(R.id.actionSaveExercise)).perform(click());
         onView(withText(R.string.program_exercise_activity_exercise_empty_text)).check(matches(isDisplayed()));
-        verify(vm, never()).save();
     }
 
     @Test
@@ -83,6 +80,5 @@ public class ProgramExerciseCreateFragmentTest {
         node.setExercise(Models.createExercise(100L, "foo"));
         onView(withId(R.id.actionSaveExercise)).perform(click());
         onView(withText(R.string.program_exercise_activity_empty_list_dialog_message)).check(matches(isDisplayed()));
-        verify(vm, never()).save();
     }
 }

@@ -1,5 +1,8 @@
 package ru.codingworkshop.gymm.ui.program.exercise;
 
+import android.arch.core.executor.testing.InstantTaskExecutorRule;
+import android.arch.lifecycle.LiveData;
+import android.arch.lifecycle.ViewModelProvider;
 import android.support.annotation.IdRes;
 import android.support.test.espresso.matcher.BoundedMatcher;
 import android.support.test.rule.ActivityTestRule;
@@ -11,39 +14,55 @@ import org.hamcrest.Matcher;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.mockito.junit.MockitoJUnitRunner;
 
 import ru.codingworkshop.gymm.R;
 import ru.codingworkshop.gymm.data.entity.ProgramSet;
+import ru.codingworkshop.gymm.data.util.LiveDataUtil;
 import ru.codingworkshop.gymm.testing.SimpleFragmentActivity;
+import ru.codingworkshop.gymm.ui.program.ProgramTrainingViewModel;
+import ru.codingworkshop.gymm.util.Models;
 
 import static android.support.test.espresso.Espresso.onView;
 import static android.support.test.espresso.action.ViewActions.click;
 import static android.support.test.espresso.action.ViewActions.swipeUp;
 import static android.support.test.espresso.assertion.ViewAssertions.matches;
 import static android.support.test.espresso.matcher.ViewMatchers.withId;
+import static org.hamcrest.Matchers.greaterThan;
 import static org.hamcrest.Matchers.not;
+import static org.junit.Assert.assertNotEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertThat;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 /**
  * Created by Радик on 27.10.2017 as part of the Gymm project.
  */
 
+@RunWith(MockitoJUnitRunner.class)
 public class ProgramSetEditorFragmentTest {
+    @Rule public InstantTaskExecutorRule instantTaskExecutorRule = new InstantTaskExecutorRule();
     @Rule public ActivityTestRule<SimpleFragmentActivity> activityTestRule =
             new ActivityTestRule<>(SimpleFragmentActivity.class);
 
-    @Mock private ProgramSetEditorFragment.OnSetReturnListener listener;
+    @Mock private ViewModelProvider.Factory viewModelFactory;
+    @Mock private ProgramTrainingViewModel vm;
+    @InjectMocks private ProgramSetEditorFragment fragment;
+    private ProgramSet set;
 
     @Before
     public void setUp() throws Exception {
-        MockitoAnnotations.initMocks(this);
-
-        ProgramSetEditorFragment fragment = ProgramSetEditorFragment.newInstance(2L);
-        fragment.listener = listener;
-
+        when(viewModelFactory.create(any())).thenReturn(vm);
+        LiveData<ProgramSet> liveProgramSet = Models.createLiveProgramSet(0L, 2L, 1);
+        set = liveProgramSet.getValue();
+        when(vm.getProgramSet()).thenReturn(liveProgramSet);
         fragment.show(activityTestRule.getActivity().getSupportFragmentManager());
     }
 
@@ -51,21 +70,23 @@ public class ProgramSetEditorFragmentTest {
     public void repsPickerTest() throws Exception {
         checkPicker(R.id.programSetRepsPicker, "1");
         onView(withId(android.R.id.button1)).perform(click());
-        verify(listener).onSetReturn(argThat(s -> s.getProgramExerciseId() == 2L && s.getReps() != 0 && s.getReps() != 1));
+        assertNotEquals(1, set.getReps());
     }
 
     @Test
     public void minutesPickerTest() throws Exception {
         checkPicker(R.id.programSetRestMinutesPicker, "0");
         onView(withId(android.R.id.button1)).perform(click());
-        verify(listener).onSetReturn(argThat(s -> s.getProgramExerciseId() == 2L && s.getSecondsForRest() != null && s.getSecondsForRest() > 60));
+        assertNotNull(set.getSecondsForRest());
+        assertThat(set.getSecondsForRest(), greaterThan(60));
     }
 
     @Test
     public void secondsPickerTest() throws Exception {
         checkPicker(R.id.programSetRestSecondsPicker, "0");
         onView(withId(android.R.id.button1)).perform(click());
-        verify(listener).onSetReturn(argThat(s -> s.getProgramExerciseId() == 2L && s.getSecondsForRest() != null && s.getSecondsForRest() > 5));
+        assertNotNull(set.getSecondsForRest());
+        assertThat(set.getSecondsForRest(), greaterThan(5));
     }
 
     @Test
@@ -75,8 +96,11 @@ public class ProgramSetEditorFragmentTest {
         set.setMinutes(1);
         set.setSeconds(30);
 
+        when(vm.getProgramSet()).thenReturn(LiveDataUtil.getLive(set));
+
         onView(withId(android.R.id.button2)).perform(click());
-        ProgramSetEditorFragment fragment = ProgramSetEditorFragment.newInstance(set);
+        ProgramSetEditorFragment fragment = new ProgramSetEditorFragment();
+        fragment.viewModelFactory = viewModelFactory;
         fragment.show(activityTestRule.getActivity().getSupportFragmentManager());
 
         onView(withId(R.id.programSetRepsPicker)).check(matches(withDisplayValue("10")));

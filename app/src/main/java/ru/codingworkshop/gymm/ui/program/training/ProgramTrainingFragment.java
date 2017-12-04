@@ -114,14 +114,18 @@ public class ProgramTrainingFragment extends BaseFragment implements
     private void initExerciseList() {
         ProgramRecyclerView programExerciseList = binding.programExerciseList;
         final ObservableBoolean inActionMode = binding.getInActionMode();
+
         ListItemListeners listeners = new ListItemListeners(R.layout.fragment_program_training_list_item)
                 .setOnClickListener(this::onExerciseClick)
                 .setOnLongClickListener(this::onExerciseLongClick)
                 .setOnReorderButtonDownListener(programExerciseList::startDragFromChildView, R.id.programExerciseReorderImage);
+
         ProgramExercisesAdapter adapter = new ProgramExercisesAdapter(listeners, tree.getChildren(), inActionMode);
+
         MyAdapterDataObserver observer = new MyAdapterDataObserver(
                 programExerciseList, R.id.programTrainingBackground,
                 R.string.program_training_activity_exercise_deleted_message, tree);
+
         adapter.registerAdapterDataObserver(observer);
         programExerciseList.setAdapter(adapter);
         programExerciseList.setItemTouchHelperCallback(new ItemTouchHelperCallback(tree));
@@ -144,33 +148,28 @@ public class ProgramTrainingFragment extends BaseFragment implements
     }
 
     private void onAddExerciseButtonClick(View v) {
-        ProgramExerciseFragment programExerciseFragment =
-                (ProgramExerciseFragment) getFragmentManager().findFragmentByTag(ProgramExerciseFragment.TAG);
-
-        if (programExerciseFragment == null) {
-            programExerciseFragment = ProgramExerciseFragment.newInstanceForNew(tree.getParent().getId());
-        }
-
-        openExerciseEditor(programExerciseFragment);
+        viewModel.createProgramExercise();
+        openExerciseEditor();
     }
 
     private void onExerciseClick(View v) {
         ProgramExerciseNode n = tree.getChildren().get(binding.programExerciseList.getChildAdapterPosition(v));
+        viewModel.setProgramExercise(n);
+        openExerciseEditor();
+    }
 
+    private void openExerciseEditor() {
         ProgramExerciseFragment programExerciseFragment =
                 (ProgramExerciseFragment) getFragmentManager().findFragmentByTag(ProgramExerciseFragment.TAG);
 
+
         if (programExerciseFragment == null) {
-            programExerciseFragment = ProgramExerciseFragment.newInstanceForExistent(n.getId());
+            programExerciseFragment = new ProgramExerciseFragment();
         }
 
-        openExerciseEditor(programExerciseFragment);
-    }
-
-    private void openExerciseEditor(Fragment exerciseEditor) {
         getFragmentManager()
                 .beginTransaction()
-                .replace(R.id.programTrainingFragmentContainer, exerciseEditor)
+                .replace(R.id.programTrainingFragmentContainer, programExerciseFragment)
                 .addToBackStack(null)
                 .commit();
     }
