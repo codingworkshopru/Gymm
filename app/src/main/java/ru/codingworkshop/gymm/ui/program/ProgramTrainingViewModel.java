@@ -43,6 +43,9 @@ public class ProgramTrainingViewModel extends ViewModel {
     private final MutableLiveData<ProgramExerciseNode> currentProgramExercise;
     private final MutableLiveData<ProgramSet> currentProgramSet;
 
+    private String programTrainingOldName;
+    private Long programExerciseOldExerciseId; // old exerciseId of program exercise
+
     @Inject
     public ProgramTrainingViewModel(ProgramTrainingTreeLoader loader, ProgramTrainingTreeSaver saver, ProgramTrainingAdapter repositoryAdapter) {
         this.loader = loader;
@@ -57,7 +60,10 @@ public class ProgramTrainingViewModel extends ViewModel {
     }
 
     public @NonNull LiveData<ProgramTrainingTree> loadTree(long programTrainingId) {
-        return loader.loadById(tree, programTrainingId);
+        LiveData<ProgramTrainingTree> liveTree = loader.loadById(tree, programTrainingId);
+        return LiveDataUtil.getOnce(liveTree, programTrainingTree -> {
+            programTrainingOldName = programTrainingTree.getParent().getName();
+        });
     }
 
     public void saveTree() {
@@ -72,6 +78,21 @@ public class ProgramTrainingViewModel extends ViewModel {
         return Transformations.map(
                 repositoryAdapter.getProgramTrainingByName(tree.getParent().getName()),
                 programTraining -> programTraining == null || programTraining.getId() == tree.getParent().getId());
+    }
+
+    public LiveData<Boolean> isProgramTrainingChanged() {
+        ProgramTraining parent = tree.getParent();
+        if (!GymmDatabase.isValidId(parent)) {
+            boolean nameChanged = !Strings.isNullOrEmpty(parent.getName());
+            boolean childrenChanged = tree.hasChildren();
+            return LiveDataUtil.getLive(nameChanged || childrenChanged);
+        } else if (!Objects.equal(programTrainingOldName, parent.getName())) {
+            return LiveDataUtil.getLive(true);
+        }
+
+        return Transformations.map(
+                repositoryAdapter.getChildren(parent.getId()),
+                oldChildren -> !Objects.equal(oldChildren, tree.getProgramExercises()));
     }
 
     /**
@@ -111,6 +132,7 @@ public class ProgramTrainingViewModel extends ViewModel {
     }
 
     public void setProgramExercise(@Nullable ProgramExerciseNode programExercise) {
+        programExerciseOldExerciseId = programExercise.getExerciseId();
         currentProgramExercise.setValue(programExercise);
     }
 
@@ -118,20 +140,20 @@ public class ProgramTrainingViewModel extends ViewModel {
         return currentProgramExercise;
     }
 
-    public LiveData<Boolean> isProgramTrainingChanged() {
-        ProgramTraining newParent = tree.getParent();
-        if (!GymmDatabase.isValidId(newParent)) {
-            return LiveDataUtil.getLive(!Strings.isNullOrEmpty(newParent.getName()));
+    public LiveData<Boolean> isProgramExerciseChanged() {
+        ProgramExerciseNode exerciseNode = Preconditions.checkNotNull(getProgramExercise().getValue(), "program exercise has not been set");
+        Long exerciseId = exerciseNode.getExerciseId();
+        if (!GymmDatabase.isValidId(exerciseNode)) {
+            boolean exerciseChanged = exerciseId != null && GymmDatabase.isValidId(exerciseId);
+            boolean childrenChanged = exerciseNode.hasChildren();
+            return LiveDataUtil.getLive(exerciseChanged || childrenChanged);
+        } else if (!Objects.equal(exerciseId, programExerciseOldExerciseId)) {
+            return LiveDataUtil.getLive(true);
         }
-        return Transformations.map(
-                repositoryAdapter.getParent(newParent.getId()),
-                oldParent -> !Objects.equal(newParent.getName(), oldParent.getName()));
-    }
 
-    public LiveData<Boolean> areProgramExercisesChanged() {
         return Transformations.map(
-                repositoryAdapter.getChildren(tree.getParent().getId()),
-                exercises -> !Objects.equal(tree.getProgramExercises(), exercises));
+                repositoryAdapter.getProgramSetsForExercise(exerciseNode.getId()),
+                sets -> !exerciseNode.getChildren().equals(sets));
     }
 
     /**
@@ -179,13 +201,5 @@ public class ProgramTrainingViewModel extends ViewModel {
 
     @NonNull public LiveData<ProgramSet> getProgramSet() {
         return currentProgramSet;
-    }
-
-    public LiveData<Boolean> areProgramSetsChanged() {
-        ProgramExerciseNode exerciseNode = Preconditions.checkNotNull(getProgramExercise().getValue(), "program exercise has not been set");
-        return Transformations.map(
-                repositoryAdapter.getProgramSetsForExercise(exerciseNode.getId()),
-                sets -> !exerciseNode.getChildren().equals(sets));
-
     }
 }

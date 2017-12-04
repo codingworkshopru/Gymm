@@ -12,7 +12,7 @@ import ru.codingworkshop.gymm.ui.info.exercise.ExerciseInfoFragmentViewModel;
 import ru.codingworkshop.gymm.ui.program.exercise.ProgramExerciseViewModel;
 import ru.codingworkshop.gymm.ui.program.exercise.picker.ExerciseListDialogViewModel;
 import ru.codingworkshop.gymm.ui.program.exercise.picker.MuscleGroupPickerViewModel;
-import ru.codingworkshop.gymm.ui.program.training.ProgramTrainingViewModel;
+import ru.codingworkshop.gymm.ui.program.ProgramTrainingViewModel;
 import ru.codingworkshop.gymm.viewmodel.ViewModelFactory;
 
 /**

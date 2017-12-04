@@ -14,11 +14,15 @@ import org.mockito.junit.MockitoJUnitRunner;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.StringJoiner;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
+import ru.codingworkshop.gymm.data.entity.ProgramExercise;
 import ru.codingworkshop.gymm.data.entity.ProgramSet;
-import ru.codingworkshop.gymm.data.entity.ProgramTraining;
 import ru.codingworkshop.gymm.data.tree.loader.ProgramTrainingTreeLoader;
 import ru.codingworkshop.gymm.data.tree.node.ImmutableProgramExerciseNode;
+import ru.codingworkshop.gymm.data.tree.node.MutableProgramExerciseNode;
 import ru.codingworkshop.gymm.data.tree.node.MutableProgramTrainingTree;
 import ru.codingworkshop.gymm.data.tree.node.ProgramExerciseNode;
 import ru.codingworkshop.gymm.data.tree.node.ProgramTrainingTree;
@@ -95,6 +99,31 @@ public class ProgramTrainingViewModelTest {
     }
 
     @Test
+    public void isProgramTrainingChanged() throws Exception {
+        assertFalse(LiveTest.getValue(vm.isProgramTrainingChanged()));
+
+        MutableProgramExerciseNode child = new MutableProgramExerciseNode(new ProgramExercise());
+        ProgramTrainingTree tree = vm.getProgramTrainingTree();
+        tree.addChild(child);
+        assertTrue(LiveTest.getValue(vm.isProgramTrainingChanged()));
+        tree.removeChild(0);
+
+        tree.getParent().setName("baz");
+        assertTrue(LiveTest.getValue(vm.isProgramTrainingChanged()));
+
+        assertNotNull(LiveTest.getValue(vm.loadTree(1L)));
+
+        when(adapter.getParent(1L)).thenReturn(Models.createLiveProgramTraining(1L, "foo", false));
+        when(adapter.getChildren(1L)).thenReturn(Models.createLiveProgramExercises(1));
+
+        tree.getParent().setName("bar");
+        assertTrue(LiveTest.getValue(vm.isProgramTrainingChanged()));
+        tree.getParent().setName("foo");
+        tree.addChild(child);
+        assertTrue(LiveTest.getValue(vm.isProgramTrainingChanged()));
+    }
+
+    @Test
     public void createProgramExercise() throws Exception {
         ProgramTrainingTree tree = vm.getProgramTrainingTree();
         tree.getParent().setId(1L);
@@ -157,26 +186,30 @@ public class ProgramTrainingViewModelTest {
     }
 
     @Test
-    public void isProgramTrainingChanged() throws Exception {
-        assertFalse(LiveTest.getValue(vm.isProgramTrainingChanged()));
+    public void isProgramExerciseChanged() throws Exception {
+        createProgramExercise();
+        assertFalse(LiveTest.getValue(vm.isProgramExerciseChanged()));
 
-        when(adapter.getParent(1L)).thenReturn(Models.createLiveProgramTraining(1L, "foo", false));
-        ProgramTrainingTree tree = LiveTest.getValue(vm.loadTree(1L));
+        ProgramExerciseNode node = vm.getProgramExercise().getValue();
+        node.setExerciseId(100L);
+        assertTrue(LiveTest.getValue(vm.isProgramExerciseChanged()));
 
-        assertFalse(LiveTest.getValue(vm.isProgramTrainingChanged()));
+        node.setExerciseId(null);
+        node.addChild(new ProgramSet());
+        assertTrue(LiveTest.getValue(vm.isProgramExerciseChanged()));
 
-        tree.getParent().setName("bar");
-        assertTrue(LiveTest.getValue(vm.isProgramTrainingChanged()));
-    }
-
-    @Test
-    public void areProgramExercisesChanged() throws Exception {
-        when(adapter.getChildren(anyLong()))
-                .thenReturn(LiveDataUtil.getLive(new ArrayList<>()))
-                .thenReturn(Models.createLiveProgramExercises(1));
-
-        LiveTest.verifyLiveData(vm.areProgramExercisesChanged(), changed -> !changed);
         LiveTest.verifyLiveData(vm.loadTree(1L), Objects::nonNull);
+        vm.setProgramExercise(vm.getProgramTrainingTree().getChildren().get(0));
+        when(adapter.getProgramSetsForExercise(2L)).thenReturn(Models.createLiveProgramSets(2L, 2));
+
+        assertFalse(LiveTest.getValue(vm.isProgramExerciseChanged()));
+
+        node = vm.getProgramExercise().getValue();
+        node.setExerciseId(101L);
+        assertTrue(LiveTest.getValue(vm.isProgramExerciseChanged()));
+        node.setExerciseId(100L);
+        node.addChild(new ProgramSet());
+        assertTrue(LiveTest.getValue(vm.isProgramExerciseChanged()));
     }
 
     @Test
@@ -237,20 +270,5 @@ public class ProgramTrainingViewModelTest {
         ProgramSet programSet = new ProgramSet();
         vm.setProgramSet(programSet);
         LiveTest.verifyLiveData(vm.getProgramSet(), set -> set == programSet);
-    }
-
-    @Test
-    public void areProgramSetsChanged() throws Exception {
-        when(adapter.getProgramSetsForExercise(anyLong()))
-                .thenReturn(LiveDataUtil.getLive(new ArrayList<>()))
-                .thenReturn(Models.createLiveProgramSets(2L, 2));
-
-        ProgramTrainingTree tree = TreeBuilders.buildProgramTrainingTree(1);
-        tree.getChildren().get(0).moveChild(0, 1);
-
-        vm.createProgramExercise();
-        LiveTest.verifyLiveData(vm.areProgramSetsChanged(), changed -> !changed);
-        LiveTest.verifyLiveData(vm.loadTree(1L), Objects::nonNull);
-        LiveTest.verifyLiveData(vm.areProgramSetsChanged(), changed -> changed);
     }
 }

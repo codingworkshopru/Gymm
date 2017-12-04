@@ -48,7 +48,7 @@ public abstract class GymmDatabase extends RoomDatabase {
     }
 
     public static boolean isValidId(@NonNull Model model) {
-        Preconditions.checkNotNull(model);
+        Preconditions.checkNotNull(model, "checking model is null");
         return isValidId(model.getId());
     }
 

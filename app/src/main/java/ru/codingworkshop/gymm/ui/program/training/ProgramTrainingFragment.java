@@ -177,11 +177,7 @@ public class ProgramTrainingFragment extends BaseFragment implements
 
     @Override
     public void onFragmentClose() {
-        Transformations.switchMap(viewModel.isProgramTrainingChanged(), changed -> {
-            return changed
-                    ? LiveDataUtil.getLive(true)
-                    : viewModel.areProgramExercisesChanged();
-        }).observe(this, this::showAlertIfChangedOrClose);
+        viewModel.isProgramTrainingChanged().observe(this, this::showAlertIfChangedOrClose);
     }
 
     private void showAlertIfChangedOrClose(Boolean changed) {

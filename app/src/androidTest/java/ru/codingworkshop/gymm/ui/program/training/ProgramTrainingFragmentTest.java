@@ -1,7 +1,6 @@
 package ru.codingworkshop.gymm.ui.program.training;
 
 import android.arch.core.executor.testing.InstantTaskExecutorRule;
-import android.arch.lifecycle.LiveData;
 import android.arch.lifecycle.ViewModelProvider;
 import android.graphics.Rect;
 import android.support.annotation.LayoutRes;
@@ -24,15 +23,11 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
-import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.TimeUnit;
-
 import ru.codingworkshop.gymm.R;
 import ru.codingworkshop.gymm.data.tree.node.ProgramExerciseNode;
 import ru.codingworkshop.gymm.data.tree.node.ProgramTrainingTree;
 import ru.codingworkshop.gymm.data.util.LiveDataUtil;
 import ru.codingworkshop.gymm.testing.SimpleFragmentActivity;
-import ru.codingworkshop.gymm.util.LiveTest;
 import ru.codingworkshop.gymm.util.RecyclerViewItemMatcher;
 import ru.codingworkshop.gymm.util.TreeBuilders;
 import ru.codingworkshop.gymm.ui.program.ProgramTrainingViewModel;
@@ -210,8 +205,7 @@ public class ProgramTrainingFragmentTest {
     }
 
     @Test
-    public void trainingNameChangedAssuranceMessageTest() throws Exception {
-        when(vm.areProgramExercisesChanged()).thenReturn(LiveDataUtil.getLive(false));
+    public void programTrainingChangedAssuranceMessageTest() throws Exception {
         when(vm.isProgramTrainingChanged()).thenReturn(LiveDataUtil.getLive(true));
 
         onView(both(isAssignableFrom(ImageButton.class)).and(withParent(withId(R.id.programTrainingToolbar)))).perform(click());
@@ -219,19 +213,6 @@ public class ProgramTrainingFragmentTest {
         onView(withText(android.R.string.ok)).perform(click());
 
         verify(vm).isProgramTrainingChanged();
-        verify(vm, never()).saveTree();
-    }
-
-    @Test
-    public void exercisesListChangedAssuranceMessageTest() throws Exception {
-        when(vm.isProgramTrainingChanged()).thenReturn(LiveDataUtil.getLive(false));
-        when(vm.areProgramExercisesChanged()).thenReturn(LiveDataUtil.getLive(true));
-
-        onView(both(isAssignableFrom(ImageButton.class)).and(withParent(withId(R.id.programTrainingToolbar)))).perform(click());
-        onView(withText(R.string.cancel_changes_question)).check(matches(isDisplayed()));
-        onView(withText(android.R.string.ok)).perform(click());
-
-        verify(vm).areProgramExercisesChanged();
         verify(vm, never()).saveTree();
     }
 
