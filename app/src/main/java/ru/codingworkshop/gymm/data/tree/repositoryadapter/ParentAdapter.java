@@ -13,7 +13,7 @@ public interface ParentAdapter<P> {
 
     void updateParent(P item);
 
-    void insertParent(P item);
+    LiveData<Long> insertParent(P item);
 
     void deleteParent(P item);
 }

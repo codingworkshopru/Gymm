@@ -27,13 +27,13 @@ class ApplicationModule {
 
     @Provides
     @Singleton
-    GymmDatabase providesDatabase(DatabaseInitializer databaseInitializer) {
+    GymmDatabase provideDatabase(DatabaseInitializer databaseInitializer) {
         return databaseInitializer.getDatabase();
     }
 
     @Provides
     @Singleton
-    Executor providesExecutor() {
+    Executor provideExecutor() {
         return Executors.newSingleThreadExecutor();
     }
 }

@@ -37,8 +37,9 @@ public class ActualTrainingAdapter implements ParentAdapter<ActualTraining>, Chi
     }
 
     @Override
-    public void insertParent(ActualTraining item) {
+    public LiveData<Long> insertParent(ActualTraining item) {
         repository.insertActualTraining(item);
+        return null;
     }
 
     @Override
@@ -52,8 +53,9 @@ public class ActualTrainingAdapter implements ParentAdapter<ActualTraining>, Chi
     }
 
     @Override
-    public void insertChildren(Collection<ActualExercise> children) {
+    public LiveData<List<Long>> insertChildren(Collection<ActualExercise> children) {
         repository.insertActualExercises(children);
+        return null;
     }
 
     @Override

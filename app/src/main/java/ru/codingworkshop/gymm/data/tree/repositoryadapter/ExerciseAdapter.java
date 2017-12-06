@@ -42,8 +42,8 @@ public class ExerciseAdapter implements ParentAdapter<Exercise>, ChildrenAdapter
     }
 
     @Override
-    public void insertParent(Exercise item) {
-
+    public LiveData<Long> insertParent(Exercise item) {
+        return null;
     }
 
     @Override
@@ -57,8 +57,8 @@ public class ExerciseAdapter implements ParentAdapter<Exercise>, ChildrenAdapter
     }
 
     @Override
-    public void insertChildren(Collection<MuscleGroup> children) {
-
+    public LiveData<List<Long>> insertChildren(Collection<MuscleGroup> children) {
+        return null;
     }
 
     @Override

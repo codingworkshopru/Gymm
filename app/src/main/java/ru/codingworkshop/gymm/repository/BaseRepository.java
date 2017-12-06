@@ -42,6 +42,12 @@ class BaseRepository {
         return liveId;
     }
 
+    <T extends Model> LiveData<List<Long>> insertWithResult(Collection<T> models, Function<Collection<T>, List<Long>> insert) {
+        MutableLiveData<List<Long>> liveIds = new MutableLiveData<>();
+        executor.execute(() -> liveIds.postValue(performSync(models, insert, BaseRepository::afterInsertion)));
+        return liveIds;
+    }
+
     <T extends Model> void update(T entity, Function<T, Integer> update) {
         perform(entity, update, null);
     }

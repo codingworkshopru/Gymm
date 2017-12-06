@@ -23,7 +23,7 @@ import static android.arch.persistence.room.OnConflictStrategy.FAIL;
 
 @Dao
 public interface ProgramTrainingDao {
-    @Query("select * from ProgramTraining where drafting = 0 order by name")
+    @Query("select * from ProgramTraining order by name")
     LiveData<List<ProgramTraining>> getProgramTrainings();
 
     @Query("select * from ProgramTraining where id = :id")

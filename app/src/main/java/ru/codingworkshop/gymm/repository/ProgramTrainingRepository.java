@@ -52,9 +52,9 @@ public class ProgramTrainingRepository extends BaseRepository {
         return dao.getDraftingProgramTraining();
     }
 
-    public void insertProgramTraining(@NonNull ProgramTraining programTraining) {
+    public LiveData<Long> insertProgramTraining(@NonNull ProgramTraining programTraining) {
         checkIsDrafting(programTraining);
-        insert(programTraining, dao::insertProgramTraining);
+        return insertWithResult(programTraining, dao::insertProgramTraining);
     }
 
     public void deleteProgramTraining(@NonNull ProgramTraining programTraining) {
@@ -93,12 +93,12 @@ public class ProgramTrainingRepository extends BaseRepository {
         insert(programExercise, dao::insertProgramExercise);
     }
 
-    public void insertProgramExercises(@NonNull Collection<ProgramExercise> programExercises) {
+    public LiveData<List<Long>> insertProgramExercises(@NonNull Collection<ProgramExercise> programExercises) {
         applyToEach(programExercises, pe -> {
             checkProgramTrainingInProgramExercise(pe);
             checkExerciseInProgramExercise(pe);
         });
-        insert(programExercises, dao::insertProgramExercises);
+        return insertWithResult(programExercises, dao::insertProgramExercises);
     }
 
     private void checkIsDrafting(Draftable draftable) {
@@ -157,9 +157,9 @@ public class ProgramTrainingRepository extends BaseRepository {
         insert(set, dao::insertProgramSet);
     }
 
-    public void insertProgramSets(@NonNull Collection<ProgramSet> sets) {
+    public LiveData<List<Long>> insertProgramSets(@NonNull Collection<ProgramSet> sets) {
         applyToEach(sets, ProgramTrainingRepository::checkProgramSet);
-        insert(sets, dao::insertProgramSets);
+        return insertWithResult(sets, dao::insertProgramSets);
     }
 
     public void updateProgramSet(@NonNull ProgramSet set) {

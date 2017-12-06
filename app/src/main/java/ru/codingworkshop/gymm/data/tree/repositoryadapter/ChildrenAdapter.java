@@ -14,7 +14,7 @@ import ru.codingworkshop.gymm.data.entity.ProgramSet;
 public interface ChildrenAdapter<C> {
     LiveData<List<C>> getChildren(long id);
 
-    void insertChildren(Collection<C> children);
+    LiveData<List<Long>> insertChildren(Collection<C> children);
 
     void updateChildren(Collection<C> children);
 

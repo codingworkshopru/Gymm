@@ -74,6 +74,7 @@ import static android.support.v7.widget.helper.ItemTouchHelper.LEFT;
 import static android.support.v7.widget.helper.ItemTouchHelper.RIGHT;
 import static junit.framework.Assert.assertEquals;
 import static junit.framework.Assert.assertNotNull;
+import static junit.framework.Assert.fail;
 import static org.hamcrest.Matchers.both;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
@@ -214,6 +215,7 @@ public class ProgramExerciseFragmentTest {
 //        onView(withId(R.id.actionSaveExercise)).perform(click());
 //        verify(vm).save();
 //        verify(vm, never()).deleteIfDrafting();
+        fail();
     }
 
     @Test
@@ -226,6 +228,7 @@ public class ProgramExerciseFragmentTest {
 //        });
 //        l.await(10000, TimeUnit.MILLISECONDS);
 //        verify(vm).deleteIfDrafting();
+        fail();
     }
 
     @Test

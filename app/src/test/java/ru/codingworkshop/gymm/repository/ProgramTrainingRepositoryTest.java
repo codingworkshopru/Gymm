@@ -78,7 +78,7 @@ public class ProgramTrainingRepositoryTest {
         ProgramTraining trainingEntity = Models.createProgramTraining(0L, "foo");
         trainingEntity.setDrafting(true);
         when(dao.insertProgramTraining(trainingEntity)).thenReturn(1L);
-        repository.insertProgramTraining(trainingEntity);
+        LiveTest.verifyLiveData(repository.insertProgramTraining(trainingEntity), id -> id == 1L);
 
         verify(dao).insertProgramTraining(trainingEntity);
     }
@@ -188,7 +188,9 @@ public class ProgramTrainingRepositoryTest {
 
     @Test
     public void insertExercises() throws Exception {
-        repository.insertProgramExercises(Models.createProgramExercises(1));
+        ArrayList<Long> ids = Lists.newArrayList(1L);
+        when(dao.insertProgramExercises(anyCollection())).thenReturn(ids);
+        LiveTest.verifyLiveData(repository.insertProgramExercises(Models.createProgramExercises(1)), returnedIds -> returnedIds == ids);
         verify(dao).insertProgramExercises(anyCollection());
     }
 
@@ -334,13 +336,11 @@ public class ProgramTrainingRepositoryTest {
 
     @Test
     public void insertProgramSets() {
-        List<Long> setIds = Lists.newArrayList(1L, 2L, 3L);
-        List<ProgramSet> sets = setIds.stream().map(
-                id -> Models.createLiveProgramSet(id, 2L, id.intValue() * 10).getValue()
-        ).collect(Collectors.toList());
+        List<Long> setIds = Lists.newArrayList(1L);
+        List<ProgramSet> sets = Models.createProgramSets(2L, 1);
         when(dao.insertProgramSets(sets)).thenReturn(setIds);
 
-        repository.insertProgramSets(sets);
+        LiveTest.verifyLiveData(repository.insertProgramSets(sets), ids -> ids.equals(setIds));
 
         verify(dao).insertProgramSets(sets);
     }

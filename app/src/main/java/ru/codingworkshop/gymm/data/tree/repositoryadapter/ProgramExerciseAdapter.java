@@ -54,8 +54,9 @@ public class ProgramExerciseAdapter implements ParentAdapter<ProgramExercise>, C
     }
 
     @Override
-    public void insertParent(ProgramExercise programExercise) {
+    public LiveData<Long> insertParent(ProgramExercise programExercise) {
         programTrainingRepository.insertProgramExercise(programExercise);
+        return null;
     }
 
     @Override
@@ -64,8 +65,9 @@ public class ProgramExerciseAdapter implements ParentAdapter<ProgramExercise>, C
     }
 
     @Override
-    public void insertChildren(Collection<ProgramSet> children) {
+    public LiveData<List<Long>> insertChildren(Collection<ProgramSet> children) {
         programTrainingRepository.insertProgramSets(children);
+        return null;
     }
 
     @Override

@@ -1,6 +1,7 @@
 package ru.codingworkshop.gymm.repository;
 
 import android.arch.core.executor.testing.InstantTaskExecutorRule;
+import android.arch.lifecycle.LiveData;
 
 import com.google.common.collect.Lists;
 
@@ -17,6 +18,7 @@ import java.util.stream.Collectors;
 
 import ru.codingworkshop.gymm.data.entity.common.Model;
 import ru.codingworkshop.gymm.util.DummyDao;
+import ru.codingworkshop.gymm.util.LiveTest;
 import ru.codingworkshop.gymm.util.Models;
 import ru.codingworkshop.gymm.util.SimpleModel;
 
@@ -43,19 +45,38 @@ public class BaseRepositoryTest {
     @Test
     public void insertTest() {
         SimpleModel model = new SimpleModel(0L, "foo");
-        List<SimpleModel> models = Models.createSimpleModels(0L, 0L, 0L);
-
         when(dao.insert(model)).thenReturn(1L);
+        repository.insert(model, dao::insert);
+        assertEquals(1L, model.getId());
+        verify(dao).insert(model);
+    }
+
+    @Test
+    public void insertModelsTest() throws Exception {
+        List<SimpleModel> models = Models.createSimpleModels(0L, 0L, 0L);
         final ArrayList<Long> ids = Lists.newArrayList(1L, 2L, 3L);
         when(dao.insert(models)).thenReturn(ids);
-
-        repository.insert(model, dao::insert);
         repository.insert(models, dao::insert);
-
-        assertEquals(1L, model.getId());
         assertEquals(ids, models.stream().map(Model::getId).collect(Collectors.toList()));
+        verify(dao).insert(models);
+    }
 
+    @Test
+    public void insertWithResultTest() throws Exception {
+        SimpleModel model = new SimpleModel(0L, "foo");
+        when(dao.insert(model)).thenReturn(1L);
+        LiveData<Long> liveId = repository.insertWithResult(model, dao::insert);
+        LiveTest.verifyLiveData(liveId, id -> id == 1L);
         verify(dao).insert(model);
+    }
+
+    @Test
+    public void insertModelsWithResultTest() throws Exception {
+        List<SimpleModel> models = Models.createSimpleModels(0L, 0L, 0L);
+        final ArrayList<Long> ids = Lists.newArrayList(1L, 2L, 3L);
+        when(dao.insert(models)).thenReturn(ids);
+        LiveData<List<Long>> liveIds = repository.insertWithResult(models, dao::insert);
+        LiveTest.verifyLiveData(liveIds, returnedIds -> returnedIds.equals(ids));
         verify(dao).insert(models);
     }
 

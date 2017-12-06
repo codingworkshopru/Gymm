@@ -44,11 +44,11 @@
         android:id="@+id/rv_test_main"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="?attr/colorButtonNormal"
+        android:background="@color/color_material_grey_200"
         android:clipToPadding="false"
         android:paddingBottom="8dp"
-        app:layout_behavior="@string/appbar_scrolling_view_behavior"
         app:layoutManager="android.support.v7.widget.LinearLayoutManager"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior"
         tools:listitem="@layout/activity_main_list_item" />
 
 </android.support.design.widget.CoordinatorLayout>

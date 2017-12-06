@@ -70,7 +70,7 @@ public class ProgramTrainingFragment extends BaseFragment implements
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         Timber.d("onCreate");
-        viewModel = ViewModelProviders.of(this, viewModelFactory).get(ProgramTrainingViewModel.class);
+        viewModel = ViewModelProviders.of(getActivity(), viewModelFactory).get(ProgramTrainingViewModel.class);
     }
 
     @Override
@@ -207,6 +207,7 @@ public class ProgramTrainingFragment extends BaseFragment implements
     private void save() {
         final EditTextValidator editTextValidator =
             new EditTextValidator(binding.programTrainingNameLayout, R.string.program_training_activity_name_empty_error);
+
         if (syncValidate(editTextValidator)) {
             LiveDataUtil.getOnce(asyncValidate(editTextValidator), valid -> {
                 if (valid != null && valid) {

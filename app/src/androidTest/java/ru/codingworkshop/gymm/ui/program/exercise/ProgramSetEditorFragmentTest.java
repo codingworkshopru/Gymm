@@ -4,6 +4,7 @@ import android.arch.core.executor.testing.InstantTaskExecutorRule;
 import android.arch.lifecycle.LiveData;
 import android.arch.lifecycle.ViewModelProvider;
 import android.support.annotation.IdRes;
+import android.support.test.espresso.Espresso;
 import android.support.test.espresso.matcher.BoundedMatcher;
 import android.support.test.rule.ActivityTestRule;
 import android.view.View;
@@ -106,6 +107,18 @@ public class ProgramSetEditorFragmentTest {
         onView(withId(R.id.programSetRepsPicker)).check(matches(withDisplayValue("10")));
         onView(withId(R.id.programSetRestMinutesPicker)).check(matches(withDisplayValue("1")));
         onView(withId(R.id.programSetRestSecondsPicker)).check(matches(withDisplayValue("30")));
+    }
+
+    @Test
+    public void onCancelTest() throws Exception {
+        onView(withId(android.R.id.button2)).perform(click());
+        verify(vm).setProgramSet(null);
+    }
+
+    @Test
+    public void onBackPressTest() throws Exception {
+        Espresso.pressBack();
+        verify(vm).setProgramSet(null);
     }
 
     private void checkPicker(@IdRes int picker, String minValue) {

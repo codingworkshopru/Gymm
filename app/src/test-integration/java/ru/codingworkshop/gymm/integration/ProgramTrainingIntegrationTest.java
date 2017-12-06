@@ -163,7 +163,7 @@ public class ProgramTrainingIntegrationTest {
 
         enterActionMode(R.id.programExerciseList);
         deleteProgramExerciseAt(2);
-        onView(withText(android.R.string.cancel));
+        onView(withText(android.R.string.cancel)).perform(click());
 
         checkProgramExercise(0, "Отжимания от пола", 1);
         checkProgramExercise(1, "Жим штанги лёжа", 1);

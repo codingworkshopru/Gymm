@@ -1,7 +1,6 @@
 package ru.codingworkshop.gymm.ui.program.exercise;
 
 
-import android.app.AlertDialog;
 import android.app.Dialog;
 import android.arch.lifecycle.ViewModelProvider;
 import android.arch.lifecycle.ViewModelProviders;
@@ -10,19 +9,18 @@ import android.content.DialogInterface;
 import android.databinding.DataBindingUtil;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
-import android.support.annotation.VisibleForTesting;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.FragmentManager;
+import android.support.v7.app.AlertDialog;
 import android.view.LayoutInflater;
 
 import javax.inject.Inject;
 
-import dagger.android.AndroidInjection;
 import dagger.android.support.AndroidSupportInjection;
 import ru.codingworkshop.gymm.R;
-import ru.codingworkshop.gymm.data.entity.ProgramSet;
 import ru.codingworkshop.gymm.databinding.FragmentProgramSetEditorBinding;
 import ru.codingworkshop.gymm.ui.program.ProgramTrainingViewModel;
+import timber.log.Timber;
 
 public class ProgramSetEditorFragment extends DialogFragment {
     private static final String TAG = ProgramSetEditorFragment.class.getName();
@@ -30,6 +28,7 @@ public class ProgramSetEditorFragment extends DialogFragment {
     @Inject
     ViewModelProvider.Factory viewModelFactory;
     private FragmentProgramSetEditorBinding binding;
+    private ProgramTrainingViewModel viewModel;
 
     public void show(FragmentManager fragmentManager) {
         show(fragmentManager, TAG);
@@ -39,7 +38,7 @@ public class ProgramSetEditorFragment extends DialogFragment {
     public void onAttach(Context context) {
         AndroidSupportInjection.inject(this);
         super.onAttach(context);
-        ProgramTrainingViewModel viewModel = ViewModelProviders.of(this, viewModelFactory).get(ProgramTrainingViewModel.class);
+        viewModel = ViewModelProviders.of(getActivity(), viewModelFactory).get(ProgramTrainingViewModel.class);
         viewModel.getProgramSet().observe(this, set -> binding.setSet(set));
     }
 
@@ -51,13 +50,20 @@ public class ProgramSetEditorFragment extends DialogFragment {
 
         return new AlertDialog.Builder(getContext())
                 .setView(binding.getRoot())
-                .setCancelable(true)
-                .setPositiveButton(android.R.string.ok, this::onPositiveButtonClick)
-                .setNegativeButton(android.R.string.cancel, null)
+                .setPositiveButton(android.R.string.ok, this::onDialogButtonClick)
+                .setNegativeButton(android.R.string.cancel, this::onDialogButtonClick)
                 .create();
     }
 
-    public void onPositiveButtonClick(DialogInterface dialog, int which) {
+    @Override
+    public void onCancel(DialogInterface dialog) {
+        viewModel.setProgramSet(null);
+    }
+
+    public void onDialogButtonClick(DialogInterface dialog, int which) {
+        if (which == AlertDialog.BUTTON_NEGATIVE) {
+            onCancel(dialog);
+        }
         dismiss();
     }
 }

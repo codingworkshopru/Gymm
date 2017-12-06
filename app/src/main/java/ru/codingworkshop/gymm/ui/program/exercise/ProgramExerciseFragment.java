@@ -10,6 +10,8 @@ import android.databinding.DataBindingUtil;
 import android.databinding.ViewDataBinding;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
 import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
@@ -25,6 +27,7 @@ import ru.codingworkshop.gymm.data.entity.ProgramSet;
 import ru.codingworkshop.gymm.data.tree.node.ProgramExerciseNode;
 import ru.codingworkshop.gymm.databinding.FragmentProgramExerciseBinding;
 import ru.codingworkshop.gymm.databinding.FragmentProgramExerciseListItemBinding;
+import ru.codingworkshop.gymm.db.GymmDatabase;
 import ru.codingworkshop.gymm.ui.program.ProgramTrainingActivity;
 import ru.codingworkshop.gymm.ui.program.ProgramTrainingViewModel;
 import ru.codingworkshop.gymm.ui.program.common.FragmentAlert;
@@ -46,8 +49,6 @@ public class ProgramExerciseFragment extends BaseFragment implements
 {
     public static final String EXERCISE_ID_KEY = "exerciseId";
     public static final String EXERCISE_NAME_KEY = "exerciseName";
-    private static final String PROGRAM_EXERCISE_ID_KEY = "programExerciseId";
-    private static final String PROGRAM_TRAINING_ID_KEY = "programTrainingId";
     private static final int CANCEL_ALERT_ID = 0;
     private static final int EMPTY_EXERCISE_LIST_ALERT_ID = 1;
     private static final int EXERCISE_NOT_SELECTED_ALERT_ID = 2;
@@ -73,9 +74,23 @@ public class ProgramExerciseFragment extends BaseFragment implements
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         Timber.d("onCreate");
-        viewModel = ViewModelProviders.of(this, viewModelFactory).get(ProgramTrainingViewModel.class);
-        LiveData<ProgramExerciseNode> liveLoaded = viewModel.getProgramExercise();
-        liveLoaded.observe(this, this::initData);
+        viewModel = ViewModelProviders.of(getActivity(), viewModelFactory).get(ProgramTrainingViewModel.class);
+        viewModel.getProgramExercise().observe(this, this::initData);
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        ProgramSet programSet = viewModel.getProgramSet().getValue();
+        if (programSet != null) {
+            int sortOrder = programSet.getSortOrder();
+            if (sortOrder == node.getChildrenCount() - 1) {
+                programSetsAdapter.notifyItemInserted(sortOrder);
+            } else {
+                programSetsAdapter.notifyItemChanged(sortOrder);
+            }
+            viewModel.setProgramSet(null);
+        }
     }
 
     @Override
@@ -158,15 +173,35 @@ public class ProgramExerciseFragment extends BaseFragment implements
 
         switch (dialogId) {
             case CANCEL_ALERT_ID:
-                cleanupAndClose();
+                close();
                 break;
         }
     }
 
     private void onAddSet(View view) {
-        ProgramSetEditorFragment programSetEditor = new ProgramSetEditorFragment();
         viewModel.createProgramSet();
-        programSetEditor.show(getChildFragmentManager());
+        showSetEditor();
+    }
+
+    private void showSetEditor() {
+        final ProgramSetEditorFragment programSetEditor = new ProgramSetEditorFragment();
+        final FragmentManager childFragmentManager = getChildFragmentManager();
+        FragmentManager.FragmentLifecycleCallbacks lifecycleCallbacks = new FragmentManager.FragmentLifecycleCallbacks() {
+            @Override
+            public void onFragmentDetached(FragmentManager fm, Fragment f) {
+                ProgramSet set = viewModel.getProgramSet().getValue();
+                if (set != null) {
+                    if (binding.programSetList.getChildCount() != programSetsAdapter.getItemCount()) {
+                        programSetsAdapter.notifyItemInserted(set.getSortOrder());
+                    } else {
+                        programSetsAdapter.notifyItemChanged(set.getSortOrder());
+                    }
+                }
+                childFragmentManager.unregisterFragmentLifecycleCallbacks(this);
+            }
+        };
+        childFragmentManager.registerFragmentLifecycleCallbacks(lifecycleCallbacks, false);
+        programSetEditor.show(childFragmentManager);
     }
 
     private void initData(ProgramExerciseNode loadedNode) {
@@ -196,8 +231,7 @@ public class ProgramExerciseFragment extends BaseFragment implements
         FragmentProgramExerciseListItemBinding binding = DataBindingUtil.getBinding(view);
         ProgramSet programSet = binding.getWrappedSet().getProgramSet();
         viewModel.setProgramSet(programSet);
-        ProgramSetEditorFragment programSetEditor = new ProgramSetEditorFragment();
-        programSetEditor.show(getChildFragmentManager());
+        showSetEditor();
     }
 
     protected void onItemLongClick(View v) {
@@ -216,14 +250,9 @@ public class ProgramExerciseFragment extends BaseFragment implements
             if (changed != null && changed) {
                 alert.showTwoButtonsAlert(CANCEL_ALERT_ID, R.string.cancel_changes_question);
             } else {
-                cleanupAndClose();
+                close();
             }
         });
-    }
-
-    private void cleanupAndClose() {
-        viewModel.deleteProgramExercise(node);
-        close();
     }
 
     private void close() {

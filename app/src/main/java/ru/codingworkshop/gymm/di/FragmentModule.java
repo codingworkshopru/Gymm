@@ -5,6 +5,7 @@ import dagger.android.ContributesAndroidInjector;
 import ru.codingworkshop.gymm.ui.actual.exercise.ActualExercisesFragment;
 import ru.codingworkshop.gymm.ui.info.exercise.ExerciseInfoFragment;
 import ru.codingworkshop.gymm.ui.program.exercise.ProgramExerciseFragment;
+import ru.codingworkshop.gymm.ui.program.exercise.ProgramSetEditorFragment;
 import ru.codingworkshop.gymm.ui.program.exercise.picker.ExerciseListDialogFragment;
 import ru.codingworkshop.gymm.ui.program.exercise.picker.MuscleGroupPickerFragment;
 import ru.codingworkshop.gymm.ui.program.training.ProgramTrainingFragment;
@@ -20,6 +21,9 @@ abstract class FragmentModule {
 
     @ContributesAndroidInjector
     abstract ProgramExerciseFragment contributeProgramExerciseFragment();
+
+    @ContributesAndroidInjector
+    abstract ProgramSetEditorFragment contributeProgramSetEditorFragment();
 
     @ContributesAndroidInjector
     abstract MuscleGroupPickerFragment contributeMuscleGroupPickerFragment();

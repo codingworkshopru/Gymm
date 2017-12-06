@@ -58,8 +58,8 @@ public class ProgramTrainingAdapter implements ParentAdapter<ProgramTraining>,
     }
 
     @Override
-    public void insertParent(ProgramTraining item) {
-        programTrainingRepository.insertProgramTraining(item);
+    public LiveData<Long> insertParent(ProgramTraining item) {
+        return programTrainingRepository.insertProgramTraining(item);
     }
 
     @Override
@@ -73,8 +73,8 @@ public class ProgramTrainingAdapter implements ParentAdapter<ProgramTraining>,
     }
 
     @Override
-    public void insertChildren(Collection<ProgramExercise> children) {
-        programTrainingRepository.insertProgramExercises(children);
+    public LiveData<List<Long>> insertChildren(Collection<ProgramExercise> children) {
+        return programTrainingRepository.insertProgramExercises(children);
     }
 
     @Override

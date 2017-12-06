@@ -3,6 +3,7 @@ package ru.codingworkshop.gymm.data.tree.saver2;
 import android.support.annotation.NonNull;
 
 import com.google.common.base.Equivalence;
+import com.google.common.base.Preconditions;
 import com.google.common.collect.Collections2;
 import com.google.common.collect.MapDifference;
 import com.google.common.collect.Maps;
@@ -14,6 +15,7 @@ import ru.codingworkshop.gymm.data.entity.common.Model;
 import ru.codingworkshop.gymm.data.tree.repositoryadapter.ChildrenAdapter;
 import ru.codingworkshop.gymm.data.util.BiPredicate;
 import ru.codingworkshop.gymm.data.util.LiveDataUtil;
+import ru.codingworkshop.gymm.db.GymmDatabase;
 
 /**
  * Created by Radik on 29.11.2017.
@@ -30,6 +32,7 @@ public class ChildrenSaver<T extends Model> implements Saver<Collection<T>> {
 
     @Override
     public void save(@NonNull Collection<T> collection) {
+        Preconditions.checkState(GymmDatabase.isValidId(parentId), "parent id is not valid");
         LiveDataUtil.getOnce(
                 adapter.getChildren(parentId),
                 oldChildren -> saveInternal(oldChildren, collection));

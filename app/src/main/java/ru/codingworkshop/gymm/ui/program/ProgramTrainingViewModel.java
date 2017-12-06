@@ -53,7 +53,9 @@ public class ProgramTrainingViewModel extends ViewModel {
         this.repositoryAdapter = repositoryAdapter;
 
         tree = new MutableProgramTrainingTree();
-        tree.setParent(new ProgramTraining());
+        ProgramTraining training = new ProgramTraining();
+        training.setDrafting(true);
+        tree.setParent(training);
 
         currentProgramExercise = new MutableLiveData<>();
         currentProgramSet = new MutableLiveData<>();

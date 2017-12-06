@@ -11,6 +11,7 @@ import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
 
@@ -51,8 +52,16 @@ public class ChildrenSaverTest {
         verify(adapter).deleteChildren(argThat(actual -> Iterables.elementsEqual(actual, oldChildren.subList(2, 3))));
     }
 
+    @Test(expected = IllegalStateException.class)
+    public void saveWithInvalidParentId() throws Exception {
+        List<SimpleModel> newChildren = Models.createSimpleModels("foo");
+
+        ChildrenSaver<SimpleModel> saver = new ChildrenSaver<>(adapter, 0L);
+        saver.save(newChildren);
+    }
+
     @Test
-    public void saveLists() throws Exception {
+    public void containersDiffTest() throws Exception {
         List<SimpleModel> models1 = Models.createSimpleModels("foo", "bar",             "baz"); // the last one has id = 10
         models1.get(2).setId(10L);
 
@@ -71,7 +80,6 @@ public class ChildrenSaverTest {
         assertEquals(models1, result.getToDelete());
 
         // new, old and updated
-
         result = ChildrenSaver.containersDiff(models1, models2);
         assertEquals(models2.subList(2, 4), result.getToInsert());
         assertEquals(models1.subList(2, 3), result.getToDelete());
