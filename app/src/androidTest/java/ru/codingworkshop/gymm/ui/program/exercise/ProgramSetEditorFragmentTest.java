@@ -2,6 +2,7 @@ package ru.codingworkshop.gymm.ui.program.exercise;
 
 import android.arch.core.executor.testing.InstantTaskExecutorRule;
 import android.arch.lifecycle.LiveData;
+import android.arch.lifecycle.MutableLiveData;
 import android.arch.lifecycle.ViewModelProvider;
 import android.support.annotation.IdRes;
 import android.support.test.espresso.Espresso;
@@ -16,6 +17,7 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.InOrder;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
@@ -40,6 +42,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.argThat;
+import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -55,6 +58,7 @@ public class ProgramSetEditorFragmentTest {
 
     @Mock private ViewModelProvider.Factory viewModelFactory;
     @Mock private ProgramTrainingViewModel vm;
+    @Mock private ProgramSetEditorFragment.OnProgramSetEditedListener listener;
     @InjectMocks private ProgramSetEditorFragment fragment;
     private ProgramSet set;
 
@@ -91,18 +95,24 @@ public class ProgramSetEditorFragmentTest {
     }
 
     @Test
+    public void saveSetTest() throws Exception {
+        onView(withId(android.R.id.button1)).perform(click());
+
+        InOrder ord = inOrder(listener, vm);
+
+        ord.verify(listener).onProgramSetEdited(any());
+        ord.verify(vm).saveProgramSet();
+    }
+
+    @Test
     public void editProgramSet() throws Exception {
         ProgramSet set = new ProgramSet();
         set.setReps(10);
         set.setMinutes(1);
         set.setSeconds(30);
 
-        when(vm.getProgramSet()).thenReturn(LiveDataUtil.getLive(set));
-
-        onView(withId(android.R.id.button2)).perform(click());
-        ProgramSetEditorFragment fragment = new ProgramSetEditorFragment();
-        fragment.viewModelFactory = viewModelFactory;
-        fragment.show(activityTestRule.getActivity().getSupportFragmentManager());
+        MutableLiveData<ProgramSet> mld = (MutableLiveData<ProgramSet>) vm.getProgramSet();
+        mld.postValue(set);
 
         onView(withId(R.id.programSetRepsPicker)).check(matches(withDisplayValue("10")));
         onView(withId(R.id.programSetRestMinutesPicker)).check(matches(withDisplayValue("1")));

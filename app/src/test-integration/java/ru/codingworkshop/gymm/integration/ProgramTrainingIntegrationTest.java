@@ -12,12 +12,15 @@ import org.junit.Rule;
 import org.junit.Test;
 
 import ru.codingworkshop.gymm.R;
+import ru.codingworkshop.gymm.data.entity.ProgramExercise;
 import ru.codingworkshop.gymm.db.GymmDatabase;
 import ru.codingworkshop.gymm.ui.MainActivity;
+import ru.codingworkshop.gymm.util.Models;
 
 import static android.support.test.espresso.Espresso.onView;
 import static android.support.test.espresso.action.ViewActions.click;
 import static android.support.test.espresso.matcher.ViewMatchers.withText;
+import static junit.framework.Assert.assertNotSame;
 import static junit.framework.Assert.fail;
 import static ru.codingworkshop.gymm.db.initializer.DatabaseInitializer.DATABASE_NAME;
 import static ru.codingworkshop.gymm.integration.Operation.*;
@@ -187,5 +190,23 @@ public class ProgramTrainingIntegrationTest {
 
         editProgramTrainingClick("workout is ruined");
         checkExerciseNotPresented("Приседания со штангой");
+    }
+
+    @Test
+    public void undoChangesAfterSetAddition() throws Exception {
+        addProgramTrainingClick();
+        addProgramExerciseClick();
+        pickExercise(db, "Отжимания от пола");
+        addProgramSetClick();
+        typeSetAndSaveIt(1, 0, 0);
+        saveProgramExerciseClick();
+
+        editProgramExerciseClick("Отжимания от пола");
+        addProgramSetClick();
+        typeSetAndSaveIt(1, 0, 0);
+        Espresso.pressBack();
+        onView(withText(android.R.string.ok)).perform(click());
+
+        checkProgramExercise(0, "Отжимания от пола", 1);
     }
 }

@@ -1,7 +1,6 @@
 package ru.codingworkshop.gymm.ui.program.exercise;
 
 
-import android.arch.lifecycle.LiveData;
 import android.arch.lifecycle.ViewModelProvider;
 import android.arch.lifecycle.ViewModelProviders;
 import android.content.Context;
@@ -27,7 +26,6 @@ import ru.codingworkshop.gymm.data.entity.ProgramSet;
 import ru.codingworkshop.gymm.data.tree.node.ProgramExerciseNode;
 import ru.codingworkshop.gymm.databinding.FragmentProgramExerciseBinding;
 import ru.codingworkshop.gymm.databinding.FragmentProgramExerciseListItemBinding;
-import ru.codingworkshop.gymm.db.GymmDatabase;
 import ru.codingworkshop.gymm.ui.program.ProgramTrainingActivity;
 import ru.codingworkshop.gymm.ui.program.ProgramTrainingViewModel;
 import ru.codingworkshop.gymm.ui.program.common.FragmentAlert;
@@ -45,7 +43,8 @@ import static android.app.Activity.RESULT_OK;
 
 public class ProgramExerciseFragment extends BaseFragment implements
         AlertDialogFragment.OnDialogButtonClickListener,
-        ProgramTrainingActivity.OnSystemBackPressedListener
+        ProgramTrainingActivity.OnSystemBackPressedListener,
+        ProgramSetEditorFragment.OnProgramSetEditedListener
 {
     public static final String EXERCISE_ID_KEY = "exerciseId";
     public static final String EXERCISE_NAME_KEY = "exerciseName";
@@ -79,21 +78,6 @@ public class ProgramExerciseFragment extends BaseFragment implements
     }
 
     @Override
-    public void onResume() {
-        super.onResume();
-        ProgramSet programSet = viewModel.getProgramSet().getValue();
-        if (programSet != null) {
-            int sortOrder = programSet.getSortOrder();
-            if (sortOrder == node.getChildrenCount() - 1) {
-                programSetsAdapter.notifyItemInserted(sortOrder);
-            } else {
-                programSetsAdapter.notifyItemChanged(sortOrder);
-            }
-            viewModel.setProgramSet(null);
-        }
-    }
-
-    @Override
     public void onDetach() {
         super.onDetach();
         Timber.d("onDetach");
@@ -110,6 +94,7 @@ public class ProgramExerciseFragment extends BaseFragment implements
         switch (item.getItemId()) {
             case R.id.actionSaveExercise:
                 if (validate()) {
+                    viewModel.saveProgramExercise();
                     close();
                 }
                 return true;
@@ -183,25 +168,29 @@ public class ProgramExerciseFragment extends BaseFragment implements
         showSetEditor();
     }
 
+    private void onCreateSet(View view) {
+        FragmentProgramExerciseListItemBinding binding = DataBindingUtil.getBinding(view);
+        ProgramSet programSet = binding.getWrappedSet().getProgramSet();
+        viewModel.setProgramSet(programSet);
+        showSetEditor();
+    }
+
     private void showSetEditor() {
         final ProgramSetEditorFragment programSetEditor = new ProgramSetEditorFragment();
         final FragmentManager childFragmentManager = getChildFragmentManager();
-        FragmentManager.FragmentLifecycleCallbacks lifecycleCallbacks = new FragmentManager.FragmentLifecycleCallbacks() {
-            @Override
-            public void onFragmentDetached(FragmentManager fm, Fragment f) {
-                ProgramSet set = viewModel.getProgramSet().getValue();
-                if (set != null) {
-                    if (binding.programSetList.getChildCount() != programSetsAdapter.getItemCount()) {
-                        programSetsAdapter.notifyItemInserted(set.getSortOrder());
-                    } else {
-                        programSetsAdapter.notifyItemChanged(set.getSortOrder());
-                    }
-                }
-                childFragmentManager.unregisterFragmentLifecycleCallbacks(this);
-            }
-        };
-        childFragmentManager.registerFragmentLifecycleCallbacks(lifecycleCallbacks, false);
         programSetEditor.show(childFragmentManager);
+    }
+
+    @Override
+    public void onProgramSetEdited(ProgramSet set) {
+        Runnable updateItem;
+        final int sortOrder = set.getSortOrder();
+        if (sortOrder == -1) {
+            updateItem = () -> programSetsAdapter.notifyItemInserted(node.getChildrenCount());
+        } else {
+            updateItem = () -> programSetsAdapter.notifyItemChanged(sortOrder);
+        }
+        getActivity().runOnUiThread(updateItem);
     }
 
     private void initData(ProgramExerciseNode loadedNode) {
@@ -217,7 +206,7 @@ public class ProgramExerciseFragment extends BaseFragment implements
     private void initSetList() {
         final ProgramRecyclerView rv = binding.programSetList;
         ListItemListeners listeners = new ListItemListeners(R.layout.fragment_program_exercise_list_item)
-                .setOnClickListener(this::onItemClick)
+                .setOnClickListener(this::onCreateSet)
                 .setOnLongClickListener(this::onItemLongClick)
                 .setOnReorderButtonDownListener(rv::startDragFromChildView, R.id.programSetReorderImage);
         programSetsAdapter = new ProgramSetsAdapter(listeners, node.getChildren(), getInActionMode());
@@ -225,13 +214,6 @@ public class ProgramExerciseFragment extends BaseFragment implements
         programSetsAdapter.registerAdapterDataObserver(adapterDataObserver);
         rv.setAdapter(programSetsAdapter);
         rv.setItemTouchHelperCallback(new ItemTouchHelperCallback(node));
-    }
-
-    private void onItemClick(View view) {
-        FragmentProgramExerciseListItemBinding binding = DataBindingUtil.getBinding(view);
-        ProgramSet programSet = binding.getWrappedSet().getProgramSet();
-        viewModel.setProgramSet(programSet);
-        showSetEditor();
     }
 
     protected void onItemLongClick(View v) {
@@ -246,13 +228,11 @@ public class ProgramExerciseFragment extends BaseFragment implements
 
     @Override
     public void onFragmentClose() {
-        viewModel.isProgramExerciseChanged().observe(this, changed -> {
-            if (changed != null && changed) {
-                alert.showTwoButtonsAlert(CANCEL_ALERT_ID, R.string.cancel_changes_question);
-            } else {
-                close();
-            }
-        });
+        if (viewModel.isProgramExerciseChanged()) {
+            alert.showTwoButtonsAlert(CANCEL_ALERT_ID, R.string.cancel_changes_question);
+        } else {
+            close();
+        }
     }
 
     private void close() {

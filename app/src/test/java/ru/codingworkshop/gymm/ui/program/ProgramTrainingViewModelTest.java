@@ -113,7 +113,6 @@ public class ProgramTrainingViewModelTest {
 
         assertNotNull(LiveTest.getValue(vm.loadTree(1L)));
 
-        when(adapter.getParent(1L)).thenReturn(Models.createLiveProgramTraining(1L, "foo", false));
         when(adapter.getChildren(1L)).thenReturn(Models.createLiveProgramExercises(1));
 
         tree.getParent().setName("bar");
@@ -128,21 +127,32 @@ public class ProgramTrainingViewModelTest {
         ProgramTrainingTree tree = vm.getProgramTrainingTree();
         tree.getParent().setId(1L);
 
-        int index = vm.createProgramExercise();
-        assertEquals(0, index);
-        LiveTest.verifyLiveData(vm.getProgramExercise(), e -> 1L == e.getProgramTrainingId());
+        vm.createProgramExercise();
+        ProgramExerciseNode programExercise = vm.getProgramExercise().getValue();
+        assertEquals(1L, programExercise.getProgramTrainingId());
+        assertEquals(-1, programExercise.getSortOrder());
+    }
 
-        index = vm.createProgramExercise();
-        assertEquals(1, index);
-        LiveTest.verifyLiveData(vm.getProgramExercise(), e -> 1L == e.getProgramTrainingId());
+    @Test
+    public void saveProgramExercise() throws Exception {
+        vm.createProgramExercise();
+        vm.saveProgramExercise();
 
-        assertEquals(2, tree.getChildrenCount());
+        assertNull(vm.getProgramExercise().getValue());
+        int index = vm.getProgramTrainingTree().getChildrenCount() - 1;
+        assertEquals(index, vm.getProgramTrainingTree().getChildren().get(index).getSortOrder());
+
+        vm.setProgramExercise(vm.getProgramTrainingTree().getChildren().get(0));
+        vm.saveProgramExercise();
+
+        assertEquals(1, vm.getProgramTrainingTree().getChildrenCount());
     }
 
     @Test
     public void deleteProgramExercise() throws Exception {
         for (int i = 0; i < 3; i++) {
             vm.createProgramExercise();
+            vm.saveProgramExercise();
         }
 
         ProgramTrainingTree tree = vm.getProgramTrainingTree();
@@ -161,6 +171,7 @@ public class ProgramTrainingViewModelTest {
     @Test
     public void restoreLastDeletedProgramExercise() throws Exception {
         vm.createProgramExercise();
+        vm.saveProgramExercise();
         vm.deleteProgramExercise(0);
         vm.restoreLastDeletedProgramExercise();
         assertTrue(vm.getProgramTrainingTree().hasChildren());
@@ -169,7 +180,9 @@ public class ProgramTrainingViewModelTest {
     @Test
     public void moveProgramExercise() throws Exception {
         vm.createProgramExercise();
+        vm.saveProgramExercise();
         vm.createProgramExercise();
+        vm.saveProgramExercise();
         List<ProgramExerciseNode> children = vm.getProgramTrainingTree().getChildren();
         ProgramExerciseNode e1 = children.get(0);
         ProgramExerciseNode e2 = children.get(1);
@@ -180,52 +193,65 @@ public class ProgramTrainingViewModelTest {
 
     @Test
     public void setProgramExercise() throws Exception {
-        ProgramExerciseNode node = new ImmutableProgramExerciseNode();
+        ProgramExerciseNode node = new MutableProgramExerciseNode();
         vm.setProgramExercise(node);
-        LiveTest.verifyLiveData(vm.getProgramExercise(), resultNode -> resultNode == node);
+        ProgramExerciseNode setNode = vm.getProgramExercise().getValue();
+        assertNotNull(setNode);
+        assertNotSame(node, setNode);
     }
 
     @Test
     public void isProgramExerciseChanged() throws Exception {
         createProgramExercise();
-        assertFalse(LiveTest.getValue(vm.isProgramExerciseChanged()));
+        assertFalse(vm.isProgramExerciseChanged());
 
         ProgramExerciseNode node = vm.getProgramExercise().getValue();
         node.setExerciseId(100L);
-        assertTrue(LiveTest.getValue(vm.isProgramExerciseChanged()));
+        assertTrue(vm.isProgramExerciseChanged());
 
         node.setExerciseId(null);
         node.addChild(new ProgramSet());
-        assertTrue(LiveTest.getValue(vm.isProgramExerciseChanged()));
+        assertTrue(vm.isProgramExerciseChanged());
 
         LiveTest.verifyLiveData(vm.loadTree(1L), Objects::nonNull);
         vm.setProgramExercise(vm.getProgramTrainingTree().getChildren().get(0));
-        when(adapter.getProgramSetsForExercise(2L)).thenReturn(Models.createLiveProgramSets(2L, 2));
 
-        assertFalse(LiveTest.getValue(vm.isProgramExerciseChanged()));
+        assertFalse(vm.isProgramExerciseChanged());
 
         node = vm.getProgramExercise().getValue();
         node.setExerciseId(101L);
-        assertTrue(LiveTest.getValue(vm.isProgramExerciseChanged()));
+        assertTrue(vm.isProgramExerciseChanged());
         node.setExerciseId(100L);
         node.addChild(new ProgramSet());
-        assertTrue(LiveTest.getValue(vm.isProgramExerciseChanged()));
+        assertTrue(vm.isProgramExerciseChanged());
     }
 
     @Test
     public void createProgramSet() throws Exception {
         vm.createProgramExercise();
         vm.getProgramExercise().getValue().setId(2L);
+        vm.createProgramSet();
 
-        int index = vm.createProgramSet();
-        assertEquals(0, index);
-        LiveTest.verifyLiveData(vm.getProgramSet(), set -> set.getProgramExerciseId() == 2L);
+        ProgramSet set = vm.getProgramSet().getValue();
+        assertEquals(2L, set.getProgramExerciseId());
+        assertEquals(-1, set.getSortOrder());
+    }
 
-        index = vm.createProgramSet();
-        assertEquals(1, index);
-        LiveTest.verifyLiveData(vm.getProgramSet(), set -> set.getProgramExerciseId() == 2L);
+    @Test
+    public void saveProgramSet() throws Exception {
+        vm.createProgramExercise();
+        vm.createProgramSet();
+        vm.saveProgramSet();
 
-        assertEquals(2, vm.getProgramExercise().getValue().getChildrenCount());
+        assertNull(vm.getProgramSet().getValue());
+        ProgramExerciseNode exercise = vm.getProgramExercise().getValue();
+        int index = exercise.getChildrenCount() - 1;
+        assertEquals(index, exercise.getChildren().get(index).getSortOrder());
+
+        vm.setProgramSet(exercise.getChildren().get(0));
+        vm.saveProgramSet();
+
+        assertEquals(1, exercise.getChildrenCount());
     }
 
     @Test
@@ -233,30 +259,35 @@ public class ProgramTrainingViewModelTest {
         vm.createProgramExercise();
 
         vm.createProgramSet();
+        vm.saveProgramSet();
         vm.deleteProgramSet(0);
-        assertFalse(vm.getProgramTrainingTree().getChildren().get(0).hasChildren());
+        assertFalse(vm.getProgramExercise().getValue().hasChildren());
 
         vm.createProgramSet();
-        vm.deleteProgramSet(vm.getProgramTrainingTree().getChildren().get(0).getChildren().get(0));
-        assertFalse(vm.getProgramTrainingTree().getChildren().get(0).hasChildren());
+        vm.saveProgramSet();
+        vm.deleteProgramSet(vm.getProgramExercise().getValue().getChildren().get(0));
+        assertFalse(vm.getProgramExercise().getValue().hasChildren());
     }
 
     @Test
     public void restoreLastDeletedProgramSet() throws Exception {
         vm.createProgramExercise();
         vm.createProgramSet();
+        vm.saveProgramSet();
         vm.deleteProgramSet(0);
         vm.restoreLastDeletedProgramSet();
-        assertTrue(vm.getProgramTrainingTree().hasChildren());
+        assertTrue(vm.getProgramExercise().getValue().hasChildren());
     }
 
     @Test
     public void moveProgramSet() throws Exception {
         vm.createProgramExercise();
         vm.createProgramSet();
+        vm.saveProgramSet();
         vm.createProgramSet();
+        vm.saveProgramSet();
 
-        ProgramExerciseNode node = vm.getProgramTrainingTree().getChildren().get(0);
+        ProgramExerciseNode node = vm.getProgramExercise().getValue();
         ProgramSet set1 = node.getChildren().get(0);
         ProgramSet set2 = node.getChildren().get(1);
 
@@ -269,6 +300,8 @@ public class ProgramTrainingViewModelTest {
     public void setProgramSet() throws Exception {
         ProgramSet programSet = new ProgramSet();
         vm.setProgramSet(programSet);
-        LiveTest.verifyLiveData(vm.getProgramSet(), set -> set == programSet);
+        ProgramSet set = vm.getProgramSet().getValue();
+        assertNotNull(set);
+        assertNotSame(programSet, set);
     }
 }

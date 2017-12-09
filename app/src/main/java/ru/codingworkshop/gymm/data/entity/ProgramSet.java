@@ -32,7 +32,7 @@ import static android.arch.persistence.room.ForeignKey.CASCADE;
         },
         indices = @Index("programExerciseId")
 )
-public class ProgramSet implements Model, Sortable, Parcelable {
+public class ProgramSet implements Model, Sortable, Parcelable, Cloneable {
     @PrimaryKey(autoGenerate = true)
     private long id;
     private long programExerciseId;
@@ -41,6 +41,14 @@ public class ProgramSet implements Model, Sortable, Parcelable {
     private int sortOrder;
 
     public ProgramSet() {
+    }
+
+    public ProgramSet(ProgramSet that) {
+        this.id = that.id;
+        this.programExerciseId = that.programExerciseId;
+        this.reps = that.reps;
+        this.secondsForRest = that.secondsForRest;
+        this.sortOrder = that.sortOrder;
     }
 
     @Override

@@ -1,6 +1,9 @@
 package ru.codingworkshop.gymm.data.tree.node;
 
+import com.google.common.collect.Lists;
+
 import ru.codingworkshop.gymm.data.entity.ProgramExercise;
+import ru.codingworkshop.gymm.data.entity.ProgramSet;
 import ru.codingworkshop.gymm.data.tree.holder.SortableRestoreChildrenHolder;
 
 /**
@@ -14,6 +17,14 @@ public class MutableProgramExerciseNode extends ProgramExerciseNode {
 
     public MutableProgramExerciseNode(ProgramExercise parent) {
         this();
-        setParent(parent);
+        super.setParent(parent);
+    }
+
+    public MutableProgramExerciseNode(ProgramExerciseNode that) {
+        this();
+        ProgramExercise parent = that.getParent();
+        setParent(parent != null ? new ProgramExercise(parent) : null);
+        setChildren(Lists.transform(that.getChildren(), ProgramSet::new));
+        setExercise(that.getExercise());
     }
 }

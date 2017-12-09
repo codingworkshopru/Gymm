@@ -4,6 +4,9 @@ import android.arch.persistence.room.Entity;
 import android.arch.persistence.room.ForeignKey;
 import android.arch.persistence.room.Index;
 import android.arch.persistence.room.PrimaryKey;
+import android.support.annotation.NonNull;
+
+import com.google.common.base.Preconditions;
 
 import static android.arch.persistence.room.ForeignKey.CASCADE;
 
@@ -34,13 +37,26 @@ import static android.arch.persistence.room.ForeignKey.CASCADE;
                 @Index("exerciseId")
         }
 )
-public class ProgramExercise implements IProgramExercise {
+public class ProgramExercise implements IProgramExercise, Cloneable {
     @PrimaryKey(autoGenerate = true)
     private long id;
     private long programTrainingId;
-    private Long exerciseId; // TODO entity validations in repostory; make it long, but not Long
+    private Long exerciseId; // TODO entity validations in repository; make it long, but not Long
     private int sortOrder;
     private boolean drafting;
+
+    public ProgramExercise() {
+    }
+
+    public ProgramExercise(@NonNull ProgramExercise that) {
+        Preconditions.checkNotNull(that, "parameter of copy constructor must be non null");
+
+        this.id = that.id;
+        this.programTrainingId = that.programTrainingId;
+        this.exerciseId = that.exerciseId;
+        this.sortOrder = that.sortOrder;
+        this.drafting = that.drafting;
+    }
 
     @Override
     public long getId() {

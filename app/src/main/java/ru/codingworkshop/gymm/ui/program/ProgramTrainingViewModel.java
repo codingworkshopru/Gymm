@@ -44,7 +44,6 @@ public class ProgramTrainingViewModel extends ViewModel {
     private final MutableLiveData<ProgramSet> currentProgramSet;
 
     private String programTrainingOldName;
-    private Long programExerciseOldExerciseId; // old exerciseId of program exercise
 
     @Inject
     public ProgramTrainingViewModel(ProgramTrainingTreeLoader loader, ProgramTrainingTreeSaver saver, ProgramTrainingAdapter repositoryAdapter) {
@@ -99,18 +98,26 @@ public class ProgramTrainingViewModel extends ViewModel {
 
     /**
      * creates {@link ProgramExerciseNode} and attaches it to tree
-     * @return index
      */
-    public int createProgramExercise() {
+    public void createProgramExercise() {
         ProgramExercise programExercise = new ProgramExercise();
         programExercise.setProgramTrainingId(tree.getParent().getId());
+        programExercise.setSortOrder(-1);
 
         ProgramExerciseNode programExerciseNode = tree.createChildNode(programExercise);
-        tree.addChild(programExerciseNode);
 
-        setProgramExercise(programExerciseNode);
+        currentProgramExercise.setValue(programExerciseNode);
+    }
 
-        return programExercise.getSortOrder();
+    public void saveProgramExercise() {
+        ProgramExerciseNode current = getCurrentExerciseNode();
+        int sortOrder = current.getSortOrder();
+        if (sortOrder == -1) {
+            tree.addChild(current);
+        } else {
+            tree.replaceChild(sortOrder, current);
+        }
+        currentProgramExercise.setValue(null);
     }
 
     public void deleteProgramExercise(ProgramExerciseNode programExerciseNode) {
@@ -134,7 +141,9 @@ public class ProgramTrainingViewModel extends ViewModel {
     }
 
     public void setProgramExercise(@Nullable ProgramExerciseNode programExercise) {
-        programExerciseOldExerciseId = programExercise.getExerciseId();
+        if (programExercise != null) {
+            programExercise = new MutableProgramExerciseNode(programExercise);
+        }
         currentProgramExercise.setValue(programExercise);
     }
 
@@ -142,43 +151,46 @@ public class ProgramTrainingViewModel extends ViewModel {
         return currentProgramExercise;
     }
 
-    public LiveData<Boolean> isProgramExerciseChanged() {
-        ProgramExerciseNode exerciseNode = Preconditions.checkNotNull(getProgramExercise().getValue(), "program exercise has not been set");
-        Long exerciseId = exerciseNode.getExerciseId();
-        if (!GymmDatabase.isValidId(exerciseNode)) {
-            boolean exerciseChanged = exerciseId != null && GymmDatabase.isValidId(exerciseId);
-            boolean childrenChanged = exerciseNode.hasChildren();
-            return LiveDataUtil.getLive(exerciseChanged || childrenChanged);
-        } else if (!Objects.equal(exerciseId, programExerciseOldExerciseId)) {
-            return LiveDataUtil.getLive(true);
+    public boolean isProgramExerciseChanged() {
+        ProgramExerciseNode newNode = getCurrentExerciseNode();
+
+        Long exerciseId = newNode.getExerciseId();
+        if (newNode.getSortOrder() == -1) {
+            return (exerciseId != null && GymmDatabase.isValidId(exerciseId)) || newNode.hasChildren();
         }
 
-        return Transformations.map(
-                repositoryAdapter.getProgramSetsForExercise(exerciseNode.getId()),
-                sets -> !exerciseNode.getChildren().equals(sets));
+        ProgramExerciseNode oldNode = tree.getChildren().get(newNode.getSortOrder());
+        return !Objects.equal(oldNode.getExerciseId(), exerciseId) || !oldNode.getChildren().equals(newNode.getChildren());
     }
 
     /**
      * creates {@link ProgramSet} instance and adds it in tree
-     * @return index
      */
-    public int createProgramSet() {
+    public void createProgramSet() {
         ProgramExerciseNode currentExercise = getCurrentExerciseNode();
 
         ProgramSet programSet = new ProgramSet();
         programSet.setProgramExerciseId(currentExercise.getId());
         programSet.setReps(1); // default value
-
-        currentExercise.addChild(programSet);
+        programSet.setSortOrder(-1);
 
         setProgramSet(programSet);
+    }
 
-        return programSet.getSortOrder();
+    public void saveProgramSet() {
+        ProgramExerciseNode currentExercise = getCurrentExerciseNode();
+        ProgramSet currentSet = Preconditions.checkNotNull(currentProgramSet.getValue(), "current set is not set");
+        int sortOrder = currentSet.getSortOrder();
+        if (sortOrder == -1) {
+            currentExercise.addChild(currentSet);
+        } else {
+            currentExercise.replaceChild(sortOrder, currentSet);
+        }
+        currentProgramSet.setValue(null);
     }
 
     public void deleteProgramSet(@NonNull ProgramSet programSet) {
         getCurrentExerciseNode().removeChild(programSet);
-
     }
 
     public void deleteProgramSet(int programSetIndex) {
@@ -194,10 +206,13 @@ public class ProgramTrainingViewModel extends ViewModel {
     }
 
     private ProgramExerciseNode getCurrentExerciseNode() {
-        return Preconditions.checkNotNull(currentProgramExercise.getValue(), "create or select exercise");
+        return Preconditions.checkNotNull(currentProgramExercise.getValue(), "you must create or set exercise");
     }
 
     public void setProgramSet(@Nullable ProgramSet programSet) {
+        if (programSet != null) {
+            programSet = new ProgramSet(programSet);
+        }
         currentProgramSet.setValue(programSet);
     }
 

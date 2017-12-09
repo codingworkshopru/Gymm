@@ -212,23 +212,8 @@ public class ProgramExerciseFragmentTest {
 
     @Test
     public void saveTest() throws Exception {
-//        onView(withId(R.id.actionSaveExercise)).perform(click());
-//        verify(vm).save();
-//        verify(vm, never()).deleteIfDrafting();
-        fail();
-    }
-
-    @Test
-    public void closeWithoutChanges() throws Throwable {
-//        checkActionModeOff(); // wait for activity start
-//        CountDownLatch l = new CountDownLatch(1);
-//        activityTestRule.runOnUiThread(() -> {
-//            fragment.onFragmentClose();
-//            l.countDown();
-//        });
-//        l.await(10000, TimeUnit.MILLISECONDS);
-//        verify(vm).deleteIfDrafting();
-        fail();
+        onView(withId(R.id.actionSaveExercise)).perform(click());
+        verify(vm).saveProgramExercise();
     }
 
     @Test
@@ -249,7 +234,7 @@ public class ProgramExerciseFragmentTest {
 
     @Test
     public void exerciseChangedAssuranceMessageTest() throws Exception {
-        when(vm.isProgramExerciseChanged()).thenReturn(LiveDataUtil.getLive(true));
+        when(vm.isProgramExerciseChanged()).thenReturn(true);
         onView(both(isAssignableFrom(ImageButton.class)).and(withParent(withId(R.id.programExerciseToolbar)))).perform(click());
         onView(withText(R.string.cancel_changes_question)).check(matches(isDisplayed()));
         onView(withText(android.R.string.ok)).perform(click());
