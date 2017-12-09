@@ -183,14 +183,17 @@ public class ProgramExerciseFragment extends BaseFragment implements
 
     @Override
     public void onProgramSetEdited(ProgramSet set) {
-        Runnable updateItem;
         final int sortOrder = set.getSortOrder();
-        if (sortOrder == -1) {
-            updateItem = () -> programSetsAdapter.notifyItemInserted(node.getChildrenCount());
-        } else {
-            updateItem = () -> programSetsAdapter.notifyItemChanged(sortOrder);
-        }
-        getActivity().runOnUiThread(updateItem);
+        viewModel.getProgramSet().observe(this, s -> {
+            if (s != null) return;
+
+            if (sortOrder == -1) {
+                programSetsAdapter.notifyItemInserted(node.getChildrenCount());
+            } else {
+                programSetsAdapter.notifyItemChanged(sortOrder);
+            }
+            viewModel.getProgramSet().removeObservers(this);
+        });
     }
 
     private void initData(ProgramExerciseNode loadedNode) {
