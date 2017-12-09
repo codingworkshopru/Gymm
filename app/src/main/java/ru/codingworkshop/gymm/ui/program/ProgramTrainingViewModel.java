@@ -19,14 +19,13 @@ import ru.codingworkshop.gymm.data.entity.ProgramTraining;
 import ru.codingworkshop.gymm.data.tree.ChildRestoreAdapter;
 import ru.codingworkshop.gymm.data.tree.loader.ProgramTrainingTreeLoader;
 import ru.codingworkshop.gymm.data.tree.loader.common.Loader;
-import ru.codingworkshop.gymm.data.tree.loader.common.LoaderDelegate;
 import ru.codingworkshop.gymm.data.tree.node.MutableProgramExerciseNode;
 import ru.codingworkshop.gymm.data.tree.node.MutableProgramTrainingTree;
 import ru.codingworkshop.gymm.data.tree.node.ProgramExerciseNode;
 import ru.codingworkshop.gymm.data.tree.node.ProgramTrainingTree;
 import ru.codingworkshop.gymm.data.tree.repositoryadapter.ProgramTrainingAdapter;
-import ru.codingworkshop.gymm.data.tree.saver2.ProgramTrainingTreeSaver;
-import ru.codingworkshop.gymm.data.tree.saver2.Saver;
+import ru.codingworkshop.gymm.data.tree.saver.ProgramTrainingTreeSaver;
+import ru.codingworkshop.gymm.data.tree.saver.Saver;
 import ru.codingworkshop.gymm.data.util.LiveDataUtil;
 import ru.codingworkshop.gymm.db.GymmDatabase;
 

@@ -9,7 +9,6 @@ import dagger.multibindings.IntoMap;
 import ru.codingworkshop.gymm.ui.MainActivityViewModel;
 import ru.codingworkshop.gymm.ui.actual.viewmodel.ActualTrainingViewModel;
 import ru.codingworkshop.gymm.ui.info.exercise.ExerciseInfoFragmentViewModel;
-import ru.codingworkshop.gymm.ui.program.exercise.ProgramExerciseViewModel;
 import ru.codingworkshop.gymm.ui.program.exercise.picker.ExerciseListDialogViewModel;
 import ru.codingworkshop.gymm.ui.program.exercise.picker.MuscleGroupPickerViewModel;
 import ru.codingworkshop.gymm.ui.program.ProgramTrainingViewModel;
@@ -35,11 +34,6 @@ abstract class ViewModelModule {
     @IntoMap
     @ViewModelKey(ProgramTrainingViewModel.class)
     abstract ViewModel bindProgramTrainingViewModel(ProgramTrainingViewModel programTrainingViewModel);
-
-    @Binds
-    @IntoMap
-    @ViewModelKey(ProgramExerciseViewModel.class)
-    abstract ViewModel bindProgramExerciseViewModel(ProgramExerciseViewModel programExerciseViewModel);
 
     @Binds
     @IntoMap

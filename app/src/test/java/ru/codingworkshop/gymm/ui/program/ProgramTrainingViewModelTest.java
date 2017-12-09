@@ -11,23 +11,18 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-import java.util.StringJoiner;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import ru.codingworkshop.gymm.data.entity.ProgramExercise;
 import ru.codingworkshop.gymm.data.entity.ProgramSet;
 import ru.codingworkshop.gymm.data.tree.loader.ProgramTrainingTreeLoader;
-import ru.codingworkshop.gymm.data.tree.node.ImmutableProgramExerciseNode;
 import ru.codingworkshop.gymm.data.tree.node.MutableProgramExerciseNode;
 import ru.codingworkshop.gymm.data.tree.node.MutableProgramTrainingTree;
 import ru.codingworkshop.gymm.data.tree.node.ProgramExerciseNode;
 import ru.codingworkshop.gymm.data.tree.node.ProgramTrainingTree;
 import ru.codingworkshop.gymm.data.tree.repositoryadapter.ProgramTrainingAdapter;
-import ru.codingworkshop.gymm.data.tree.saver2.ProgramTrainingTreeSaver;
+import ru.codingworkshop.gymm.data.tree.saver.ProgramTrainingTreeSaver;
 import ru.codingworkshop.gymm.data.util.LiveDataUtil;
 import ru.codingworkshop.gymm.util.LiveTest;
 import ru.codingworkshop.gymm.util.Models;
@@ -209,7 +204,7 @@ public class ProgramTrainingViewModelTest {
         node.setExerciseId(100L);
         assertTrue(vm.isProgramExerciseChanged());
 
-        node.setExerciseId(null);
+        node.setExerciseId(0L);
         node.addChild(new ProgramSet());
         assertTrue(vm.isProgramExerciseChanged());
 

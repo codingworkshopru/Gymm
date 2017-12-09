@@ -1,36 +1,26 @@
 package ru.codingworkshop.gymm.data.tree.saver;
 
-import android.support.annotation.NonNull;
-
-import com.google.common.base.Preconditions;
-
 import ru.codingworkshop.gymm.data.entity.common.Model;
+import ru.codingworkshop.gymm.data.tree.repositoryadapter.ParentAdapter;
 import ru.codingworkshop.gymm.db.GymmDatabase;
 
 /**
- * Created by Радик on 18.08.2017 as part of the Gymm project.
+ * Created by Radik on 28.11.2017.
  */
 
-public class ModelSaver<P extends Model> implements Saver {
-    private P model;
-    private ModelSaverCallback<P> callback;
+public class ModelSaver<T extends Model> implements Saver<T> {
+    private ParentAdapter<T> parentAdapter;
 
-    public interface ModelSaverCallback<P> {
-        void updateParent(P parent);
-        void insertParent(P parent);
-    }
-
-    public ModelSaver(@NonNull P model, @NonNull ModelSaverCallback<P> callback) {
-        this.model = Preconditions.checkNotNull(model);
-        this.callback = Preconditions.checkNotNull(callback);
+    public ModelSaver(ParentAdapter<T> parentAdapter) {
+        this.parentAdapter = parentAdapter;
     }
 
     @Override
-    public void save() {
-        if (GymmDatabase.isValidId(model)) {
-            callback.updateParent(model);
+    public void save(T objectToSave) {
+        if (GymmDatabase.isValidId(objectToSave)) {
+            parentAdapter.updateParent(objectToSave);
         } else {
-            callback.insertParent(model);
+            parentAdapter.insertParent(objectToSave);
         }
     }
 }

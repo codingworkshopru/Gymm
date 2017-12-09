@@ -1,4 +1,4 @@
-package ru.codingworkshop.gymm.data.tree.saver2;
+package ru.codingworkshop.gymm.data.tree.saver;
 
 import android.arch.core.executor.testing.InstantTaskExecutorRule;
 
@@ -14,7 +14,6 @@ import org.mockito.junit.MockitoJUnitRunner;
 import ru.codingworkshop.gymm.data.entity.ProgramExercise;
 import ru.codingworkshop.gymm.data.entity.ProgramSet;
 import ru.codingworkshop.gymm.data.entity.ProgramTraining;
-import ru.codingworkshop.gymm.data.tree.node.ActualTrainingTree;
 import ru.codingworkshop.gymm.data.tree.node.ProgramTrainingTree;
 import ru.codingworkshop.gymm.data.tree.repositoryadapter.ProgramTrainingAdapter;
 import ru.codingworkshop.gymm.data.util.LiveDataUtil;

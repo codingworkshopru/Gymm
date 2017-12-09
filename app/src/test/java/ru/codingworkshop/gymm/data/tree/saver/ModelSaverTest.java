@@ -1,43 +1,36 @@
 package ru.codingworkshop.gymm.data.tree.saver;
 
-import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 
-import ru.codingworkshop.gymm.data.entity.common.Model;
+import ru.codingworkshop.gymm.data.tree.repositoryadapter.ParentAdapter;
+import ru.codingworkshop.gymm.util.SimpleModel;
 
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 
 /**
- * Created by Радик on 24.08.2017 as part of the Gymm project.
+ * Created by Radik on 28.11.2017.
  */
 
 @RunWith(MockitoJUnitRunner.class)
 public class ModelSaverTest {
-    @Mock private ModelSaver.ModelSaverCallback<Model> callback;
-    @Mock private Model model;
+    @Mock private ParentAdapter<SimpleModel> adapter;
+    @InjectMocks private ModelSaver<SimpleModel> saver;
 
-    private ModelSaver<Model> saver;
-
-    @Before
-    public void setUp() throws Exception {
-        saver = new ModelSaver<>(model, callback);
+    @Test
+    public void saveNew() throws Exception {
+        SimpleModel model = new SimpleModel(0L, "foo");
+        saver.save(model);
+        verify(adapter).insertParent(model);
     }
 
     @Test
-    public void insert() throws Exception {
-        when(model.getId()).thenReturn(0L);
-        saver.save();
-        verify(callback).insertParent(model);
-    }
-
-    @Test
-    public void update() throws Exception {
-        when(model.getId()).thenReturn(1L);
-        saver.save();
-        verify(callback).updateParent(model);
+    public void saveOld() throws Exception {
+        SimpleModel model = new SimpleModel(1L, "foo");
+        saver.save(model);
+        verify(adapter).updateParent(model);
     }
 }

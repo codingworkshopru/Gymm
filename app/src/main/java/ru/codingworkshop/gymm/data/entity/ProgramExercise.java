@@ -6,6 +6,7 @@ import android.arch.persistence.room.Index;
 import android.arch.persistence.room.PrimaryKey;
 import android.support.annotation.NonNull;
 
+import com.google.common.base.Objects;
 import com.google.common.base.Preconditions;
 
 import static android.arch.persistence.room.ForeignKey.CASCADE;
@@ -41,7 +42,7 @@ public class ProgramExercise implements IProgramExercise, Cloneable {
     @PrimaryKey(autoGenerate = true)
     private long id;
     private long programTrainingId;
-    private Long exerciseId; // TODO entity validations in repository; make it long, but not Long
+    private long exerciseId;
     private int sortOrder;
     private boolean drafting;
 
@@ -76,11 +77,11 @@ public class ProgramExercise implements IProgramExercise, Cloneable {
         this.programTrainingId = programTrainingId;
     }
 
-    public Long getExerciseId() {
+    public long getExerciseId() {
         return exerciseId;
     }
 
-    public void setExerciseId(Long exerciseId) {
+    public void setExerciseId(long exerciseId) {
         this.exerciseId = exerciseId;
     }
 
@@ -108,21 +109,16 @@ public class ProgramExercise implements IProgramExercise, Cloneable {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-
         ProgramExercise that = (ProgramExercise) o;
-
-        if (id != that.id) return false;
-        if (programTrainingId != that.programTrainingId) return false;
-        if (sortOrder != that.sortOrder) return false;
-        return exerciseId != null ? exerciseId.equals(that.exerciseId) : that.exerciseId == null;
+        return id == that.id &&
+                programTrainingId == that.programTrainingId &&
+                exerciseId == that.exerciseId &&
+                sortOrder == that.sortOrder &&
+                drafting == that.drafting;
     }
 
     @Override
     public int hashCode() {
-        int result = (int) (id ^ (id >>> 32));
-        result = 31 * result + (int) (programTrainingId ^ (programTrainingId >>> 32));
-        result = 31 * result + (exerciseId != null ? exerciseId.hashCode() : 0);
-        result = 31 * result + sortOrder;
-        return result;
+        return Objects.hashCode(id, programTrainingId, exerciseId, sortOrder, drafting);
     }
 }

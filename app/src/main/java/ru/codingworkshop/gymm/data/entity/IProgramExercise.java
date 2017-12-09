@@ -15,8 +15,7 @@ public interface IProgramExercise extends Model, Sortable, Draftable {
 
     void setProgramTrainingId(long programTrainingId);
 
-    @Nullable
-    Long getExerciseId();
+    long getExerciseId();
 
-    void setExerciseId(@Nullable Long exerciseId);
+    void setExerciseId(long exerciseId);
 }

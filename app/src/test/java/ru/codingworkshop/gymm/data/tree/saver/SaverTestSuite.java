@@ -4,15 +4,14 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 
 /**
- * Created by Радик on 25.08.2017 as part of the Gymm project.
+ * Created by Radik on 29.11.2017.
  */
 
 @RunWith(Suite.class)
 @Suite.SuiteClasses({
         ModelSaverTest.class,
         ChildrenSaverTest.class,
-        ProgramTrainingSaverTest.class,
-        ProgramExerciseSaverTest.class
+        ProgramTrainingTreeSaverTest.class
 })
 public class SaverTestSuite {
 }

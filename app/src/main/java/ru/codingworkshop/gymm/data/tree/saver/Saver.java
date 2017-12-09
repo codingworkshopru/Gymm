@@ -1,9 +1,11 @@
 package ru.codingworkshop.gymm.data.tree.saver;
 
+import android.support.annotation.NonNull;
+
 /**
- * Created by Радик on 18.08.2017 as part of the Gymm project.
+ * Created by Radik on 28.11.2017.
  */
 
-public interface Saver {
-    void save();
+public interface Saver<T> {
+    void save(@NonNull T objectToSave);
 }

@@ -1,4 +1,4 @@
-package ru.codingworkshop.gymm.data.tree.saver2;
+package ru.codingworkshop.gymm.data.tree.saver;
 
 import android.arch.lifecycle.LiveData;
 import android.arch.lifecycle.MutableLiveData;

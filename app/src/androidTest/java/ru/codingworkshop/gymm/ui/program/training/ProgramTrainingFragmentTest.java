@@ -192,6 +192,7 @@ public class ProgramTrainingFragmentTest {
         when(vm.validateProgramTraining()).thenReturn(LiveDataUtil.getLive(false));
         enterActionMode();
         removeAll();
+        Thread.sleep(1000);
         onView(withId(R.id.actionSaveTraining)).perform(click());
         onView(withText(R.string.program_training_activity_empty_list_dialog_message)).check(matches(isDisplayed()));
         verify(vm, never()).saveTree();
