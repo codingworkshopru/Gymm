@@ -14,7 +14,6 @@ import dagger.android.support.HasSupportFragmentInjector;
 import ru.codingworkshop.gymm.R;
 import ru.codingworkshop.gymm.ui.actual.exercise.ActualExercisesFragment;
 import ru.codingworkshop.gymm.ui.actual.rest.ActualTrainingRestFragment;
-import ru.codingworkshop.gymm.ui.common.LoadingFragment;
 import timber.log.Timber;
 
 public class ActualTrainingActivity extends AppCompatActivity implements
@@ -22,8 +21,6 @@ public class ActualTrainingActivity extends AppCompatActivity implements
         ActualTrainingRestFragment.ActualTrainingRestCallback,
         HasSupportFragmentInjector
 {
-
-    private LoadingFragment loadingFragment;
 
     @Inject
     DispatchingAndroidInjector<Fragment> fragmentInjector;
@@ -36,12 +33,6 @@ public class ActualTrainingActivity extends AppCompatActivity implements
         AndroidInjection.inject(this);
         setContentView(R.layout.activity_actual_training);
         super.onCreate(savedInstanceState);
-
-        loadingFragment = new LoadingFragment();
-        getSupportFragmentManager()
-                .beginTransaction()
-                .add(R.id.actualTrainingFragmentContainer, loadingFragment)
-                .commit();
 
         if (actualExercisesFragment == null) {
             actualExercisesFragment = new ActualExercisesFragment();
@@ -60,16 +51,6 @@ public class ActualTrainingActivity extends AppCompatActivity implements
         getSupportFragmentManager()
                 .beginTransaction()
                 .replace(R.id.actualTrainingFragmentContainer, fragment)
-                .commit();
-    }
-
-    @Override
-    public void onLoadingFinished() {
-        Timber.d("onLoadingFinished");
-
-        getSupportFragmentManager()
-                .beginTransaction()
-                .remove(loadingFragment)
                 .commit();
     }
 

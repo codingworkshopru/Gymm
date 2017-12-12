@@ -54,7 +54,6 @@ public class ActualExercisesFragmentStartTrainingTest extends Base {
         onView(withId(R.id.actualExercisesToolbar)).check(matches(withChild(withText("foo"))));
         onView(withText("exercise100")).check(matches(isDisplayed()));
 
-        verify(callback).onLoadingFinished();
         verify(vm).startTraining(1L);
         verify(vm, never()).loadTraining(anyLong());
         verify(vm, atLeastOnce()).getActualTrainingTree();

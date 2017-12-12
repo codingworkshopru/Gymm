@@ -43,7 +43,6 @@ public class ActualExercisesFragmentResumeTrainingTest extends Base {
         checkRepsCount(3);
         checkWeight(3.5);
 
-        verify(callback).onLoadingFinished();
         verify(vm).loadTraining(11L);
         verify(vm, never()).startTraining(anyLong());
         verify(vm, atLeastOnce()).getActualTrainingTree();

@@ -53,7 +53,6 @@ public class ActualExercisesFragment extends Fragment implements
 
     public interface ActualExercisesCallback {
         void onStartRest(int restSeconds);
-        void onLoadingFinished();
     }
 
     @Inject
@@ -135,8 +134,6 @@ public class ActualExercisesFragment extends Fragment implements
         if (loadedTree == null) return;
 
         tree = loadedTree;
-
-        callback.onLoadingFinished();
 
         if (!TrainingForegroundService.isRunning(context)) {
             TrainingForegroundService.startService(context, tree.getParent().getId(),

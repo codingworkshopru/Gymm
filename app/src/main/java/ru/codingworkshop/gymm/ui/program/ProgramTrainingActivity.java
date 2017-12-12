@@ -16,7 +16,6 @@ import dagger.android.support.HasSupportFragmentInjector;
 import ru.codingworkshop.gymm.R;
 import ru.codingworkshop.gymm.data.util.LiveDataUtil;
 import ru.codingworkshop.gymm.db.GymmDatabase;
-import ru.codingworkshop.gymm.ui.common.LoadingFragment;
 import ru.codingworkshop.gymm.ui.program.training.ProgramTrainingFragment;
 import timber.log.Timber;
 
@@ -38,11 +37,6 @@ public class ProgramTrainingActivity extends AppCompatActivity implements HasSup
 
         Timber.d("onCreate");
 
-        getSupportFragmentManager()
-                .beginTransaction()
-                .add(R.id.programTrainingFragmentContainer, new LoadingFragment(), LoadingFragment.TAG)
-                .commitNowAllowingStateLoss();
-
         ProgramTrainingViewModel vm = ViewModelProviders.of(this, viewModelFactory).get(ProgramTrainingViewModel.class);
 
         long programTrainingId = getIntent().getLongExtra(PROGRAM_TRAINING_ID_KEY, 0L);
@@ -55,13 +49,12 @@ public class ProgramTrainingActivity extends AppCompatActivity implements HasSup
 
     private void addProgramTrainingFragment() {
         FragmentManager fragmentManager = getSupportFragmentManager();
-        ProgramTrainingFragment programTrainingFragment = (ProgramTrainingFragment) fragmentManager.findFragmentByTag(ProgramTrainingFragment.TAG);
-        if (programTrainingFragment == null) {
-            programTrainingFragment = new ProgramTrainingFragment();
+        if (fragmentManager.findFragmentByTag(ProgramTrainingFragment.TAG) == null) {
+            ProgramTrainingFragment programTrainingFragment = new ProgramTrainingFragment();
             programTrainingFragment.setArguments(getIntent().getExtras());
             fragmentManager
                     .beginTransaction()
-                    .replace(R.id.programTrainingFragmentContainer, programTrainingFragment, ProgramTrainingFragment.TAG)
+                    .add(R.id.programTrainingFragmentContainer, programTrainingFragment, ProgramTrainingFragment.TAG)
                     .commit();
         }
     }
