@@ -52,7 +52,6 @@ public class ProgramTrainingViewModel extends ViewModel {
 
         tree = new MutableProgramTrainingTree();
         ProgramTraining training = new ProgramTraining();
-        training.setDrafting(true);
         tree.setParent(training);
 
         currentProgramExercise = new MutableLiveData<>();

@@ -37,12 +37,6 @@ public class ProgramTrainingAdapterTest {
     }
 
     @Test
-    public void getDrafting() throws Exception {
-        adapter.getDrafting();
-        verify(programTrainingRepository).getDraftingProgramTraining();
-    }
-
-    @Test
     public void getProgramTrainingByName() throws Exception {
         adapter.getProgramTrainingByName("foo");
         verify(programTrainingRepository).getProgramTrainingByName("foo");

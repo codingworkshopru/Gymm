@@ -42,11 +42,6 @@ public class ImmutableProgramExerciseNode extends ProgramExerciseNode {
     }
 
     @Override
-    public void setDrafting(boolean drafting) {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
     public void setProgramTrainingId(long programTrainingId) {
         throw new UnsupportedOperationException();
     }

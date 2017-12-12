@@ -35,10 +35,6 @@ public class ProgramTrainingAdapter implements ParentAdapter<ProgramTraining>,
         return exercisesRepository.getExercisesForProgramTraining(programTrainingId);
     }
 
-    public LiveData<ProgramTraining> getDrafting() {
-        return programTrainingRepository.getDraftingProgramTraining();
-    }
-
     public LiveData<ProgramTraining> getProgramTrainingByName(String programTrainingName) {
         return programTrainingRepository.getProgramTrainingByName(programTrainingName);
     }

@@ -34,10 +34,6 @@ public class ProgramExerciseAdapter implements ParentAdapter<ProgramExercise>, C
         return exercisesRepository.getExerciseForProgramExercise(programExerciseId);
     }
 
-    public LiveData<ProgramExercise> getDrafting(long programTrainingId) {
-        return programTrainingRepository.getDraftingProgramExercise(programTrainingId);
-    }
-
     @Override
     public LiveData<ProgramExercise> getParent(long programExerciseId) {
         return programTrainingRepository.getProgramExerciseById(programExerciseId);

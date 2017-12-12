@@ -25,7 +25,7 @@ public class ImmutableProgramExerciseNodeTest {
         node = new ImmutableProgramExerciseNode();
         assertImmutableChildrenDelegate(node);
 
-        node = new ImmutableProgramExerciseNode(Models.createProgramExercise(2L, 1L, 100L, false));
+        node = new ImmutableProgramExerciseNode(Models.createProgramExercise(2L, 1L, 100L));
         assertEquals(2L, node.getParent().getId());
         assertImmutableChildrenDelegate(node);
     }
@@ -38,7 +38,7 @@ public class ImmutableProgramExerciseNodeTest {
 
     @Test
     public void setParent() throws Exception {
-        node.setParent(Models.createProgramExercise(2L, 1L, 100L, false));
+        node.setParent(Models.createProgramExercise(2L, 1L, 100L));
         assertEquals(2L, node.getParent().getId());
     }
 
@@ -50,11 +50,6 @@ public class ImmutableProgramExerciseNodeTest {
     @Test(expected = UnsupportedOperationException.class)
     public void setId() {
         node.setId(1L);
-    }
-
-    @Test(expected = UnsupportedOperationException.class)
-    public void setDrafting() {
-        node.setDrafting(true);
     }
 
     @Test(expected = UnsupportedOperationException.class)

@@ -32,9 +32,6 @@ public interface ProgramTrainingDao {
     @Query("select * from ProgramTraining where name = :name")
     LiveData<ProgramTraining> getProgramTrainingByName(String name);
 
-    @Query("select * from ProgramTraining where drafting = 1 limit 1")
-    LiveData<ProgramTraining> getDraftingProgramTraining();
-
     @Insert(onConflict = FAIL)
     long insertProgramTraining(ProgramTraining programTraining);
 
@@ -46,15 +43,12 @@ public interface ProgramTrainingDao {
 
     @Query("select * " +
             "from ProgramExercise " +
-            "where programTrainingId = :programTrainingId and drafting = 0 " +
+            "where programTrainingId = :programTrainingId " +
             "order by sortOrder")
     LiveData<List<ProgramExercise>> getProgramExercisesForTraining(long programTrainingId);
 
     @Query("select * from ProgramExercise where id = :id")
     LiveData<ProgramExercise> getProgramExerciseById(long id);
-
-    @Query("select * from ProgramExercise where drafting = 1 and programTrainingId = :programTrainingId limit 1")
-    LiveData<ProgramExercise> getDraftingProgramExercise(long programTrainingId);
 
     @Insert
     long insertProgramExercise(ProgramExercise programExercise);
@@ -83,7 +77,7 @@ public interface ProgramTrainingDao {
     @Query("select ps.* " +
             "from ProgramSet ps " +
             "join ProgramExercise pe on pe.id = ps.programExerciseId " +
-            "where pe.programTrainingId = :programTrainingId and pe.drafting == 0 " +
+            "where pe.programTrainingId = :programTrainingId " +
             "order by pe.sortOrder, ps.sortOrder")
     LiveData<List<ProgramSet>> getProgramSetsForTraining(long programTrainingId);
 

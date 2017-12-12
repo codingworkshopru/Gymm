@@ -25,7 +25,7 @@ public class ProgramExerciseLoaderTest {
     @Test
     public void load() throws Exception {
         ProgramExerciseAdapter dataSource = mock(ProgramExerciseAdapter.class);
-        when(dataSource.getParent(2L)).thenReturn(Models.createLiveProgramExercise(2L, 1L, false));
+        when(dataSource.getParent(2L)).thenReturn(Models.createLiveProgramExercise(2L, 1L));
         when(dataSource.getChildren(2L)).thenReturn(Models.createLiveProgramSets(2L, 1));
         when(dataSource.getExercise(2L)).thenReturn(Models.createLiveExercise(100L, "foo"));
 

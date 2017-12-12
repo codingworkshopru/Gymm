@@ -35,12 +35,6 @@ public class ProgramExerciseAdapterTest {
     }
 
     @Test
-    public void getDraftingTest() throws Exception {
-        programExerciseAdapter.getDrafting(1L);
-        verify(programTrainingRepository).getDraftingProgramExercise(1L);
-    }
-
-    @Test
     public void getParentTest() throws Exception {
         programExerciseAdapter.getParent(2L);
         verify(programTrainingRepository).getProgramExerciseById(2L);
@@ -54,21 +48,21 @@ public class ProgramExerciseAdapterTest {
 
     @Test
     public void updateParentTest() throws Exception {
-        ProgramExercise programExercise = Models.createProgramExercise(2L, 1L, 100L, false);
+        ProgramExercise programExercise = Models.createProgramExercise(2L, 1L, 100L);
         programExerciseAdapter.updateParent(programExercise);
         verify(programTrainingRepository).updateProgramExercise(programExercise);
     }
 
     @Test
     public void insertParentTest() throws Exception {
-        ProgramExercise programExercise = Models.createProgramExercise(2L, 1L, 100L, false);
+        ProgramExercise programExercise = Models.createProgramExercise(2L, 1L, 100L);
         programExerciseAdapter.insertParent(programExercise);
         verify(programTrainingRepository).insertProgramExercise(programExercise);
     }
 
     @Test
     public void deleteParentTest() throws Exception {
-        ProgramExercise programExercise = Models.createProgramExercise(2L, 1L, 100L, false);
+        ProgramExercise programExercise = Models.createProgramExercise(2L, 1L, 100L);
         programExerciseAdapter.deleteParent(programExercise);
         verify(programTrainingRepository).deleteProgramExercise(programExercise);
     }

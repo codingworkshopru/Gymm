@@ -37,8 +37,6 @@ import ru.codingworkshop.gymm.data.tree.node.ExerciseNode;
 import ru.codingworkshop.gymm.databinding.FragmentExerciseInfoBinding;
 
 import static android.view.ViewGroup.LayoutParams.MATCH_PARENT;
-import static com.google.android.youtube.player.YouTubeInitializationResult.SUCCESS;
-import static com.google.android.youtube.player.YouTubePlayer.FULLSCREEN_FLAG_CUSTOM_LAYOUT;
 
 public class ExerciseInfoFragment extends DialogFragment {
     public static final String TAG = "exerciseInfoFragmentTag";

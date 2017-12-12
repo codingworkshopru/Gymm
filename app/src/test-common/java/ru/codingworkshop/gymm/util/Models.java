@@ -45,9 +45,8 @@ public class Models {
         return createByIds(id -> createProgramTraining(id, "program training " + id), trainingIds);
     }
 
-    public static LiveData<ProgramTraining> createLiveProgramTraining(long id, String name, boolean drafting) {
+    public static LiveData<ProgramTraining> createLiveProgramTraining(long id, String name) {
         ProgramTraining entity = createProgramTraining(id, name);
-        entity.setDrafting(drafting);
         return LiveDataUtil.getLive(entity);
     }
 
@@ -58,15 +57,14 @@ public class Models {
         return result;
     }
 
-    public static LiveData<ProgramExercise> createLiveProgramExercise(long id, long programTrainingId, boolean drafting) {
-        return LiveDataUtil.getLive(createProgramExercise(id, programTrainingId, 100L, drafting));
+    public static LiveData<ProgramExercise> createLiveProgramExercise(long id, long programTrainingId) {
+        return LiveDataUtil.getLive(createProgramExercise(id, programTrainingId, 100L));
     }
 
-    public static ProgramExercise createProgramExercise(long id, long programTrainingId, long exerciseId, boolean drafting) {
+    public static ProgramExercise createProgramExercise(long id, long programTrainingId, long exerciseId) {
         ProgramExercise entity = new ProgramExercise();
         entity.setId(id);
         entity.setProgramTrainingId(programTrainingId);
-        entity.setDrafting(drafting);
         entity.setExerciseId(exerciseId);
         return entity;
     }
@@ -78,7 +76,7 @@ public class Models {
     public static List<ProgramExercise> createProgramExercises(int count) {
         List<ProgramExercise> exercises = new ArrayList<>(count);
         for (int i = 0; i < count; i++) {
-            ProgramExercise programExercise = createProgramExercise(i + 2, 1L, i + 100, false);
+            ProgramExercise programExercise = createProgramExercise(i + 2, 1L, i + 100);
             programExercise.setSortOrder(i);
             exercises.add(programExercise);
         }

@@ -33,7 +33,7 @@ public class ProgramTrainingTreeLoaderTest {
 
     @Test
     public void load() throws Exception {
-        when(repository.getProgramTrainingById(1L)).thenReturn(Models.createLiveProgramTraining(1L, "foo", false));
+        when(repository.getProgramTrainingById(1L)).thenReturn(Models.createLiveProgramTraining(1L, "foo"));
         when(repository.getProgramExercisesForTraining(1L)).thenReturn(Models.createLiveProgramExercises(1));
         when(repository.getProgramSetsForTraining(1L)).thenReturn(Models.createLiveProgramSets(2L, 3));
         when(exercisesRepository.getExercisesForProgramTraining(1L)).thenReturn(Models.createLiveExercises("bar", "baz"));

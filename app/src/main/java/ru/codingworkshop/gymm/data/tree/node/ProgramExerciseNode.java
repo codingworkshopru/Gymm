@@ -53,16 +53,6 @@ public abstract class ProgramExerciseNode extends BaseNode<ProgramExercise, Prog
     }
 
     @Override
-    public boolean isDrafting() {
-        return getParent().isDrafting();
-    }
-
-    @Override
-    public void setDrafting(boolean drafting) {
-        getParent().setDrafting(drafting);
-    }
-
-    @Override
     public long getProgramTrainingId() {
         return getParent().getProgramTrainingId();
     }

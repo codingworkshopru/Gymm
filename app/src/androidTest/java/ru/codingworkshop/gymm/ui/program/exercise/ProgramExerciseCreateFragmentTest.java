@@ -61,7 +61,7 @@ public class ProgramExerciseCreateFragmentTest {
 
         when(viewModelFactory.create(any())).thenReturn(vm);
         when(vm.getProgramExercise()).thenAnswer(invocation -> {
-            node.setParent(Models.createLiveProgramExercise(0L, 1L, true).getValue());
+            node.setParent(Models.createLiveProgramExercise(0L, 1L).getValue());
             return new LiveData<ProgramExerciseNode>() {{postValue(node);}};
         });
         activityTestRule.getActivity().setFragment(fragment);

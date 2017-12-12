@@ -41,7 +41,7 @@ public interface ExerciseDao {
     @Query(
             "select distinct e.* from Exercise as e " +
                     "join ProgramExercise pe on pe.exerciseId = e.id " +
-                    "where pe.programTrainingId = :programTrainingId and pe.drafting = 0 " +
+                    "where pe.programTrainingId = :programTrainingId " +
                     "order by pe.sortOrder"
     )
     LiveData<List<Exercise>> getExercisesForProgramTraining(long programTrainingId);

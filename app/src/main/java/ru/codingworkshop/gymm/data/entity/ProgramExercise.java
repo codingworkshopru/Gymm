@@ -44,7 +44,6 @@ public class ProgramExercise implements IProgramExercise, Cloneable {
     private long programTrainingId;
     private long exerciseId;
     private int sortOrder;
-    private boolean drafting;
 
     public ProgramExercise() {
     }
@@ -56,7 +55,6 @@ public class ProgramExercise implements IProgramExercise, Cloneable {
         this.programTrainingId = that.programTrainingId;
         this.exerciseId = that.exerciseId;
         this.sortOrder = that.sortOrder;
-        this.drafting = that.drafting;
     }
 
     @Override
@@ -96,16 +94,6 @@ public class ProgramExercise implements IProgramExercise, Cloneable {
     }
 
     @Override
-    public boolean isDrafting() {
-        return drafting;
-    }
-
-    @Override
-    public void setDrafting(boolean drafting) {
-        this.drafting = drafting;
-    }
-
-    @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
@@ -113,12 +101,11 @@ public class ProgramExercise implements IProgramExercise, Cloneable {
         return id == that.id &&
                 programTrainingId == that.programTrainingId &&
                 exerciseId == that.exerciseId &&
-                sortOrder == that.sortOrder &&
-                drafting == that.drafting;
+                sortOrder == that.sortOrder;
     }
 
     @Override
     public int hashCode() {
-        return Objects.hashCode(id, programTrainingId, exerciseId, sortOrder, drafting);
+        return Objects.hashCode(id, programTrainingId, exerciseId, sortOrder);
     }
 }

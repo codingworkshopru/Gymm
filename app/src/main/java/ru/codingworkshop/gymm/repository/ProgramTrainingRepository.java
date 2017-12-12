@@ -15,7 +15,6 @@ import javax.inject.Singleton;
 import ru.codingworkshop.gymm.data.entity.ProgramExercise;
 import ru.codingworkshop.gymm.data.entity.ProgramSet;
 import ru.codingworkshop.gymm.data.entity.ProgramTraining;
-import ru.codingworkshop.gymm.data.entity.common.Draftable;
 import ru.codingworkshop.gymm.data.entity.common.Named;
 import ru.codingworkshop.gymm.db.dao.ProgramTrainingDao;
 
@@ -48,12 +47,8 @@ public class ProgramTrainingRepository extends BaseRepository {
         return dao.getProgramTrainingByName(name);
     }
 
-    public LiveData<ProgramTraining> getDraftingProgramTraining() {
-        return dao.getDraftingProgramTraining();
-    }
-
     public LiveData<Long> insertProgramTraining(@NonNull ProgramTraining programTraining) {
-        checkIsDrafting(programTraining);
+        checkName(programTraining);
         return insertWithResult(programTraining, dao::insertProgramTraining);
     }
 
@@ -78,54 +73,30 @@ public class ProgramTrainingRepository extends BaseRepository {
         return dao.getProgramExerciseById(id);
     }
 
-    public LiveData<ProgramExercise> getDraftingProgramExercise(@NonNull ProgramTraining training) {
-        return getDraftingProgramExercise(training.getId());
-    }
-
-    public LiveData<ProgramExercise> getDraftingProgramExercise(long programTrainingId) {
-        Preconditions.checkArgument(isValidId(programTrainingId));
-        return dao.getDraftingProgramExercise(programTrainingId);
-    }
-
     public void insertProgramExercise(ProgramExercise programExercise) {
-        checkProgramTrainingInProgramExercise(programExercise);
-        checkIsDrafting(programExercise);
+        checkProgramExercise(programExercise);
         insert(programExercise, dao::insertProgramExercise);
     }
 
     public LiveData<List<Long>> insertProgramExercises(@NonNull Collection<ProgramExercise> programExercises) {
-        applyToEach(programExercises, pe -> {
-            checkProgramTrainingInProgramExercise(pe);
-            checkExerciseInProgramExercise(pe);
-        });
+        applyToEach(programExercises, ProgramTrainingRepository::checkProgramExercise);
         return insertWithResult(programExercises, dao::insertProgramExercises);
     }
 
-    private void checkIsDrafting(Draftable draftable) {
-        Preconditions.checkArgument(draftable.isDrafting());
-    }
-
     public void updateProgramExercise(ProgramExercise programExercise) {
-        checkProgramTrainingInProgramExercise(programExercise);
-        checkExerciseInProgramExercise(programExercise);
+        checkProgramExercise(programExercise);
         update(programExercise, dao::updateProgramExercise);
     }
 
     public void updateProgramExercises(Collection<ProgramExercise> exerciseEntities) {
-        applyToEach(exerciseEntities, pe -> {
-            checkProgramTrainingInProgramExercise(pe);
-            checkExerciseInProgramExercise(pe);
-        });
+        applyToEach(exerciseEntities, ProgramTrainingRepository::checkProgramExercise);
         update(exerciseEntities, dao::updateProgramExercises);
     }
 
-    private static void checkProgramTrainingInProgramExercise(ProgramExercise programExercise) {
+    private static void checkProgramExercise(ProgramExercise programExercise) {
         Preconditions.checkArgument(isValidId(programExercise.getProgramTrainingId()));
-    }
-
-    private static void checkExerciseInProgramExercise(ProgramExercise programExercise) {
         Long exerciseId = programExercise.getExerciseId();
-        Preconditions.checkArgument(exerciseId != null && isValidId(exerciseId));
+        Preconditions.checkArgument(isValidId(exerciseId));
     }
 
     public void deleteProgramExercise(ProgramExercise programExercise) {

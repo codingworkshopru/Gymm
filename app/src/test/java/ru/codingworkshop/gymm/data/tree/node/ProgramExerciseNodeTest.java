@@ -56,18 +56,6 @@ public class ProgramExerciseNodeTest {
     }
 
     @Test
-    public void isDrafting() throws Exception {
-        node.isDrafting();
-        verify(exercise).isDrafting();
-    }
-
-    @Test
-    public void setDrafting() throws Exception {
-        node.setDrafting(true);
-        verify(exercise).setDrafting(true);
-    }
-
-    @Test
     public void getProgramTrainingId() throws Exception {
         node.getProgramTrainingId();
         verify(exercise).getProgramTrainingId();

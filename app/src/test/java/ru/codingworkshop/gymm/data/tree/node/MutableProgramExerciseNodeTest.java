@@ -20,7 +20,7 @@ public class MutableProgramExerciseNodeTest {
         MutableProgramExerciseNode node = new MutableProgramExerciseNode();
         assertImmutableChildrenDelegate(node);
 
-        final ProgramExercise programExercise = Models.createProgramExercise(2L, 1L, 100L, false);
+        final ProgramExercise programExercise = Models.createProgramExercise(2L, 1L, 100L);
         node = new MutableProgramExerciseNode(programExercise);
         assertImmutableChildrenDelegate(node);
         assertEquals(programExercise, node.getParent());

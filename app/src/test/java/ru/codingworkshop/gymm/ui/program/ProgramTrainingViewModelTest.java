@@ -84,7 +84,7 @@ public class ProgramTrainingViewModelTest {
     @Test
     public void validateProgramTraining() throws Exception {
         when(adapter.getProgramTrainingByName("foo"))
-                .thenReturn(Models.createLiveProgramTraining(1L, "foo", false))
+                .thenReturn(Models.createLiveProgramTraining(1L, "foo"))
                 .thenReturn(LiveDataUtil.getAbsent());
 
         vm.getProgramTrainingTree().setParent(Models.createProgramTraining(1L, "foo"));
