@@ -31,21 +31,11 @@ public class AppInitializer implements Initializer {
 
     @Override
     public void initialize() {
-        new AsyncTask<Void, Void, Void>() {
-
-            @Override
-            protected Void doInBackground(Void... voids) {
-                for (Initializer initializer : initializerMap.values()) {
-                    initializer.initialize();
-                }
-
-                return null;
+        AsyncTask.execute(() -> {
+            for (Initializer initializer : initializerMap.values()) {
+                initializer.initialize();
             }
-
-            @Override
-            protected void onPostExecute(Void aVoid) {
-                initialized.setValue(true);
-            }
-        }.execute();
+            initialized.postValue(true);
+        });
     }
 }

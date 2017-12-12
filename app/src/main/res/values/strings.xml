@@ -6,6 +6,7 @@
     <!-- main activity -->
     <!-- menu -->
     <string name="main_activity_menu_add_program_title">Добавить программу тренировки</string>
+    <string name="main_activity_menu_show_statistics_title">Показать статистику тренировок</string>
 
     <!-- program training activity -->
     <string name="program_training_activity_title">Тренировка</string>
@@ -57,6 +58,12 @@
     <string name="actual_training_activity_stepper_item_reps_error">введите количество повторений</string>
     <string name="actual_training_activity_stepper_item_weight_error">введите вес</string>
     <string name="actual_training_activity_are_you_sure_message">Завершить тренировку?</string>
+
+    <!-- statistics activity -->
+    <string name="statistics_activity_data_spinner_label">Данные</string>
+    <string name="statistics_activity_period_spinner_label">Период</string>
+    <string name="statistics_activity_exercise_spinner_label">Упражнение</string>
+    <string name="statistics_activity_empty_plot_text">Нет данных для отображения</string>
 
     <!-- notification -->
     <string name="notification_time_till_rest_finish">Время до конца отдыха: </string>

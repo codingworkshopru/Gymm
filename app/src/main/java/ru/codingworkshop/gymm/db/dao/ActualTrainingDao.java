@@ -5,14 +5,20 @@ import android.arch.persistence.room.Dao;
 import android.arch.persistence.room.Delete;
 import android.arch.persistence.room.Insert;
 import android.arch.persistence.room.Query;
+import android.arch.persistence.room.TypeConverter;
+import android.arch.persistence.room.TypeConverters;
 import android.arch.persistence.room.Update;
+import android.support.annotation.Nullable;
 
 import java.util.Collection;
+import java.util.Date;
 import java.util.List;
 
 import ru.codingworkshop.gymm.data.entity.ActualExercise;
 import ru.codingworkshop.gymm.data.entity.ActualSet;
 import ru.codingworkshop.gymm.data.entity.ActualTraining;
+import ru.codingworkshop.gymm.data.entity.ExercisePlotTuple;
+import ru.codingworkshop.gymm.db.Converters;
 
 /**
  * Created by Радик on 04.06.2017.
@@ -44,6 +50,9 @@ public interface ActualTrainingDao {
     @Insert
     Long insertActualSet(ActualSet actualSet);
 
+    @Insert
+    void insertActualSets(Collection<ActualSet> actualSets);
+
     @Update
     int updateActualSet(ActualSet actualSet);
 
@@ -61,4 +70,22 @@ public interface ActualTrainingDao {
             "where ae.actualTrainingId = :actualTrainingId " +
             "order by ae.id, aset.id")
     LiveData<List<ActualSet>> getActualSetsForActualTraining(long actualTrainingId);
+
+    @Query("select distinct exerciseName from ActualExercise order by exerciseName")
+    LiveData<List<String>> getActualExerciseNames();
+
+    /**
+     * Returns LiveData with statistics on particular exercise for the period of time till today.
+     * @param exerciseName - get statistics for this exercise
+     * @param startDate - pass null if need data for all the time
+     * @return {@link ExercisePlotTuple}
+     */
+    @TypeConverters(Converters.class)
+    @Query("select startTime as trainingTime, reps, weight " +
+            "from ActualExercise e " +
+            "join ActualTraining t on t.id = e.actualTrainingId " +
+            "join ActualSet s on s.actualExerciseId = e.id " +
+            "where e.exerciseName = :exerciseName and (startTime > coalesce(:startDate, 0)) " +
+            "order by startTime")
+    List<ExercisePlotTuple> getStatisticsForExerciseSync(String exerciseName, @Nullable Date startDate);
 }

@@ -6,6 +6,7 @@ import dagger.multibindings.IntKey;
 import dagger.multibindings.IntoMap;
 import ru.codingworkshop.gymm.db.initializer.DatabaseInitializer;
 import ru.codingworkshop.gymm.db.initializer.ExerciseInitializer;
+import ru.codingworkshop.gymm.db.initializer.FakeDataInitializer;
 import ru.codingworkshop.gymm.db.initializer.Initializer;
 import ru.codingworkshop.gymm.db.initializer.MuscleGroupInitializer;
 
@@ -29,4 +30,9 @@ abstract class InitializerModule {
     @IntoMap
     @IntKey(2)
     abstract Initializer bindsExerciseInitializer(ExerciseInitializer exerciseInitializer);
+
+    @Binds
+    @IntoMap
+    @IntKey(3)
+    abstract Initializer bindsFakeDataInitializer(FakeDataInitializer fakeDataInitializer);
 }

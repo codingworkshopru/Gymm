@@ -95,7 +95,12 @@ public class MuscleGroupPickerFragment extends Fragment {
                 case MotionEvent.ACTION_UP:
                     int color = findColorOnMap(event);
                     Optional<MuscleGroup> found = Iterables.tryFind(muscleGroups, mg -> {
-                        int muscleGroupColor = Color.parseColor(mg.getMapColorRgb());
+                        int muscleGroupColor;
+                        try {
+                            muscleGroupColor = Color.parseColor(mg.getMapColorRgb());
+                        } catch (Throwable e) {
+                            return false;
+                        }
                         return color == muscleGroupColor;
                     });
                     if (found.isPresent()) {

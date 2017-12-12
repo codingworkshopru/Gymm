@@ -18,6 +18,8 @@ import ru.codingworkshop.gymm.data.entity.common.Model;
 import ru.codingworkshop.gymm.data.entity.common.Named;
 import ru.codingworkshop.gymm.db.Converters;
 
+import static android.arch.persistence.room.ForeignKey.CASCADE;
+
 /**
  * Created by Радик on 22.05.2017.
  */

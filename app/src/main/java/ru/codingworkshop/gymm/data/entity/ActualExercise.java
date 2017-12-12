@@ -5,8 +5,7 @@ import android.arch.persistence.room.ForeignKey;
 import android.arch.persistence.room.Index;
 import android.arch.persistence.room.PrimaryKey;
 import android.support.annotation.NonNull;
-
-import javax.annotation.Nullable;
+import android.support.annotation.Nullable;
 
 import ru.codingworkshop.gymm.data.entity.common.Model;
 
@@ -52,9 +51,9 @@ public class ActualExercise implements Model {
     private long id;
     private String exerciseName;
     private long actualTrainingId;
-    private Long programExerciseId;
+    @Nullable private Long programExerciseId;
 
-    public ActualExercise(String exerciseName, long actualTrainingId, long programExerciseId) {
+    public ActualExercise(String exerciseName, long actualTrainingId, @Nullable Long programExerciseId) {
         this.exerciseName = exerciseName;
         this.actualTrainingId = actualTrainingId;
         this.programExerciseId = programExerciseId;
@@ -90,7 +89,7 @@ public class ActualExercise implements Model {
         return programExerciseId;
     }
 
-    public void setProgramExerciseId(Long programExerciseId) {
+    public void setProgramExerciseId(@Nullable Long programExerciseId) {
         this.programExerciseId = programExerciseId;
     }
 }

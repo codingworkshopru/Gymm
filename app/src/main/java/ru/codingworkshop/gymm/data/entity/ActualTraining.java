@@ -42,9 +42,9 @@ public class ActualTraining implements Model, Named {
     private Date startTime;
     private Date finishTime;
     private String comment;
-    private Long programTrainingId;
+    @Nullable private Long programTrainingId;
 
-    public ActualTraining(long programTrainingId, String name) {
+    public ActualTraining(@Nullable Long programTrainingId, String name) {
         this.programTrainingId = programTrainingId;
         this.startTime = new Date();
         this.name = name;

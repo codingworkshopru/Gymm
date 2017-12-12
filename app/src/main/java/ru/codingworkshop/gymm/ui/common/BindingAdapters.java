@@ -29,13 +29,13 @@ public class BindingAdapters {
     }
 
     @BindingAdapter(value = {"android:value", "android:valueAttrChanged"}, requireAll = false)
-    public static void setPrimaryMuscleGroup(Spinner spinner, long primaryMuscleGroup, final InverseBindingListener l) {
-        setSpinnerValue(spinner, primaryMuscleGroup);
+    public static void setCurrentItemId(Spinner spinner, long itemId, final InverseBindingListener l) {
+        setSpinnerValue(spinner, itemId);
         setSpinnerItemSelectedListener(spinner, l);
     }
 
     @InverseBindingAdapter(attribute = "android:value", event = "android:valueAttrChanged")
-    public static long getPrimaryMuscleGroup(Spinner spinner) {
+    public static long getCurrentItemId(Spinner spinner) {
         return spinner.getSelectedItemId();
     }
 

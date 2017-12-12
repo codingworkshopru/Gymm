@@ -1,6 +1,7 @@
 package ru.codingworkshop.gymm.db;
 
 import android.arch.persistence.room.Database;
+import android.arch.persistence.room.DatabaseConfiguration;
 import android.arch.persistence.room.RoomDatabase;
 import android.support.annotation.NonNull;
 
@@ -41,7 +42,7 @@ import ru.codingworkshop.gymm.db.dao.ProgramTrainingDao;
         exportSchema = false
 )
 public abstract class GymmDatabase extends RoomDatabase {
-    public static final long INVALID_ID = 0;
+    private static final long INVALID_ID = 0;
 
     public static boolean isValidId(long id) {
         return id != INVALID_ID;
@@ -50,6 +51,11 @@ public abstract class GymmDatabase extends RoomDatabase {
     public static boolean isValidId(@NonNull Model model) {
         Preconditions.checkNotNull(model, "checking model is null");
         return isValidId(model.getId());
+    }
+
+    @Override
+    public void init(DatabaseConfiguration configuration) {
+        super.init(configuration);
     }
 
     public abstract ActualTrainingDao getActualTrainingDao();

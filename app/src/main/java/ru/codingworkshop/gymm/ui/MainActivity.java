@@ -3,7 +3,6 @@ package ru.codingworkshop.gymm.ui;
 import android.arch.lifecycle.ViewModelProvider;
 import android.content.Intent;
 import android.databinding.DataBindingUtil;
-import android.databinding.ViewDataBinding;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.PopupMenu;
@@ -26,8 +25,8 @@ import ru.codingworkshop.gymm.ui.actual.ActualTrainingActivity;
 import ru.codingworkshop.gymm.ui.actual.exercise.ActualExercisesFragment;
 import ru.codingworkshop.gymm.ui.common.ClickableBindingListAdapter;
 import ru.codingworkshop.gymm.ui.common.ListItemListeners;
+import ru.codingworkshop.gymm.ui.info.statistics.StatisticsActivity;
 import ru.codingworkshop.gymm.ui.program.ProgramTrainingActivity;
-import ru.codingworkshop.gymm.ui.program.training.ProgramTrainingFragment;
 
 import static ru.codingworkshop.gymm.ui.program.ProgramTrainingActivity.PROGRAM_TRAINING_ID_KEY;
 
@@ -94,6 +93,9 @@ public class MainActivity extends AppCompatActivity {
             case R.id.action_add_program:
                 startActivity(programTrainingActivityIntent());
                 return true;
+
+            case R.id.action_show_statistics:
+                startActivity(new Intent(this, StatisticsActivity.class));
 
             default:
                 return super.onOptionsItemSelected(item);

@@ -3,13 +3,16 @@ package ru.codingworkshop.gymm.ui;
 import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Context;
+import android.content.Intent;
 import android.os.Build;
 import android.os.SystemClock;
 import android.support.annotation.IdRes;
 import android.support.annotation.StringRes;
 import android.support.v4.app.NotificationCompat;
+import android.support.v4.app.TaskStackBuilder;
 import android.util.Log;
 import android.view.View;
 import android.widget.RemoteViews;
@@ -27,6 +30,9 @@ import ru.codingworkshop.gymm.service.RestEventBusHolder;
 import ru.codingworkshop.gymm.service.event.outcoming.RestFinishedEvent;
 import ru.codingworkshop.gymm.service.event.outcoming.RestStartedEvent;
 import ru.codingworkshop.gymm.service.event.outcoming.RestTimerTickEvent;
+import ru.codingworkshop.gymm.ui.actual.ActualTrainingActivity;
+import ru.codingworkshop.gymm.ui.actual.exercise.ActualExercisesFragment;
+import ru.codingworkshop.gymm.ui.program.ProgramTrainingActivity;
 
 
 /**
@@ -52,14 +58,14 @@ public class TrainingNotification {
         remoteViews.setTextViewText(R.id.notification_title, title);
         remoteViews.setChronometer(R.id.notification_chronometer, SystemClock.elapsedRealtime(), null, true);
 
-//        Intent actualTrainingIntent = new Intent(service, ActualTrainingActivity.class);
-//        actualTrainingIntent.putExtra(ProgramTrainingActivity.PROGRAM_TRAINING_ID, actualTrainingId);
-//
-//        TaskStackBuilder stackBuilder = TaskStackBuilder.programTrainingInstance(service)
-//                .addParentStack(ActualTrainingActivity.class)
-//                .addNextIntent(actualTrainingIntent);
-//
-//        PendingIntent mainAction = stackBuilder.getPendingIntent(123, PendingIntent.FLAG_UPDATE_CURRENT);
+        Intent actualTrainingIntent = new Intent(service, ActualTrainingActivity.class);
+        actualTrainingIntent.putExtra(ActualExercisesFragment.EXTRA_ACTUAL_TRAINING_ID, actualTrainingId);
+
+        TaskStackBuilder stackBuilder = TaskStackBuilder.create(service)
+                .addParentStack(ActualTrainingActivity.class)
+                .addNextIntent(actualTrainingIntent);
+
+        PendingIntent mainAction = stackBuilder.getPendingIntent(123, PendingIntent.FLAG_UPDATE_CURRENT);
 
         final String GYMM_CHANNEL_ID = "gymm_silent_channel_id";
         final String GYMM_CHANNEL_ID_2 = "gymm_channel_id";
@@ -86,7 +92,7 @@ public class TrainingNotification {
                 .setCustomContentView(remoteViews)
                 .setShowWhen(false)
                 .setStyle(new NotificationCompat.DecoratedCustomViewStyle())
-//                .setContentIntent(mainAction)
+                .setContentIntent(mainAction)
                 .build();
     }
 

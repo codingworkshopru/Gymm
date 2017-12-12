@@ -10,4 +10,17 @@
         <item>суббота</item>
         <item>воскресенье</item>
     </string-array>
+    <string-array name="statisticsPlotPeriods">
+        <item>месяц</item>
+        <item>3 месяца</item>
+        <item>полгода</item>
+        <item>9 месяцев</item>
+        <item>год</item>
+        <item>за всё время</item>
+    </string-array>
+    <string-array name="statisticsPlotDataType">
+        <item>объём</item>
+        <item>вес</item>
+        <item>повторения</item>
+    </string-array>
 </resources>

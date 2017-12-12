@@ -41,10 +41,13 @@ ext {
     arch = "1.0.0"
 
     gson = "2.8.2"
-    guava = "23.5-android"
+    guava = "23.5"
     dagger = "2.13"
+    rxjava2 = "2.1.7"
+    rxandroid = "2.0.1"
     leakcanary = "1.5.4"
     timber = "4.6.0"
+    mpandroidchart = "3.0.3"
 
     espresso = "3.0.1"
     mockito = "2.13.0"
@@ -68,13 +71,17 @@ dependencies {
     implementation "android.arch.lifecycle:common-java8:$arch"
     implementation "android.arch.persistence.room:runtime:$arch"
 
-    implementation "com.google.guava:guava:$guava"
+    implementation "com.google.guava:guava:$guava-android"
     implementation "com.google.code.gson:gson:$gson"
     implementation "com.google.dagger:dagger:$dagger"
     implementation "com.google.dagger:dagger-android:$dagger"
     implementation "com.google.dagger:dagger-android-support:$dagger"
+    implementation "io.reactivex.rxjava2:rxjava:$rxjava2"
+    implementation "io.reactivex.rxjava2:rxandroid:$rxandroid"
     implementation "com.jakewharton.timber:timber:$timber"
+    implementation "com.github.PhilJay:MPAndroidChart:v$mpandroidchart"
 
+    implementation 'com.android.support.constraint:constraint-layout:1.0.2'
     debugImplementation "com.squareup.leakcanary:leakcanary-android:$leakcanary"
     releaseImplementation "com.squareup.leakcanary:leakcanary-android-no-op:$leakcanary"
 
