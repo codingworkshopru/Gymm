@@ -1,4 +1,9 @@
-<layout>
+<layout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context=".ui.program.exercise.ProgramSetEditorFragment">
+
     <data>
         <variable
             name="set"
@@ -6,12 +11,8 @@
     </data>
 
     <android.support.constraint.ConstraintLayout
-        xmlns:android="http://schemas.android.com/apk/res/android"
-        xmlns:app="http://schemas.android.com/apk/res-auto"
-        xmlns:tools="http://schemas.android.com/tools"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        tools:context=".ui.program.exercise.ProgramSetEditorFragment">
+        android:layout_height="wrap_content">
 
         <ru.codingworkshop.gymm.ui.common.CustomisableNumberPicker
             android:id="@+id/programSetRepsPicker"
@@ -78,7 +79,7 @@
             android:layout_height="0dp"
             android:layout_marginTop="16dp"
             android:alpha="0.12"
-            android:src="@android:color/black"
+            app:srcCompat="@android:color/black"
             app:layout_constraintBottom_toBottomOf="@+id/programSetRepsPicker"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.33"

@@ -1,6 +1,5 @@
 package ru.codingworkshop.gymm.ui.info.statistics.viewmodel;
 
-import android.annotation.SuppressLint;
 import android.arch.lifecycle.LiveData;
 import android.arch.lifecycle.MediatorLiveData;
 import android.arch.lifecycle.MutableLiveData;
@@ -11,19 +10,15 @@ import android.support.v4.util.Pair;
 
 import com.github.mikephil.charting.data.Entry;
 import com.google.common.base.Function;
-import com.google.common.base.Preconditions;
-import com.google.common.math.PairedStats;
 
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
-import java.util.Map;
 
 import javax.inject.Inject;
 
 import io.reactivex.Observable;
-import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.schedulers.Schedulers;
 import ru.codingworkshop.gymm.data.entity.ExercisePlotTuple;

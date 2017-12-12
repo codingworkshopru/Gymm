@@ -3,9 +3,16 @@ package ru.codingworkshop.gymm.data.entity;
 import android.arch.persistence.room.ColumnInfo;
 import android.arch.persistence.room.TypeConverters;
 
+import java.util.Calendar;
 import java.util.Date;
 
 import ru.codingworkshop.gymm.db.Converters;
+import timber.log.Timber;
+
+import static java.util.Calendar.HOUR;
+import static java.util.Calendar.MILLISECOND;
+import static java.util.Calendar.MINUTE;
+import static java.util.Calendar.SECOND;
 
 /**
  * Created by Radik on 10.12.2017.
@@ -13,17 +20,19 @@ import ru.codingworkshop.gymm.db.Converters;
 
 @TypeConverters(Converters.class)
 public class ExercisePlotTuple {
-    @ColumnInfo(name = "trainingTime")
     private Date trainingTime;
-
-    @ColumnInfo(name = "reps")
     private int reps;
-
-    @ColumnInfo(name = "weight")
     private Double weight;
 
     public Date getTrainingTime() {
-        return trainingTime;
+        Calendar c = Calendar.getInstance();
+        c.setTime(trainingTime);
+        c.set(Calendar.HOUR_OF_DAY, 0);
+        c.clear(MINUTE);
+        c.clear(SECOND);
+        c.clear(MILLISECOND);
+        Timber.d(c.getTime().toString());
+        return c.getTime();
     }
 
     public void setTrainingTime(Date trainingTime) {
