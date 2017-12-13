@@ -31,7 +31,6 @@ public class ExercisePlotTuple {
         c.clear(MINUTE);
         c.clear(SECOND);
         c.clear(MILLISECOND);
-        Timber.d(c.getTime().toString());
         return c.getTime();
     }
 

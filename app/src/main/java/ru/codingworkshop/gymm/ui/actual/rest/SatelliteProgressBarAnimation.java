@@ -3,6 +3,8 @@ package ru.codingworkshop.gymm.ui.actual.rest;
 import android.animation.ObjectAnimator;
 import android.view.animation.LinearInterpolator;
 
+import timber.log.Timber;
+
 /**
  * Created by Радик on 27.09.2017 as part of the Gymm project.
  */
@@ -26,7 +28,9 @@ class SatelliteProgressBarAnimation {
     }
 
     void pause() {
+        long currentPlayTime = progressBarAnimator.getCurrentPlayTime();
         progressBarAnimator.cancel();
+        progressBarAnimator.setDuration(progressBarAnimator.getDuration() - currentPlayTime);
     }
 
     void stop() {

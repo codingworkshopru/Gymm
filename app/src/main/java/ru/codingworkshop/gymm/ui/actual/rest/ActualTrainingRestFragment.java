@@ -177,7 +177,7 @@ public class ActualTrainingRestFragment extends Fragment {
                 case PAUSED:
                     progressBarAnimation.pause();
                     playPauseButtonDrawable = R.drawable.ic_play_arrow_white_24dp;
-//                    binding.restTimeLeft.startAnimation(fadeInFadeOut);
+                    binding.restTimeLeft.startAnimation(fadeInFadeOut);
                     break;
 
                 case IN_PROGRESS:
@@ -189,7 +189,7 @@ public class ActualTrainingRestFragment extends Fragment {
                 case FINISHED:
                     progressBarAnimation.stop();
                     playPauseButtonDrawable = R.drawable.ic_stop_white_24dp;
-//                    binding.restTimeLeft.startAnimation(fadeInFadeOut);
+                    binding.restTimeLeft.startAnimation(fadeInFadeOut);
                     break;
 
                 default:

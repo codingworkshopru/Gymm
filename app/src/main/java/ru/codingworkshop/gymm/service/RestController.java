@@ -34,6 +34,8 @@ import timber.log.Timber;
 /**
  * Created by Радик on 22.09.2017 as part of the Gymm project.
  */
+
+@SuppressWarnings("unused")
 public final class RestController extends Handler {
     public static final int START_REST_MSG = 0;
     public static final int PAUSE_REST_MSG = 1;
