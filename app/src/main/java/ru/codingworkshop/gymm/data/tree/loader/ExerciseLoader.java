@@ -26,11 +26,6 @@ public class ExerciseLoader implements Loader<ExerciseNode> {
     }
 
     @Override
-    public LiveData<ExerciseNode> load(ExerciseNode node) {
-        return null;
-    }
-
-    @Override
     public LiveData<ExerciseNode> loadById(ExerciseNode node, long id) {
         NodeLoaderDelegate<Exercise, MuscleGroup> nodeLoaderDelegate =
                 new NodeLoaderDelegate<>(node, node, dataSource, dataSource, id);

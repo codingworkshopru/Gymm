@@ -26,11 +26,6 @@ public class ActualTrainingEmptyTreeLoader implements Loader<ActualTrainingTree>
     }
 
     @Override
-    public LiveData<ActualTrainingTree> load(ActualTrainingTree node) {
-        return null;
-    }
-
-    @Override
     public LiveData<ActualTrainingTree> loadById(ActualTrainingTree tree, long id) {
         return mapProgramTrainingTree(id, programTrainingTree -> {
             return buildActualTrainingTree(tree, programTrainingTree);

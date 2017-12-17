@@ -28,11 +28,6 @@ public class ProgramTrainingTreeLoader implements Loader<ProgramTrainingTree> {
     }
 
     @Override
-    public LiveData<ProgramTrainingTree> load(ProgramTrainingTree node) {
-        return null;
-    }
-
-    @Override
     public LiveData<ProgramTrainingTree> loadById(ProgramTrainingTree tree, long id) {
         ProgramTrainingTreeBuilder programTrainingTreeBuilder = new ProgramTrainingTreeBuilder(tree);
         TreeLoaderDelegate<ProgramTraining, ProgramExercise, ProgramSet> treeLoaderDelegate =

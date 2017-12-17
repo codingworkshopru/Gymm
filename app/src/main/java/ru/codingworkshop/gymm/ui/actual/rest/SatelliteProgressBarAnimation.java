@@ -30,7 +30,7 @@ class SatelliteProgressBarAnimation {
     void pause() {
         long currentPlayTime = progressBarAnimator.getCurrentPlayTime();
         progressBarAnimator.cancel();
-        progressBarAnimator.setDuration(progressBarAnimator.getDuration() - currentPlayTime);
+        setDuration(progressBarAnimator.getDuration() - currentPlayTime);
     }
 
     void stop() {

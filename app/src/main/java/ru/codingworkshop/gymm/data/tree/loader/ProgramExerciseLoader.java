@@ -26,11 +26,6 @@ public class ProgramExerciseLoader implements Loader<ProgramExerciseNode> {
     }
 
     @Override
-    public LiveData<ProgramExerciseNode> load(ProgramExerciseNode node) {
-        return null;
-    }
-
-    @Override
     public LiveData<ProgramExerciseNode> loadById(ProgramExerciseNode node, long id) {
         NodeLoaderDelegate<ProgramExercise, ProgramSet> loaderDelegate =
                 new NodeLoaderDelegate<>(node, node, dataSource, dataSource, id);

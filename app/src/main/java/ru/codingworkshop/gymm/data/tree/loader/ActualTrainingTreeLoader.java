@@ -34,11 +34,6 @@ public class ActualTrainingTreeLoader implements Loader<ActualTrainingTree> {
     }
 
     @Override
-    public LiveData<ActualTrainingTree> load(ActualTrainingTree tree) {
-        return null;
-    }
-
-    @Override
     public LiveData<ActualTrainingTree> loadById(ActualTrainingTree tree, long id) {
         return Transformations.switchMap(dataSource.getParent(id), actualTraining -> {
             return mapProgramTrainingTree(actualTraining.getProgramTrainingId(), programTrainingTree -> {
