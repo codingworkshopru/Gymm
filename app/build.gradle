@@ -70,6 +70,7 @@ dependencies {
     implementation "android.arch.lifecycle:extensions:$arch"
     implementation "android.arch.lifecycle:common-java8:$arch"
     implementation "android.arch.persistence.room:runtime:$arch"
+    implementation "android.arch.persistence.room:rxjava2:$arch"
 
     implementation "com.google.guava:guava:$guava-android"
     implementation "com.google.code.gson:gson:$gson"
