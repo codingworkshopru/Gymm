@@ -3,8 +3,6 @@ package ru.codingworkshop.gymm.ui.info.statistics.viewmodel;
 import android.arch.core.executor.testing.InstantTaskExecutorRule;
 import android.arch.lifecycle.LiveData;
 
-import com.google.common.base.Function;
-
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -14,24 +12,24 @@ import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 
 import java.text.DateFormat;
-import java.time.format.DateTimeFormatter;
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.List;
 import java.util.Locale;
-import java.util.Objects;
 
+import io.reactivex.Flowable;
 import ru.codingworkshop.gymm.data.entity.ExercisePlotTuple;
 import ru.codingworkshop.gymm.data.util.LiveDataUtil;
 import ru.codingworkshop.gymm.db.dao.ActualTrainingDao;
 import ru.codingworkshop.gymm.util.LiveTest;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertSame;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -60,14 +58,19 @@ public class StatisticsViewModelTest {
 
     @Test
     public void queryStatistics() throws Exception {
+        ExercisePlotTuple tuple = new ExercisePlotTuple();
+        tuple.setTrainingTime(new Date());
+        tuple.setReps(1);
+        tuple.setWeight(1.0);
+        when(dao.getStatisticsForExercise("foo", null)).thenReturn(Flowable.just(Collections.singletonList(tuple)));
         vm.chartEntries.observeForever(l -> {});
         vm.exerciseId.setValue(0L);
         vm.dataTypeId.setValue(0L);
-        verify(dao, never()).getStatisticsForExerciseSync(anyString(), any(Date.class));
+        verify(dao, never()).getStatisticsForExercise(anyString(), any(Date.class));
         vm.getActualExerciseNames();
         vm.rangeId.setValue(5L);
         LiveTest.getValue(vm.chartEntries);
-        verify(dao).getStatisticsForExerciseSync("foo", null);
+        verify(dao).getStatisticsForExercise("foo", null);
     }
 
     @Test

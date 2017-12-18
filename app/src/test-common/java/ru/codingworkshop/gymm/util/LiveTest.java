@@ -3,6 +3,8 @@ package ru.codingworkshop.gymm.util;
 import android.arch.lifecycle.LiveData;
 import android.arch.lifecycle.Observer;
 
+import com.google.common.base.Preconditions;
+
 import org.mockito.ArgumentMatcher;
 
 import java.util.ArrayList;
@@ -44,7 +46,11 @@ public class LiveTest {
             countDownLatch.countDown();
         });
 
-        countDownLatch.await(2, TimeUnit.SECONDS);
+        final int timeout = 2;
+        final TimeUnit t = TimeUnit.SECONDS;
+        boolean success = countDownLatch.await(timeout, t);
+
+        Preconditions.checkState(success, "observer's method didn't invoke in " + t.toSeconds(timeout) + " seconds");
 
         return result.get(0);
     }
