@@ -1,5 +1,6 @@
 package ru.codingworkshop.gymm.ui.info.statistics.viewmodel;
 
+import android.annotation.SuppressLint;
 import android.arch.lifecycle.LiveData;
 import android.arch.lifecycle.MediatorLiveData;
 import android.arch.lifecycle.MutableLiveData;
@@ -18,9 +19,9 @@ import java.util.Locale;
 
 import javax.inject.Inject;
 
+import hu.akarnokd.rxjava2.math.MathObservable;
 import io.reactivex.Observable;
 import io.reactivex.disposables.Disposable;
-import io.reactivex.schedulers.Schedulers;
 import ru.codingworkshop.gymm.data.entity.ExercisePlotTuple;
 import ru.codingworkshop.gymm.db.dao.ActualTrainingDao;
 
@@ -47,6 +48,7 @@ public class StatisticsViewModel extends ViewModel {
         chartEntries.addSource(dataTypeId, this::onFilterEvent);
     }
 
+    @SuppressLint("CheckResult")
     private void onFilterEvent(@Nullable Long id) {
         Long exercise = exerciseId.getValue();
         Long range = rangeId.getValue();
@@ -56,18 +58,21 @@ public class StatisticsViewModel extends ViewModel {
             return;
         }
 
-        subscribe = Observable.just(1)
-                .subscribeOn(Schedulers.computation())
-                .switchMap(unused -> Observable.fromIterable(dao.getStatisticsForExerciseSync(getExerciseNameById(exercise), getStartDateById(range))))
+        if (subscribe != null && !subscribe.isDisposed()) {
+            subscribe.dispose();
+        }
+
+        dao.getStatisticsForExercise(getExerciseNameById(exercise), getStartDateById(range))
+                .take(1)
+                .toObservable()
+                .flatMap(Observable::fromIterable)
                 .map(tuple -> Pair.create(tuple.getTrainingTime(), getDataFunctionById(data).apply(tuple)))
                 .filter(pair -> pair.second != null)
-                .groupBy(pair -> pair.first, pair -> pair.second)
-                .flatMap(dateNumberGroupedObservable -> {
-                    Entry entry = new Entry(dateNumberGroupedObservable.getKey().getTime(), 0f); // casting long to float precision lose about 2 minutes
-                    return dateNumberGroupedObservable
-                            .collectInto(entry, (u, number) -> u.setY(u.getY() + number.floatValue()))
-                            .toObservable();
-                })
+                .groupBy(pair -> pair.first, pair -> pair.second.floatValue())
+                .flatMap(dateNumberGroupedFlowable ->
+                        MathObservable
+                                .sumFloat(dateNumberGroupedFlowable)
+                                .map(n -> new Entry(dateNumberGroupedFlowable.getKey().getTime(), n)))
                 .toSortedList((o1, o2) -> Float.compare(o1.getX(), o2.getX()))
                 .subscribe(chartEntries::postValue);
     }

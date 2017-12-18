@@ -5,7 +5,6 @@ import android.arch.persistence.room.Dao;
 import android.arch.persistence.room.Delete;
 import android.arch.persistence.room.Insert;
 import android.arch.persistence.room.Query;
-import android.arch.persistence.room.TypeConverter;
 import android.arch.persistence.room.TypeConverters;
 import android.arch.persistence.room.Update;
 import android.support.annotation.Nullable;
@@ -14,6 +13,7 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 
+import io.reactivex.Flowable;
 import ru.codingworkshop.gymm.data.entity.ActualExercise;
 import ru.codingworkshop.gymm.data.entity.ActualSet;
 import ru.codingworkshop.gymm.data.entity.ActualTraining;
@@ -75,7 +75,7 @@ public interface ActualTrainingDao {
     LiveData<List<String>> getActualExerciseNames();
 
     /**
-     * Returns LiveData with statistics on particular exercise for the period of time till today.
+     * Returns statistics on particular exercise for the period of time till today.
      * @param exerciseName - get statistics for this exercise
      * @param startDate - pass null if need data for all the time
      * @return {@link ExercisePlotTuple}
@@ -87,5 +87,5 @@ public interface ActualTrainingDao {
             "join ActualSet s on s.actualExerciseId = e.id " +
             "where e.exerciseName = :exerciseName and (startTime > coalesce(:startDate, 0)) " +
             "order by startTime")
-    List<ExercisePlotTuple> getStatisticsForExerciseSync(String exerciseName, @Nullable Date startDate);
+    Flowable<List<ExercisePlotTuple>> getStatisticsForExercise(String exerciseName, @Nullable Date startDate);
 }

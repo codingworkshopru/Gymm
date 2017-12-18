@@ -44,6 +44,7 @@ ext {
     guava = "23.5"
     dagger = "2.13"
     rxjava2 = "2.1.7"
+    rxjava2extensions = "0.18.2"
     rxandroid = "2.0.1"
     leakcanary = "1.5.4"
     timber = "4.6.0"
@@ -69,6 +70,8 @@ dependencies {
 
     implementation "android.arch.lifecycle:extensions:$arch"
     implementation "android.arch.lifecycle:common-java8:$arch"
+    implementation "android.arch.lifecycle:reactivestreams:$arch"
+    implementation "android.arch.persistence.room:rxjava2:$arch"
     implementation "android.arch.persistence.room:runtime:$arch"
 
     implementation "com.google.guava:guava:$guava-android"
@@ -77,11 +80,11 @@ dependencies {
     implementation "com.google.dagger:dagger-android:$dagger"
     implementation "com.google.dagger:dagger-android-support:$dagger"
     implementation "io.reactivex.rxjava2:rxjava:$rxjava2"
+    implementation "com.github.akarnokd:rxjava2-extensions:$rxjava2extensions"
     implementation "io.reactivex.rxjava2:rxandroid:$rxandroid"
     implementation "com.jakewharton.timber:timber:$timber"
     implementation "com.github.PhilJay:MPAndroidChart:v$mpandroidchart"
 
-    implementation 'com.android.support.constraint:constraint-layout:1.0.2'
     debugImplementation "com.squareup.leakcanary:leakcanary-android:$leakcanary"
     releaseImplementation "com.squareup.leakcanary:leakcanary-android-no-op:$leakcanary"
 
