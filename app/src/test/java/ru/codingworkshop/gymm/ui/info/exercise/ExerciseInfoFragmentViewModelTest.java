@@ -7,18 +7,18 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 
-import ru.codingworkshop.gymm.data.tree.loader.ExerciseLoader;
+import io.reactivex.Flowable;
+import ru.codingworkshop.gymm.data.tree.loader2.ExerciseLoader;
 import ru.codingworkshop.gymm.data.tree.node.ExerciseNode;
-import ru.codingworkshop.gymm.data.util.LiveDataUtil;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertSame;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -31,15 +31,14 @@ public class ExerciseInfoFragmentViewModelTest {
     @Rule public InstantTaskExecutorRule instantTaskExecutorRule = new InstantTaskExecutorRule();
 
     @Mock private ExerciseLoader loader;
-    private ExerciseInfoFragmentViewModel vm;
+    @InjectMocks private ExerciseInfoFragmentViewModel vm;
 
     @Before
     public void setUp() throws Exception {
         when(loader.loadById(any(), eq(100L))).thenAnswer(invocation -> {
             ExerciseNode node = invocation.getArgument(0);
-            return LiveDataUtil.getLive(node);
+            return Flowable.just(node);
         });
-        vm = new ExerciseInfoFragmentViewModel(loader);
     }
 
     @Test

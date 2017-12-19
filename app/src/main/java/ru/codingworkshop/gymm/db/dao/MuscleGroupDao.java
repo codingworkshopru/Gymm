@@ -8,8 +8,7 @@ import android.arch.persistence.room.Query;
 import java.util.Collection;
 import java.util.List;
 
-import io.reactivex.Maybe;
-import io.reactivex.Single;
+import io.reactivex.Flowable;
 import ru.codingworkshop.gymm.data.entity.MuscleGroup;
 
 import static android.arch.persistence.room.OnConflictStrategy.FAIL;
@@ -45,21 +44,10 @@ public interface MuscleGroupDao {
             "join SecondaryMuscleGroupLink as l on l.muscleGroupId = mg.id " +
             "where l.exerciseId = :exerciseId " +
             "order by name")
-    LiveData<List<MuscleGroup>> getSecondaryMuscleGroupsForExercise(long exerciseId);
-
-    @Query("select mg.* from MuscleGroup as mg " +
-            "join SecondaryMuscleGroupLink as l on l.muscleGroupId = mg.id " +
-            "where l.exerciseId = :exerciseId " +
-            "order by name")
-    Maybe<List<MuscleGroup>> getSecondaryMuscleGroupsForExerciseRx(long exerciseId);
+    Flowable<List<MuscleGroup>> getSecondaryMuscleGroupsForExercise(long exerciseId);
 
     @Query("select mg.* from MuscleGroup as mg " +
             "join Exercise e on e.primaryMuscleGroupId = mg.id " +
             "where e.id = :exerciseId")
-    LiveData<MuscleGroup> getPrimaryMuscleGroupForExercise(long exerciseId);
-
-    @Query("select mg.* from MuscleGroup as mg " +
-            "join Exercise e on e.primaryMuscleGroupId = mg.id " +
-            "where e.id = :exerciseId")
-    Single<MuscleGroup> getPrimaryMuscleGroupForExerciseRx(long exerciseId);
+    Flowable<MuscleGroup> getPrimaryMuscleGroupForExercise(long exerciseId);
 }

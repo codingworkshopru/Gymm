@@ -12,6 +12,7 @@ android {
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
 //        testInstrumentationRunner "ru.codingworkshop.gymm.util.GymmTestRunner"
         vectorDrawables.useSupportLibrary true
+        multiDexEnabled true
     }
     compileOptions {
         targetCompatibility JavaVersion.VERSION_1_8
@@ -39,6 +40,7 @@ ext {
     support = "26.1.0"
     constraint = "1.0.2"
     arch = "1.0.0"
+    multidex = "1.0.2"
 
     gson = "2.8.2"
     guava = "23.5"
@@ -67,6 +69,7 @@ dependencies {
     implementation "com.android.support:support-v4:$support"
     implementation "com.android.support:cardview-v7:$support"
     implementation "com.android.support.constraint:constraint-layout:$constraint"
+    implementation "com.android.support:multidex:$multidex"
 
     implementation "android.arch.lifecycle:extensions:$arch"
     implementation "android.arch.lifecycle:common-java8:$arch"

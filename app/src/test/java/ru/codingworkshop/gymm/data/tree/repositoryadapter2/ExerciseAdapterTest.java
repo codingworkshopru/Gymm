@@ -9,10 +9,9 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 
-import io.reactivex.Maybe;
-import io.reactivex.Single;
-import ru.codingworkshop.gymm.db.dao.ExerciseDao;
-import ru.codingworkshop.gymm.db.dao.MuscleGroupDao;
+import io.reactivex.Flowable;
+import ru.codingworkshop.gymm.repository.ExercisesRepository;
+import ru.codingworkshop.gymm.repository.MuscleGroupsRepository;
 import ru.codingworkshop.gymm.util.Models;
 
 import static org.mockito.Mockito.when;
@@ -23,30 +22,30 @@ import static org.mockito.Mockito.when;
 
 @RunWith(MockitoJUnitRunner.class)
 public class ExerciseAdapterTest {
-    @Mock private ExerciseDao exerciseDao;
-    @Mock private MuscleGroupDao muscleGroupDao;
+    @Mock private ExercisesRepository exercisesRepository;
+    @Mock private MuscleGroupsRepository muscleGroupsRepository;
     @InjectMocks private ExerciseAdapter adapter;
 
     @Rule public InstantTaskExecutorRule instantTaskExecutorRule = new InstantTaskExecutorRule();
 
     @Test
     public void getPrimaryMuscleGroup() throws Exception {
-        when(muscleGroupDao.getPrimaryMuscleGroupForExerciseRx(100L))
-                .thenReturn(Single.just(Models.createMuscleGroup(200L, "bar")));
+        when(muscleGroupsRepository.getPrimaryMuscleGroupForExercise(100L))
+                .thenReturn(Flowable.just(Models.createMuscleGroup(200L, "bar")));
 
         adapter.getPrimaryMuscleGroup(100L).test().assertValue(mg -> mg.getId() == 200L);
     }
 
     @Test
     public void getParent() throws Exception {
-        when(exerciseDao.getExerciseByIdRx(100L)).thenReturn(Single.just(Models.createExercise(100L, "foo")));
+        when(exercisesRepository.getExerciseById(100L)).thenReturn(Flowable.just(Models.createExercise(100L, "foo")));
 
         adapter.getParent(100L).test().assertValue(mg -> mg.getId() == 100L);
     }
 
     @Test
     public void getChildren() throws Exception {
-        when(muscleGroupDao.getSecondaryMuscleGroupsForExerciseRx(100L)).thenReturn(Maybe.just(Models.createMuscleGroups(201L)));
+        when(muscleGroupsRepository.getSecondaryMuscleGroupsForExercise(100L)).thenReturn(Flowable.just(Models.createMuscleGroups(201L)));
 
         adapter.getChildren(100L).test().assertValue(mgs -> !mgs.isEmpty());
     }
