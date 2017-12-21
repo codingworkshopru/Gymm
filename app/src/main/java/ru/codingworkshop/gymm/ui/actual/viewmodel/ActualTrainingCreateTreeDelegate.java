@@ -1,13 +1,10 @@
 package ru.codingworkshop.gymm.ui.actual.viewmodel;
 
 import android.arch.lifecycle.LiveData;
-import android.arch.lifecycle.Transformations;
+import android.arch.lifecycle.LiveDataReactiveStreams;
 
-import ru.codingworkshop.gymm.data.entity.ActualTraining;
-import ru.codingworkshop.gymm.data.entity.ProgramTraining;
 import ru.codingworkshop.gymm.data.tree.loader.builder.ActualTrainingTreeBuilder;
 import ru.codingworkshop.gymm.data.tree.node.ActualTrainingTree;
-import ru.codingworkshop.gymm.data.tree.node.ProgramTrainingTree;
 
 /**
  * Created by Радик on 18.09.2017 as part of the Gymm project.
@@ -20,12 +17,17 @@ final class ActualTrainingCreateTreeDelegate extends ActualTrainingTreeDelegate 
 
     @Override
     LiveData<ActualTrainingTree> load(ActualTrainingTree tree) {
-        return Transformations.switchMap(loadProgramTrainingTree(id), (ProgramTrainingTree loaded) -> {
-            new ActualTrainingTreeBuilder(tree)
-                    .setProgramTrainingTree(programTrainingTree)
-                    .build();
+        return LiveDataReactiveStreams.fromPublisher(
+                loadProgramTrainingTree(id)
+                        .map(programTrainingTree1 -> {
+                            ActualTrainingTree builtTree = (ActualTrainingTree) new ActualTrainingTreeBuilder(tree)
+                                    .setProgramTrainingTree(programTrainingTree)
+                                    .build();
 
-            return Transformations.map(actualTrainingRepository.insertActualTrainingWithResult(tree.getParent()), id -> tree);
-        });
+                            actualTrainingRepository.insertActualTraining(tree.getParent());
+
+                            return builtTree;
+                        })
+        );
     }
 }

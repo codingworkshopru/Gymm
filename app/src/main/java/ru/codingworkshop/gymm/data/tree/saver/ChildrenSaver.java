@@ -7,12 +7,14 @@ import com.google.common.collect.Collections2;
 import com.google.common.collect.MapDifference;
 import com.google.common.collect.Maps;
 
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 
+import io.reactivex.disposables.Disposable;
 import ru.codingworkshop.gymm.data.entity.common.Model;
 import ru.codingworkshop.gymm.data.tree.repositoryadapter.ChildrenAdapter;
-import ru.codingworkshop.gymm.data.util.LiveDataUtil;
 import ru.codingworkshop.gymm.db.GymmDatabase;
 
 /**
@@ -22,6 +24,7 @@ import ru.codingworkshop.gymm.db.GymmDatabase;
 public class ChildrenSaver<T extends Model> implements Saver<Collection<T>> {
     private ChildrenAdapter<T> adapter;
     private long parentId;
+    private Disposable subscription;
 
     public ChildrenSaver(@NonNull ChildrenAdapter<T> adapter, long parentId) {
         this.adapter = adapter;
@@ -31,12 +34,15 @@ public class ChildrenSaver<T extends Model> implements Saver<Collection<T>> {
     @Override
     public void save(@NonNull Collection<T> collection) {
         Preconditions.checkState(GymmDatabase.isValidId(parentId), "parent id is not valid");
-        LiveDataUtil.getOnce(
-                adapter.getChildren(parentId),
-                oldChildren -> saveInternal(oldChildren, collection));
+        subscription = adapter.getChildren(parentId)
+                .take(1)
+                .subscribe(ts -> saveInternal(ts, collection));
     }
 
     private void saveInternal(Collection<T> oldChildren, Collection<T> newChildren) {
+        if (subscription != null && !subscription.isDisposed()) {
+            subscription.dispose();
+        }
         ContainersDiffResult<T> result = containersDiff(oldChildren, newChildren);
         adapter.insertChildren(result.getToInsert());
         adapter.updateChildren(result.getToUpdate());
@@ -58,13 +64,17 @@ public class ChildrenSaver<T extends Model> implements Saver<Collection<T>> {
         } else if (emptyNew) {
             result.setToDelete(oldContainer);
         } else {
+            List<T> toInsert = new ArrayList<>(Collections2.filter(newContainer, model -> !GymmDatabase.isValidId(model)));
             Map<Long, T> oldListMap = Maps.uniqueIndex(oldContainer, Model::getId);
-            Map<Long, T> newListMap = Maps.uniqueIndex(newContainer, Model::getId);
+            Map<Long, T> newListMap = Maps.uniqueIndex(Collections2.filter(newContainer, GymmDatabase::isValidId), Model::getId);
 
             MapDifference<Long, T> difference = Maps.difference(oldListMap, newListMap);
 
             result.setToDelete(difference.entriesOnlyOnLeft().values());
-            result.setToInsert(difference.entriesOnlyOnRight().values());
+
+            toInsert.addAll(difference.entriesOnlyOnRight().values());
+            result.setToInsert(toInsert);
+
             Collection<T> changedItems = Collections2.transform(
                     difference.entriesDiffering().values(),
                     MapDifference.ValueDifference::rightValue);

@@ -2,6 +2,7 @@ package ru.codingworkshop.gymm.ui.actual.viewmodel;
 
 import android.arch.lifecycle.LiveData;
 
+import io.reactivex.Flowable;
 import ru.codingworkshop.gymm.data.tree.loader.ProgramTrainingTreeLoader;
 import ru.codingworkshop.gymm.data.tree.node.ActualTrainingTree;
 import ru.codingworkshop.gymm.data.tree.node.ImmutableProgramTrainingTree;
@@ -39,7 +40,7 @@ abstract class ActualTrainingTreeDelegate {
 
     abstract LiveData<ActualTrainingTree> load(ActualTrainingTree tree);
 
-    LiveData<ProgramTrainingTree> loadProgramTrainingTree(long programTrainingId) {
+    Flowable<ProgramTrainingTree> loadProgramTrainingTree(long programTrainingId) {
         programTrainingTree = new ImmutableProgramTrainingTree();
 
         ProgramTrainingAdapter dataSource = new ProgramTrainingAdapter(programTrainingRepository, exercisesRepository);

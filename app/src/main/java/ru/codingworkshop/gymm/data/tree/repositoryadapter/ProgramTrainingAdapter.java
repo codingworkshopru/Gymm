@@ -6,8 +6,8 @@ import java.util.Collection;
 import java.util.List;
 
 import javax.inject.Inject;
-import javax.inject.Singleton;
 
+import io.reactivex.Flowable;
 import ru.codingworkshop.gymm.data.entity.Exercise;
 import ru.codingworkshop.gymm.data.entity.ProgramExercise;
 import ru.codingworkshop.gymm.data.entity.ProgramSet;
@@ -31,7 +31,7 @@ public class ProgramTrainingAdapter implements ParentAdapter<ProgramTraining>,
         this.exercisesRepository = exercisesRepository;
     }
 
-    public LiveData<List<Exercise>> getExercises(long programTrainingId) {
+    public Flowable<List<Exercise>> getExercises(long programTrainingId) {
         return exercisesRepository.getExercisesForProgramTraining(programTrainingId);
     }
 
@@ -39,12 +39,8 @@ public class ProgramTrainingAdapter implements ParentAdapter<ProgramTraining>,
         return programTrainingRepository.getProgramTrainingByName(programTrainingName);
     }
 
-    public LiveData<List<ProgramSet>> getProgramSetsForExercise(long programExerciseId) {
-        return programTrainingRepository.getProgramSetsForExercise(programExerciseId);
-    }
-
     @Override
-    public LiveData<ProgramTraining> getParent(long id) {
+    public Flowable<ProgramTraining> getParent(long id) {
         return programTrainingRepository.getProgramTrainingById(id);
     }
 
@@ -54,7 +50,7 @@ public class ProgramTrainingAdapter implements ParentAdapter<ProgramTraining>,
     }
 
     @Override
-    public LiveData<Long> insertParent(ProgramTraining item) {
+    public long insertParent(ProgramTraining item) {
         return programTrainingRepository.insertProgramTraining(item);
     }
 
@@ -64,12 +60,12 @@ public class ProgramTrainingAdapter implements ParentAdapter<ProgramTraining>,
     }
 
     @Override
-    public LiveData<List<ProgramExercise>> getChildren(long id) {
+    public Flowable<List<ProgramExercise>> getChildren(long id) {
         return programTrainingRepository.getProgramExercisesForTraining(id);
     }
 
     @Override
-    public LiveData<List<Long>> insertChildren(Collection<ProgramExercise> children) {
+    public List<Long> insertChildren(Collection<ProgramExercise> children) {
         return programTrainingRepository.insertProgramExercises(children);
     }
 
@@ -84,7 +80,7 @@ public class ProgramTrainingAdapter implements ParentAdapter<ProgramTraining>,
     }
 
     @Override
-    public LiveData<List<ProgramSet>> getGrandchildren(long id) {
+    public Flowable<List<ProgramSet>> getGrandchildren(long id) {
         return programTrainingRepository.getProgramSetsForTraining(id);
     }
 

@@ -13,12 +13,13 @@ import org.mockito.junit.MockitoJUnitRunner;
 import java.util.ArrayList;
 import java.util.List;
 
+import io.reactivex.Flowable;
 import ru.codingworkshop.gymm.data.tree.repositoryadapter.ChildrenAdapter;
-import ru.codingworkshop.gymm.data.util.LiveDataUtil;
 import ru.codingworkshop.gymm.util.Models;
 import ru.codingworkshop.gymm.util.SimpleModel;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -39,7 +40,7 @@ public class ChildrenSaverTest {
         List<SimpleModel> newChildren = Models.createSimpleModels("foo", "baz", "bak");
         oldChildren.get(2).setId(10L);
 
-        when(adapter.getChildren(1L)).thenReturn(LiveDataUtil.getLive(oldChildren));
+        when(adapter.getChildren(1L)).thenReturn(Flowable.just(oldChildren));
 
         ChildrenSaver<SimpleModel> saver = new ChildrenSaver<>(adapter, 1L);
         saver.save(newChildren);
@@ -63,6 +64,8 @@ public class ChildrenSaverTest {
         models1.get(2).setId(10L);
 
         List<SimpleModel> models2 = Models.createSimpleModels("foo", "bak", "buk", "bum");
+        models2.get(2).setId(0L);
+        models2.get(3).setId(0L);
 
         // new only
         ChildrenSaver.ContainersDiffResult<SimpleModel> result = ChildrenSaver.containersDiff(new ArrayList<>(), models2);

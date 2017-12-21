@@ -36,7 +36,7 @@ public class StatisticsViewModel extends ViewModel {
 
     public final MediatorLiveData<List<Entry>> chartEntries = new MediatorLiveData<>();
 
-    private final ActualTrainingDao dao;
+    private final ActualTrainingDao dao; // FIXME: 20.12.2017 replace to repository
     private LiveData<List<String>> actualExerciseNames;
     private Disposable subscribe;
 
@@ -62,7 +62,7 @@ public class StatisticsViewModel extends ViewModel {
             subscribe.dispose();
         }
 
-        dao.getStatisticsForExercise(getExerciseNameById(exercise), getStartDateById(range))
+        subscribe = dao.getStatisticsForExercise(getExerciseNameById(exercise), getStartDateById(range))
                 .take(1)
                 .toObservable()
                 .flatMap(Observable::fromIterable)

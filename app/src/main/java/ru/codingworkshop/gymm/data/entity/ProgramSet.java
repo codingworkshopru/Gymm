@@ -116,6 +116,17 @@ public class ProgramSet implements Model, Sortable, Parcelable, Cloneable {
     }
 
     @Override
+    public String toString() {
+        return "ProgramSet{" +
+                "id=" + id +
+                ", programExerciseId=" + programExerciseId +
+                ", reps=" + reps +
+                ", secondsForRest=" + secondsForRest +
+                ", sortOrder=" + sortOrder +
+                '}';
+    }
+
+    @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;

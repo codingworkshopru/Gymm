@@ -16,8 +16,6 @@ import ru.codingworkshop.gymm.repository.ExercisesRepository;
 import ru.codingworkshop.gymm.repository.ProgramTrainingRepository;
 import ru.codingworkshop.gymm.util.Models;
 
-import static org.junit.Assert.*;
-import static org.mockito.ArgumentMatchers.anyCollection;
 import static org.mockito.Mockito.verify;
 
 /**
@@ -40,12 +38,6 @@ public class ProgramTrainingAdapterTest {
     public void getProgramTrainingByName() throws Exception {
         adapter.getProgramTrainingByName("foo");
         verify(programTrainingRepository).getProgramTrainingByName("foo");
-    }
-
-    @Test
-    public void getProgramSetsForExercise() throws Exception {
-        adapter.getProgramSetsForExercise(2L);
-        verify(programTrainingRepository).getProgramSetsForExercise(2L);
     }
 
     @Test

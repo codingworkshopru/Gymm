@@ -10,13 +10,12 @@ import org.mockito.junit.MockitoJUnitRunner;
 
 import java.util.stream.Collectors;
 
+import io.reactivex.Flowable;
 import ru.codingworkshop.gymm.data.tree.node.ActualTrainingTree;
 import ru.codingworkshop.gymm.data.tree.node.ImmutableProgramTrainingTree;
 import ru.codingworkshop.gymm.data.tree.node.ProgramExerciseNode;
 import ru.codingworkshop.gymm.data.tree.node.ProgramTrainingTree;
 import ru.codingworkshop.gymm.data.tree.repositoryadapter.ActualTrainingAdapter;
-import ru.codingworkshop.gymm.data.util.LiveDataUtil;
-import ru.codingworkshop.gymm.util.LiveTest;
 import ru.codingworkshop.gymm.util.Models;
 
 import static junit.framework.Assert.assertEquals;
@@ -53,15 +52,15 @@ public class ActualTrainingTreeLoaderTest {
     @Test
     public void load() throws Exception {
         ActualTrainingAdapter adapter = mock(ActualTrainingAdapter.class);
-        when(adapter.getParent(11L)).thenReturn(Models.createLiveActualTraining(11L, 1L));
-        when(adapter.getChildren(11L)).thenReturn(Models.createLiveActualExercises(12L));
-        when(adapter.getGrandchildren(11L)).thenReturn(Models.createLiveActualSets(12L, 13L));
+        when(adapter.getParent(11L)).thenReturn(Flowable.just(Models.createActualTraining(11L, 1L)));
+        when(adapter.getChildren(11L)).thenReturn(Flowable.just(Models.createActualExercises(12L)));
+        when(adapter.getGrandchildren(11L)).thenReturn(Flowable.just(Models.createActualSets(12L, 13L)));
 
         ProgramTrainingTreeLoader programTrainingLoader = mock(ProgramTrainingTreeLoader.class);
-        when(programTrainingLoader.loadById(any(ProgramTrainingTree.class), eq(1L))).thenReturn(LiveDataUtil.getLive(programTree));
+        when(programTrainingLoader.loadById(any(ProgramTrainingTree.class), eq(1L))).thenReturn(Flowable.just(programTree));
         ActualTrainingTreeLoader loader = new ActualTrainingTreeLoader(adapter, programTrainingLoader);
 
-        LiveTest.verifyLiveData(loader.loadById(tree, 11L), loadedTree -> {
+        loader.loadById(tree, 11L).test().assertValue(loadedTree -> {
             assertEquals(11L, tree.getParent().getId());
             assertEquals(1L, tree.getProgramTraining().getId());
             assertEquals(2L, tree.getChildren().get(0).getProgramExerciseNode().getParent().getId());

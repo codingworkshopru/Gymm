@@ -12,6 +12,7 @@ import org.mockito.junit.MockitoJUnitRunner;
 
 import java.util.List;
 
+import io.reactivex.Flowable;
 import ru.codingworkshop.gymm.data.entity.MuscleGroup;
 import ru.codingworkshop.gymm.db.dao.MuscleGroupDao;
 import ru.codingworkshop.gymm.util.Models;
@@ -89,9 +90,9 @@ public class MuscleGroupsRepositoryTest {
 
     @Test
     public void getSecondaryMuscleGroupsForExercise() throws Exception {
-        final LiveData<List<MuscleGroup>> liveMuscleGroups = Models.createLiveMuscleGroups(2L);
-        when(dao.getSecondaryMuscleGroupsForExercise(1L)).thenReturn(liveMuscleGroups);
-        assertEquals(liveMuscleGroups, repository.getSecondaryMuscleGroupsForExercise(1L));
+        final Flowable<List<MuscleGroup>> just = Flowable.just(Models.createMuscleGroups(2L));
+        when(dao.getSecondaryMuscleGroupsForExercise(1L)).thenReturn(just);
+        assertEquals(just, repository.getSecondaryMuscleGroupsForExercise(1L));
         verify(dao).getSecondaryMuscleGroupsForExercise(1L);
     }
 }

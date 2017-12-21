@@ -14,6 +14,7 @@ import org.mockito.junit.MockitoJUnitRunner;
 import java.util.List;
 import java.util.Objects;
 
+import io.reactivex.Flowable;
 import ru.codingworkshop.gymm.data.entity.ProgramExercise;
 import ru.codingworkshop.gymm.data.entity.ProgramSet;
 import ru.codingworkshop.gymm.data.tree.loader.ProgramTrainingTreeLoader;
@@ -28,8 +29,16 @@ import ru.codingworkshop.gymm.util.LiveTest;
 import ru.codingworkshop.gymm.util.Models;
 import ru.codingworkshop.gymm.util.TreeBuilders;
 
-import static org.junit.Assert.*;
-import static org.mockito.ArgumentMatchers.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNotSame;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertSame;
+import static org.junit.Assert.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -53,7 +62,7 @@ public class ProgramTrainingViewModelTest {
             ProgramTrainingTree donorTree = TreeBuilders.buildProgramTrainingTree(1);
             originalTree.setParent(donorTree.getParent());
             originalTree.setChildren(donorTree.getChildren());
-            return LiveDataUtil.getLive(originalTree);
+            return Flowable.just(originalTree);
         });
     }
 
@@ -108,7 +117,7 @@ public class ProgramTrainingViewModelTest {
 
         assertNotNull(LiveTest.getValue(vm.loadTree(1L)));
 
-        when(adapter.getChildren(1L)).thenReturn(Models.createLiveProgramExercises(1));
+        when(adapter.getChildren(1L)).thenReturn(Flowable.just(Models.createProgramExercises(1)));
 
         tree.getParent().setName("bar");
         assertTrue(LiveTest.getValue(vm.isProgramTrainingChanged()));

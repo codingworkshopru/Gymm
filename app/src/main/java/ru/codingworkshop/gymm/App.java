@@ -1,7 +1,7 @@
 package ru.codingworkshop.gymm;
 
 import android.app.Activity;
-import android.app.Application;
+import android.support.multidex.MultiDexApplication;
 
 import com.squareup.leakcanary.LeakCanary;
 
@@ -17,7 +17,7 @@ import timber.log.Timber;
  * Created by Радик on 19.04.2017.
  */
 
-public class App extends Application implements HasActivityInjector {
+public class App extends MultiDexApplication implements HasActivityInjector {
     @Inject DispatchingAndroidInjector<Activity> dispatchingAndroidInjector;
     @Inject AppInitializer initializer;
 

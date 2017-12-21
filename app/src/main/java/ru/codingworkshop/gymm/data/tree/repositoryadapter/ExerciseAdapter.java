@@ -1,20 +1,18 @@
 package ru.codingworkshop.gymm.data.tree.repositoryadapter;
 
-import android.arch.lifecycle.LiveData;
-
 import java.util.Collection;
 import java.util.List;
 
 import javax.inject.Inject;
-import javax.inject.Singleton;
 
+import io.reactivex.Flowable;
 import ru.codingworkshop.gymm.data.entity.Exercise;
 import ru.codingworkshop.gymm.data.entity.MuscleGroup;
 import ru.codingworkshop.gymm.repository.ExercisesRepository;
 import ru.codingworkshop.gymm.repository.MuscleGroupsRepository;
 
 /**
- * Created by Radik on 11.11.2017.
+ * Created by Radik on 17.12.2017.
  */
 
 public class ExerciseAdapter implements ParentAdapter<Exercise>, ChildrenAdapter<MuscleGroup> {
@@ -27,37 +25,37 @@ public class ExerciseAdapter implements ParentAdapter<Exercise>, ChildrenAdapter
         this.muscleGroupsRepository = muscleGroupsRepository;
     }
 
-    public LiveData<MuscleGroup> getPrimaryMuscleGroup(long exerciseId) {
+    public Flowable<MuscleGroup> getPrimaryMuscleGroup(long exerciseId) {
         return muscleGroupsRepository.getPrimaryMuscleGroupForExercise(exerciseId);
     }
 
     @Override
-    public LiveData<Exercise> getParent(long id) {
-        return exercisesRepository.getExerciseById(id);
+    public Flowable<Exercise> getParent(long parentId) {
+        return exercisesRepository.getExerciseById(parentId);
     }
 
     @Override
-    public void updateParent(Exercise item) {
-
+    public long insertParent(Exercise parent) {
+        return 0L;
     }
 
     @Override
-    public LiveData<Long> insertParent(Exercise item) {
-        return null;
-    }
-
-    @Override
-    public void deleteParent(Exercise item) {
+    public void updateParent(Exercise parent) {
 
     }
 
     @Override
-    public LiveData<List<MuscleGroup>> getChildren(long id) {
-        return muscleGroupsRepository.getSecondaryMuscleGroupsForExercise(id);
+    public void deleteParent(Exercise parent) {
+
     }
 
     @Override
-    public LiveData<List<Long>> insertChildren(Collection<MuscleGroup> children) {
+    public Flowable<List<MuscleGroup>> getChildren(long parentId) {
+        return muscleGroupsRepository.getSecondaryMuscleGroupsForExercise(parentId);
+    }
+
+    @Override
+    public List<Long> insertChildren(Collection<MuscleGroup> children) {
         return null;
     }
 

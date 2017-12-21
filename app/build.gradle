@@ -12,6 +12,7 @@ android {
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
 //        testInstrumentationRunner "ru.codingworkshop.gymm.util.GymmTestRunner"
         vectorDrawables.useSupportLibrary true
+        multiDexEnabled true
     }
     compileOptions {
         targetCompatibility JavaVersion.VERSION_1_8
@@ -24,7 +25,7 @@ android {
     }
     buildTypes {
         release {
-            minifyEnabled false
+            minifyEnabled true
             proguardFiles getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro"
         }
     }
@@ -34,11 +35,11 @@ android {
 }
 
 
-
 ext {
     support = "26.1.0"
     constraint = "1.0.2"
     arch = "1.0.0"
+    multidex = "1.0.2"
 
     gson = "2.8.2"
     guava = "23.5"
@@ -52,7 +53,6 @@ ext {
 
     espresso = "3.0.1"
     mockito = "2.13.0"
-    junit = "4.12"
     junit_params = "1.1.0"
 }
 
@@ -67,12 +67,14 @@ dependencies {
     implementation "com.android.support:support-v4:$support"
     implementation "com.android.support:cardview-v7:$support"
     implementation "com.android.support.constraint:constraint-layout:$constraint"
+    implementation "com.android.support:multidex:$multidex"
 
     implementation "android.arch.lifecycle:extensions:$arch"
     implementation "android.arch.lifecycle:common-java8:$arch"
     implementation "android.arch.lifecycle:reactivestreams:$arch"
     implementation "android.arch.persistence.room:rxjava2:$arch"
     implementation "android.arch.persistence.room:runtime:$arch"
+    implementation "android.arch.persistence.room:rxjava2:$arch"
 
     implementation "com.google.guava:guava:$guava-android"
     implementation "com.google.code.gson:gson:$gson"
@@ -92,7 +94,6 @@ dependencies {
     annotationProcessor "com.google.dagger:dagger-android-processor:$dagger"
     annotationProcessor "com.google.dagger:dagger-compiler:$dagger"
 
-    testImplementation "junit:junit:$junit"
     testImplementation "pl.pragmatists:JUnitParams:$junit_params"
     testImplementation "org.mockito:mockito-core:$mockito"
     testImplementation "android.arch.core:core-testing:$arch"

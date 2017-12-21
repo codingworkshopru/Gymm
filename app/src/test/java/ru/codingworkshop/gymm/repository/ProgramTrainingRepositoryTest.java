@@ -1,7 +1,6 @@
 package ru.codingworkshop.gymm.repository;
 
 import android.arch.core.executor.testing.InstantTaskExecutorRule;
-import android.arch.lifecycle.LiveData;
 
 import com.google.common.collect.Lists;
 
@@ -14,20 +13,20 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import io.reactivex.Flowable;
 import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
 import ru.codingworkshop.gymm.data.entity.ProgramExercise;
 import ru.codingworkshop.gymm.data.entity.ProgramSet;
 import ru.codingworkshop.gymm.data.entity.ProgramTraining;
-import ru.codingworkshop.gymm.data.util.LiveDataUtil;
+import ru.codingworkshop.gymm.data.entity.common.Model;
 import ru.codingworkshop.gymm.db.dao.ProgramTrainingDao;
-import ru.codingworkshop.gymm.util.LiveTest;
 import ru.codingworkshop.gymm.util.Models;
 
+import static junit.framework.Assert.assertEquals;
 import static org.mockito.ArgumentMatchers.anyCollection;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -46,7 +45,7 @@ public class ProgramTrainingRepositoryTest {
     @Before
     public void init() {
         dao = mock(ProgramTrainingDao.class);
-        repository = new ProgramTrainingRepository(dao, Runnable::run);
+        repository = new ProgramTrainingRepository(dao, new InsertDelegate());
     }
 
     @Test
@@ -71,7 +70,7 @@ public class ProgramTrainingRepositoryTest {
     public void insertProgramTraining() {
         ProgramTraining trainingEntity = Models.createProgramTraining(0L, "foo");
         when(dao.insertProgramTraining(trainingEntity)).thenReturn(1L);
-        LiveTest.verifyLiveData(repository.insertProgramTraining(trainingEntity), id -> id == 1L);
+        assertEquals(1L, repository.insertProgramTraining(trainingEntity));
 
         verify(dao).insertProgramTraining(trainingEntity);
     }
@@ -129,23 +128,6 @@ public class ProgramTrainingRepositoryTest {
         verify(dao).getProgramExercisesForTraining(1L);
     }
 
-    @Test
-    public void queryProgramExerciseById() {
-        repository.getProgramExerciseById(2);
-        verify(dao).getProgramExerciseById(2);
-    }
-
-    @Test
-    public void insertProgramExercise() {
-        ProgramExercise exercise = Models.createProgramExercise(2L, 1L, 100L);
-        exercise.setExerciseId(10L);
-        when(dao.insertProgramExercise(exercise)).thenReturn(1L);
-
-        repository.insertProgramExercise(exercise);
-
-        verify(dao).insertProgramExercise(exercise);
-    }
-
     @Test(expected = IllegalArgumentException.class)
     public void insertProgramExercisesWithoutParentId() throws Exception {
         ProgramExercise exercise = Models.createProgramExercise(0L, 0L, 100L);
@@ -164,16 +146,13 @@ public class ProgramTrainingRepositoryTest {
 
     @Test
     public void insertExercises() throws Exception {
-        ArrayList<Long> ids = Lists.newArrayList(1L);
+        ArrayList<Long> ids = Lists.newArrayList(2L);
         when(dao.insertProgramExercises(anyCollection())).thenReturn(ids);
-        LiveTest.verifyLiveData(repository.insertProgramExercises(Models.createProgramExercises(1)), returnedIds -> returnedIds == ids);
+        List<ProgramExercise> programExercises = Models.createProgramExercises(1);
+        programExercises.get(0).setId(0L);
+        assertEquals(ids, repository.insertProgramExercises(programExercises));
+        assertEquals(ids, Lists.transform(programExercises, Model::getId));
         verify(dao).insertProgramExercises(anyCollection());
-    }
-
-    @Test(expected = IllegalArgumentException.class)
-    @Parameters(method = "invalidProgramExercises")
-    public void insertProgramExerciseWithoutProgramTrainingAndExercise(ProgramExercise exercise) {
-        repository.insertProgramExercise(exercise);
     }
 
     private ProgramExercise[] invalidProgramExercises() {
@@ -185,17 +164,6 @@ public class ProgramTrainingRepositoryTest {
                 exercise,
                 exerciseWithoutExercise
         };
-    }
-
-    @Test
-    public void updateProgramExercise() {
-        ProgramExercise exercise = Models.createLiveProgramExercise(2, 1).getValue();
-        exercise.setExerciseId(10L);
-        when(dao.updateProgramExercise(exercise)).thenReturn(1);
-
-        repository.updateProgramExercise(exercise);
-
-        verify(dao).updateProgramExercise(exercise);
     }
 
     @Test
@@ -211,22 +179,6 @@ public class ProgramTrainingRepositoryTest {
         repository.updateProgramExercises(exercisesToUpdate);
 
         verify(dao).updateProgramExercises(exercisesToUpdate);
-    }
-
-    @Test(expected = IllegalArgumentException.class)
-    @Parameters(method = "invalidProgramExercises")
-    public void updateProgramExerciseWithoutProgramTrainingAndExercise(ProgramExercise exercise) {
-        repository.updateProgramExercise(exercise);
-    }
-
-    @Test
-    public void deleteProgramExercise() {
-        ProgramExercise exercise = Models.createLiveProgramExercise(2, 1).getValue();
-        when(dao.deleteProgramExercise(exercise)).thenReturn(1);
-
-        repository.deleteProgramExercise(exercise);
-
-        verify(dao).deleteProgramExercise(exercise);
     }
 
     @Test
@@ -245,69 +197,17 @@ public class ProgramTrainingRepositoryTest {
     }
 
     @Test
-    public void queryProgramSetsForExercise() {
-        ProgramExercise exercise = Models.createLiveProgramExercise(2, 1).getValue();
-        ProgramSet set = Models.createLiveProgramSet(3, 2, 1).getValue();
-        LiveData<List<ProgramSet>> list = LiveDataUtil.getLive(Lists.newArrayList(set));
-
-        when(dao.getProgramSetsForExercise(exercise.getId())).thenReturn(list);
-        LiveTest.verifyLiveData(
-                repository.getProgramSetsForExercise(exercise),
-                returned -> !returned.isEmpty()
-                        && returned.get(0).getId() == 3
-                        && returned.get(0).getProgramExerciseId() == 2
-                        && returned.get(0).getReps() == 1
-        );
-
-        verify(dao).getProgramSetsForExercise(2);
-    }
-
-    @Test
-    public void queryProgramSetsForExerciseId() {
-        ProgramExercise exercise = Models.createLiveProgramExercise(2, 1).getValue();
-        ProgramSet set = Models.createLiveProgramSet(3, 2, 1).getValue();
-        LiveData<List<ProgramSet>> list = LiveDataUtil.getLive(Lists.newArrayList(set));
-
-        when(dao.getProgramSetsForExercise(exercise.getId())).thenReturn(list);
-        LiveTest.verifyLiveData(
-                repository.getProgramSetsForExercise(exercise.getId()),
-                returned -> !returned.isEmpty()
-                        && returned.get(0).getId() == 3
-                        && returned.get(0).getProgramExerciseId() == 2
-                        && returned.get(0).getReps() == 1
-        );
-
-        verify(dao).getProgramSetsForExercise(2);
-    }
-
-    @Test
     public void queryProgramSetsForTrainingId() {
         List<Long> ids = Lists.newArrayList(23L, 24L, 25L, 26L, 27L, 38L, 39L);
         List<ProgramSet> sets = ids.stream().map(id -> Models.createLiveProgramSet(id, id / 10, id.intValue()).getValue()).collect(Collectors.toList());
 
-        when(dao.getProgramSetsForTraining(1L)).thenReturn(LiveDataUtil.getLive(sets));
+        when(dao.getProgramSetsForTraining(1L)).thenReturn(Flowable.just(sets));
 
-        LiveData<List<ProgramSet>> liveSets = repository.getProgramSetsForTraining(1L);
-        LiveTest.verifyLiveData(liveSets, returnedSets -> sets == returnedSets);
+        repository.getProgramSetsForTraining(1L)
+                .test()
+                .assertValue(returnedSets -> sets == returnedSets);
 
         verify(dao).getProgramSetsForTraining(1L);
-    }
-
-    @Test
-    public void queryProgramSetById() {
-        when(dao.getProgramSetById(3)).thenReturn(Models.createLiveProgramSet(3, 2, 1));
-        LiveTest.verifyLiveData(repository.getProgramSetById(3), returned -> returned.getId() == 3 && returned.getReps() == 1);
-        verify(dao).getProgramSetById(3);
-    }
-
-    @Test
-    public void insertProgramSet() {
-        ProgramSet set = Models.createLiveProgramSet(3L, 2L, 1).getValue();
-        when(dao.insertProgramSet(set)).thenReturn(set.getId());
-
-        repository.insertProgramSet(set);
-
-        verify(dao).insertProgramSet(set);
     }
 
     @Test
@@ -316,15 +216,9 @@ public class ProgramTrainingRepositoryTest {
         List<ProgramSet> sets = Models.createProgramSets(2L, 1);
         when(dao.insertProgramSets(sets)).thenReturn(setIds);
 
-        LiveTest.verifyLiveData(repository.insertProgramSets(sets), ids -> ids.equals(setIds));
+        assertEquals(setIds, repository.insertProgramSets(sets));
 
         verify(dao).insertProgramSets(sets);
-    }
-
-    @Test(expected = IllegalArgumentException.class)
-    @Parameters(method = "invalidProgramSets")
-    public void insertProgramSetWithZeroRepsAndWithoutExercise(ProgramSet set) {
-        repository.insertProgramSet(set);
     }
 
     private ProgramSet[] invalidProgramSets() {
@@ -339,16 +233,6 @@ public class ProgramTrainingRepositoryTest {
     }
 
     @Test
-    public void updateProgramSet() {
-        ProgramSet set = Models.createLiveProgramSet(3, 2, 1).getValue();
-        when(dao.updateProgramSet(set)).thenReturn(1);
-
-        repository.updateProgramSet(set);
-
-        verify(dao).updateProgramSet(set);
-    }
-
-    @Test
     public void updateProgramSets() {
         List<Long> setIds = Lists.newArrayList(1L, 2L, 3L);
         List<ProgramSet> sets = setIds.stream().map(
@@ -359,22 +243,6 @@ public class ProgramTrainingRepositoryTest {
         repository.updateProgramSets(sets);
 
         verify(dao).updateProgramSets(sets);
-    }
-
-    @Test(expected = IllegalArgumentException.class)
-    @Parameters(method = "invalidProgramSets")
-    public void updateProgramSetWithZeroRepsAndWithoutExercise(ProgramSet set) {
-        repository.updateProgramSet(set);
-    }
-
-    @Test
-    public void deleteProgramSet() {
-        ProgramSet set = Models.createLiveProgramSet(3, 2, 1).getValue();
-        when(dao.deleteProgramSet(set)).thenReturn(1);
-
-        repository.deleteProgramSet(set);
-
-        verify(dao).deleteProgramSet(set);
     }
 
     @Test

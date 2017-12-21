@@ -7,10 +7,10 @@ import android.arch.persistence.room.Insert;
 import android.arch.persistence.room.Query;
 import android.arch.persistence.room.Update;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+import io.reactivex.Flowable;
 import ru.codingworkshop.gymm.data.entity.ProgramExercise;
 import ru.codingworkshop.gymm.data.entity.ProgramSet;
 import ru.codingworkshop.gymm.data.entity.ProgramTraining;
@@ -27,7 +27,7 @@ public interface ProgramTrainingDao {
     LiveData<List<ProgramTraining>> getProgramTrainings();
 
     @Query("select * from ProgramTraining where id = :id")
-    LiveData<ProgramTraining> getProgramTrainingById(long id);
+    Flowable<ProgramTraining> getProgramTrainingById(long id);
 
     @Query("select * from ProgramTraining where name = :name")
     LiveData<ProgramTraining> getProgramTrainingByName(String name);
@@ -45,59 +45,29 @@ public interface ProgramTrainingDao {
             "from ProgramExercise " +
             "where programTrainingId = :programTrainingId " +
             "order by sortOrder")
-    LiveData<List<ProgramExercise>> getProgramExercisesForTraining(long programTrainingId);
-
-    @Query("select * from ProgramExercise where id = :id")
-    LiveData<ProgramExercise> getProgramExerciseById(long id);
-
-    @Insert
-    long insertProgramExercise(ProgramExercise programExercise);
+    Flowable<List<ProgramExercise>> getProgramExercisesForTraining(long programTrainingId);
 
     @Insert
     List<Long> insertProgramExercises(Collection<ProgramExercise> programExercises);
 
     @Delete
-    int deleteProgramExercise(ProgramExercise programExercise);
-
-    @Delete
     int deleteProgramExercises(Collection<ProgramExercise> programExercises);
 
     @Update
-    int updateProgramExercise(ProgramExercise programExercise);
-
-    @Update
     int updateProgramExercises(Collection<ProgramExercise> programExercises);
-
-    @Query("select * " +
-            "from ProgramSet " +
-            "where programExerciseId = :programExerciseId " +
-            "order by sortOrder")
-    LiveData<List<ProgramSet>> getProgramSetsForExercise(long programExerciseId);
 
     @Query("select ps.* " +
             "from ProgramSet ps " +
             "join ProgramExercise pe on pe.id = ps.programExerciseId " +
             "where pe.programTrainingId = :programTrainingId " +
             "order by pe.sortOrder, ps.sortOrder")
-    LiveData<List<ProgramSet>> getProgramSetsForTraining(long programTrainingId);
-
-    @Query("select * from ProgramSet where id = :id")
-    LiveData<ProgramSet> getProgramSetById(long id);
-
-    @Insert
-    long insertProgramSet(ProgramSet programSet);
+    Flowable<List<ProgramSet>> getProgramSetsForTraining(long programTrainingId);
 
     @Insert
     List<Long> insertProgramSets(Collection<ProgramSet> programSets);
 
     @Delete
-    int deleteProgramSet(ProgramSet programSet);
-
-    @Delete
     int deleteProgramSets(Collection<ProgramSet> programSets);
-
-    @Update
-    int updateProgramSet(ProgramSet programSet);
 
     @Update
     int updateProgramSets(Collection<ProgramSet> programSets);

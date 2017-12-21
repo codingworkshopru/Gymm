@@ -1,19 +1,17 @@
 package ru.codingworkshop.gymm.data.tree.repositoryadapter;
 
-import android.arch.lifecycle.LiveData;
-
-import ru.codingworkshop.gymm.data.entity.ProgramExercise;
+import io.reactivex.Flowable;
 
 /**
  * Created by Radik on 09.11.2017.
  */
 
 public interface ParentAdapter<P> {
-    LiveData<P> getParent(long id);
+    Flowable<P> getParent(long id);
 
     void updateParent(P item);
 
-    LiveData<Long> insertParent(P item);
+    long insertParent(P item);
 
     void deleteParent(P item);
 }

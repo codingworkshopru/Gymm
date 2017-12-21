@@ -1,17 +1,14 @@
 package ru.codingworkshop.gymm.data.tree.repositoryadapter;
 
-import android.arch.lifecycle.LiveData;
-
 import java.util.Collection;
 import java.util.List;
 
 import javax.inject.Inject;
-import javax.inject.Singleton;
 
+import io.reactivex.Flowable;
 import ru.codingworkshop.gymm.data.entity.ActualExercise;
 import ru.codingworkshop.gymm.data.entity.ActualSet;
 import ru.codingworkshop.gymm.data.entity.ActualTraining;
-import ru.codingworkshop.gymm.data.tree.node.ActualTrainingTree;
 import ru.codingworkshop.gymm.repository.ActualTrainingRepository;
 
 /**
@@ -27,7 +24,7 @@ public class ActualTrainingAdapter implements ParentAdapter<ActualTraining>, Chi
     }
 
     @Override
-    public LiveData<ActualTraining> getParent(long id) {
+    public Flowable<ActualTraining> getParent(long id) {
         return repository.getActualTrainingById(id);
     }
 
@@ -37,9 +34,8 @@ public class ActualTrainingAdapter implements ParentAdapter<ActualTraining>, Chi
     }
 
     @Override
-    public LiveData<Long> insertParent(ActualTraining item) {
-        repository.insertActualTraining(item);
-        return null;
+    public long insertParent(ActualTraining item) {
+        return repository.insertActualTraining(item);
     }
 
     @Override
@@ -48,14 +44,13 @@ public class ActualTrainingAdapter implements ParentAdapter<ActualTraining>, Chi
     }
 
     @Override
-    public LiveData<List<ActualExercise>> getChildren(long id) {
+    public Flowable<List<ActualExercise>> getChildren(long id) {
         return repository.getActualExercisesForActualTraining(id);
     }
 
     @Override
-    public LiveData<List<Long>> insertChildren(Collection<ActualExercise> children) {
-        repository.insertActualExercises(children);
-        return null;
+    public List<Long> insertChildren(Collection<ActualExercise> children) {
+        return repository.insertActualExercises(children);
     }
 
     @Override
@@ -68,7 +63,7 @@ public class ActualTrainingAdapter implements ParentAdapter<ActualTraining>, Chi
     }
 
     @Override
-    public LiveData<List<ActualSet>> getGrandchildren(long id) {
+    public Flowable<List<ActualSet>> getGrandchildren(long id) {
         return repository.getActualSetsForActualTraining(id);
     }
 

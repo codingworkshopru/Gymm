@@ -11,7 +11,6 @@ import org.junit.runners.Suite;
 @Suite.SuiteClasses({
         ActualTrainingAdapterTest.class,
         ExerciseAdapterTest.class,
-        ProgramExerciseAdapterTest.class,
         ProgramTrainingAdapterTest.class
 })
 public class RepositoryAdapterTestSuite {

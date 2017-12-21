@@ -4,11 +4,11 @@ import android.arch.lifecycle.LiveData;
 import android.arch.persistence.room.Dao;
 import android.arch.persistence.room.Insert;
 import android.arch.persistence.room.Query;
-import android.support.annotation.VisibleForTesting;
 
 import java.util.Collection;
 import java.util.List;
 
+import io.reactivex.Flowable;
 import ru.codingworkshop.gymm.data.entity.MuscleGroup;
 
 import static android.arch.persistence.room.OnConflictStrategy.FAIL;
@@ -41,13 +41,13 @@ public interface MuscleGroupDao {
     LiveData<MuscleGroup> getMuscleGroupById(long muscleGroupId);
 
     @Query("select mg.* from MuscleGroup as mg " +
-                    "join SecondaryMuscleGroupLink as l on l.muscleGroupId = mg.id " +
-                    "where l.exerciseId = :exerciseId " +
-                    "order by name")
-    LiveData<List<MuscleGroup>> getSecondaryMuscleGroupsForExercise(long exerciseId);
+            "join SecondaryMuscleGroupLink as l on l.muscleGroupId = mg.id " +
+            "where l.exerciseId = :exerciseId " +
+            "order by name")
+    Flowable<List<MuscleGroup>> getSecondaryMuscleGroupsForExercise(long exerciseId);
 
     @Query("select mg.* from MuscleGroup as mg " +
             "join Exercise e on e.primaryMuscleGroupId = mg.id " +
             "where e.id = :exerciseId")
-    LiveData<MuscleGroup> getPrimaryMuscleGroupForExercise(long exerciseId);
+    Flowable<MuscleGroup> getPrimaryMuscleGroupForExercise(long exerciseId);
 }

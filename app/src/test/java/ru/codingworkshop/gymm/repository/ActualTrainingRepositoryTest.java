@@ -15,7 +15,6 @@ import org.mockito.MockitoAnnotations;
 
 import java.util.Collection;
 import java.util.List;
-import java.util.concurrent.Executor;
 import java.util.stream.Collectors;
 
 import junitparams.JUnitParamsRunner;
@@ -43,31 +42,20 @@ public class ActualTrainingRepositoryTest {
     public InstantTaskExecutorRule instantTaskExecutorRule = new InstantTaskExecutorRule();
 
     @Mock private ActualTrainingDao dao;
-    private Executor executor = Runnable::run;
     private ActualTrainingRepository repository;
 
     @Before
     public void init() {
         MockitoAnnotations.initMocks(this);
-        repository = new ActualTrainingRepository(executor, dao);
+        repository = new ActualTrainingRepository(dao, new InsertDelegate());
     }
 
     @Test
     public void insertActualTraining() {
         ActualTraining training = Models.createActualTraining(0L, 1L);
         when(dao.insertActualTraining(training)).thenReturn(11L);
-        repository.insertActualTraining(training);
+        assertEquals(11L, repository.insertActualTraining(training));
         verify(dao).insertActualTraining(training);
-    }
-
-    @Test
-    public void insertActualTrainingWithResult() throws Exception {
-        ActualTraining actualTraining = Models.createActualTraining(0L, 1L);
-        when(dao.insertActualTraining(actualTraining)).thenReturn(11L);
-
-        LiveData<Long> liveId = repository.insertActualTrainingWithResult(actualTraining);
-        LiveTest.verifyLiveData(liveId, id -> id == 11L);
-        verify(dao).insertActualTraining(actualTraining);
     }
 
     @Test
