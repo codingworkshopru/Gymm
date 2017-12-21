@@ -1,4 +1,4 @@
-package ru.codingworkshop.gymm.data.tree.repositoryadapter2;
+package ru.codingworkshop.gymm.data.tree.repositoryadapter;
 
 import java.util.Collection;
 import java.util.List;

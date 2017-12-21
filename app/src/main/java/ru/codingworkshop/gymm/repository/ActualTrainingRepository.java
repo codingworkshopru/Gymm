@@ -1,6 +1,7 @@
 package ru.codingworkshop.gymm.repository;
 
 import android.arch.lifecycle.LiveData;
+import android.arch.lifecycle.LiveDataReactiveStreams;
 import android.support.annotation.NonNull;
 
 import com.google.common.base.Preconditions;
@@ -8,11 +9,11 @@ import com.google.common.base.Strings;
 
 import java.util.Collection;
 import java.util.List;
-import java.util.concurrent.Executor;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
+import io.reactivex.Flowable;
 import ru.codingworkshop.gymm.data.entity.ActualExercise;
 import ru.codingworkshop.gymm.data.entity.ActualSet;
 import ru.codingworkshop.gymm.data.entity.ActualTraining;
@@ -26,36 +27,32 @@ import static ru.codingworkshop.gymm.db.GymmDatabase.isValidId;
  */
 
 @Singleton
-public class ActualTrainingRepository extends BaseRepository {
+public class ActualTrainingRepository {
     private ActualTrainingDao dao;
+    private InsertDelegate insertDelegate;
 
     @Inject
-    public ActualTrainingRepository(Executor executor, ActualTrainingDao dao) {
-        super(executor);
+    public ActualTrainingRepository(ActualTrainingDao dao, InsertDelegate insertDelegate) {
         this.dao = dao;
+        this.insertDelegate = insertDelegate;
     }
 
-    public LiveData<ActualTraining> getActualTrainingById(long actualTrainingId) {
+    public Flowable<ActualTraining> getActualTrainingById(long actualTrainingId) {
         return dao.getActualTrainingById(actualTrainingId);
     }
 
-    public void insertActualTraining(@NonNull ActualTraining actualTraining) {
+    public long insertActualTraining(@NonNull ActualTraining actualTraining) {
         checkActualTraining(actualTraining);
-        insert(actualTraining, dao::insertActualTraining);
-    }
-
-    public LiveData<Long> insertActualTrainingWithResult(ActualTraining actualTraining) {
-        checkActualTraining(actualTraining);
-        return insertWithResult(actualTraining, dao::insertActualTraining);
+        return insertDelegate.insert(actualTraining, dao::insertActualTraining);
     }
 
     public void updateActualTraining(ActualTraining actualTraining) {
         checkActualTraining(actualTraining);
-        update(actualTraining, dao::updateActualTraining);
+        dao.updateActualTraining(actualTraining);
     }
 
     public void deleteActualTraining(ActualTraining actualTraining) {
-        delete(actualTraining, dao::deleteActualTraining);
+        dao.deleteActualTraining(actualTraining);
     }
 
     private static void checkActualTraining(@NonNull ActualTraining actualTraining) {
@@ -66,22 +63,24 @@ public class ActualTrainingRepository extends BaseRepository {
         );
     }
 
-    public LiveData<List<ActualExercise>> getActualExercisesForActualTraining(long actualTrainingId) {
+    public Flowable<List<ActualExercise>> getActualExercisesForActualTraining(long actualTrainingId) {
         return dao.getActualExercisesForActualTraining(actualTrainingId);
     }
 
-    public void insertActualExercise(ActualExercise actualExercise) {
+    public long insertActualExercise(ActualExercise actualExercise) {
         checkActualExercise(actualExercise);
-        insert(actualExercise, dao::insertActualExercise);
+        return insertDelegate.insert(actualExercise, dao::insertActualExercise);
     }
 
-    public void insertActualExercises(Collection<ActualExercise> actualExercises) {
-        applyToEach(actualExercises, ActualTrainingRepository::checkActualExercise);
-        insert(actualExercises, dao::insertActualExercises);
+    public List<Long> insertActualExercises(Collection<ActualExercise> actualExercises) {
+        for (ActualExercise e : actualExercises) {
+            checkActualExercise(e);
+        }
+        return insertDelegate.insert(actualExercises, dao::insertActualExercises);
     }
 
     public void deleteActualExercises(Collection<ActualExercise> actualExercises) {
-        delete(actualExercises, dao::deleteActualExercises);
+        dao.deleteActualExercises(actualExercises);
     }
 
     private static void checkActualExercise(@NonNull ActualExercise actualExercise) {
@@ -89,28 +88,30 @@ public class ActualTrainingRepository extends BaseRepository {
         Preconditions.checkArgument(isValidId(actualExercise.getActualTrainingId()));
     }
 
-    public LiveData<List<ActualSet>> getActualSetsForActualTraining(long actualTrainingId) {
+    public Flowable<List<ActualSet>> getActualSetsForActualTraining(long actualTrainingId) {
         return dao.getActualSetsForActualTraining(actualTrainingId);
     }
 
     public void insertActualSet(ActualSet actualSet) {
         checkActualSet(actualSet);
-        insert(actualSet, dao::insertActualSet);
+        dao.insertActualSet(actualSet);
     }
 
     public LiveData<Long> insertActualSetWithResult(ActualSet actualSet) {
         checkActualSet(actualSet);
-        return insertWithResult(actualSet, dao::insertActualSet);
+        return LiveDataReactiveStreams.fromPublisher(
+                Flowable.just(
+                        insertDelegate.insert(actualSet, dao::insertActualSet)));
     }
 
     public void updateActualSet(ActualSet actualSet) {
         checkActualSet(actualSet);
         Preconditions.checkArgument(GymmDatabase.isValidId(actualSet));
-        update(actualSet, dao::updateActualSet);
+        dao.updateActualSet(actualSet);
     }
 
     public void deleteActualSet(ActualSet actualSet) {
-        delete(actualSet, dao::deleteActualSet);
+        dao.deleteActualSet(actualSet);
     }
 
     private static void checkActualSet(@NonNull ActualSet actualSet) {

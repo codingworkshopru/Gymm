@@ -1,5 +1,7 @@
 package ru.codingworkshop.gymm.data.tree.saver;
 
+import android.support.annotation.NonNull;
+
 import ru.codingworkshop.gymm.data.entity.common.Model;
 import ru.codingworkshop.gymm.data.tree.repositoryadapter.ParentAdapter;
 import ru.codingworkshop.gymm.db.GymmDatabase;
@@ -16,7 +18,7 @@ public class ModelSaver<T extends Model> implements Saver<T> {
     }
 
     @Override
-    public void save(T objectToSave) {
+    public void save(@NonNull T objectToSave) {
         if (GymmDatabase.isValidId(objectToSave)) {
             parentAdapter.updateParent(objectToSave);
         } else {

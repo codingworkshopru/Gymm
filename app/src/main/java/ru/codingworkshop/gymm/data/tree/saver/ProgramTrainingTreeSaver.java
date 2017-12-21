@@ -1,16 +1,19 @@
 package ru.codingworkshop.gymm.data.tree.saver;
 
-import android.arch.lifecycle.LiveData;
-import android.arch.lifecycle.MutableLiveData;
 import android.support.annotation.NonNull;
 
-import com.google.common.collect.Lists;
+import com.google.common.base.Preconditions;
+import com.google.common.collect.Collections2;
 
 import java.util.Collection;
+import java.util.Iterator;
 import java.util.List;
 
 import javax.inject.Inject;
 
+import io.reactivex.Completable;
+import io.reactivex.Flowable;
+import io.reactivex.schedulers.Schedulers;
 import ru.codingworkshop.gymm.data.entity.IProgramExercise;
 import ru.codingworkshop.gymm.data.entity.ProgramExercise;
 import ru.codingworkshop.gymm.data.entity.ProgramSet;
@@ -19,7 +22,6 @@ import ru.codingworkshop.gymm.data.tree.node.ProgramExerciseNode;
 import ru.codingworkshop.gymm.data.tree.node.ProgramTrainingTree;
 import ru.codingworkshop.gymm.data.tree.repositoryadapter.ChildrenAdapter;
 import ru.codingworkshop.gymm.data.tree.repositoryadapter.ProgramTrainingAdapter;
-import ru.codingworkshop.gymm.data.util.LiveDataUtil;
 import ru.codingworkshop.gymm.db.GymmDatabase;
 
 /**
@@ -30,87 +32,81 @@ public class ProgramTrainingTreeSaver implements Saver<ProgramTrainingTree> {
     private ProgramTrainingAdapter adapter;
 
     @Inject
-    public ProgramTrainingTreeSaver(ProgramTrainingAdapter adapter) {
+    ProgramTrainingTreeSaver(ProgramTrainingAdapter adapter) {
         this.adapter = adapter;
     }
 
     @Override
-    public void save(@NonNull ProgramTrainingTree tree) { // TODO refactor this as soon as possible
+    public void save(@NonNull ProgramTrainingTree tree) {
         ProgramTraining parent = tree.getParent();
 
         List<ProgramExerciseNode> programExerciseNodes = tree.getChildren();
 
         if (!GymmDatabase.isValidId(parent)) {
-            LiveDataUtil.getOnce(adapter.insertParent(parent), parentId -> {
-                setParentIdToEveryExercise(programExerciseNodes, parentId);
-                LiveDataUtil.getOnce(adapter.insertChildren(tree.getProgramExercises()), childrenIds -> {
-                    setParentIdToEverySet(programExerciseNodes, childrenIds);
-                    adapter.insertGrandchildren(tree.getAllProgramSets());
-                });
-            });
+            Completable
+                    .fromRunnable(() -> {
+                        long parentId = adapter.insertParent(parent);
+
+                        setParentIdToEveryExercise(programExerciseNodes, parentId);
+                        List<Long> ids = adapter.insertChildren(tree.getProgramExercises());
+
+                        setParentIdToEverySet(programExerciseNodes, ids);
+                        adapter.insertGrandchildren(tree.getAllProgramSets());
+                    })
+                    .subscribeOn(Schedulers.single())
+                    .subscribe();
         } else {
-            adapter.updateParent(parent);
-            final MutableLiveData<Boolean> exercisesInserted = new MutableLiveData<>();
-            ChildrenAdapter<ProgramExercise> exercisesAdapter = new ChildrenAdapter<ProgramExercise>() {
-                @Override
-                public LiveData<List<ProgramExercise>> getChildren(long id) {
-                    return adapter.getChildren(id);
-                }
+            long parentId = parent.getId();
+            adapter.getChildren(parentId)
+                    .take(1)
+                    .subscribe(oldChildren -> {
+                        adapter.updateParent(tree.getParent());
 
-                @Override
-                public LiveData<List<Long>> insertChildren(Collection<ProgramExercise> children) {
-                    setParentIdToEveryExercise(children, parent.getId());
-                    return LiveDataUtil.getOnce(adapter.insertChildren(children), childrenIds -> {
-                        setParentIdToEverySet(programExerciseNodes, childrenIds);
-                        exercisesInserted.setValue(true);
+                        ChildrenSaver.ContainersDiffResult<ProgramExercise> diffResult =
+                                ChildrenSaver.containersDiff(oldChildren, tree.getProgramExercises());
+
+                        adapter.deleteChildren(diffResult.getToDelete());
+                        adapter.updateChildren(diffResult.getToUpdate());
+
+                        Collection<ProgramExercise> toInsert = diffResult.getToInsert();
+                        List<Long> ids = adapter.insertChildren(toInsert);
+                        setParentIdToEverySet(Collections2.filter(tree.getChildren(), ch -> toInsert.contains(ch.getParent())), ids);
+
+                        new ChildrenSaver<>(new ChildrenAdapter<ProgramSet>() {
+                            @Override
+                            public Flowable<List<ProgramSet>> getChildren(long id) {
+                                return adapter.getGrandchildren(id);
+                            }
+
+                            @Override
+                            public List<Long> insertChildren(Collection<ProgramSet> children) {
+                                adapter.insertGrandchildren(children);
+                                return null;
+                            }
+
+                            @Override
+                            public void updateChildren(Collection<ProgramSet> children) {
+                                adapter.updateGrandchildren(children);
+                            }
+
+                            @Override
+                            public void deleteChildren(Collection<ProgramSet> children) {
+                                adapter.deleteGrandchildren(children);
+                            }
+                        }, parentId).save(tree.getAllProgramSets());
                     });
-                }
-
-                @Override
-                public void updateChildren(Collection<ProgramExercise> children) {
-                    adapter.updateChildren(children);
-                }
-
-                @Override
-                public void deleteChildren(Collection<ProgramExercise> children) {
-                    adapter.deleteChildren(children);
-                }
-            };
-            new ChildrenSaver<>(exercisesAdapter, parent.getId()).save(tree.getProgramExercises());
-            LiveDataUtil.getOnce(exercisesInserted, i -> {
-                if (i != null && i) {
-                    new ChildrenSaver<>(new ChildrenAdapter<ProgramSet>() {
-                        @Override
-                        public LiveData<List<ProgramSet>> getChildren(long id) {
-                            return adapter.getGrandchildren(id);
-                        }
-
-                        @Override
-                        public LiveData<List<Long>> insertChildren(Collection<ProgramSet> children) {
-                            adapter.insertGrandchildren(children);
-                            return null;
-                        }
-
-                        @Override
-                        public void updateChildren(Collection<ProgramSet> children) {
-                            adapter.updateGrandchildren(children);
-                        }
-
-                        @Override
-                        public void deleteChildren(Collection<ProgramSet> children) {
-                            adapter.deleteGrandchildren(children);
-                        }
-                    }, parent.getId())
-                            .save(Lists.newArrayList(tree.getAllProgramSets()));
-                }
-            });
         }
     }
 
-    private void setParentIdToEverySet(List<ProgramExerciseNode> programExerciseNodes, List<Long> childrenIds) {
-        for (int i = 0; i < childrenIds.size(); i++) {
-            ProgramExerciseNode n = programExerciseNodes.get(i);
-            long id = childrenIds.get(i);
+    private void setParentIdToEverySet(Collection<ProgramExerciseNode> programExerciseNodes, Collection<Long> childrenIds) {
+        Preconditions.checkArgument(programExerciseNodes.size() == childrenIds.size(), "collection exercises and their ids must have the same size");
+
+        Iterator<ProgramExerciseNode> nodeIt = programExerciseNodes.iterator();
+        Iterator<Long> idIt = childrenIds.iterator();
+
+        while (nodeIt.hasNext() && idIt.hasNext()) {
+            ProgramExerciseNode n = nodeIt.next();
+            long id = idIt.next();
 
             for (ProgramSet s : n.getChildren()) {
                 s.setProgramExerciseId(id);
@@ -118,8 +114,8 @@ public class ProgramTrainingTreeSaver implements Saver<ProgramTrainingTree> {
         }
     }
 
-    private void setParentIdToEveryExercise(Collection<? extends IProgramExercise> programExerciseNodes, Long parentId) {
-        for (IProgramExercise n : programExerciseNodes) {
+    private void setParentIdToEveryExercise(List<? extends IProgramExercise> programExercises, long parentId) {
+        for (IProgramExercise n : programExercises) {
             n.setProgramTrainingId(parentId);
         }
     }

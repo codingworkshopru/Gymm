@@ -1,10 +1,11 @@
-package ru.codingworkshop.gymm.data.tree.loader2;
+package ru.codingworkshop.gymm.data.tree.loader;
 
 import javax.inject.Inject;
 
 import io.reactivex.Flowable;
+import ru.codingworkshop.gymm.data.tree.loader.common.Loader;
 import ru.codingworkshop.gymm.data.tree.node.ExerciseNode;
-import ru.codingworkshop.gymm.data.tree.repositoryadapter2.ExerciseAdapter;
+import ru.codingworkshop.gymm.data.tree.repositoryadapter.ExerciseAdapter;
 
 /**
  * Created by Radik on 17.12.2017.

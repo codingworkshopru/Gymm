@@ -27,10 +27,10 @@ import ru.codingworkshop.gymm.db.Converters;
 @Dao
 public interface ActualTrainingDao {
     @Query("select * from ActualTraining where id = :actualTrainingId")
-    LiveData<ActualTraining> getActualTrainingById(long actualTrainingId);
+    Flowable<ActualTraining> getActualTrainingById(long actualTrainingId);
 
     @Insert
-    Long insertActualTraining(ActualTraining actualTraining);
+    long insertActualTraining(ActualTraining actualTraining);
 
     @Update
     int updateActualTraining(ActualTraining training);
@@ -62,14 +62,14 @@ public interface ActualTrainingDao {
     @Query("select * " +
             "from ActualExercise " +
             "where actualTrainingId = :actualTrainingId")
-    LiveData<List<ActualExercise>> getActualExercisesForActualTraining(long actualTrainingId);
+    Flowable<List<ActualExercise>> getActualExercisesForActualTraining(long actualTrainingId);
 
     @Query("select aset.* " +
             "from ActualSet aset " +
             "join ActualExercise ae on ae.id = aset.actualExerciseId " +
             "where ae.actualTrainingId = :actualTrainingId " +
             "order by ae.id, aset.id")
-    LiveData<List<ActualSet>> getActualSetsForActualTraining(long actualTrainingId);
+    Flowable<List<ActualSet>> getActualSetsForActualTraining(long actualTrainingId);
 
     @Query("select distinct exerciseName from ActualExercise order by exerciseName")
     LiveData<List<String>> getActualExerciseNames();

@@ -1,7 +1,7 @@
 package ru.codingworkshop.gymm;
 
 import android.app.Activity;
-import android.app.Application;
+import android.support.multidex.MultiDexApplication;
 
 import dagger.android.AndroidInjector;
 import dagger.android.HasActivityInjector;
@@ -11,7 +11,7 @@ import timber.log.Timber;
  * Created by Радик on 19.06.2017.
  */
 
-public class TestApp extends Application implements HasActivityInjector {
+public class TestApp extends MultiDexApplication implements HasActivityInjector {
     @Override
     public void onCreate() {
         super.onCreate();

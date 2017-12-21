@@ -25,7 +25,7 @@ android {
     }
     buildTypes {
         release {
-            minifyEnabled false
+            minifyEnabled true
             proguardFiles getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro"
         }
     }
@@ -33,7 +33,6 @@ android {
         enabled true
     }
 }
-
 
 
 ext {
@@ -54,7 +53,6 @@ ext {
 
     espresso = "3.0.1"
     mockito = "2.13.0"
-    junit = "4.12"
     junit_params = "1.1.0"
 }
 
@@ -96,7 +94,6 @@ dependencies {
     annotationProcessor "com.google.dagger:dagger-android-processor:$dagger"
     annotationProcessor "com.google.dagger:dagger-compiler:$dagger"
 
-    testImplementation "junit:junit:$junit"
     testImplementation "pl.pragmatists:JUnitParams:$junit_params"
     testImplementation "org.mockito:mockito-core:$mockito"
     testImplementation "android.arch.core:core-testing:$arch"

@@ -9,7 +9,7 @@ import org.junit.runners.Suite;
 
 @RunWith(Suite.class)
 @Suite.SuiteClasses({
-        BaseRepositoryTest.class,
+        InsertDelegateTest.class,
         ExercisesRepositoryTest.class,
         MuscleGroupsRepositoryTest.class,
         ProgramTrainingRepositoryTest.class,

@@ -45,14 +45,7 @@ public interface ExerciseDao {
                     "where pe.programTrainingId = :programTrainingId " +
                     "order by pe.sortOrder"
     )
-    LiveData<List<Exercise>> getExercisesForProgramTraining(long programTrainingId);
-
-    @Query(
-            "select e.* from Exercise as e " +
-                    "join ProgramExercise pe on pe.exerciseId = e.id " +
-                    "where pe.id = :programExerciseId"
-    )
-    LiveData<Exercise> getExerciseForProgramExercise(long programExerciseId);
+    Flowable<List<Exercise>> getExercisesForProgramTraining(long programTrainingId);
 
     @Insert(onConflict = FAIL)
     List<Long> insertExercises(List<Exercise> entities);

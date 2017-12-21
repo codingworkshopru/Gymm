@@ -13,9 +13,8 @@ import org.mockito.junit.MockitoJUnitRunner;
 import java.util.ArrayList;
 
 import io.reactivex.Flowable;
-import ru.codingworkshop.gymm.data.tree.loader2.ExerciseLoader;
 import ru.codingworkshop.gymm.data.tree.node.ExerciseNode;
-import ru.codingworkshop.gymm.data.tree.repositoryadapter2.ExerciseAdapter;
+import ru.codingworkshop.gymm.data.tree.repositoryadapter.ExerciseAdapter;
 import ru.codingworkshop.gymm.util.Models;
 
 import static org.junit.Assert.assertFalse;

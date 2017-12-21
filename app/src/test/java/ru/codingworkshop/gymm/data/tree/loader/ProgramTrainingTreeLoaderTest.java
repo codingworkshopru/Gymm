@@ -8,12 +8,12 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 
+import io.reactivex.Flowable;
 import ru.codingworkshop.gymm.data.tree.node.ImmutableProgramTrainingTree;
 import ru.codingworkshop.gymm.data.tree.node.ProgramTrainingTree;
 import ru.codingworkshop.gymm.data.tree.repositoryadapter.ProgramTrainingAdapter;
 import ru.codingworkshop.gymm.repository.ExercisesRepository;
 import ru.codingworkshop.gymm.repository.ProgramTrainingRepository;
-import ru.codingworkshop.gymm.util.LiveTest;
 import ru.codingworkshop.gymm.util.Models;
 
 import static org.junit.Assert.assertEquals;
@@ -33,17 +33,17 @@ public class ProgramTrainingTreeLoaderTest {
 
     @Test
     public void load() throws Exception {
-        when(repository.getProgramTrainingById(1L)).thenReturn(Models.createLiveProgramTraining(1L, "foo"));
-        when(repository.getProgramExercisesForTraining(1L)).thenReturn(Models.createLiveProgramExercises(1));
-        when(repository.getProgramSetsForTraining(1L)).thenReturn(Models.createLiveProgramSets(2L, 3));
-        when(exercisesRepository.getExercisesForProgramTraining(1L)).thenReturn(Models.createLiveExercises("bar", "baz"));
+        when(repository.getProgramTrainingById(1L)).thenReturn(Flowable.just(Models.createProgramTraining(1L, "foo")));
+        when(repository.getProgramExercisesForTraining(1L)).thenReturn(Flowable.just(Models.createProgramExercises(1)));
+        when(repository.getProgramSetsForTraining(1L)).thenReturn(Flowable.just(Models.createProgramSets(2L, 3)));
+        when(exercisesRepository.getExercisesForProgramTraining(1L)).thenReturn(Flowable.just(Models.createExercises("bar", "baz")));
 
         ProgramTrainingAdapter adapter = new ProgramTrainingAdapter(repository, exercisesRepository);
 
         ProgramTrainingTree tree = new ImmutableProgramTrainingTree();
         ProgramTrainingTreeLoader loader = new ProgramTrainingTreeLoader(adapter);
 
-        LiveTest.verifyLiveData(loader.loadById(tree, 1L), loadedTree -> {
+        loader.loadById(tree, 1L).test().assertValue(loadedTree -> {
             assertEquals(1L, loadedTree.getParent().getId());
             assertEquals(2L, loadedTree.getChildren().get(0).getId());
             assertEquals(3L, loadedTree.getChildren().get(0).getChildren().get(0).getId());

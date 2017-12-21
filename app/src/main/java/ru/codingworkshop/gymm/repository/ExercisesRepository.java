@@ -46,11 +46,7 @@ public class ExercisesRepository {
         return exerciseDao.getExerciseById(id);
     }
 
-    public LiveData<List<Exercise>> getExercisesForProgramTraining(long programTrainingId) {
+    public Flowable<List<Exercise>> getExercisesForProgramTraining(long programTrainingId) {
         return exerciseDao.getExercisesForProgramTraining(programTrainingId);
-    }
-
-    public LiveData<Exercise> getExerciseForProgramExercise(long programExerciseId) {
-        return exerciseDao.getExerciseForProgramExercise(programExerciseId);
     }
 }

@@ -12,18 +12,32 @@ import org.junit.Rule;
 import org.junit.Test;
 
 import ru.codingworkshop.gymm.R;
-import ru.codingworkshop.gymm.data.entity.ProgramExercise;
 import ru.codingworkshop.gymm.db.GymmDatabase;
 import ru.codingworkshop.gymm.ui.MainActivity;
-import ru.codingworkshop.gymm.util.Models;
 
 import static android.support.test.espresso.Espresso.onView;
 import static android.support.test.espresso.action.ViewActions.click;
 import static android.support.test.espresso.matcher.ViewMatchers.withText;
-import static junit.framework.Assert.assertNotSame;
-import static junit.framework.Assert.fail;
 import static ru.codingworkshop.gymm.db.initializer.DatabaseInitializer.DATABASE_NAME;
-import static ru.codingworkshop.gymm.integration.Operation.*;
+import static ru.codingworkshop.gymm.integration.Operation.addProgramExerciseClick;
+import static ru.codingworkshop.gymm.integration.Operation.addProgramSetClick;
+import static ru.codingworkshop.gymm.integration.Operation.addProgramTrainingClick;
+import static ru.codingworkshop.gymm.integration.Operation.checkExerciseNotPresented;
+import static ru.codingworkshop.gymm.integration.Operation.checkProgramExercise;
+import static ru.codingworkshop.gymm.integration.Operation.checkProgramTraining;
+import static ru.codingworkshop.gymm.integration.Operation.checkSet;
+import static ru.codingworkshop.gymm.integration.Operation.clearProgramTrainingName;
+import static ru.codingworkshop.gymm.integration.Operation.deleteProgramExerciseAt;
+import static ru.codingworkshop.gymm.integration.Operation.editProgramExerciseClick;
+import static ru.codingworkshop.gymm.integration.Operation.editProgramSetClick;
+import static ru.codingworkshop.gymm.integration.Operation.editProgramTrainingClick;
+import static ru.codingworkshop.gymm.integration.Operation.enterActionMode;
+import static ru.codingworkshop.gymm.integration.Operation.exitActionMode;
+import static ru.codingworkshop.gymm.integration.Operation.pickExercise;
+import static ru.codingworkshop.gymm.integration.Operation.saveProgramExerciseClick;
+import static ru.codingworkshop.gymm.integration.Operation.saveProgramTrainingClick;
+import static ru.codingworkshop.gymm.integration.Operation.typeProgramTrainingName;
+import static ru.codingworkshop.gymm.integration.Operation.typeSetAndSaveIt;
 
 /**
  * Created by Radik on 22.11.2017.
@@ -67,6 +81,54 @@ public class ProgramTrainingIntegrationTest {
         checkProgramExercise(0, exerciseName, 1);
         saveProgramTrainingClick();
         checkProgramTraining(trainingName);
+    }
+
+    @Test
+    public void addAndEditProgramSet() throws Exception {
+        addOneProgramTraining("monday workout", "Приседания в гакк-тренажере");
+
+        editProgramTrainingClick("monday workout");
+        editProgramExerciseClick("Приседания в гакк-тренажере");
+        // add
+        addProgramSetClick();
+        typeSetAndSaveIt(7, 6, 5);
+        // edit
+        editProgramSetClick(0);
+        typeSetAndSaveIt(8, 9, 10);
+
+        saveProgramExerciseClick();
+        saveProgramTrainingClick();
+
+        editProgramTrainingClick("monday workout");
+        editProgramExerciseClick("Приседания в гакк-тренажере");
+        checkSet(0, 8, 9, 10);
+        checkSet(1, 7, 6, 5);
+    }
+
+    @Test
+    public void addAndEditProgramExercise() throws Exception {
+        addOneProgramTraining("monday workout", "Приседания в гакк-тренажере");
+
+        editProgramTrainingClick("monday workout");
+
+        // edit
+        editProgramExerciseClick("Приседания в гакк-тренажере");
+        pickExercise(db, "Отжимания от пола");
+        addProgramSetClick();
+        typeSetAndSaveIt(1, 2, 5);
+        saveProgramExerciseClick();
+
+        // add
+        addProgramExerciseClick();
+        pickExercise(db, "Жим штанги лёжа");
+        addProgramSetClick();
+        typeSetAndSaveIt(1, 4, 5);
+        saveProgramExerciseClick();
+
+        saveProgramTrainingClick();
+        editProgramTrainingClick("monday workout");
+        checkProgramExercise(0, "Отжимания от пола", 2);
+        checkProgramExercise(1, "Жим штанги лёжа", 1);
     }
 
     @Test

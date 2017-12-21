@@ -9,12 +9,12 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 
+import io.reactivex.Flowable;
 import ru.codingworkshop.gymm.data.tree.node.ActualTrainingTree;
-import ru.codingworkshop.gymm.data.util.LiveDataUtil;
-import ru.codingworkshop.gymm.util.LiveTest;
 import ru.codingworkshop.gymm.util.TreeBuilders;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
@@ -33,21 +33,22 @@ public class ActualTrainingEmptyTreeLoaderTest {
     @Before
     public void setUp() throws Exception {
         when(programTrainingTreeLoader.loadById(any(), eq(1L)))
-                .thenReturn(LiveDataUtil.getLive(TreeBuilders.buildProgramTrainingTree(1)));
+                .thenReturn(Flowable.just(TreeBuilders.buildProgramTrainingTree(1)));
 
         loader = new ActualTrainingEmptyTreeLoader(programTrainingTreeLoader);
     }
 
     @Test
     public void loadById() throws Exception {
-        LiveTest.verifyLiveData(loader.loadById(new ActualTrainingTree(), 1L), tree -> {
+        loader.loadById(new ActualTrainingTree(), 1L)
+                .test()
+                .assertValue(tree -> {
+                    assertNotNull(tree.getParent());
+                    assertNotNull(tree.getProgramTraining());
+                    assertEquals(1, tree.getChildrenCount());
+                    assertNotNull(tree.getChildren().get(0).getProgramExerciseNode());
 
-            assertNotNull(tree.getParent());
-            assertNotNull(tree.getProgramTraining());
-            assertEquals(1, tree.getChildrenCount());
-            assertNotNull(tree.getChildren().get(0).getProgramExerciseNode());
-
-            return true;
-        });
+                    return true;
+                });
     }
 }

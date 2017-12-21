@@ -12,7 +12,7 @@ import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 
 import io.reactivex.Flowable;
-import ru.codingworkshop.gymm.data.tree.loader2.ExerciseLoader;
+import ru.codingworkshop.gymm.data.tree.loader.ExerciseLoader;
 import ru.codingworkshop.gymm.data.tree.node.ExerciseNode;
 
 import static org.junit.Assert.assertSame;

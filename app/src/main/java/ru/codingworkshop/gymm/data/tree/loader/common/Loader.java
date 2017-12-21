@@ -1,10 +1,10 @@
 package ru.codingworkshop.gymm.data.tree.loader.common;
 
-import android.arch.lifecycle.LiveData;
+import io.reactivex.Flowable;
 
 /**
  * Created by Radik on 09.11.2017.
  */
 public interface Loader<T> {
-    LiveData<T> loadById(T node, long id);
+    Flowable<T> loadById(T node, long id);
 }

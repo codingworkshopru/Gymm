@@ -1,6 +1,7 @@
 package ru.codingworkshop.gymm.ui.program;
 
 import android.arch.lifecycle.LiveData;
+import android.arch.lifecycle.LiveDataReactiveStreams;
 import android.arch.lifecycle.MutableLiveData;
 import android.arch.lifecycle.Transformations;
 import android.arch.lifecycle.ViewModel;
@@ -13,6 +14,7 @@ import com.google.common.base.Strings;
 
 import javax.inject.Inject;
 
+import io.reactivex.Flowable;
 import ru.codingworkshop.gymm.data.entity.ProgramExercise;
 import ru.codingworkshop.gymm.data.entity.ProgramSet;
 import ru.codingworkshop.gymm.data.entity.ProgramTraining;
@@ -59,10 +61,10 @@ public class ProgramTrainingViewModel extends ViewModel {
     }
 
     public @NonNull LiveData<ProgramTrainingTree> loadTree(long programTrainingId) {
-        LiveData<ProgramTrainingTree> liveTree = loader.loadById(tree, programTrainingId);
-        return LiveDataUtil.getOnce(liveTree, programTrainingTree -> {
+        Flowable<ProgramTrainingTree> tree = loader.loadById(this.tree, programTrainingId);
+        return LiveDataReactiveStreams.fromPublisher(tree.doOnNext(programTrainingTree -> {
             programTrainingOldName = programTrainingTree.getParent().getName();
-        });
+        }));
     }
 
     public void saveTree() {
@@ -89,9 +91,9 @@ public class ProgramTrainingViewModel extends ViewModel {
             return LiveDataUtil.getLive(true);
         }
 
-        return Transformations.map(
-                repositoryAdapter.getChildren(parent.getId()),
-                oldChildren -> !Objects.equal(oldChildren, tree.getProgramExercises()));
+        return LiveDataReactiveStreams.fromPublisher(
+                repositoryAdapter.getChildren(parent.getId())
+                .map(oldChildren -> !Objects.equal(oldChildren, tree.getProgramExercises())));
     }
 
     /**

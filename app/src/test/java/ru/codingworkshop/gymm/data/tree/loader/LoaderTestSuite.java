@@ -5,7 +5,6 @@ import org.junit.runners.Suite;
 
 import ru.codingworkshop.gymm.data.tree.loader.builder.TreeBuilderTestSuite;
 import ru.codingworkshop.gymm.data.tree.loader.common.LoaderDelegateTest;
-import ru.codingworkshop.gymm.data.tree.loader.common.NodeLoaderDelegateTest;
 
 /**
  * Created by Радик on 21.08.2017 as part of the Gymm project.
@@ -16,9 +15,7 @@ import ru.codingworkshop.gymm.data.tree.loader.common.NodeLoaderDelegateTest;
         TreeBuilderTestSuite.class,
 
         LoaderDelegateTest.class,
-        NodeLoaderDelegateTest.class,
 
-        ProgramExerciseLoaderTest.class,
         ProgramTrainingTreeLoaderTest.class,
         ActualTrainingTreeLoaderTest.class,
         ActualTrainingEmptyTreeLoaderTest.class,

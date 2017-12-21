@@ -7,7 +7,7 @@ import android.arch.lifecycle.ViewModel;
 import javax.inject.Inject;
 
 import io.reactivex.Flowable;
-import ru.codingworkshop.gymm.data.tree.loader2.ExerciseLoader;
+import ru.codingworkshop.gymm.data.tree.loader.ExerciseLoader;
 import ru.codingworkshop.gymm.data.tree.node.ExerciseNode;
 
 /**

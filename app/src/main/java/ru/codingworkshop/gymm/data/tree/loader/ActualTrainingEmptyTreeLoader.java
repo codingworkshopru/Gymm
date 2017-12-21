@@ -1,12 +1,10 @@
 package ru.codingworkshop.gymm.data.tree.loader;
 
-import android.arch.core.util.Function;
-import android.arch.lifecycle.LiveData;
-import android.arch.lifecycle.Transformations;
 import android.support.annotation.NonNull;
 
 import javax.inject.Inject;
 
+import io.reactivex.Flowable;
 import ru.codingworkshop.gymm.data.tree.loader.builder.ActualTrainingTreeBuilder;
 import ru.codingworkshop.gymm.data.tree.loader.common.Loader;
 import ru.codingworkshop.gymm.data.tree.node.ActualTrainingTree;
@@ -21,25 +19,18 @@ public class ActualTrainingEmptyTreeLoader implements Loader<ActualTrainingTree>
     private ProgramTrainingTreeLoader programTrainingTreeLoader;
 
     @Inject
-    public ActualTrainingEmptyTreeLoader(@NonNull ProgramTrainingTreeLoader programTrainingTreeLoader) {
+    ActualTrainingEmptyTreeLoader(@NonNull ProgramTrainingTreeLoader programTrainingTreeLoader) {
         this.programTrainingTreeLoader = programTrainingTreeLoader;
     }
 
     @Override
-    public LiveData<ActualTrainingTree> loadById(ActualTrainingTree tree, long id) {
-        return mapProgramTrainingTree(id, programTrainingTree -> {
-            return buildActualTrainingTree(tree, programTrainingTree);
-        });
-    }
-
-    private ActualTrainingTree buildActualTrainingTree(ActualTrainingTree tree, ProgramTrainingTree programTrainingTree) {
-        return (ActualTrainingTree) new ActualTrainingTreeBuilder(tree)
-                .setProgramTrainingTree(programTrainingTree)
-                .build();
-    }
-
-    private LiveData<ActualTrainingTree> mapProgramTrainingTree(long programTrainingId, Function<ProgramTrainingTree, ActualTrainingTree> func) {
+    public Flowable<ActualTrainingTree> loadById(ActualTrainingTree tree, long id) {
         ProgramTrainingTree programTrainingTree = new ImmutableProgramTrainingTree();
-        return Transformations.map(programTrainingTreeLoader.loadById(programTrainingTree, programTrainingId), func);
+        return programTrainingTreeLoader.loadById(programTrainingTree, id)
+                .map(programTrainingTree1 ->
+                        (ActualTrainingTree) new ActualTrainingTreeBuilder(tree)
+                        .setProgramTrainingTree(programTrainingTree1)
+                        .build()
+        );
     }
 }

@@ -1,6 +1,5 @@
 package ru.codingworkshop.gymm.ui.info.statistics.viewmodel;
 
-import android.annotation.SuppressLint;
 import android.arch.lifecycle.LiveData;
 import android.arch.lifecycle.MediatorLiveData;
 import android.arch.lifecycle.MutableLiveData;
@@ -36,7 +35,7 @@ public class StatisticsViewModel extends ViewModel {
 
     public final MediatorLiveData<List<Entry>> chartEntries = new MediatorLiveData<>();
 
-    private final ActualTrainingDao dao;
+    private final ActualTrainingDao dao; // FIXME: 20.12.2017 replace to repository
     private LiveData<List<String>> actualExerciseNames;
     private Disposable subscribe;
 
@@ -48,7 +47,6 @@ public class StatisticsViewModel extends ViewModel {
         chartEntries.addSource(dataTypeId, this::onFilterEvent);
     }
 
-    @SuppressLint("CheckResult")
     private void onFilterEvent(@Nullable Long id) {
         Long exercise = exerciseId.getValue();
         Long range = rangeId.getValue();
@@ -62,7 +60,7 @@ public class StatisticsViewModel extends ViewModel {
             subscribe.dispose();
         }
 
-        dao.getStatisticsForExercise(getExerciseNameById(exercise), getStartDateById(range))
+        subscribe = dao.getStatisticsForExercise(getExerciseNameById(exercise), getStartDateById(range))
                 .take(1)
                 .toObservable()
                 .flatMap(Observable::fromIterable)

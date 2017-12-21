@@ -1,7 +1,7 @@
 package ru.codingworkshop.gymm.ui.actual.viewmodel;
 
 import android.arch.lifecycle.LiveData;
-import android.arch.lifecycle.Transformations;
+import android.arch.lifecycle.LiveDataReactiveStreams;
 import android.arch.lifecycle.ViewModel;
 import android.support.annotation.NonNull;
 import android.support.annotation.VisibleForTesting;
@@ -27,8 +27,6 @@ import ru.codingworkshop.gymm.data.tree.node.ProgramExerciseNode;
 import ru.codingworkshop.gymm.data.util.LiveDataUtil;
 import ru.codingworkshop.gymm.db.GymmDatabase;
 import ru.codingworkshop.gymm.repository.ActualTrainingRepository;
-import ru.codingworkshop.gymm.repository.ExercisesRepository;
-import ru.codingworkshop.gymm.repository.ProgramTrainingRepository;
 
 /**
  * Created by Радик on 25.08.2017 as part of the Gymm project.
@@ -56,13 +54,12 @@ public class ActualTrainingViewModel extends ViewModel {
     public LiveData<ActualTrainingTree> startTraining(final long programTrainingId) {
         if (tree == null) {
             tree = new ActualTrainingTree();
-            LiveData<ActualTrainingTree> actualTrainingTreeLiveData = emptyTreeLoader.get().loadById(tree, programTrainingId);
-            return Transformations.switchMap(
-                    actualTrainingTreeLiveData,
-                    tree -> Transformations.map(
-                            actualTrainingRepository.insertActualTrainingWithResult(tree.getParent()),
-                            insertedId -> tree)
-            );
+            return LiveDataReactiveStreams.fromPublisher(emptyTreeLoader.get()
+                    .loadById(tree, programTrainingId)
+                    .map(t -> {
+                        actualTrainingRepository.insertActualTraining(tree.getParent());
+                        return t;
+                    }));
         } else {
             return LiveDataUtil.getLive(tree);
         }
@@ -72,7 +69,7 @@ public class ActualTrainingViewModel extends ViewModel {
         if (tree == null) {
             tree = new ActualTrainingTree();
             ActualTrainingTreeLoader loader = treeLoader.get();
-            return loader.loadById(tree, actualTrainingId);
+            return LiveDataReactiveStreams.fromPublisher(loader.loadById(tree, actualTrainingId));
         } else {
             return LiveDataUtil.getLive(tree);
         }

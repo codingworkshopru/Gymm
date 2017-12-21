@@ -13,6 +13,7 @@ import org.mockito.junit.MockitoJUnitRunner;
 import java.util.Objects;
 
 import dagger.Lazy;
+import io.reactivex.Flowable;
 import ru.codingworkshop.gymm.data.entity.ActualExercise;
 import ru.codingworkshop.gymm.data.entity.ActualSet;
 import ru.codingworkshop.gymm.data.entity.ActualTraining;
@@ -61,21 +62,21 @@ public class ActualTrainingViewModelTest {
         when(actualTrainingTreeLoader.loadById(any(), eq(11L))).thenAnswer(invocation -> {
             ActualTrainingTree tree = TreeBuilders.buildFullPopulatedTree(1);
             vm.tree = tree;
-            return LiveDataUtil.getLive(tree);
+            return Flowable.just(tree);
         });
         when(actualTrainingEmptyTreeLoader.loadById(any(), eq(1L))).thenAnswer(invocation -> {
             ActualTrainingTree tree = TreeBuilders.buildTreeWithoutActuals(1);
             vm.tree = tree;
-            return LiveDataUtil.getLive(tree);
+            return Flowable.just(tree);
         });
 
         when(actualTrainingTreeLoaderLazy.get()).thenReturn(actualTrainingTreeLoader);
         when(actualTrainingEmptyTreeLoaderLazy.get()).thenReturn(actualTrainingEmptyTreeLoader);
 
-        when(actualRepository.insertActualTrainingWithResult(any())).thenAnswer(invocation -> {
+        when(actualRepository.insertActualTraining(any())).thenAnswer(invocation -> {
             ActualTraining actualTraining = invocation.getArgument(0);
             actualTraining.setId(11L);
-            return LiveDataUtil.getLive(11L);
+            return 11L;
         });
 
         when(actualRepository.insertActualSetWithResult(any())).thenAnswer(invocation -> {
@@ -92,7 +93,7 @@ public class ActualTrainingViewModelTest {
 
         assertEquals(1, tree.getChildren().size());
         assertEquals(11L, tree.getParent().getId());
-        verify(actualRepository).insertActualTrainingWithResult(any());
+        verify(actualRepository).insertActualTraining(any());
 
         verifyProgramLoaded();
 
