@@ -18,7 +18,7 @@
             android:layout_weight="1"
             android:ellipsize="end"
             android:maxLines="1"
-            android:textAppearance="@style/TextAppearance.AppCompat.Notification.Title"
+            android:textAppearance="@style/TextAppearance.Compat.Notification.Title"
             tools:text="very very very very very very very very very very very long text" />
 
         <TextView
@@ -27,7 +27,7 @@
             android:layout_marginLeft="4dp"
             android:layout_marginStart="4dp"
             android:text="@string/bullet"
-            android:textAppearance="@style/TextAppearance.AppCompat.Notification.Title" />
+            android:textAppearance="@style/TextAppearance.Compat.Notification.Title" />
 
         <Chronometer
             android:id="@+id/notification_chronometer"
@@ -35,7 +35,7 @@
             android:layout_height="wrap_content"
             android:layout_marginLeft="4dp"
             android:layout_marginStart="4dp"
-            android:textAppearance="@style/TextAppearance.AppCompat.Notification.Title" />
+            android:textAppearance="@style/TextAppearance.Compat.Notification.Title" />
 
     </LinearLayout>
 
@@ -54,7 +54,7 @@
             android:layout_weight="1"
             android:ellipsize="end"
             android:maxLines="1"
-            android:textAppearance="@style/TextAppearance.AppCompat.Notification"
+            android:textAppearance="@style/TextAppearance.Compat.Notification"
             tools:text="very very very very very very very very very very very long" />
 
         <TextView
@@ -64,7 +64,7 @@
             android:layout_marginLeft="4dp"
             android:layout_marginStart="4dp"
             android:maxLines="1"
-            android:textAppearance="@style/TextAppearance.AppCompat.Notification"
+            android:textAppearance="@style/TextAppearance.Compat.Notification"
             tools:text="1234" />
 
     </LinearLayout>

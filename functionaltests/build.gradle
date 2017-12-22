@@ -1,0 +1,44 @@
+apply plugin: 'com.android.test'
+
+android {
+    compileSdkVersion 27
+    buildToolsVersion "27.0.3"
+
+    defaultConfig {
+        minSdkVersion 15
+        targetSdkVersion 27
+
+        testApplicationId "ru.codingworkshop.gymm.functionaltests.test"
+        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+        vectorDrawables.useSupportLibrary true
+        multiDexEnabled true
+    }
+    compileOptions {
+        targetCompatibility JavaVersion.VERSION_1_8
+        sourceCompatibility JavaVersion.VERSION_1_8
+    }
+    targetProjectPath ':app'
+}
+
+ext {
+    support = "27.0.2"
+    arch = "1.0.0"
+    multidex = "1.0.2"
+    espresso = "3.0.1"
+    mockito = "2.13.0"
+}
+
+dependencies {
+    implementation fileTree(dir: 'libs', include: ['*.jar'])
+
+    implementation "com.android.support:appcompat-v7:$support"
+    implementation "com.android.support:recyclerview-v7:$support"
+    implementation "com.android.support:support-v4:$support"
+    implementation "com.android.support:design:$support"
+    implementation "android.arch.core:core-testing:$arch"
+    implementation "android.arch.persistence.room:runtime:$arch"
+    implementation "org.mockito:mockito-android:$mockito"
+    implementation "com.android.support.test.espresso:espresso-core:$espresso"
+    implementation "com.android.support.test.espresso:espresso-contrib:$espresso"
+    implementation "com.android.support:multidex:$multidex"
+}
