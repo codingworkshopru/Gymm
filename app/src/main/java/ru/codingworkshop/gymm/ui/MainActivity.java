@@ -25,7 +25,8 @@ import ru.codingworkshop.gymm.ui.actual.ActualTrainingActivity;
 import ru.codingworkshop.gymm.ui.actual.exercise.ActualExercisesFragment;
 import ru.codingworkshop.gymm.ui.common.ClickableBindingListAdapter;
 import ru.codingworkshop.gymm.ui.common.ListItemListeners;
-import ru.codingworkshop.gymm.ui.info.statistics.StatisticsActivity;
+import ru.codingworkshop.gymm.ui.info.statistics.journal.StatisticsJournalActivity;
+import ru.codingworkshop.gymm.ui.info.statistics.plot.StatisticsPlotActivity;
 import ru.codingworkshop.gymm.ui.program.ProgramTrainingActivity;
 
 import static ru.codingworkshop.gymm.ui.program.ProgramTrainingActivity.PROGRAM_TRAINING_ID_KEY;
@@ -50,8 +51,8 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void onProgramTrainingLoaded(List<ProgramTraining> programTrainings) {
-        ListItemListeners listItemListeners = new ListItemListeners(R.layout.activity_main_list_item);
-        listItemListeners.setOnClickListener(this::onProgramTrainingClick);
+        ListItemListeners listItemListeners = new ListItemListeners(R.layout.activity_main_list_item)
+                .setOnClickListener(this::onProgramTrainingClick);
 
         RecyclerView programTrainingsView = findViewById(R.id.rv_test_main);
         programTrainingsView.setAdapter(new ClickableBindingListAdapter<ProgramTraining, ActivityMainListItemBinding>(programTrainings, listItemListeners) {
@@ -94,8 +95,13 @@ public class MainActivity extends AppCompatActivity {
                 startActivity(programTrainingActivityIntent());
                 return true;
 
-            case R.id.action_show_statistics:
-                startActivity(new Intent(this, StatisticsActivity.class));
+            case R.id.action_show_plot_statistics:
+                startActivity(new Intent(this, StatisticsPlotActivity.class));
+                return true;
+
+            case R.id.action_show_journal_statistics:
+                startActivity(new Intent(this, StatisticsJournalActivity.class));
+                return true;
 
             default:
                 return super.onOptionsItemSelected(item);

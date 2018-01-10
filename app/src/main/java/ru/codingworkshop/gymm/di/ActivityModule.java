@@ -5,7 +5,8 @@ import dagger.android.ContributesAndroidInjector;
 import ru.codingworkshop.gymm.ui.MainActivity;
 import ru.codingworkshop.gymm.ui.actual.ActualTrainingActivity;
 import ru.codingworkshop.gymm.ui.info.exercise.ExerciseInfoActivity;
-import ru.codingworkshop.gymm.ui.info.statistics.StatisticsActivity;
+import ru.codingworkshop.gymm.ui.info.statistics.journal.StatisticsJournalActivity;
+import ru.codingworkshop.gymm.ui.info.statistics.plot.StatisticsPlotActivity;
 import ru.codingworkshop.gymm.ui.program.ProgramTrainingActivity;
 import ru.codingworkshop.gymm.ui.program.exercise.picker.ExercisePickerActivity;
 
@@ -31,5 +32,8 @@ abstract class ActivityModule {
     abstract ActualTrainingActivity contributeActualTrainingActivity();
 
     @ContributesAndroidInjector
-    abstract StatisticsActivity contributeStatisticsActivity();
+    abstract StatisticsPlotActivity contributeStatisticsActivity();
+
+    @ContributesAndroidInjector
+    abstract StatisticsJournalActivity contributeStatisticsJournalActivity();
 }

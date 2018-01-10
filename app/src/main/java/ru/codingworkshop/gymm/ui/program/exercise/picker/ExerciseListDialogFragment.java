@@ -6,7 +6,6 @@ import android.arch.lifecycle.ViewModelProviders;
 import android.content.Context;
 import android.content.Intent;
 import android.databinding.DataBindingUtil;
-import android.databinding.ViewDataBinding;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -28,7 +27,6 @@ import ru.codingworkshop.gymm.databinding.FragmentExercisePickerListItemBinding;
 import ru.codingworkshop.gymm.ui.common.ClickableBindingListAdapter;
 import ru.codingworkshop.gymm.ui.common.ListItemListeners;
 import ru.codingworkshop.gymm.ui.info.exercise.ExerciseInfoActivity;
-import ru.codingworkshop.gymm.ui.info.exercise.ExerciseInfoFragment;
 
 /**
  * Created by Radik on 21.11.2017.
@@ -90,9 +88,9 @@ public class ExerciseListDialogFragment extends BottomSheetDialogFragment {
 
     private void onExercisesLoaded(List<Exercise> exercises) {
         if (exercises != null && !exercises.isEmpty()) {
-            ListItemListeners listItemListeners = new ListItemListeners(R.layout.fragment_exercise_picker_list_item);
-            listItemListeners.setOnClickListener(this::onExerciseClick);
-            listItemListeners.setOnButtonClickListener(this::onExerciseInfoButtonClick, R.id.exerciseListItemInfoButton);
+            ListItemListeners listItemListeners = new ListItemListeners(R.layout.fragment_exercise_picker_list_item)
+                    .setOnClickListener(this::onExerciseClick)
+                    .setOnButtonClickListener(this::onExerciseInfoButtonClick, R.id.exerciseListItemInfoButton);
             ClickableBindingListAdapter<Exercise, FragmentExercisePickerListItemBinding> adapter = new ClickableBindingListAdapter<Exercise, FragmentExercisePickerListItemBinding>(exercises, listItemListeners) {
                 @Override
                 protected void bind(FragmentExercisePickerListItemBinding binding, Exercise item) {

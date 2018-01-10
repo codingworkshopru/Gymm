@@ -13,7 +13,6 @@ import ru.codingworkshop.gymm.data.entity.ActualTraining;
 import ru.codingworkshop.gymm.repository.ActualTrainingRepository;
 import ru.codingworkshop.gymm.util.Models;
 
-import static org.junit.Assert.*;
 import static org.mockito.Mockito.verify;
 
 /**
@@ -26,54 +25,54 @@ public class ActualTrainingAdapterTest {
     @InjectMocks private ActualTrainingAdapter adapter;
 
     @Test
-    public void getParent() throws Exception {
+    public void getParent() {
         adapter.getParent(11L);
         verify(repository).getActualTrainingById(11L);
     }
 
     @Test
-    public void updateParent() throws Exception {
+    public void updateParent() {
         ActualTraining actualTraining = Models.createActualTraining(11L, 1L);
         adapter.updateParent(actualTraining);
         verify(repository).updateActualTraining(actualTraining);
     }
 
     @Test
-    public void insertParent() throws Exception {
+    public void insertParent() {
         ActualTraining actualTraining = Models.createActualTraining(11L, 1L);
         adapter.insertParent(actualTraining);
         verify(repository).insertActualTraining(actualTraining);
     }
 
     @Test
-    public void deleteParent() throws Exception {
+    public void deleteParent() {
         ActualTraining actualTraining = Models.createActualTraining(11L, 1L);
         adapter.deleteParent(actualTraining);
         verify(repository).deleteActualTraining(actualTraining);
     }
 
     @Test
-    public void getChildren() throws Exception {
+    public void getChildren() {
         adapter.getChildren(11L);
         verify(repository).getActualExercisesForActualTraining(11L);
     }
 
     @Test
-    public void insertChildren() throws Exception {
+    public void insertChildren() {
         Collection<ActualExercise> exercises = Models.createActualExercises(1L);
         adapter.insertChildren(exercises);
         verify(repository).insertActualExercises(exercises);
     }
 
     @Test
-    public void deleteChildren() throws Exception {
+    public void deleteChildren() {
         Collection<ActualExercise> exercises = Models.createActualExercises(1L);
         adapter.deleteChildren(exercises);
         verify(repository).deleteActualExercises(exercises);
     }
 
     @Test
-    public void getGrandchildren() throws Exception {
+    public void getGrandchildren() {
         adapter.getGrandchildren(11L);
         verify(repository).getActualSetsForActualTraining(11L);
     }

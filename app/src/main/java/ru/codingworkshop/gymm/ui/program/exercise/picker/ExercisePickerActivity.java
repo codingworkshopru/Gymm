@@ -1,18 +1,16 @@
 package ru.codingworkshop.gymm.ui.program.exercise.picker;
 
 import android.content.Intent;
+import android.os.Bundle;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.app.NavUtils;
-import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
 import android.view.MenuItem;
-import android.view.View;
 
 import javax.inject.Inject;
 
@@ -24,7 +22,6 @@ import ru.codingworkshop.gymm.R;
 import ru.codingworkshop.gymm.data.entity.Exercise;
 import ru.codingworkshop.gymm.data.entity.MuscleGroup;
 import ru.codingworkshop.gymm.ui.program.exercise.ProgramExerciseFragment;
-import timber.log.Timber;
 
 public class ExercisePickerActivity extends AppCompatActivity implements
         HasSupportFragmentInjector,
@@ -59,15 +56,12 @@ public class ExercisePickerActivity extends AppCompatActivity implements
             public int getCount() {
                 return 2;
             }
-
-            @Override
-            public CharSequence getPageTitle(int position) {
-                return getString(position == 0 ? R.string.muscles_activity_anterior : R.string.muscles_activity_posterior);
-            }
         });
 
         TabLayout tabLayout = findViewById(R.id.exercisePickerHumanBodyTabs);
-        tabLayout.setupWithViewPager(viewPager);
+
+        viewPager.addOnPageChangeListener(new TabLayout.TabLayoutOnPageChangeListener(tabLayout));
+        tabLayout.addOnTabSelectedListener(new TabLayout.ViewPagerOnTabSelectedListener(viewPager));
     }
 
     @Override

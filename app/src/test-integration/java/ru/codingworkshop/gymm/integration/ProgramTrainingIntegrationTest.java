@@ -49,13 +49,13 @@ public class ProgramTrainingIntegrationTest {
     private static GymmDatabase db;
 
     @BeforeClass
-    public static void initDb() throws Exception {
+    public static void initDb() {
         db = Room.databaseBuilder(InstrumentationRegistry.getTargetContext(), GymmDatabase.class, DATABASE_NAME)
                 .build();
     }
 
     @AfterClass
-    public static void closeDb() throws Exception {
+    public static void closeDb() {
         db.close();
     }
 
@@ -65,7 +65,7 @@ public class ProgramTrainingIntegrationTest {
     }
 
     @Test
-    public void addProgramTraining() throws Exception {
+    public void addProgramTraining() {
         addOneProgramTraining("monday workout", "Приседания в гакк-тренажере");
     }
 
@@ -84,7 +84,7 @@ public class ProgramTrainingIntegrationTest {
     }
 
     @Test
-    public void addAndEditProgramSet() throws Exception {
+    public void addAndEditProgramSet() {
         addOneProgramTraining("monday workout", "Приседания в гакк-тренажере");
 
         editProgramTrainingClick("monday workout");
@@ -106,7 +106,7 @@ public class ProgramTrainingIntegrationTest {
     }
 
     @Test
-    public void addAndEditProgramExercise() throws Exception {
+    public void addAndEditProgramExercise() {
         addOneProgramTraining("monday workout", "Приседания в гакк-тренажере");
 
         editProgramTrainingClick("monday workout");
@@ -132,7 +132,7 @@ public class ProgramTrainingIntegrationTest {
     }
 
     @Test
-    public void editProgramTraining() throws Exception {
+    public void editProgramTraining() {
         addOneProgramTraining("monday workout", "Приседания в гакк-тренажере");
 
         editProgramTrainingClick("monday workout");
@@ -154,7 +154,7 @@ public class ProgramTrainingIntegrationTest {
     }
 
     @Test
-    public void deleteProgramExercise() throws Exception {
+    public void deleteProgramExercise() {
         addProgramTrainingClick();
         typeProgramTrainingName("my workout");
 
@@ -182,7 +182,7 @@ public class ProgramTrainingIntegrationTest {
     }
 
     @Test
-    public void checkSetsSortOrder() throws Exception {
+    public void checkSetsSortOrder() {
         addProgramTrainingClick();
         addProgramExerciseClick();
 
@@ -205,7 +205,7 @@ public class ProgramTrainingIntegrationTest {
     }
 
     @Test
-    public void checkExercisesSortOrder() throws Exception {
+    public void checkExercisesSortOrder() {
         addProgramTrainingClick();
 
         addProgramExerciseClick();
@@ -236,7 +236,7 @@ public class ProgramTrainingIntegrationTest {
     }
 
     @Test
-    public void undoChangesAfterExerciseAddition() throws Exception {
+    public void undoChangesAfterExerciseAddition() {
         addOneProgramTraining("workout is ruined", "Отжимания от пола");
 
         editProgramTrainingClick("workout is ruined");
@@ -255,7 +255,7 @@ public class ProgramTrainingIntegrationTest {
     }
 
     @Test
-    public void undoChangesAfterSetAddition() throws Exception {
+    public void undoChangesAfterSetAddition() {
         addProgramTrainingClick();
         addProgramExerciseClick();
         pickExercise(db, "Отжимания от пола");

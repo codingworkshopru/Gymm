@@ -52,7 +52,6 @@
     <string name="exercises_picker_activity_secondary">С задействованием</string>
 
     <!-- actual training activity -->
-    <string name="actual_training_activity_stepper_item_weight">Вес</string>
     <string name="actual_training_activity_stepper_item_finish_set">Завершить подход</string>
     <string name="actual_training_activity_stepper_item_edit_set">Изменить подход</string>
     <string name="actual_training_activity_stepper_item_reps_error">введите количество повторений</string>
@@ -60,10 +59,20 @@
     <string name="actual_training_activity_are_you_sure_message">Завершить тренировку?</string>
 
     <!-- statistics activity -->
+    <string name="statistics_activity_title">Статистика</string>
+
+    <string name="statistics_activity_plot_tab">Графики</string>
     <string name="statistics_activity_data_spinner_label">Данные</string>
     <string name="statistics_activity_period_spinner_label">Период</string>
     <string name="statistics_activity_exercise_spinner_label">Упражнение</string>
     <string name="statistics_activity_empty_plot_text">Нет данных для отображения</string>
+
+    <string name="statistics_activity_journal_tab">Журнал</string>
+    <string name="statistics_activity_journal_date_and_time_label">Дата и время</string>
+    <string name="statistics_activity_journal_name_label">Тренировка</string>
+    <string name="statistics_activity_journal_duration_label">Длительность</string>
+    <string name="statistics_activity_journal_comment_label">Комментарий</string>
+    <string name="statistics_activity_journal_volume">Объём (повторение * вес)</string>
 
     <!-- notification -->
     <string name="notification_time_till_rest_finish">Время до конца отдыха: </string>
@@ -73,6 +82,8 @@
     <string name="bullet" translatable="false">•</string>
     <string name="colon" translatable="false">:</string>
     <string name="reps">Повторения</string>
+    <string name="set">Подход</string>
+    <string name="weight">Вес</string>
     <string name="no_button_text">Нет</string>
     <string name="save_button_text">Сохранить</string>
     <string name="delete_button_text">Удалить</string>
@@ -82,6 +93,7 @@
     <string name="add_button_text">Добавить</string>
     <string name="select_button_text">Выбрать</string>
     <string name="out_of">из</string>
+    <string name="sum">Сумма</string>
 
     <plurals name="number_of_reps">
         <item quantity="one">%d повторение</item>

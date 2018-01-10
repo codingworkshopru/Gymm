@@ -2,10 +2,16 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
     <item
-        android:id="@+id/action_show_statistics"
+        android:id="@+id/action_show_plot_statistics"
         android:title="@string/main_activity_menu_show_statistics_title"
         app:showAsAction="ifRoom"
         android:icon="@drawable/ic_show_chart_white_24dp" />
+
+    <item
+        android:id="@+id/action_show_journal_statistics"
+        android:title="@string/main_activity_menu_show_statistics_title"
+        app:showAsAction="ifRoom"
+        android:icon="@drawable/ic_import_contacts_white_24dp" />
 
     <item
         android:id="@+id/action_add_program"

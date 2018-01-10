@@ -2,7 +2,6 @@ package ru.codingworkshop.gymm.ui.info.exercise;
 
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 
@@ -32,7 +31,6 @@ public class ExerciseInfoActivity extends AppCompatActivity implements
 
     private static final String GOOGLE_DEVELOPER_KEY = "AIzaSyCnjhekaG5JdIEtdbeMH4iE0pZiprQZYp4";
     private static final String YOUTUBE_PLAYER_FRAGMENT_TAG = "youTubePlayerFragmentTag";
-    private FragmentManager fragmentManager;
     private YouTubePlayerSupportFragment youTubePlayerFragment;
 
     private YouTubePlayer youTubePlayer;
@@ -42,8 +40,6 @@ public class ExerciseInfoActivity extends AppCompatActivity implements
         AndroidInjection.inject(this);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_exercise_info);
-
-        fragmentManager = getSupportFragmentManager();
 
         addExerciseInfoFragment();
         addYouTubeVideoFragment();
@@ -60,12 +56,12 @@ public class ExerciseInfoActivity extends AppCompatActivity implements
 
     private void addYouTubeVideoFragment() {
         if (YouTubeApiServiceUtil.isYouTubeApiServiceAvailable(this) == SUCCESS) {
-            youTubePlayerFragment = (YouTubePlayerSupportFragment) fragmentManager.findFragmentByTag(YOUTUBE_PLAYER_FRAGMENT_TAG);
+            youTubePlayerFragment = (YouTubePlayerSupportFragment) getSupportFragmentManager().findFragmentByTag(YOUTUBE_PLAYER_FRAGMENT_TAG);
 
             if (youTubePlayerFragment == null) {
                 youTubePlayerFragment = YouTubePlayerSupportFragment.newInstance();
 
-                fragmentManager
+                getSupportFragmentManager()
                         .beginTransaction()
                         .add(R.id.exerciseInfoYouTubePlayerContainer, youTubePlayerFragment, YOUTUBE_PLAYER_FRAGMENT_TAG)
                         .commit();
@@ -76,10 +72,10 @@ public class ExerciseInfoActivity extends AppCompatActivity implements
     }
 
     private void addExerciseInfoFragment() {
-        ExerciseInfoFragment fragment = (ExerciseInfoFragment) fragmentManager.findFragmentByTag(ExerciseInfoFragment.TAG);
+        ExerciseInfoFragment fragment = (ExerciseInfoFragment) getSupportFragmentManager().findFragmentByTag(ExerciseInfoFragment.TAG);
         if (fragment == null) {
             fragment = ExerciseInfoFragment.newInstance(getIntent().getLongExtra(EXERCISE_ID_KEY, 0L));
-            fragmentManager
+            getSupportFragmentManager()
                     .beginTransaction()
                     .add(R.id.exerciseInfoActivityInfoContainer, fragment, ExerciseInfoFragment.TAG)
                     .commit();

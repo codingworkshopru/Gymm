@@ -13,10 +13,10 @@
         android:label="@string/app_name"
         android:supportsRtl="true"
         android:theme="@style/AppTheme.NoActionBar">
-
         <meta-data
             android:name="android.support.VERSION"
             android:value="26.1.0" />
+
         <service
             android:name=".service.TrainingForegroundService"
             android:description="@string/time_service_description"
@@ -58,8 +58,24 @@
         <activity
             android:name=".ui.info.exercise.ExerciseInfoActivity"
             android:configChanges="orientation|keyboardHidden|screenSize"
-            android:theme="@style/AppTheme.NoActionBar.TranslucentStatusOn" /> <!-- for YouTube video smooth playback -->
-        <activity android:name=".ui.info.statistics.StatisticsActivity"></activity>
+            android:theme="@style/AppTheme.NoActionBar.TranslucentStatusOn" /> <!-- configChanges for YouTube video smooth playback -->
+        <activity
+            android:name=".ui.info.statistics.plot.StatisticsPlotActivity"
+            android:label="@string/statistics_activity_title"
+            android:parentActivityName=".ui.MainActivity">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="ru.codingworkshop.gymm.ui.MainActivity" />
+        </activity>
+        <activity
+            android:name=".ui.info.statistics.journal.StatisticsJournalActivity"
+            android:launchMode="singleTop"
+            android:label="@string/statistics_activity_title"
+            android:parentActivityName=".ui.MainActivity">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="ru.codingworkshop.gymm.ui.MainActivity" />
+        </activity>
     </application>
 
 </manifest>

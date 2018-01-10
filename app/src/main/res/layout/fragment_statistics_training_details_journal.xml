@@ -1,0 +1,143 @@
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+
+        <import
+            alias="Format"
+            type="ru.codingworkshop.gymm.ui.info.statistics.util.DateTimeFormatter" />
+
+        <variable
+            name="training"
+            type="ru.codingworkshop.gymm.data.entity.ActualTraining" />
+    </data>
+
+    <android.support.constraint.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        tools:context=".ui.info.statistics.journal.StatisticsJournalTrainingDetailsFragment">
+
+        <TextView
+            android:id="@+id/statisticsTrainingDetailsJournalDateTimeCaption"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="16dp"
+            android:text="@string/statistics_activity_journal_date_and_time_label"
+            android:textAppearance="@style/TextAppearance.AppCompat.Caption"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:id="@+id/statisticsTrainingDetailsJournalDateTime"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="16dp"
+            android:layout_marginStart="16dp"
+            android:text="@{Format.formatDateAndTime(training.startTime)}"
+            android:textAppearance="@style/TextAppearance.AppCompat.Body1"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/statisticsTrainingDetailsJournalDateTimeCaption"
+            tools:text="04.01.2018 14:05" />
+
+        <TextView
+            android:id="@+id/statisticsTrainingDetailsJournalNameCaption"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="8dp"
+            android:text="@string/statistics_activity_journal_name_label"
+            android:textAppearance="@style/TextAppearance.AppCompat.Caption"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/statisticsTrainingDetailsJournalDateTime" />
+
+        <TextView
+            android:id="@+id/statisticsTrainingDetailsJournalName"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="16dp"
+            android:layout_marginStart="16dp"
+            android:text="@{training.name}"
+            android:textAppearance="@style/TextAppearance.AppCompat.Body1"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/statisticsTrainingDetailsJournalNameCaption"
+            tools:text="Понедельник" />
+
+        <TextView
+            android:id="@+id/statisticsTrainingDetailsJournalDurationCaption"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="8dp"
+            android:text="@string/statistics_activity_journal_duration_label"
+            android:textAppearance="@style/TextAppearance.AppCompat.Caption"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/statisticsTrainingDetailsJournalName" />
+
+        <TextView
+            android:id="@+id/statisticsTrainingDetailsJournalDuration"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="16dp"
+            android:layout_marginStart="16dp"
+            android:text="@{Format.formatDuration(training.startTime, training.finishTime)}"
+            android:textAppearance="@style/TextAppearance.AppCompat.Body1"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/statisticsTrainingDetailsJournalDurationCaption"
+            tools:text="00:57:41" />
+
+        <TextView
+            android:id="@+id/statisticsTrainingDetailsJournalCommentCaption"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="8dp"
+            android:text="@string/statistics_activity_journal_comment_label"
+            android:textAppearance="@style/TextAppearance.AppCompat.Caption"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/statisticsTrainingDetailsJournalDuration" />
+
+        <TextView
+            android:id="@+id/statisticsTrainingDetailsJournalComment"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="16dp"
+            android:layout_marginStart="16dp"
+            android:text="@{training.comment}"
+            android:textAppearance="@style/TextAppearance.AppCompat.Body1"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/statisticsTrainingDetailsJournalCommentCaption"
+            tools:text="Ой устал, ой устал, Ой устал, ой устал, Ой устал, ой устал, Ой устал, ой устал, Ой устал, ой устал,  " />
+
+        <ImageView
+            android:id="@+id/statisticsTrainingDetailsJournalDivider"
+            android:layout_width="0dp"
+            android:layout_height="8dp"
+            android:layout_marginTop="16dp"
+            android:alpha="0.25"
+            android:background="@android:color/black"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/statisticsTrainingDetailsJournalComment" />
+
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/statisticsTrainingDetailsJournalExerciseList"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_marginTop="8dp"
+            android:clipChildren="false"
+            android:paddingBottom="16dp"
+            app:layoutManager="LinearLayoutManager"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/statisticsTrainingDetailsJournalDivider"
+            tools:listitem="@layout/fragment_statistics_training_details_journal_list_item" />
+
+    </android.support.constraint.ConstraintLayout>
+</layout>

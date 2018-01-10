@@ -82,7 +82,7 @@ public class FakeDataInitializer implements Initializer {
                 ActualSet set = new ActualSet(exerciseId, repsPerSet + (int)(repsPerSet/2.0 * Math.random()));
                 double delta = weightPerSet - (Math.random() * weightPerSet);
                 double trend = i > 0 ? 10*Math.log(i) : 0;
-//                set.setWeight(weightPerSet + trend + delta);
+                set.setWeight(weightPerSet + trend + delta);
                 sets.add(set);
             }
         }

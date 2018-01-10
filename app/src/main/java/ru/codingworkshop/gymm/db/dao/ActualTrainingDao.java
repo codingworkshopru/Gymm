@@ -7,6 +7,7 @@ import android.arch.persistence.room.Insert;
 import android.arch.persistence.room.Query;
 import android.arch.persistence.room.TypeConverters;
 import android.arch.persistence.room.Update;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
 import java.util.Collection;
@@ -26,6 +27,9 @@ import ru.codingworkshop.gymm.db.Converters;
 
 @Dao
 public interface ActualTrainingDao {
+    @Query("select * from ActualTraining order by startTime desc")
+    LiveData<List<ActualTraining>> getActualTrainings();
+
     @Query("select * from ActualTraining where id = :actualTrainingId")
     Flowable<ActualTraining> getActualTrainingById(long actualTrainingId);
 
@@ -87,5 +91,5 @@ public interface ActualTrainingDao {
             "join ActualSet s on s.actualExerciseId = e.id " +
             "where e.exerciseName = :exerciseName and (startTime > coalesce(:startDate, 0)) " +
             "order by startTime")
-    Flowable<List<ExercisePlotTuple>> getStatisticsForExercise(String exerciseName, @Nullable Date startDate);
+    Flowable<List<ExercisePlotTuple>> getStatisticsForExercise(@NonNull String exerciseName, @Nullable Date startDate);
 }

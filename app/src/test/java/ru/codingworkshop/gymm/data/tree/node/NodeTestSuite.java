@@ -10,6 +10,7 @@ import org.junit.runners.Suite;
 @RunWith(Suite.class)
 @Suite.SuiteClasses({
         BaseNodeTest.class,
+        ImmutableBaseNodeTest.class,
         ExerciseNodeTest.class,
         ProgramExerciseNodeTest.class,
         ImmutableProgramExerciseNodeTest.class,

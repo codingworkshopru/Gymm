@@ -10,7 +10,6 @@ import android.databinding.ObservableBoolean;
 import android.databinding.ViewDataBinding;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.support.v4.app.Fragment;
 import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
@@ -29,7 +28,6 @@ import ru.codingworkshop.gymm.data.util.LiveDataUtil;
 import ru.codingworkshop.gymm.databinding.FragmentProgramTrainingBinding;
 import ru.codingworkshop.gymm.ui.common.EditTextValidator;
 import ru.codingworkshop.gymm.ui.common.ListItemListeners;
-
 import ru.codingworkshop.gymm.ui.program.ProgramTrainingActivity;
 import ru.codingworkshop.gymm.ui.program.ProgramTrainingViewModel;
 import ru.codingworkshop.gymm.ui.program.common.ActionModeCallback;
@@ -169,7 +167,7 @@ public class ProgramTrainingFragment extends BaseFragment implements
 
         getFragmentManager()
                 .beginTransaction()
-                .replace(R.id.programTrainingFragmentContainer, programExerciseFragment)
+                .replace(R.id.programTrainingFragmentContainer, programExerciseFragment, ProgramExerciseFragment.TAG)
                 .addToBackStack(null)
                 .commit();
     }

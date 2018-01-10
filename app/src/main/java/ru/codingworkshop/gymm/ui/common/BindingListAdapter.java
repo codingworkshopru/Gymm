@@ -43,7 +43,7 @@ public abstract class BindingListAdapter<T, V extends ViewDataBinding> extends R
         return items != null ? items.size() : 0;
     }
 
-    protected void setItems(@Nullable List<T> items) {
+    public void setItems(@Nullable List<T> items) {
         this.items = items;
         notifyDataSetChanged();
     }

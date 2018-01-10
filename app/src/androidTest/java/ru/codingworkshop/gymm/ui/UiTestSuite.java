@@ -4,7 +4,7 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 
 import ru.codingworkshop.gymm.ui.actual.ActualUiTestSuite;
-import ru.codingworkshop.gymm.ui.info.exercise.ExerciseInfoFragmentTest;
+import ru.codingworkshop.gymm.ui.info.InfoUiTestSuite;
 import ru.codingworkshop.gymm.ui.program.ProgramUiTestSuite;
 
 /**
@@ -15,7 +15,7 @@ import ru.codingworkshop.gymm.ui.program.ProgramUiTestSuite;
 @Suite.SuiteClasses({
         ActualUiTestSuite.class,
         ProgramUiTestSuite.class,
-        ExerciseInfoFragmentTest.class
+        InfoUiTestSuite.class
 })
 public class UiTestSuite {
 }

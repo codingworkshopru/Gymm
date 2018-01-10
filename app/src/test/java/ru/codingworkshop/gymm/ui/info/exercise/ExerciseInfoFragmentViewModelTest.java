@@ -42,7 +42,7 @@ public class ExerciseInfoFragmentViewModelTest {
     }
 
     @Test
-    public void load() throws Exception {
+    public void load() {
         LiveData<ExerciseNode> node = vm.load(100L);
         LiveData<ExerciseNode> sameNode = vm.load(100L);
 

@@ -1,0 +1,63 @@
+<layout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+        <variable
+            name="totalReps"
+            type="Integer" />
+
+        <variable
+            name="totalWeight"
+            type="Double" />
+    </data>
+
+    <android.support.constraint.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="48dp">
+
+        <TextView
+            android:id="@+id/statisticsJournalExerciseDetailsListFooterLabel"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="32dp"
+            android:text="@string/sum"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toStartOf="@+id/statisticsJournalExerciseDetailsListFooterTotalReps"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            android:layout_marginLeft="32dp" />
+
+        <TextView
+            android:id="@+id/statisticsJournalExerciseDetailsListFooterTotalReps"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:gravity="end"
+            android:text="@{Integer.toString(totalReps)}"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toStartOf="@+id/statisticsJournalExerciseDetailsListFooterTotalWeight"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintStart_toEndOf="@+id/statisticsJournalExerciseDetailsListFooterLabel"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_bias="0.5"
+            tools:text="500" />
+
+        <TextView
+            android:id="@+id/statisticsJournalExerciseDetailsListFooterTotalWeight"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="32dp"
+            android:gravity="end"
+            android:text='@{String.format("%.2f", safeUnbox(totalWeight))}'
+            tools:text="1024.78"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintStart_toEndOf="@+id/statisticsJournalExerciseDetailsListFooterTotalReps"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_bias="0.5"
+            android:layout_marginRight="32dp" />
+    </android.support.constraint.ConstraintLayout>
+</layout>

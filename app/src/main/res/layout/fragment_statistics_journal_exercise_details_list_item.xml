@@ -1,0 +1,64 @@
+<layout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+        <variable
+            name="index"
+            type="Integer" />
+        <variable
+            name="set"
+            type="ru.codingworkshop.gymm.data.entity.ActualSet" />
+    </data>
+
+    <android.support.constraint.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="48dp">
+
+        <TextView
+            android:id="@+id/statisticsJournalSetIndex"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="32dp"
+            android:gravity="end"
+            android:text="@{index.toString()}"
+            android:textAppearance="@style/TextAppearance.AppCompat.Body1"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toStartOf="@+id/statisticsJournalSetRepsCount"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:text="1" />
+
+        <TextView
+            android:id="@+id/statisticsJournalSetRepsCount"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:gravity="end"
+            android:text="@{Integer.toString(set.reps)}"
+            android:textAppearance="@style/TextAppearance.AppCompat.Body1"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toStartOf="@+id/statisticsJournalSetWeight"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintStart_toEndOf="@+id/statisticsJournalSetIndex"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:text="15" />
+
+        <TextView
+            android:id="@+id/statisticsJournalSetWeight"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="32dp"
+            android:gravity="end"
+            android:text='@{String.format("%.2f", safeUnbox(set.weight))}'
+            android:textAppearance="@style/TextAppearance.AppCompat.Body1"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintStart_toEndOf="@+id/statisticsJournalSetRepsCount"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:text="20.125" />
+
+    </android.support.constraint.ConstraintLayout>
+</layout>

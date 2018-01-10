@@ -15,10 +15,6 @@ import org.hamcrest.TypeSafeMatcher;
 public final class RecyclerViewItemMatcher {
     private static @IdRes int recyclerViewId;
 
-    public static int getRecyclerViewId() {
-        return recyclerViewId;
-    }
-
     public static void setRecyclerViewId(@LayoutRes int recyclerViewId) {
         RecyclerViewItemMatcher.recyclerViewId = recyclerViewId;
     }
@@ -31,7 +27,22 @@ public final class RecyclerViewItemMatcher {
         return itemAtPosition(recyclerViewId, targetViewId, position);
     }
 
-    public static View findItemView(View item, @IdRes int recyclerViewId, @IdRes int targetViewId, int position) {
+    public static Matcher<View> itemAtPosition(@IdRes int recyclerViewId, @IdRes int targetViewId, int position) {
+        return new TypeSafeMatcher<View>() {
+            @Override
+            protected boolean matchesSafely(View item) {
+                View targetView = findItemView(item, recyclerViewId, targetViewId, position);
+                return targetView != null && item == targetView;
+            }
+
+            @Override
+            public void describeTo(Description description) {
+                description.appendText("is matches to specified item of specified recycler view");
+            }
+        };
+    }
+
+    private static View findItemView(View item, @IdRes int recyclerViewId, @IdRes int targetViewId, int position) {
         RecyclerView rv = (RecyclerView) item.getRootView().findViewById(recyclerViewId);
         if (rv == null) {
             return null;
@@ -48,20 +59,5 @@ public final class RecyclerViewItemMatcher {
         }
 
         return child.findViewById(targetViewId);
-    }
-
-    public static Matcher<View> itemAtPosition(@IdRes int recyclerViewId, @IdRes int targetViewId, int position) {
-        return new TypeSafeMatcher<View>() {
-            @Override
-            protected boolean matchesSafely(View item) {
-                View targetView = findItemView(item, recyclerViewId, targetViewId, position);
-                return targetView != null && item == targetView;
-            }
-
-            @Override
-            public void describeTo(Description description) {
-                description.appendText("is matches to specified item of specified recycler view");
-            }
-        };
     }
 }

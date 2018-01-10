@@ -14,6 +14,7 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
 import java.util.Collection;
+import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -28,7 +29,9 @@ import ru.codingworkshop.gymm.util.LiveTest;
 import ru.codingworkshop.gymm.util.Models;
 
 import static org.junit.Assert.assertEquals;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.argThat;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -59,7 +62,7 @@ public class ActualTrainingRepositoryTest {
     }
 
     @Test
-    public void updateActualTraining() throws Exception {
+    public void updateActualTraining() {
         ActualTraining training = Models.createActualTraining(11L, 1L);
         when(dao.updateActualTraining(training)).thenReturn(1);
         repository.updateActualTraining(training);
@@ -67,7 +70,7 @@ public class ActualTrainingRepositoryTest {
     }
 
     @Test
-    public void deleteActualTraining() throws Exception {
+    public void deleteActualTraining() {
         ActualTraining training = Models.createActualTraining(11L, 1L);
         when(dao.deleteActualTraining(training)).thenReturn(1);
         repository.deleteActualTraining(training);
@@ -91,7 +94,7 @@ public class ActualTrainingRepositoryTest {
     }
 
     @Test
-    public void insertActualExercise() throws Exception {
+    public void insertActualExercise() {
         ActualExercise actualExercise = Models.createActualExercise(0L, "foo", 11L, 2L);
         when(dao.insertActualExercise(actualExercise)).thenReturn(12L);
         repository.insertActualExercise(actualExercise);
@@ -100,7 +103,7 @@ public class ActualTrainingRepositoryTest {
     }
 
     @Test
-    public void deleteActualExercises() throws Exception {
+    public void deleteActualExercises() {
         List<ActualExercise> actualExercises = Models.createActualExercises(12L);
         when(dao.deleteActualExercises(actualExercises)).thenReturn(1);
         repository.deleteActualExercises(actualExercises);
@@ -126,7 +129,7 @@ public class ActualTrainingRepositoryTest {
     }
 
     @Test
-    public void insertActualSetWithResult() throws Exception {
+    public void insertActualSetWithResult() {
         ActualSet set = Models.createActualSet(0L, 12L, 10);
         set.setWeight(6.6);
         when(dao.insertActualSet(set)).thenReturn(13L);
@@ -146,7 +149,7 @@ public class ActualTrainingRepositoryTest {
 
     @Parameters(method = "invalidActualSets")
     @Test(expected = IllegalArgumentException.class)
-    public void insertInvalidActualSet(ActualSet actualSet) throws Exception {
+    public void insertInvalidActualSet(ActualSet actualSet) {
         repository.insertActualSet(actualSet);
     }
 
@@ -160,7 +163,7 @@ public class ActualTrainingRepositoryTest {
 
     @Parameters(method = "weights")
     @Test
-    public void updateActualSet(Double weight, Double expectedWeight) throws Exception {
+    public void updateActualSet(Double weight, Double expectedWeight) {
         ActualSet actualSet = Models.createActualSet(13L, 12L, 7);
         actualSet.setWeight(weight);
         when(dao.updateActualSet(actualSet)).thenReturn(1);
@@ -172,7 +175,7 @@ public class ActualTrainingRepositoryTest {
 
     @Parameters(method = "invalidActualSetsForUpdate")
     @Test(expected = IllegalArgumentException.class)
-    public void updateInvalidActualSet(ActualSet actualSet) throws Exception {
+    public void updateInvalidActualSet(ActualSet actualSet) {
         repository.updateActualSet(actualSet);
     }
 
@@ -185,7 +188,7 @@ public class ActualTrainingRepositoryTest {
     }
 
     @Test
-    public void deleteActualSet() throws Exception {
+    public void deleteActualSet() {
         ActualSet actualSet = Models.createActualSet(13L, 12L, 7);
         when(dao.deleteActualSet(actualSet)).thenReturn(1);
         repository.deleteActualSet(actualSet);
@@ -196,5 +199,23 @@ public class ActualTrainingRepositoryTest {
     public void getActualSetsForActualTraining() {
         repository.getActualSetsForActualTraining(1000L);
         verify(dao).getActualSetsForActualTraining(1000L);
+    }
+
+    @Test
+    public void getActualExerciseNames() {
+        repository.getActualExerciseNames();
+        verify(dao).getActualExerciseNames();
+    }
+
+    @Test
+    public void getStatisticsForExercise() {
+        repository.getStatisticsForExercise("foo", new Date());
+        verify(dao).getStatisticsForExercise(eq("foo"), any(Date.class));
+    }
+
+    @Test
+    public void getActualTrainings() {
+        repository.getActualTrainings();
+        verify(dao).getActualTrainings();
     }
 }

@@ -108,8 +108,11 @@ public abstract class TreeBuilder<P, C extends Model, GC> implements ParentHolde
         return tree;
     }
 
-    abstract BaseNode<C, GC> getNode(C child);
-    abstract void setNodes(List<? extends BaseNode<C, GC>> nodes);
-    abstract void beforeBuild();
-    abstract long parentGetter(GC grandchild);
+    protected void beforeBuild() {
+
+    }
+
+    abstract protected BaseNode<C, GC> getNode(C child);
+    abstract protected void setNodes(List<? extends BaseNode<C, GC>> nodes);
+    abstract protected long parentGetter(GC grandchild);
 }

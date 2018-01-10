@@ -79,7 +79,7 @@
             android:layout_height="0dp"
             android:layout_marginTop="16dp"
             android:alpha="0.12"
-            app:srcCompat="@android:color/black"
+            android:background="@android:color/black"
             app:layout_constraintBottom_toBottomOf="@+id/programSetRepsPicker"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.33"

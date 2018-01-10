@@ -1,6 +1,5 @@
-package ru.codingworkshop.gymm.ui.info.statistics.viewmodel;
+package ru.codingworkshop.gymm.ui.info.statistics.plot;
 
-import android.annotation.SuppressLint;
 import android.arch.lifecycle.LiveData;
 import android.arch.lifecycle.MediatorLiveData;
 import android.arch.lifecycle.MutableLiveData;
@@ -23,32 +22,48 @@ import hu.akarnokd.rxjava2.math.MathObservable;
 import io.reactivex.Observable;
 import io.reactivex.disposables.Disposable;
 import ru.codingworkshop.gymm.data.entity.ExercisePlotTuple;
-import ru.codingworkshop.gymm.db.dao.ActualTrainingDao;
+import ru.codingworkshop.gymm.repository.ActualTrainingRepository;
+import timber.log.Timber;
 
 /**
  * Created by Radik on 11.12.2017.
  */
 
-public class StatisticsViewModel extends ViewModel {
-    public final MutableLiveData<Long> exerciseId = new MutableLiveData<>();
-    public final MutableLiveData<Long> rangeId = new MutableLiveData<>();
-    public final MutableLiveData<Long> dataTypeId = new MutableLiveData<>();
+public class StatisticsPlotViewModel extends ViewModel {
+    private final MutableLiveData<Long> exerciseId = new MutableLiveData<>();
+    private final MutableLiveData<Long> rangeId = new MutableLiveData<>();
+    private final MutableLiveData<Long> dataTypeId = new MutableLiveData<>();
 
-    public final MediatorLiveData<List<Entry>> chartEntries = new MediatorLiveData<>();
+    private final MediatorLiveData<List<Entry>> chartEntries = new MediatorLiveData<>();
 
-    private final ActualTrainingDao dao; // FIXME: 20.12.2017 replace to repository
+    private final ActualTrainingRepository repository;
     private LiveData<List<String>> actualExerciseNames;
     private Disposable subscribe;
 
     @Inject
-    StatisticsViewModel(ActualTrainingDao dao) {
-        this.dao = dao;
+    StatisticsPlotViewModel(ActualTrainingRepository repository) {
+        this.repository = repository;
         chartEntries.addSource(exerciseId, this::onFilterEvent);
         chartEntries.addSource(rangeId, this::onFilterEvent);
         chartEntries.addSource(dataTypeId, this::onFilterEvent);
     }
 
-    @SuppressLint("CheckResult")
+    public MutableLiveData<Long> getExerciseId() {
+        return exerciseId;
+    }
+
+    public MutableLiveData<Long> getRangeId() {
+        return rangeId;
+    }
+
+    public MutableLiveData<Long> getDataTypeId() {
+        return dataTypeId;
+    }
+
+    public MediatorLiveData<List<Entry>> getChartEntries() {
+        return chartEntries;
+    }
+
     private void onFilterEvent(@Nullable Long id) {
         Long exercise = exerciseId.getValue();
         Long range = rangeId.getValue();
@@ -58,11 +73,11 @@ public class StatisticsViewModel extends ViewModel {
             return;
         }
 
-        if (subscribe != null && !subscribe.isDisposed()) {
-            subscribe.dispose();
-        }
+        Timber.d("onFilterEvent()");
 
-        subscribe = dao.getStatisticsForExercise(getExerciseNameById(exercise), getStartDateById(range))
+        onCleared();
+
+        subscribe = repository.getStatisticsForExercise(getExerciseNameById(exercise), getStartDateById(range))
                 .take(1)
                 .toObservable()
                 .flatMap(Observable::fromIterable)
@@ -80,12 +95,15 @@ public class StatisticsViewModel extends ViewModel {
     @Override
     protected void onCleared() {
         super.onCleared();
-        subscribe.dispose();
+
+        if (subscribe != null && !subscribe.isDisposed()) {
+            subscribe.dispose();
+        }
     }
 
     public LiveData<List<String>> getActualExerciseNames() {
         if (actualExerciseNames == null) {
-            actualExerciseNames = dao.getActualExerciseNames();
+            actualExerciseNames = repository.getActualExerciseNames();
         }
         return actualExerciseNames;
     }
@@ -101,7 +119,7 @@ public class StatisticsViewModel extends ViewModel {
      * @return start date for statistics. Default is null.
      */
     @VisibleForTesting
-    @Nullable Date getStartDateById(@Nullable Long rangeSizePosition) {
+    @Nullable static Date getStartDateById(@Nullable Long rangeSizePosition) {
         Calendar c = Calendar.getInstance(Locale.getDefault());
         switch (longInstanceToInt(rangeSizePosition)) {
             case 0:
@@ -140,7 +158,7 @@ public class StatisticsViewModel extends ViewModel {
      */
     @VisibleForTesting
     @SuppressWarnings("Guava")
-    Function<ExercisePlotTuple, Number> getDataFunctionById(@Nullable Long dataProviderFunctionId) {
+    static Function<ExercisePlotTuple, Number> getDataFunctionById(@Nullable Long dataProviderFunctionId) {
         switch (longInstanceToInt(dataProviderFunctionId)) {
             case 0:
                 return (tuple) -> {
@@ -160,7 +178,7 @@ public class StatisticsViewModel extends ViewModel {
         }
     }
 
-    private int longInstanceToInt(@Nullable Long value) {
+    private static int longInstanceToInt(@Nullable Long value) {
         return value != null ? value.intValue() : 0;
     }
 }

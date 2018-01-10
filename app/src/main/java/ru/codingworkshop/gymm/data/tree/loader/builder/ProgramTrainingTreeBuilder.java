@@ -33,22 +33,19 @@ public class ProgramTrainingTreeBuilder extends TreeBuilder<ProgramTraining, Pro
     }
 
     @Override
-    BaseNode<ProgramExercise, ProgramSet> getNode(ProgramExercise child) {
+    protected BaseNode<ProgramExercise, ProgramSet> getNode(ProgramExercise child) {
         ProgramExerciseNode node = tree.createChildNode(child);
         node.setExercise(exerciseMap.get(child.getExerciseId()));
         return node;
     }
 
     @Override
-    void setNodes(List<? extends BaseNode<ProgramExercise, ProgramSet>> baseNodes) {
+    protected void setNodes(List<? extends BaseNode<ProgramExercise, ProgramSet>> baseNodes) {
         tree.setChildren(Lists.transform(baseNodes, bn -> (ProgramExerciseNode) bn));
     }
 
     @Override
-    void beforeBuild() {}
-
-    @Override
-    long parentGetter(ProgramSet grandchild) {
+    protected long parentGetter(ProgramSet grandchild) {
         return grandchild.getProgramExerciseId();
     }
 }

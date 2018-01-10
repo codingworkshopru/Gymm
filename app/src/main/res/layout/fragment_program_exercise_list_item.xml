@@ -16,7 +16,7 @@
 
     <android.support.constraint.ConstraintLayout
         android:layout_width="match_parent"
-        android:layout_height="72dp"
+        android:layout_height="@dimen/list_item_height"
         android:background="@android:color/background_light">
 
         <TextView
@@ -24,7 +24,6 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginStart="16dp"
-            android:layout_marginLeft="16dp"
             android:ellipsize="end"
             android:maxLines="1"
             android:text="@{@plurals/number_of_reps(wrappedSet.reps, wrappedSet.reps)}"
@@ -34,7 +33,7 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintVertical_chainStyle="packed"
-            tools:text="Very very very very very very very very very long text"/>
+            tools:text="Very very very very very very very very very long text" />
 
         <TextView
             android:id="@+id/programSetRestTime"

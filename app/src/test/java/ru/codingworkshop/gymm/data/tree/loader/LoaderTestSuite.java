@@ -17,6 +17,7 @@ import ru.codingworkshop.gymm.data.tree.loader.common.LoaderDelegateTest;
         LoaderDelegateTest.class,
 
         ProgramTrainingTreeLoaderTest.class,
+        ImmutableActualTrainingTreeLoaderTest.class,
         ActualTrainingTreeLoaderTest.class,
         ActualTrainingEmptyTreeLoaderTest.class,
         ExerciseLoaderTest.class

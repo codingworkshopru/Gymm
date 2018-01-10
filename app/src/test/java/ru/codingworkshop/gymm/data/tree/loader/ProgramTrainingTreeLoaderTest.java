@@ -12,8 +12,6 @@ import io.reactivex.Flowable;
 import ru.codingworkshop.gymm.data.tree.node.ImmutableProgramTrainingTree;
 import ru.codingworkshop.gymm.data.tree.node.ProgramTrainingTree;
 import ru.codingworkshop.gymm.data.tree.repositoryadapter.ProgramTrainingAdapter;
-import ru.codingworkshop.gymm.repository.ExercisesRepository;
-import ru.codingworkshop.gymm.repository.ProgramTrainingRepository;
 import ru.codingworkshop.gymm.util.Models;
 
 import static org.junit.Assert.assertEquals;
@@ -25,20 +23,17 @@ import static org.mockito.Mockito.when;
 
 @RunWith(MockitoJUnitRunner.class)
 public class ProgramTrainingTreeLoaderTest {
-    @Mock private ProgramTrainingRepository repository;
-    @Mock private ExercisesRepository exercisesRepository;
+    @Mock private ProgramTrainingAdapter adapter;
 
     @Rule
     public InstantTaskExecutorRule instantTaskExecutorRule = new InstantTaskExecutorRule();
 
     @Test
-    public void load() throws Exception {
-        when(repository.getProgramTrainingById(1L)).thenReturn(Flowable.just(Models.createProgramTraining(1L, "foo")));
-        when(repository.getProgramExercisesForTraining(1L)).thenReturn(Flowable.just(Models.createProgramExercises(1)));
-        when(repository.getProgramSetsForTraining(1L)).thenReturn(Flowable.just(Models.createProgramSets(2L, 3)));
-        when(exercisesRepository.getExercisesForProgramTraining(1L)).thenReturn(Flowable.just(Models.createExercises("bar", "baz")));
-
-        ProgramTrainingAdapter adapter = new ProgramTrainingAdapter(repository, exercisesRepository);
+    public void load() {
+        when(adapter.getParent(1L)).thenReturn(Flowable.just(Models.createProgramTraining(1L, "foo")));
+        when(adapter.getChildren(1L)).thenReturn(Flowable.just(Models.createProgramExercises(1)));
+        when(adapter.getGrandchildren(1L)).thenReturn(Flowable.just(Models.createProgramSets(2L, 3)));
+        when(adapter.getExercises(1L)).thenReturn(Flowable.just(Models.createExercises("bar", "baz")));
 
         ProgramTrainingTree tree = new ImmutableProgramTrainingTree();
         ProgramTrainingTreeLoader loader = new ProgramTrainingTreeLoader(adapter);

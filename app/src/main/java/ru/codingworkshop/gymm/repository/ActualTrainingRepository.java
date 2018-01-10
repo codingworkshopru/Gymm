@@ -3,11 +3,13 @@ package ru.codingworkshop.gymm.repository;
 import android.arch.lifecycle.LiveData;
 import android.arch.lifecycle.LiveDataReactiveStreams;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
 
 import java.util.Collection;
+import java.util.Date;
 import java.util.List;
 
 import javax.inject.Inject;
@@ -17,6 +19,7 @@ import io.reactivex.Flowable;
 import ru.codingworkshop.gymm.data.entity.ActualExercise;
 import ru.codingworkshop.gymm.data.entity.ActualSet;
 import ru.codingworkshop.gymm.data.entity.ActualTraining;
+import ru.codingworkshop.gymm.data.entity.ExercisePlotTuple;
 import ru.codingworkshop.gymm.db.GymmDatabase;
 import ru.codingworkshop.gymm.db.dao.ActualTrainingDao;
 
@@ -121,5 +124,18 @@ public class ActualTrainingRepository {
         }
         Preconditions.checkArgument(actualSet.getReps() != 0);
         Preconditions.checkArgument(isValidId(actualSet.getActualExerciseId()));
+    }
+
+
+    public LiveData<List<String>> getActualExerciseNames() {
+        return dao.getActualExerciseNames();
+    }
+
+    public Flowable<List<ExercisePlotTuple>> getStatisticsForExercise(@NonNull String exerciseName, @Nullable Date startDate) {
+        return dao.getStatisticsForExercise(exerciseName, startDate);
+    }
+
+    public LiveData<List<ActualTraining>> getActualTrainings() {
+        return dao.getActualTrainings();
     }
 }

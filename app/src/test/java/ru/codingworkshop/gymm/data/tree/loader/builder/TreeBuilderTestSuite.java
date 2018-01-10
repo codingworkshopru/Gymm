@@ -10,7 +10,8 @@ import org.junit.runners.Suite;
 @RunWith(Suite.class)
 @Suite.SuiteClasses({
         ActualTrainingTreeBuilderTest.class,
-        ProgramTrainingTreeBuilderTest.class
+        ProgramTrainingTreeBuilderTest.class,
+        ImmutableActualTrainingTreeBuilderTest.class
 })
 public class TreeBuilderTestSuite {
 }

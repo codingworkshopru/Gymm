@@ -47,7 +47,7 @@ public class ActualTrainingTreeBuilder extends TreeBuilder<ActualTraining, Actua
     }
 
     @Override
-    BaseNode<ActualExercise, ActualSet> getNode(ActualExercise child) {
+    protected BaseNode<ActualExercise, ActualSet> getNode(ActualExercise child) {
         return new ActualExerciseNode(child);
     }
 
@@ -56,7 +56,7 @@ public class ActualTrainingTreeBuilder extends TreeBuilder<ActualTraining, Actua
     }
 
     @Override
-    void setNodes(List<? extends BaseNode<ActualExercise, ActualSet>> baseNodes) {
+    protected void setNodes(List<? extends BaseNode<ActualExercise, ActualSet>> baseNodes) {
         Map<Long, ? extends BaseNode<ActualExercise, ActualSet>> nodeProgramExerciseIdMap
                 = Maps.uniqueIndex(baseNodes, bn -> bn.getParent().getProgramExerciseId());
 
@@ -73,12 +73,12 @@ public class ActualTrainingTreeBuilder extends TreeBuilder<ActualTraining, Actua
     }
 
     @Override
-    void beforeBuild() {
+    protected void beforeBuild() {
         tree.setProgramTraining(programTrainingTree.getParent());
     }
 
     @Override
-    long parentGetter(ActualSet grandchild) {
+    protected long parentGetter(ActualSet grandchild) {
         return grandchild.getActualExerciseId();
     }
 }

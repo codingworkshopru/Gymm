@@ -9,11 +9,11 @@ import dagger.multibindings.IntoMap;
 import ru.codingworkshop.gymm.ui.MainActivityViewModel;
 import ru.codingworkshop.gymm.ui.actual.viewmodel.ActualTrainingViewModel;
 import ru.codingworkshop.gymm.ui.info.exercise.ExerciseInfoFragmentViewModel;
-import ru.codingworkshop.gymm.ui.info.statistics.viewmodel.StatisticsViewModel;
-import ru.codingworkshop.gymm.ui.info.statistics.viewmodel.StatisticsViewModel_Factory;
+import ru.codingworkshop.gymm.ui.info.statistics.journal.StatisticsJournalViewModel;
+import ru.codingworkshop.gymm.ui.info.statistics.plot.StatisticsPlotViewModel;
+import ru.codingworkshop.gymm.ui.program.ProgramTrainingViewModel;
 import ru.codingworkshop.gymm.ui.program.exercise.picker.ExerciseListDialogViewModel;
 import ru.codingworkshop.gymm.ui.program.exercise.picker.MuscleGroupPickerViewModel;
-import ru.codingworkshop.gymm.ui.program.ProgramTrainingViewModel;
 import ru.codingworkshop.gymm.viewmodel.ViewModelFactory;
 
 /**
@@ -54,8 +54,13 @@ abstract class ViewModelModule {
 
     @Binds
     @IntoMap
-    @ViewModelKey(StatisticsViewModel.class)
-    abstract ViewModel bindStatisticsViewModel(StatisticsViewModel statisticsViewModel);
+    @ViewModelKey(StatisticsPlotViewModel.class)
+    abstract ViewModel bindStatisticsPlotViewModel(StatisticsPlotViewModel statisticsPlotViewModel);
+
+    @Binds
+    @IntoMap
+    @ViewModelKey(StatisticsJournalViewModel.class)
+    abstract ViewModel bindStatisticsJournalViewModel(StatisticsJournalViewModel statisticsJournalViewModel);
 
     @Binds
     abstract ViewModelProvider.Factory bindViewModelFactory(ViewModelFactory viewModelFactory);

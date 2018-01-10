@@ -101,7 +101,7 @@
                 android:id="@+id/actualSetWeightEditText"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="@string/actual_training_activity_stepper_item_weight"
+                android:hint="@string/weight"
                 android:inputType="numberDecimal"
                 android:text="@={actualSet.weight}" />
         </android.support.design.widget.TextInputLayout>

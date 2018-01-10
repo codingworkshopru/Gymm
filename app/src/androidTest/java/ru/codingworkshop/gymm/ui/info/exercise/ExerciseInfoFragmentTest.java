@@ -49,7 +49,7 @@ public class ExerciseInfoFragmentTest {
     }
 
     @Test
-    public void checkTextLabels() throws Exception {
+    public void checkTextLabels() {
         initFragmentWithExercise(createExercise());
         onView(withId(R.id.exerciseInfoName)).check(matches(withText("foo")));
         onView(withId(R.id.exerciseInfoMainMuscleGroup)).check(matches(withText("main muscle group")));
@@ -61,19 +61,19 @@ public class ExerciseInfoFragmentTest {
     }
 
     @Test
-    public void checkDifficultyPicture() throws Exception {
+    public void checkDifficultyPicture() {
         initFragmentWithExercise(createExercise());
         onView(withId(R.id.exerciseInfoDifficulty)).check(matches(hasBackground(R.drawable.ic_signal_cellular_2_bar_primary_24dp)));
     }
 
     @Test
-    public void withoutYouTubeVideoTest() throws Exception {
+    public void withoutYouTubeVideoTest() {
         initFragmentWithExercise(createExerciseWithoutYouTubeVideo());
         onView(withId(R.id.exerciseInfoDifficulty)).check(matches(isDisplayed()));
     }
 
     @Test
-    public void onlyStepsVisibleTest() throws Exception {
+    public void onlyStepsVisibleTest() {
         initFragmentWithExercise(createExerciseWithStepsOnly());
 
         onView(withId(R.id.exerciseInfoStepsLayout)).check(matches(isDisplayed()));

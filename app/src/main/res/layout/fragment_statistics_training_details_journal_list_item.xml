@@ -1,0 +1,70 @@
+<layout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+        <variable
+            name="exercise"
+            type="ru.codingworkshop.gymm.data.tree.node.ImmutableActualExerciseNode" />
+    </data>
+
+    <android.support.constraint.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/list_item_height">
+
+        <TextView
+            android:id="@+id/statisticsTrainingDetailsJournalExerciseItem"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="16dp"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="16dp"
+            android:ellipsize="end"
+            android:maxLines="1"
+            android:text="@{exercise.parent.exerciseName}"
+            android:textAppearance="@style/TextAppearance.AppCompat.Menu"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:text="Приседания" />
+
+        <TextView
+            android:id="@+id/statisticsTrainingDetailsJournalExerciseVolumeLabel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:ellipsize="end"
+            android:maxLines="1"
+            android:text="@string/statistics_activity_journal_volume"
+            app:layout_constraintEnd_toStartOf="@+id/statisticsTrainingDetailsJournalExerciseColon"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/statisticsTrainingDetailsJournalExerciseItem" />
+
+        <TextView
+            android:id="@+id/statisticsTrainingDetailsJournalExerciseColon"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/colon"
+            app:layout_constraintEnd_toStartOf="@+id/statisticsTrainingDetailsJournalExerciseVolume"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintStart_toEndOf="@+id/statisticsTrainingDetailsJournalExerciseVolumeLabel"
+            app:layout_constraintTop_toBottomOf="@+id/statisticsTrainingDetailsJournalExerciseItem" />
+
+        <TextView
+            android:id="@+id/statisticsTrainingDetailsJournalExerciseVolume"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="16dp"
+            android:layout_marginStart="8dp"
+            android:text='@{String.format("%.2f", exercise.volume)}'
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintStart_toEndOf="@+id/statisticsTrainingDetailsJournalExerciseColon"
+            app:layout_constraintTop_toTopOf="@+id/statisticsTrainingDetailsJournalExerciseColon"
+            tools:text="521.56" />
+
+
+    </android.support.constraint.ConstraintLayout>
+</layout>

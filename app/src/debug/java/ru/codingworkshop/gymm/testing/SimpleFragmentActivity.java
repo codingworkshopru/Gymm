@@ -6,7 +6,6 @@ import android.support.v7.app.AppCompatActivity;
 import android.widget.FrameLayout;
 
 import dagger.android.AndroidInjector;
-import dagger.android.DispatchingAndroidInjector;
 import dagger.android.support.HasSupportFragmentInjector;
 import ru.codingworkshop.gymm.R;
 

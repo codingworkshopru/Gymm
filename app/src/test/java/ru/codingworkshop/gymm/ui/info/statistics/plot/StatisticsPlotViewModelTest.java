@@ -1,4 +1,4 @@
-package ru.codingworkshop.gymm.ui.info.statistics.viewmodel;
+package ru.codingworkshop.gymm.ui.info.statistics.plot;
 
 import android.arch.core.executor.testing.InstantTaskExecutorRule;
 import android.arch.lifecycle.LiveData;
@@ -22,7 +22,7 @@ import java.util.Locale;
 import io.reactivex.Flowable;
 import ru.codingworkshop.gymm.data.entity.ExercisePlotTuple;
 import ru.codingworkshop.gymm.data.util.LiveDataUtil;
-import ru.codingworkshop.gymm.db.dao.ActualTrainingDao;
+import ru.codingworkshop.gymm.repository.ActualTrainingRepository;
 import ru.codingworkshop.gymm.util.LiveTest;
 
 import static org.junit.Assert.assertEquals;
@@ -39,9 +39,9 @@ import static org.mockito.Mockito.when;
  */
 
 @RunWith(MockitoJUnitRunner.class)
-public class StatisticsViewModelTest {
-    @Mock private ActualTrainingDao dao;
-    @InjectMocks private StatisticsViewModel vm;
+public class StatisticsPlotViewModelTest {
+    @Mock private ActualTrainingRepository repository;
+    @InjectMocks private StatisticsPlotViewModel vm;
 
     @Rule public InstantTaskExecutorRule instantTaskExecutorRule = new InstantTaskExecutorRule();
 
@@ -49,11 +49,7 @@ public class StatisticsViewModelTest {
     public void setUp() throws Exception {
         List<String> foo = Collections.singletonList("foo");
         LiveData<List<String>> live = LiveDataUtil.getLive(foo);
-        when(dao.getActualExerciseNames()).thenReturn(live);
-        ExercisePlotTuple tuple = new ExercisePlotTuple();
-        tuple.setReps(10);
-        tuple.setWeight(10d);
-        tuple.setTrainingTime(new Date());
+        when(repository.getActualExerciseNames()).thenReturn(live);
     }
 
     @Test
@@ -62,50 +58,50 @@ public class StatisticsViewModelTest {
         tuple.setTrainingTime(new Date());
         tuple.setReps(1);
         tuple.setWeight(1.0);
-        when(dao.getStatisticsForExercise("foo", null)).thenReturn(Flowable.just(Collections.singletonList(tuple)));
-        vm.chartEntries.observeForever(l -> {});
-        vm.exerciseId.setValue(0L);
-        vm.dataTypeId.setValue(0L);
-        verify(dao, never()).getStatisticsForExercise(anyString(), any(Date.class));
+        when(repository.getStatisticsForExercise("foo", null)).thenReturn(Flowable.just(Collections.singletonList(tuple)));
+        vm.getChartEntries().observeForever(l -> {});
+        vm.getExerciseId().setValue(0L);
+        vm.getDataTypeId().setValue(0L);
+        verify(repository, never()).getStatisticsForExercise(anyString(), any(Date.class));
         vm.getActualExerciseNames();
-        vm.rangeId.setValue(5L);
-        LiveTest.getValue(vm.chartEntries);
-        verify(dao).getStatisticsForExercise("foo", null);
+        vm.getRangeId().setValue(5L);
+        LiveTest.getValue(vm.getChartEntries());
+        verify(repository).getStatisticsForExercise("foo", null);
     }
 
     @Test
-    public void getExercisesTest() throws Exception {
-        when(dao.getActualExerciseNames())
+    public void getActualExerciseNames() {
+        when(repository.getActualExerciseNames())
                 .thenReturn(LiveDataUtil.getAbsent())
                 .thenReturn(LiveDataUtil.getAbsent());
 
         LiveData<List<String>> actualExerciseNames = vm.getActualExerciseNames();
         assertSame(actualExerciseNames, vm.getActualExerciseNames());
 
-        verify(dao).getActualExerciseNames();
+        verify(repository).getActualExerciseNames();
     }
 
     @Test
-    public void getExerciseNameById() throws Exception {
+    public void getExerciseNameById() {
         vm.getActualExerciseNames();
 
         assertEquals("foo", vm.getExerciseNameById(0L));
     }
 
     @Test
-    public void getStartDateById() throws Exception {
+    public void getStartDateById() {
         Calendar c = new GregorianCalendar(Locale.getDefault());
         c.add(Calendar.MONTH, -1);
         DateFormat f = DateFormat.getInstance();
-        assertEquals(f.format(c.getTime()), f.format(vm.getStartDateById(0L)));
-        assertNull(vm.getStartDateById(5L));
+        assertEquals(f.format(c.getTime()), f.format(StatisticsPlotViewModel.getStartDateById(0L)));
+        assertNull(StatisticsPlotViewModel.getStartDateById(5L));
     }
 
     @Test
-    public void getDataFunctionById() throws Exception {
+    public void getDataFunctionById() {
         ExercisePlotTuple tuple = new ExercisePlotTuple();
         tuple.setWeight(2.0);
         tuple.setReps(2);
-        assertEquals(4.0, vm.getDataFunctionById(0L).apply(tuple));
+        assertEquals(4.0, StatisticsPlotViewModel.getDataFunctionById(0L).apply(tuple));
     }
 }
