@@ -134,19 +134,6 @@ class Operation {
             public void perform(UiController uiController, View view) {
                 if (view instanceof CustomisableNumberPicker) {
                     CustomisableNumberPicker numberPicker = (CustomisableNumberPicker) view;
-//                    TextView tv = null;
-//                    for (int i = 0; i < numberPicker.getChildCount(); i++) {
-//                        View child = numberPicker.getChildAt(i);
-//                        if (child instanceof TextView) {
-//                            tv = (TextView) child;
-//                            break;
-//                        }
-//                    }
-//                    if (tv != null) {
-//                        tv.requestFocus();
-//                    } else {
-//                        throw new RuntimeException("Cannot find child TextView");
-//                    }
                     numberPicker.setDisplayedValue(value);
                     try {
                         Method notifyChange = NumberPicker.class.getDeclaredMethod("notifyChange", int.class, int.class);
@@ -155,7 +142,6 @@ class Operation {
                     } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {
                         e.printStackTrace();
                     }
-//                    tv.clearFocus();
                 } else {
                     throw new RuntimeException(String.format(
                             "Failed to set value %d to %s",
@@ -164,7 +150,6 @@ class Operation {
                 }
             }
         });
-//        onView(m).perform(typeText(stringValue));
         onView(m).check(matches(withText(stringValue)));
     }
 
