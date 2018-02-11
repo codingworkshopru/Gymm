@@ -10,6 +10,7 @@ import android.support.annotation.StringRes;
 import android.support.design.widget.TextInputLayout;
 import android.support.test.InstrumentationRegistry;
 import android.support.test.espresso.matcher.BoundedMatcher;
+import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.view.ViewPager;
 import android.support.v7.widget.RecyclerView;
@@ -39,19 +40,19 @@ public final class Matchers {
             private View desiredView;
 
             private void findDesiredView(View rootView) {
-                RecyclerView stepperRecyclerView = (RecyclerView) rootView.findViewById(R.id.actualExerciseList);
+                RecyclerView stepperRecyclerView = rootView.findViewById(R.id.actualExerciseList);
                 ViewGroup pagerContainer = null;
                 for (int i = 0; i < stepperRecyclerView.getChildCount(); i++) {
                     View stepContainer = stepperRecyclerView.getChildAt(i);
-                    pagerContainer = (ViewGroup) stepContainer.findViewById(R.id.stepperItemActualSetsContainer);
+                    pagerContainer = stepContainer.findViewById(R.id.stepperItemActualSetsContainer);
                     if (pagerContainer.getChildCount() > 0) {
                         break;
                     }
                 }
-
                 ViewPager viewPager = (ViewPager) pagerContainer.getChildAt(0);
                 int currentItem = viewPager.getCurrentItem();
-                View pageView = viewPager.getChildAt(currentItem);
+                Fragment fragment = (Fragment) viewPager.getAdapter().instantiateItem(viewPager, currentItem);
+                View pageView = fragment.getView();
                 desiredView = pageView.findViewById(itemId);
             }
 

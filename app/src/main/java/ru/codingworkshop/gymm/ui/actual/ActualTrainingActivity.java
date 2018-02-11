@@ -1,9 +1,9 @@
 package ru.codingworkshop.gymm.ui.actual;
 
 import android.os.Bundle;
-import android.support.annotation.VisibleForTesting;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.app.AppCompatDelegate;
 
 import javax.inject.Inject;
 
@@ -14,7 +14,6 @@ import dagger.android.support.HasSupportFragmentInjector;
 import ru.codingworkshop.gymm.R;
 import ru.codingworkshop.gymm.ui.actual.exercise.ActualExercisesFragment;
 import ru.codingworkshop.gymm.ui.actual.rest.ActualTrainingRestFragment;
-import timber.log.Timber;
 
 public class ActualTrainingActivity extends AppCompatActivity implements
         ActualExercisesFragment.ActualExercisesCallback,
@@ -22,26 +21,31 @@ public class ActualTrainingActivity extends AppCompatActivity implements
         HasSupportFragmentInjector
 {
 
+    public static final String ACTUAL_EXERCISES_FRAGMENT_TAG = "actualExercisesFragmentTag";
+
+    static {
+        AppCompatDelegate.setCompatVectorFromResourcesEnabled(true);
+    }
+
     @Inject
     DispatchingAndroidInjector<Fragment> fragmentInjector;
-
-    @VisibleForTesting
-    public Fragment actualExercisesFragment;
+    private Fragment actualExercisesFragment;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         AndroidInjection.inject(this);
-        setContentView(R.layout.activity_actual_training);
         super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_actual_training);
 
+        actualExercisesFragment = getSupportFragmentManager().findFragmentByTag(ACTUAL_EXERCISES_FRAGMENT_TAG);
         if (actualExercisesFragment == null) {
             actualExercisesFragment = new ActualExercisesFragment();
+            getSupportFragmentManager()
+                    .beginTransaction()
+                    .add(R.id.actualTrainingFragmentContainer, actualExercisesFragment, ACTUAL_EXERCISES_FRAGMENT_TAG)
+                    .commit();
         }
         actualExercisesFragment.setArguments(getIntent().getExtras());
-        getSupportFragmentManager()
-                .beginTransaction()
-                .add(R.id.actualTrainingFragmentContainer, actualExercisesFragment)
-                .commit();
     }
 
     @Override

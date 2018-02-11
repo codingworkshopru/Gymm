@@ -8,6 +8,7 @@ import android.support.test.espresso.contrib.RecyclerViewActions;
 import android.support.test.rule.ActivityTestRule;
 
 import org.junit.After;
+import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.mockito.InjectMocks;
@@ -26,7 +27,6 @@ import ru.codingworkshop.gymm.util.TreeBuilders;
 
 import static android.support.test.espresso.Espresso.onView;
 import static android.support.test.espresso.action.ViewActions.click;
-import static android.support.test.espresso.action.ViewActions.swipeRight;
 import static android.support.test.espresso.assertion.ViewAssertions.matches;
 import static android.support.test.espresso.matcher.ViewMatchers.isDisplayed;
 import static android.support.test.espresso.matcher.ViewMatchers.withId;
@@ -48,7 +48,7 @@ public class ActualTrainingActivityTest {
 
                 @Override
                 protected void beforeActivityLaunched() {
-                    setUp();
+                    onBeforeActivityLaunched();
                 }
             };
 
@@ -56,7 +56,12 @@ public class ActualTrainingActivityTest {
     @Mock private ActualTrainingViewModel vm;
     @InjectMocks private ActualExercisesFragment fragment;
 
-    public void setUp() {
+    @Before
+    public void setUp() throws Exception {
+        AnimationClearUtils.clearAnimation(activityTestRule);
+    }
+
+    private void onBeforeActivityLaunched() {
         MockitoAnnotations.initMocks(this);
         ActualTrainingActivityInjectedFragments.fragment = fragment;
         when(viewModelFactory.create(any())).thenReturn(vm);
@@ -72,26 +77,26 @@ public class ActualTrainingActivityTest {
     }
 
     @After
-    public void tearDown() throws Exception {
+    public void tearDown() {
         final Context context = InstrumentationRegistry.getTargetContext();
         final Intent intent = new Intent(context, TrainingForegroundService.class);
         context.stopService(intent);
     }
 
     @Test
-    public void exercisesFragmentShowsTest() throws Exception {
+    public void exercisesFragmentShowsTest() {
         onView(withText("exercise100")).check(matches(isDisplayed()));
     }
 
     @Test
-    public void startRestTest() throws Exception {
+    public void startRestTest() {
         onView(withId(R.id.actualExerciseList)).perform(RecyclerViewActions.actionOnItemAtPosition(2, click()));
         onView(both(withId(R.id.actualSetDoneButton)).and(isDisplayed())).perform(click());
         onView(withId(R.id.restTimeLeft)).check(matches(isDisplayed()));
     }
 
     @Test
-    public void stopRestTest() throws Exception {
+    public void stopRestTest() {
         onView(withId(R.id.actualExerciseList)).perform(RecyclerViewActions.actionOnItemAtPosition(2, click()));
         onView(both(withId(R.id.actualSetDoneButton)).and(isDisplayed())).perform(click());
         onView(withId(R.id.restTimeLeft)).check(matches(isDisplayed()));

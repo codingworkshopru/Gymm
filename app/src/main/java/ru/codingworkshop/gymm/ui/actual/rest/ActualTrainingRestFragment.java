@@ -6,6 +6,8 @@ import android.content.Context;
 import android.databinding.DataBindingUtil;
 import android.os.Bundle;
 import android.support.annotation.DrawableRes;
+import android.support.annotation.Nullable;
+import android.support.annotation.VisibleForTesting;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -51,8 +53,8 @@ public class ActualTrainingRestFragment extends Fragment {
     private FragmentActualTrainingRestBinding binding;
     private long totalTimeMilliseconds;
     private EventBus restEventBus;
-    private SatelliteProgressBarAnimation progressBarAnimation;
-    private Animation fadeInFadeOut;
+    @VisibleForTesting
+    public SatelliteProgressBarAnimation progressBarAnimation;
     private ServiceBindController serviceBindController;
 
     private ActualTrainingRestCallback callback;
@@ -127,9 +129,11 @@ public class ActualTrainingRestFragment extends Fragment {
     private void initAnimations() {
         progressBarAnimation = new SatelliteProgressBarAnimation(binding.satelliteProgressBar, totalTimeMilliseconds);
 
-        fadeInFadeOut = AnimationUtils.loadAnimation(getContext(), android.R.anim.fade_out);
+        Animation fadeInFadeOut = AnimationUtils.loadAnimation(getContext(), android.R.anim.fade_out);
         fadeInFadeOut.setRepeatMode(REVERSE);
         fadeInFadeOut.setRepeatCount(INFINITE);
+
+        binding.restTimeLeft.setAnimation(fadeInFadeOut);
     }
 
     private void initListeners() {
@@ -177,20 +181,19 @@ public class ActualTrainingRestFragment extends Fragment {
                 case PAUSED:
                     progressBarAnimation.pause();
                     playPauseButtonDrawable = R.drawable.ic_play_arrow_white_24dp;
-                    // TODO: 21.12.2017 turn on animation
-//                    binding.restTimeLeft.startAnimation(fadeInFadeOut);
+                    startTimerAnimation();
                     break;
 
                 case IN_PROGRESS:
                     progressBarAnimation.start();
                     playPauseButtonDrawable = R.drawable.ic_pause_white_24dp;
-//                    binding.restTimeLeft.clearAnimation();
+                    stopTimerAnimation();
                     break;
 
                 case FINISHED:
                     progressBarAnimation.stop();
                     playPauseButtonDrawable = R.drawable.ic_stop_white_24dp;
-//                    binding.restTimeLeft.startAnimation(fadeInFadeOut);
+                    startTimerAnimation();
                     break;
 
                 default:
@@ -200,6 +203,24 @@ public class ActualTrainingRestFragment extends Fragment {
             binding.restPauseResumeActionButton.setImageResource(playPauseButtonDrawable);
             binding.setState(state);
         });
+    }
+
+    private void startTimerAnimation() {
+        Animation timerAnimation = getTimerAnimation();
+        if (timerAnimation != null) {
+            binding.restTimeLeft.startAnimation(timerAnimation);
+        }
+    }
+
+    private void stopTimerAnimation() {
+        Animation timerAnimation = getTimerAnimation();
+        if (timerAnimation != null) {
+            timerAnimation.cancel();
+        }
+    }
+
+    private @Nullable Animation getTimerAnimation() {
+        return binding.restTimeLeft.getAnimation();
     }
 
     private void onPlusOneMinuteButtonClick(View view) {

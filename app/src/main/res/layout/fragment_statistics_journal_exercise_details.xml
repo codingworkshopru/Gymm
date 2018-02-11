@@ -11,7 +11,8 @@
         android:id="@+id/statisticsExerciseDetailsJournalList"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_marginTop="8dp"
+        android:clipToPadding="false"
+        android:paddingTop="8dp"
         app:layoutManager="android.support.v7.widget.LinearLayoutManager"
         tools:listitem="@layout/fragment_statistics_journal_exercise_details_list_item" />
 

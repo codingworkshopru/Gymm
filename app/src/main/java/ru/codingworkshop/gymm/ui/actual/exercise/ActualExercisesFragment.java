@@ -21,16 +21,16 @@ import android.widget.LinearLayout;
 
 import com.google.common.base.Preconditions;
 
+import java.util.concurrent.TimeUnit;
+
 import javax.inject.Inject;
 
 import dagger.android.support.AndroidSupportInjection;
 import ru.codingworkshop.gymm.R;
 import ru.codingworkshop.gymm.data.entity.ActualSet;
 import ru.codingworkshop.gymm.data.tree.node.ActualTrainingTree;
-import ru.codingworkshop.gymm.databinding.FragmentActualSetBinding;
 import ru.codingworkshop.gymm.db.GymmDatabase;
 import ru.codingworkshop.gymm.service.TrainingForegroundService;
-import ru.codingworkshop.gymm.ui.program.common.FragmentAlert;
 import ru.codingworkshop.gymm.ui.actual.ServiceBindController;
 import ru.codingworkshop.gymm.ui.actual.set.ActualSetDataBindingWrapper;
 import ru.codingworkshop.gymm.ui.actual.set.ActualSetFragment;
@@ -38,6 +38,7 @@ import ru.codingworkshop.gymm.ui.actual.set.ActualSetsFragmentPagerAdapter;
 import ru.codingworkshop.gymm.ui.actual.set.ActualSetsViewPager;
 import ru.codingworkshop.gymm.ui.actual.viewmodel.ActualTrainingViewModel;
 import ru.codingworkshop.gymm.ui.common.ListItemListeners;
+import ru.codingworkshop.gymm.ui.program.common.FragmentAlert;
 import ru.codingworkshop.gymm.ui.util.AlertDialogFragment;
 
 public class ActualExercisesFragment extends Fragment implements
@@ -50,6 +51,7 @@ public class ActualExercisesFragment extends Fragment implements
     private static final String PREFS_ACTUAL_TRAINING_ID_KEY = "prefsActualTrainingId";
     private static final String PREFS_EXERCISE_INDEX_KEY = "prefsExerciseIndex";
     private static final String PREFS_SET_INDEX_KEY = "prefsSetIndex";
+    public static final int DIALOG_ID = 0;
 
     public interface ActualExercisesCallback {
         void onStartRest(int restSeconds);
@@ -94,7 +96,7 @@ public class ActualExercisesFragment extends Fragment implements
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         return inflater.inflate(R.layout.fragment_actual_exercises, container, false);
     }
@@ -139,16 +141,21 @@ public class ActualExercisesFragment extends Fragment implements
             TrainingForegroundService.startService(context, tree.getParent().getId(),
                     tree.getParent().getName());
         } else {
-            ServiceBindController controller = new ServiceBindController(context);
-            controller.bindService().observe(this, service -> {
+            ServiceBindController serviceBindController = new ServiceBindController(context);
+            serviceBindController.bindService().observe(this, service -> {
                 if (service != null && (service.isRestInProgress() || service.isRestInPause())) {
-                    startRest((int)(service.getMillisecondsLeft()/1000));
+                    startRest((int) TimeUnit.MILLISECONDS.toSeconds(service.getMillisecondsLeft()));
                 }
-                controller.unbindService();
+                serviceBindController.unbindService();
             });
         }
 
         initUi();
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
     }
 
     @Override
@@ -190,7 +197,7 @@ public class ActualExercisesFragment extends Fragment implements
     }
 
     private void finishTraining() {
-        alert.showTwoButtonsAlert(0, R.string.actual_training_activity_are_you_sure_message);
+        alert.showTwoButtonsAlert(DIALOG_ID, R.string.actual_training_activity_are_you_sure_message);
     }
 
     @Override
@@ -214,7 +221,7 @@ public class ActualExercisesFragment extends Fragment implements
         startRest(secondsForRest);
     }
 
-    private void startRest(Integer secondsForRest) {
+    private void startRest(@Nullable Integer secondsForRest) {
         if (secondsForRest != null && secondsForRest > 0) {
             callback.onStartRest(secondsForRest);
         }
@@ -223,11 +230,7 @@ public class ActualExercisesFragment extends Fragment implements
     // go to next set or exercise
     private void goNext() {
         final int currentSetIndex = setsViewPager.getCurrentItem();
-        FragmentActualSetBinding setCurrentBinding = setsPagerAdapter.getBinding(currentSetIndex);
-
-        if (setCurrentBinding == null) return;
-
-        if (setCurrentBinding.getIndex() < setCurrentBinding.getSetsCount() - 1) {
+        if (currentSetIndex < setsViewPager.getChildCount() - 1) {
             setsViewPager.setCurrentItem(currentSetIndex + 1);
         } else {
             getToNextExercise();
@@ -297,10 +300,13 @@ public class ActualExercisesFragment extends Fragment implements
 
     @Override
     public void onDialogButtonClick(int dialogId, boolean positive) {
-        if (dialogId == 0) {
+        if (dialogId == DIALOG_ID) {
             if (positive) {
                 viewModel.finishTraining();
                 context.stopService(new Intent(context, TrainingForegroundService.class));
+                if (isAdded()) {
+                    getActivity().finish();
+                }
             } else {
                 alert.hideAlert();
             }

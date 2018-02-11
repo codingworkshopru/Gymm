@@ -11,6 +11,7 @@ import android.os.HandlerThread;
 import android.os.IBinder;
 import android.os.Looper;
 import android.os.Process;
+import android.support.annotation.NonNull;
 import android.support.annotation.VisibleForTesting;
 
 import com.google.common.base.Preconditions;
@@ -110,6 +111,7 @@ public class TrainingForegroundService extends Service implements RestEventBusHo
         return binder;
     }
 
+    @NonNull
     @Override
     public EventBus getRestEventBus() {
         return restController.getRestEventBus();

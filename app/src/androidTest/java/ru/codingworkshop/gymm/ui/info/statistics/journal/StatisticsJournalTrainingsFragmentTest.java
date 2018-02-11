@@ -12,7 +12,9 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 
+import java.text.DateFormat;
 import java.util.Collections;
+import java.util.Date;
 import java.util.GregorianCalendar;
 
 import ru.codingworkshop.gymm.R;
@@ -29,6 +31,8 @@ import static org.mockito.Mockito.when;
 
 @RunWith(MockitoJUnitRunner.class)
 public class StatisticsJournalTrainingsFragmentTest {
+    private static final Date START_TIME = new GregorianCalendar(2000, 0, 1, 15, 5, 30).getTime();
+
     @Rule public InstantTaskExecutorRule instantTaskExecutorRule = new InstantTaskExecutorRule();
 
     @Rule public ActivityTestRule<SimpleFragmentActivity> activityTestRule =
@@ -43,7 +47,7 @@ public class StatisticsJournalTrainingsFragmentTest {
     public void setUp() throws Exception {
         when(viewModelFactory.create(any())).thenReturn(vm);
         ActualTraining actualTraining = new ActualTraining(1L, "foo");
-        actualTraining.setStartTime(new GregorianCalendar(2000, 0, 1, 15, 5, 30).getTime());
+        actualTraining.setStartTime(START_TIME);
         when(vm.getActualTrainings()).thenReturn(LiveDataUtil.getLive(Collections.singletonList(actualTraining)));
 
         RecyclerViewItemMatcher.setRecyclerViewId(R.id.statisticsJournalTrainings);
@@ -54,7 +58,7 @@ public class StatisticsJournalTrainingsFragmentTest {
     @Test
     public void checkListItem() {
         onView(RecyclerViewItemMatcher.itemAtPosition(R.id.statisticsJournalTrainingsDate, 0))
-                .check(matches(withText("01.01.2000 15:05")));
+                .check(matches(withText(DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.SHORT).format(START_TIME))));
         onView(RecyclerViewItemMatcher.itemAtPosition(R.id.statisticsJournalTrainingsName, 0))
                 .check(matches(withText("foo")));
     }

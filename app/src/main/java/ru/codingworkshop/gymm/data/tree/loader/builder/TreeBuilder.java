@@ -5,7 +5,6 @@ import com.google.common.collect.Multimap;
 import com.google.common.collect.Multimaps;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 
 import ru.codingworkshop.gymm.data.entity.common.Model;
@@ -95,10 +94,7 @@ public abstract class TreeBuilder<P, C extends Model, GC> implements ParentHolde
         if (children != null) {
             for (C child : children) {
                 BaseNode<C, GC> node = getNode(child);
-                Collection<GC> gcn = grandchildren.get(child.getId());
-                if (!gcn.isEmpty()) {
-                    node.setChildren(new ArrayList<>(gcn));
-                }
+                node.setChildren(new ArrayList<>(grandchildren.get(child.getId())));
                 nodes.add(node);
             }
         }

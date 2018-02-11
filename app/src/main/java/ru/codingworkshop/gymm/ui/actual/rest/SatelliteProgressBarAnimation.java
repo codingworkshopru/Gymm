@@ -1,15 +1,16 @@
 package ru.codingworkshop.gymm.ui.actual.rest;
 
 import android.animation.ObjectAnimator;
+import android.os.Build;
+import android.support.annotation.VisibleForTesting;
 import android.view.animation.LinearInterpolator;
-
-import timber.log.Timber;
 
 /**
  * Created by Радик on 27.09.2017 as part of the Gymm project.
  */
 
-class SatelliteProgressBarAnimation {
+@VisibleForTesting(otherwise = VisibleForTesting.PACKAGE_PRIVATE)
+public class SatelliteProgressBarAnimation {
     private ObjectAnimator progressBarAnimator;
 
     SatelliteProgressBarAnimation(SatelliteProgressBar progressBar, long duration) {
@@ -18,7 +19,8 @@ class SatelliteProgressBarAnimation {
         progressBarAnimator.setInterpolator(new LinearInterpolator());
     }
 
-    void setDuration(long millis) {
+    @VisibleForTesting(otherwise = VisibleForTesting.PACKAGE_PRIVATE)
+    public void setDuration(long millis) {
         progressBarAnimator.setDuration(millis);
     }
 
@@ -28,9 +30,13 @@ class SatelliteProgressBarAnimation {
     }
 
     void pause() {
-        long currentPlayTime = progressBarAnimator.getCurrentPlayTime();
-        progressBarAnimator.cancel();
-        setDuration(progressBarAnimator.getDuration() - currentPlayTime);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+            progressBarAnimator.pause();
+        } else {
+            long currentPlayTime = progressBarAnimator.getCurrentPlayTime();
+            progressBarAnimator.cancel();
+            setDuration(progressBarAnimator.getDuration() - currentPlayTime);
+        }
     }
 
     void stop() {

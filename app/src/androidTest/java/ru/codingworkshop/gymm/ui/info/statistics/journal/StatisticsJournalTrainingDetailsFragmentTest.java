@@ -4,6 +4,8 @@ import android.arch.core.executor.testing.InstantTaskExecutorRule;
 import android.arch.lifecycle.ViewModelProvider;
 import android.support.test.rule.ActivityTestRule;
 
+import com.google.common.collect.Lists;
+
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -12,10 +14,11 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 
+import java.text.DateFormat;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import ru.codingworkshop.gymm.R;
 import ru.codingworkshop.gymm.data.entity.ActualExercise;
@@ -36,6 +39,7 @@ import static ru.codingworkshop.gymm.util.RecyclerViewItemMatcher.itemAtPosition
 
 @RunWith(MockitoJUnitRunner.class)
 public class StatisticsJournalTrainingDetailsFragmentTest {
+    public static final Date START_TIME = new GregorianCalendar(2000, 0, 1, 15, 5, 30).getTime();
     @Mock private StatisticsJournalViewModel vm;
     @Mock private ViewModelProvider.Factory viewModelFactory;
     @InjectMocks private StatisticsJournalTrainingDetailsFragment fragment;
@@ -49,26 +53,24 @@ public class StatisticsJournalTrainingDetailsFragmentTest {
         ImmutableActualTrainingTree tree = new ImmutableActualTrainingTree();
 
         ActualTraining actualTraining = new ActualTraining(1L, "foo");
-        actualTraining.setStartTime(new GregorianCalendar(2000, 0, 1, 15, 5, 30).getTime());
+        actualTraining.setStartTime(START_TIME);
         actualTraining.setFinishTime(new GregorianCalendar(2000, 0, 1, 15, 25, 0).getTime());
         actualTraining.setComment("comment");
         tree.setParent(actualTraining);
 
         List<ActualExercise> actualExercises = Models.createActualExercises(12L);
-        List<ImmutableActualExerciseNode> nodes = actualExercises.stream()
-                .map(ex -> {
-                    ActualSet actualSet = Models.createActualSet(13L, 12L, 1);
+        List<ImmutableActualExerciseNode> nodes = Lists.transform(actualExercises, ex -> {
+            ActualSet actualSet = Models.createActualSet(13L, 12L, 1);
 
-                    ActualSet actualSetWithoutWeight = Models.createActualSet(14L, 12L, 1);
+            ActualSet actualSetWithoutWeight = Models.createActualSet(14L, 12L, 1);
 
-                    ImmutableActualExerciseNode node = new ImmutableActualExerciseNode();
-                    node.setParent(ex);
-                    node.setChildren(Arrays.asList(actualSet, actualSetWithoutWeight));
-                    node.setVolume(2.125);
+            ImmutableActualExerciseNode node = new ImmutableActualExerciseNode();
+            node.setParent(ex);
+            node.setChildren(Arrays.asList(actualSet, actualSetWithoutWeight));
+            node.setVolume(2.125);
 
-                    return node;
-                })
-                .collect(Collectors.toList());
+            return node;
+        });
         tree.setChildren(nodes);
 
         when(viewModelFactory.create(StatisticsJournalViewModel.class)).thenReturn(vm);
@@ -84,7 +86,7 @@ public class StatisticsJournalTrainingDetailsFragmentTest {
 
     @Test
     public void actualTraining() {
-        onView(withId(R.id.statisticsTrainingDetailsJournalDateTime)).check(matches(withText("01.01.2000 15:05")));
+        onView(withId(R.id.statisticsTrainingDetailsJournalDateTime)).check(matches(withText(DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.SHORT).format(START_TIME))));
         onView(withId(R.id.statisticsTrainingDetailsJournalName)).check(matches(withText("foo")));
         onView(withId(R.id.statisticsTrainingDetailsJournalDuration)).check(matches(withText("00:19:30")));
         onView(withId(R.id.statisticsTrainingDetailsJournalComment)).check(matches(withText("comment")));

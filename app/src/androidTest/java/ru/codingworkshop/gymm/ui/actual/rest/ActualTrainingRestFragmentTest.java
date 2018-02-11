@@ -29,6 +29,7 @@ import ru.codingworkshop.gymm.service.event.outcoming.RestTimeAddedEvent;
 import ru.codingworkshop.gymm.service.event.outcoming.RestTimerTickEvent;
 import ru.codingworkshop.gymm.testing.SimpleFragmentActivity;
 import ru.codingworkshop.gymm.ui.Matchers;
+import ru.codingworkshop.gymm.ui.actual.AnimationClearUtils;
 
 import static android.support.test.espresso.Espresso.onView;
 import static android.support.test.espresso.action.ViewActions.click;
@@ -57,6 +58,8 @@ public class ActualTrainingRestFragmentTest {
     public void setUp() throws Exception {
         MockitoAnnotations.initMocks(this);
 
+        AnimationClearUtils.clearAnimation(activityTestRule);
+
         doAnswer(invocation -> {
             bus.post(new RestResumedEvent(25000));
             return null;
@@ -79,7 +82,7 @@ public class ActualTrainingRestFragmentTest {
     }
 
     @Test
-    public void initializationTest() throws Exception {
+    public void initializationTest() {
         verify(bus).register(fragment);
         verify(bus).post(any(StartRestEvent.class));
 
@@ -87,7 +90,7 @@ public class ActualTrainingRestFragmentTest {
     }
 
     @Test
-    public void plusOneMinute() throws Exception {
+    public void plusOneMinute() {
         onView(withId(R.id.restPlusOneMinuteButton)).perform(click());
         verify(bus).post(any(AddRestTimeEvent.class));
 
@@ -95,14 +98,14 @@ public class ActualTrainingRestFragmentTest {
     }
 
     @Test
-    public void stopRest() throws Exception {
+    public void stopRest() {
         onView(withId(R.id.restStopButton)).perform(click());
         verify(callback).onRestStopped();
         verify(bus).post(any(StopRestEvent.class));
     }
 
     @Test
-    public void restFinished() throws Exception {
+    public void restFinished() {
         bus.post(new RestFinishedEvent());
 
         assertTime("0:00");
@@ -112,7 +115,7 @@ public class ActualTrainingRestFragmentTest {
     }
 
     @Test
-    public void pauseRest() throws Exception {
+    public void pauseRest() {
         onView(withId(R.id.restPauseResumeActionButton)).perform(click());
         verify(bus).post(any(PauseRestEvent.class));
 
@@ -121,7 +124,7 @@ public class ActualTrainingRestFragmentTest {
     }
 
     @Test
-    public void resumeRest() throws Exception {
+    public void resumeRest() {
         onView(withId(R.id.restPauseResumeActionButton)).perform(click(), click());
         verify(bus).post(any(ResumeRestEvent.class));
 

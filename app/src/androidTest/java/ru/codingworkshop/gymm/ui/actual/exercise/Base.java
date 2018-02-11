@@ -15,6 +15,7 @@ import org.mockito.MockitoAnnotations;
 import ru.codingworkshop.gymm.R;
 import ru.codingworkshop.gymm.data.tree.node.ActualTrainingTree;
 import ru.codingworkshop.gymm.testing.SimpleFragmentActivity;
+import ru.codingworkshop.gymm.ui.actual.AnimationClearUtils;
 import ru.codingworkshop.gymm.ui.actual.viewmodel.ActualTrainingViewModel;
 import ru.codingworkshop.gymm.util.RecyclerViewItemMatcher;
 
@@ -47,6 +48,8 @@ public abstract class Base {
     @Before
     public void setUp() throws Exception {
         MockitoAnnotations.initMocks(this);
+
+        AnimationClearUtils.clearAnimation(activityTestRule);
 
         RecyclerViewItemMatcher.setRecyclerViewId(R.id.actualExerciseList);
         InstrumentationRegistry

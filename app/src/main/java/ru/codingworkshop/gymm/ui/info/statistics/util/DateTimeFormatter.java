@@ -23,7 +23,9 @@ public class DateTimeFormatter {
         if (date == null) {
             return "";
         }
-        return DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.SHORT).format(date);
+        return DateFormat
+                .getDateTimeInstance(DateFormat.SHORT, DateFormat.SHORT)
+                .format(date);
     }
 
     public static String formatDuration(Date start, Date finish) {

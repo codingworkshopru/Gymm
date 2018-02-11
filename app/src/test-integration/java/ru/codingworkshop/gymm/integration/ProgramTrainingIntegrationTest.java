@@ -3,6 +3,7 @@ package ru.codingworkshop.gymm.integration;
 import android.arch.persistence.room.Room;
 import android.support.test.InstrumentationRegistry;
 import android.support.test.espresso.Espresso;
+import android.support.test.filters.LargeTest;
 import android.support.test.rule.ActivityTestRule;
 
 import org.junit.AfterClass;
@@ -43,6 +44,7 @@ import static ru.codingworkshop.gymm.integration.Operation.typeSetAndSaveIt;
  * Created by Radik on 22.11.2017.
  */
 
+@LargeTest
 public class ProgramTrainingIntegrationTest {
     @Rule public ActivityTestRule<MainActivity> activityTestRule =
             new ActivityTestRule<>(MainActivity.class);
@@ -61,9 +63,10 @@ public class ProgramTrainingIntegrationTest {
 
     @Before
     public void setUp() throws Exception {
-        db.compileStatement("delete from ProgramTraining").execute();
+        db.compileStatement("delete from ProgramTraining").executeUpdateDelete();
     }
 
+    @LargeTest
     @Test
     public void addProgramTraining() {
         addOneProgramTraining("monday workout", "Приседания в гакк-тренажере");
@@ -83,6 +86,7 @@ public class ProgramTrainingIntegrationTest {
         checkProgramTraining(trainingName);
     }
 
+    @LargeTest
     @Test
     public void addAndEditProgramSet() {
         addOneProgramTraining("monday workout", "Приседания в гакк-тренажере");
@@ -105,6 +109,7 @@ public class ProgramTrainingIntegrationTest {
         checkSet(1, 7, 6, 5);
     }
 
+    @LargeTest
     @Test
     public void addAndEditProgramExercise() {
         addOneProgramTraining("monday workout", "Приседания в гакк-тренажере");
@@ -131,6 +136,7 @@ public class ProgramTrainingIntegrationTest {
         checkProgramExercise(1, "Жим штанги лёжа", 1);
     }
 
+    @LargeTest
     @Test
     public void editProgramTraining() {
         addOneProgramTraining("monday workout", "Приседания в гакк-тренажере");
@@ -153,6 +159,7 @@ public class ProgramTrainingIntegrationTest {
         checkProgramTraining("tuesday workout");
     }
 
+    @LargeTest
     @Test
     public void deleteProgramExercise() {
         addProgramTrainingClick();
@@ -181,6 +188,7 @@ public class ProgramTrainingIntegrationTest {
         checkExerciseNotPresented("Жим штанги лёжа");
     }
 
+    @LargeTest
     @Test
     public void checkSetsSortOrder() {
         addProgramTrainingClick();
@@ -204,6 +212,7 @@ public class ProgramTrainingIntegrationTest {
         checkSet(2, 3, 4, 10);
     }
 
+    @LargeTest
     @Test
     public void checkExercisesSortOrder() {
         addProgramTrainingClick();
@@ -235,6 +244,7 @@ public class ProgramTrainingIntegrationTest {
         checkProgramExercise(2, "Приседания со штангой", 1);
     }
 
+    @LargeTest
     @Test
     public void undoChangesAfterExerciseAddition() {
         addOneProgramTraining("workout is ruined", "Отжимания от пола");
@@ -254,6 +264,7 @@ public class ProgramTrainingIntegrationTest {
         checkExerciseNotPresented("Приседания со штангой");
     }
 
+    @LargeTest
     @Test
     public void undoChangesAfterSetAddition() {
         addProgramTrainingClick();

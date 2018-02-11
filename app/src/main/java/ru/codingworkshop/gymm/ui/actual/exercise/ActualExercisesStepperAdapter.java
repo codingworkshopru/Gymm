@@ -17,7 +17,7 @@ import timber.log.Timber;
 public class ActualExercisesStepperAdapter extends
         ClickableBindingListAdapter<ActualExerciseNode, FragmentActualExercisesStepperItemBinding> {
 
-    public ActualExercisesStepperAdapter(@Nullable List<ActualExerciseNode> items, ListItemListeners listeners) {
+    ActualExercisesStepperAdapter(@Nullable List<ActualExerciseNode> items, ListItemListeners listeners) {
         super(items, listeners);
     }
 

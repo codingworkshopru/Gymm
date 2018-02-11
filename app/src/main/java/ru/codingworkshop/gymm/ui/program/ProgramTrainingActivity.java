@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.app.AppCompatDelegate;
 
 import javax.inject.Inject;
 
@@ -20,6 +21,10 @@ import ru.codingworkshop.gymm.ui.program.training.ProgramTrainingFragment;
 import timber.log.Timber;
 
 public class ProgramTrainingActivity extends AppCompatActivity implements HasSupportFragmentInjector {
+    static {
+        AppCompatDelegate.setCompatVectorFromResourcesEnabled(true);
+    }
+
     public static final String PROGRAM_TRAINING_ID_KEY = "programTrainingId";
 
     @Inject DispatchingAndroidInjector<Fragment> fragmentInjector;

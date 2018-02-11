@@ -87,7 +87,7 @@ public class ActualTrainingViewModelTest {
     }
 
     @Test
-    public void startTraining() throws Exception {
+    public void startTraining() {
         LiveTest.verifyLiveData(vm.startTraining(1L), Objects::nonNull);
         ActualTrainingTree tree = vm.getActualTrainingTree();
 
@@ -103,7 +103,7 @@ public class ActualTrainingViewModelTest {
     }
 
     @Test
-    public void loadTraining() throws Exception {
+    public void loadTraining() {
 
         LiveTest.verifyLiveData(vm.loadTraining(11L), Objects::nonNull);
 
@@ -123,7 +123,7 @@ public class ActualTrainingViewModelTest {
     }
 
     @Test
-    public void finishTrainingWithoutExercises() throws Exception {
+    public void finishTrainingWithoutExercises() {
         LiveTest.verifyLiveData(vm.loadTraining(11L), Objects::nonNull);
         vm.getActualTrainingTree().getChildren().clear();
 
@@ -133,7 +133,7 @@ public class ActualTrainingViewModelTest {
     }
 
     @Test
-    public void finishTrainingWithoutSets() throws Exception {
+    public void finishTrainingWithoutSets() {
         LiveTest.verifyLiveData(vm.loadTraining(11L), Objects::nonNull);
         vm.getActualTrainingTree().getChildren().get(0).getChildren().clear();
 
@@ -144,7 +144,7 @@ public class ActualTrainingViewModelTest {
     }
 
     @Test
-    public void finishTraining() throws Exception {
+    public void finishTraining() {
         LiveTest.verifyLiveData(vm.loadTraining(11L), Objects::nonNull);
         final ActualExercise foo = Models.createActualExercise(20L, "foo", 11L, 4L);
         vm.getActualTrainingTree().addChild(new ActualExerciseNode(foo));
@@ -156,7 +156,7 @@ public class ActualTrainingViewModelTest {
     }
 
     @Test
-    public void createActualExercise() throws Exception {
+    public void createActualExercise() {
         doAnswer(invocation -> {
             ActualExercise exercise = invocation.getArgument(0);
             exercise.setId(12L);
@@ -178,7 +178,7 @@ public class ActualTrainingViewModelTest {
     }
 
     @Test
-    public void createActualSet() throws Exception {
+    public void createActualSet() {
         LiveTest.verifyLiveData(vm.startTraining(1L), Objects::nonNull);
 
         vm.createActualExercise(0);
@@ -197,7 +197,7 @@ public class ActualTrainingViewModelTest {
     }
 
     @Test
-    public void updateActualSet() throws Exception {
+    public void updateActualSet() {
         LiveTest.verifyLiveData(vm.loadTraining(11L), loaded -> {
             final ActualSet actualSet = Models.createActualSet(13L, 12L, 3);
             actualSet.setWeight(5.5);

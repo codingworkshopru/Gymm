@@ -19,6 +19,7 @@ import ru.codingworkshop.gymm.data.util.LiveDataUtil;
 import ru.codingworkshop.gymm.util.Models;
 import ru.codingworkshop.gymm.util.RecyclerViewItemMatcher;
 
+import static android.support.test.espresso.Espresso.closeSoftKeyboard;
 import static android.support.test.espresso.Espresso.onView;
 import static android.support.test.espresso.action.ViewActions.click;
 import static android.support.test.espresso.action.ViewActions.replaceText;
@@ -73,7 +74,7 @@ public class ActualExercisesFragmentTest extends Base {
     }
 
     @Test
-    public void finishTrainingTest() throws Exception {
+    public void finishTrainingTest() {
         onView(withId(R.id.action_finish_training)).perform(click());
 
         final String areYouSureMessage = InstrumentationRegistry.getTargetContext()
@@ -85,14 +86,14 @@ public class ActualExercisesFragmentTest extends Base {
     }
 
     @Test
-    public void verifyItemCircle() throws Exception {
+    public void verifyItemCircle() {
         onView(stepItem(R.id.stepperItemIndex, 0)).check(matches(withText("1")));
         onView(stepItem(R.id.stepperItemCircle, 1)).check(matches(isDisplayed()));
         onView(stepItem(R.id.stepperItemCircle, 1)).check(matches(hasBackground(R.drawable.ic_circle_grey_24dp)));
     }
 
     @Test
-    public void verifyVerticalLinesVisibility() throws Exception {
+    public void verifyVerticalLinesVisibility() {
         onView(stepItem(R.id.stepperItemTopLine, 0)).check(matches(not(isDisplayed())));
         onView(stepItem(R.id.stepperItemBottomLine, 0)).check(matches(isDisplayed()));
         onView(stepItem(R.id.stepperItemTopLine, 2)).check(matches(isDisplayed()));
@@ -100,7 +101,7 @@ public class ActualExercisesFragmentTest extends Base {
     }
 
     @Test
-    public void actualSetsSlideTest() throws Exception {
+    public void actualSetsSlideTest() {
         selectStepAtPosition(0);
         assertCurrentSetFinished();
         assertCurrentPageIndex(1);
@@ -123,7 +124,7 @@ public class ActualExercisesFragmentTest extends Base {
     }
 
     @Test
-    public void verifyActiveExercise() throws Exception {
+    public void verifyActiveExercise() {
         selectStepAtPosition(1);
 
         assertItemAtPositionIsActive(1);
@@ -135,13 +136,13 @@ public class ActualExercisesFragmentTest extends Base {
     }
 
     @Test
-    public void actualExerciseCreationOnStepClickTest() throws Exception {
+    public void actualExerciseCreationOnStepClickTest() {
         selectStepAtPosition(0);
         verify(vm).createActualExercise(0);
     }
 
     @Test
-    public void testPageFillsFromModel() throws Exception {
+    public void testPageFillsFromModel() {
         selectStepAtPosition(0);
         final ActualSet veryFirstActualSet = vm.getActualTrainingTree().getChildren().get(0).getChildren().get(0);
         checkWeight(veryFirstActualSet.getWeight());
@@ -149,11 +150,12 @@ public class ActualExercisesFragmentTest extends Base {
     }
 
     @Test
-    public void finishSetWithoutRestTest() throws Exception {
+    public void finishSetWithoutRestTest() {
         selectStepAtPosition(2);
 
         onView(currentPageItem(R.id.actualSetWeightEditText)).perform(click());
         typeWeight(1.1);
+        closeSoftKeyboard();
         clickDoneButton();
         onView(stepItem(R.id.stepperItemActualSetsContainer, 2)).perform(swipeRight());
         assertCurrentSetFinished();
@@ -163,14 +165,9 @@ public class ActualExercisesFragmentTest extends Base {
     }
 
     @Test
-    public void startRestTest() throws Exception {
-        vm.getActualTrainingTree()
-                .getChildren()
-                .get(2)
-                .getProgramExerciseNode()
-                .getChildren()
-                .get(0)
-                .setSecondsForRest(1);
+    public void startRestTest() {
+        ActualExerciseNode thirdExercise = vm.getActualTrainingTree().getChildren().get(2);
+        thirdExercise.getProgramExerciseNode().getChildren().get(0).setSecondsForRest(1);
 
         selectStepAtPosition(2);
         typeWeight(1.1);
@@ -182,7 +179,7 @@ public class ActualExercisesFragmentTest extends Base {
     }
 
     @Test
-    public void finishExerciseTest() throws Exception {
+    public void finishExerciseTest() {
         onView(stepItem(R.id.stepperItemCircle, 0)).check(matches(hasBackground(R.drawable.ic_check_circle_primary_24dp)));
         selectStepAtPosition(1);
         onView(stepItem(R.id.stepperItemActualSetsContainer, 1)).perform(swipeLeft());
@@ -195,7 +192,7 @@ public class ActualExercisesFragmentTest extends Base {
     }
 
     @Test
-    public void goToNextSetAfterSetCreationTest() throws Exception {
+    public void goToNextSetAfterSetCreationTest() {
         selectStepAtPosition(2);
 
         typeWeight(1.1);
@@ -205,7 +202,7 @@ public class ActualExercisesFragmentTest extends Base {
     }
 
     @Test
-    public void updateActualSet() throws Exception {
+    public void updateActualSet() {
         selectStepAtPosition(0);
 
         replaceRepsCount(1);
@@ -220,7 +217,7 @@ public class ActualExercisesFragmentTest extends Base {
     }
 
     @Test
-    public void saveStateBeforeDetach() throws Exception {
+    public void saveStateBeforeDetach() {
         selectStepAtPosition(1);
         onView(stepItem(R.id.stepperItemActualSetsContainer, 1)).perform(swipeLeft());
 
@@ -231,7 +228,7 @@ public class ActualExercisesFragmentTest extends Base {
                 .remove(fragment)
                 .commit();
 
-        Thread.sleep(100);
+        onView(withId(R.id.container)); // waiting for commit finishes
 
         fragment.callback = callback; // onAttach
 
@@ -242,7 +239,7 @@ public class ActualExercisesFragmentTest extends Base {
                 .add(R.id.container, fragment)
                 .commit();
 
-        Thread.sleep(100);
+        onView(withId(android.R.id.tabcontent)); // waiting for commit finishes
 
         assertItemAtPositionIsActive(1);
         assertCurrentPageIndex(2);

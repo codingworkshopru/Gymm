@@ -8,7 +8,6 @@ import com.google.common.collect.Lists;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import ru.codingworkshop.gymm.data.entity.ActualExercise;
 import ru.codingworkshop.gymm.data.entity.ActualSet;
@@ -28,9 +27,9 @@ import ru.codingworkshop.gymm.data.util.LiveDataUtil;
 public class Models {
     public static List<SimpleModel> createSimpleModels(String... names) {
         List<String> namesList = Lists.newArrayList(names);
-        return namesList.stream().map(
+        return new ArrayList<>(Lists.transform(namesList,
                 name -> new SimpleModel(namesList.contains(name) ? namesList.indexOf(name) + 1L : -1L, name)
-        ).collect(Collectors.toList());
+        ));
     }
 
     public static List<SimpleModel> createSimpleModels(Long... ids) {
@@ -212,10 +211,10 @@ public class Models {
 
     private static <T extends Model> List<T> createByNames(Function<String, T> returnsObject, long dx, String[] names) {
         List<String> namesList = Lists.newArrayList(names);
-        return namesList.stream().map(name -> {
+        return new ArrayList<>(Lists.transform(namesList, name -> {
             T obj = returnsObject.apply(name);
             obj.setId(namesList.indexOf(name) + dx);
             return obj;
-        }).collect(Collectors.toList());
+        }));
     }
 }

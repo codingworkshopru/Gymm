@@ -3,24 +3,21 @@ package ru.codingworkshop.gymm.service;
 import android.content.Context;
 import android.content.Intent;
 import android.os.IBinder;
-import android.support.annotation.NonNull;
 import android.support.test.InstrumentationRegistry;
 import android.support.test.rule.ServiceTestRule;
 
-import com.google.common.collect.Iterables;
-import com.google.common.collect.Lists;
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
 
 import org.junit.After;
+import org.junit.AfterClass;
 import org.junit.Before;
-import org.junit.Rule;
+import org.junit.BeforeClass;
+import org.junit.ClassRule;
 import org.junit.Test;
 
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
 import java.util.Map;
 import java.util.Observer;
 import java.util.Vector;
@@ -57,19 +54,30 @@ import static org.junit.Assert.assertThat;
  */
 
 public class TrainingForegroundServiceTest {
-    @Rule
-    public ServiceTestRule serviceTestRule = new ServiceTestRule();
+    @ClassRule
+    public static ServiceTestRule serviceTestRule;
 
     private Map<Class, Long> postedEvents = Collections.synchronizedMap(new HashMap<>());
     private Vector<Observer> observers = new Vector<>();
 
     private TrainingForegroundService service;
 
+    @BeforeClass
+    public static void setUpClass() throws Exception {
+        serviceTestRule = new ServiceTestRule();
+        serviceTestRule.startService(getIntent(11L, "foo"));
+    }
+
+    @AfterClass
+    public static void tearDownClass() {
+        assert InstrumentationRegistry.getTargetContext().stopService(getIntent());
+    }
+
     @Before
     public void setUp() throws Exception {
-        serviceTestRule.startService(getIntent(11L, "foo"));
         service = bind();
         service.getRestEventBus().register(new Object() {
+            @SuppressWarnings("unused")
             @Subscribe
             private void onEvent(Object event) {
                 long millis = -1L;
@@ -85,14 +93,15 @@ public class TrainingForegroundServiceTest {
     }
 
     @After
-    public void tearDown() throws Exception {
+    public void tearDown() {
         postedEvents.clear();
         observers.clear();
+        postEvent(new StopRestEvent());
         serviceTestRule.unbindService();
     }
 
     @Test
-    public void isRunningTest() throws Exception {
+    public void isRunningTest() {
         final Context targetContext = InstrumentationRegistry.getTargetContext();
         assertTrue(TrainingForegroundService.isRunning(targetContext));
     }
@@ -108,8 +117,8 @@ public class TrainingForegroundServiceTest {
 
     @Test
     public void restFinished() throws Exception {
-        postEvent(new StartRestEvent(2000));
-        assertEventReceived(RestFinishedEvent.class, 3000L);
+        postEvent(new StartRestEvent(1));
+        assertEventReceived(RestFinishedEvent.class, 1000L);
     }
 
     @Test
@@ -121,7 +130,7 @@ public class TrainingForegroundServiceTest {
     @Test
     public void getMillisecondsLeft() throws Exception {
         postEvent(new StartRestEvent(2000));
-        Thread.sleep(1100);
+        assertEventReceived(RestTimerTickEvent.class);
         assertThat(service.getMillisecondsLeft(), both(greaterThan(0L)).and(lessThan(2000L)));
     }
 
@@ -130,25 +139,21 @@ public class TrainingForegroundServiceTest {
         postEvent(new StartRestEvent(2000));
         assertFalse(service.isRestInPause());
         postEvent(new PauseRestEvent());
-        assertTrue(service.isRestInPause());
-
         assertEventReceived(RestPausedEvent.class);
-        assertEventNotReceived(2100L, RestTimerTickEvent.class, RestFinishedEvent.class);
+        assertTrue(service.isRestInPause());
     }
 
     @Test
     public void resumeRest() throws Exception {
-        postEvent(new StartRestEvent(2000));
+        postEvent(new StartRestEvent(2000L));
         postEvent(new PauseRestEvent());
-        assertEventNotReceived(2100L, RestTimerTickEvent.class, RestFinishedEvent.class);
         postEvent(new ResumeRestEvent());
         assertEventReceived(RestResumedEvent.class, 1000L, 1000L, 2001L);
-        assertEventReceived(RestFinishedEvent.class, 10000L);
+        assertTrue(service.isRestInProgress());
     }
 
     @Test
     public void stopRest() throws Exception {
-        final TrainingForegroundService service = bind();
         postEvent(new StartRestEvent(1000));
         postEvent(new StopRestEvent());
         assertEventReceived(RestStoppedEvent.class);
@@ -157,7 +162,6 @@ public class TrainingForegroundServiceTest {
 
     @Test
     public void stopPausedRest() throws Exception {
-        final TrainingForegroundService service = bind();
         postEvent(new StartRestEvent(2000));
         postEvent(new PauseRestEvent());
         postEvent(new StopRestEvent());
@@ -167,11 +171,10 @@ public class TrainingForegroundServiceTest {
 
     @Test
     public void addMoreTimeForRest() throws Exception {
-        final TrainingForegroundService service = bind();
         postEvent(new StartRestEvent(1000));
         postEvent(new AddRestTimeEvent(3000));
         assertEventReceived(RestTimeAddedEvent.class, 1000L, 3000L, 4001L);
-        assertEventNotReceived(1100L, RestFinishedEvent.class);
+        assertThat(service.getMillisecondsLeft(), greaterThan(2000L));
     }
 
     private TrainingForegroundService bind() throws TimeoutException {
@@ -183,12 +186,11 @@ public class TrainingForegroundServiceTest {
         return ((TrainingForegroundService.ServiceBinder)binder).getService();
     }
 
-    @NonNull
-    private Intent getIntent() {
+    private static Intent getIntent() {
         return new Intent(InstrumentationRegistry.getTargetContext(), TrainingForegroundService.class);
     }
 
-    private Intent getIntent(long id, String name) {
+    private static Intent getIntent(long id, String name) {
         Intent intent = getIntent();
         intent.putExtras(TrainingForegroundService.createExtras(id, name));
         return intent;
@@ -245,28 +247,8 @@ public class TrainingForegroundServiceTest {
         if (expectedMin == expectedMax) {
             assertEquals("expected value is not equals to actual one", expectedMin, l.get());
         } else {
-            assertThat("actual value doesn't fits in bounds", l.get(),
+            assertThat("actual value doesn't fit in bounds", l.get(),
                     both(greaterThan(expectedMin)).and(lessThan(expectedMax)));
         }
-    }
-
-    private void assertEventNotReceived(long timeout, Class... eventTypes) throws InterruptedException {
-        List<Class> eventTypesList = Lists.newArrayList(eventTypes);
-        List<Class> receivedEvents = new LinkedList<>();
-        AtomicBoolean received = new AtomicBoolean(Iterables.any(eventTypesList, c -> postedEvents.containsKey(c)));
-
-        if (!received.get()) {
-            CountDownLatch latch = new CountDownLatch(1);
-            observers.add((o, arg) -> {
-                Class<?> receivedEventClass = arg.getClass();
-                if (eventTypesList.contains(receivedEventClass)) {
-                    receivedEvents.add(receivedEventClass);
-                    received.set(true);
-                }
-            });
-            latch.await(timeout, TimeUnit.MILLISECONDS);
-        }
-
-        assertFalse("one of events have been received in specified timeout " + Lists.transform(receivedEvents, cl -> cl.toString() + " "), received.get());
     }
 }

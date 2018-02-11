@@ -5,7 +5,8 @@
     android:id="@+id/statisticsJournalTrainings"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:layout_marginTop="8dp"
+    android:clipToPadding="false"
+    android:paddingTop="8dp"
     android:scrollbars="vertical"
     app:layoutManager="android.support.v7.widget.LinearLayoutManager"
     tools:listitem="@layout/fragment_statistics_trainings_journal_list_item">

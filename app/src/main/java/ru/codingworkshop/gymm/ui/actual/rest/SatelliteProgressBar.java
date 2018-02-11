@@ -8,6 +8,7 @@ import android.graphics.Paint;
 import android.graphics.PointF;
 import android.graphics.RectF;
 import android.support.annotation.ColorInt;
+import android.support.annotation.Keep;
 import android.support.annotation.Nullable;
 import android.util.AttributeSet;
 import android.view.View;
@@ -33,7 +34,7 @@ public class SatelliteProgressBar extends View {
 
     private PointF satelliteCenter = new PointF();
     private Paint satellitePaint = new Paint();
-    private Paint orbitPaint = new Paint();
+    private Paint orbitPaint;
     private Paint backgroundRingPaint;
     private final RectF orbitRect = new RectF();
 
@@ -117,6 +118,7 @@ public class SatelliteProgressBar extends View {
         return -angle;
     }
 
+    @Keep
     public void setAngle(float angle) {
         this.angle = -angle;
         updateSatellitePosition(getWidth(), getHeight());

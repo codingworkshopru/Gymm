@@ -1,10 +1,9 @@
 package ru.codingworkshop.gymm.testing;
 
-import android.os.Bundle;
 import android.support.v4.app.Fragment;
 
 import dagger.android.AndroidInjector;
-import dagger.android.support.HasSupportFragmentInjector;
+import ru.codingworkshop.gymm.R;
 import ru.codingworkshop.gymm.ui.actual.ActualTrainingActivity;
 
 /**
@@ -15,9 +14,12 @@ public class ActualTrainingActivityInjectedFragments extends ActualTrainingActiv
     public static Fragment fragment;
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        actualExercisesFragment = fragment;
-        super.onCreate(savedInstanceState);
+    public void setContentView(int layoutResID) {
+        super.setContentView(layoutResID);
+        getSupportFragmentManager()
+                .beginTransaction()
+                .add(R.id.actualTrainingFragmentContainer, fragment, ACTUAL_EXERCISES_FRAGMENT_TAG)
+                .commitNow();
     }
 
     @Override

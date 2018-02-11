@@ -23,6 +23,7 @@ import ru.codingworkshop.gymm.data.tree.loader.ActualTrainingEmptyTreeLoader;
 import ru.codingworkshop.gymm.data.tree.loader.ActualTrainingTreeLoader;
 import ru.codingworkshop.gymm.data.tree.node.ActualExerciseNode;
 import ru.codingworkshop.gymm.data.tree.node.ActualTrainingTree;
+import ru.codingworkshop.gymm.data.tree.node.BaseNode;
 import ru.codingworkshop.gymm.data.tree.node.ProgramExerciseNode;
 import ru.codingworkshop.gymm.data.util.LiveDataUtil;
 import ru.codingworkshop.gymm.db.GymmDatabase;
@@ -82,7 +83,7 @@ public class ActualTrainingViewModel extends ViewModel {
         if (hasData) {
             actualTraining.setFinishTime(new Date());
             actualTrainingRepository.updateActualTraining(actualTraining);
-            Collection<ActualExercise> emptyExercises = Collections2.transform(nodesWithoutSets, node -> node.getParent());
+            Collection<ActualExercise> emptyExercises = Collections2.transform(nodesWithoutSets, BaseNode::getParent);
             if (!emptyExercises.isEmpty()) {
                 actualTrainingRepository.deleteActualExercises(emptyExercises);
             }

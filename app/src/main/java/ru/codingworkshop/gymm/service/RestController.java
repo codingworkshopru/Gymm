@@ -11,6 +11,11 @@ import com.google.common.base.Preconditions;
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
 
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
 
 import ru.codingworkshop.gymm.service.event.incoming.AddRestTimeEvent;
@@ -36,7 +41,7 @@ import timber.log.Timber;
  */
 
 @SuppressWarnings("unused")
-public final class RestController extends Handler {
+public class RestController extends Handler {
     public static final int START_REST_MSG = 0;
     public static final int PAUSE_REST_MSG = 1;
     public static final int RESUME_REST_MSG = 2;
@@ -72,27 +77,26 @@ public final class RestController extends Handler {
     public void handleMessage(Message msg) {
         long millis;
         switch (msg.what) {
-            case ADD_TIME_REST_MSG:
-                stopTimer();
-                millis = millisecondsLeft.get() + getMillis(msg);
-                startTimer(millis);
-                restEventBus.post(new RestTimeAddedEvent(millis));
-                break;
-
             case START_REST_MSG:
                 millis = getMillis(msg);
                 startTimer(millis);
                 restEventBus.post(new RestStartedEvent(millis));
                 break;
 
-            case PAUSE_REST_MSG:
-                stopTimer();
-                restEventBus.post(new RestPausedEvent());
+            case ADD_TIME_REST_MSG:
+                millis = millisecondsLeft.get() + getMillis(msg);
+                restartTimer(millis);
+                restEventBus.post(new RestTimeAddedEvent(millis));
                 break;
 
             case RESUME_REST_MSG:
                 startTimer(millisecondsLeft.get());
                 restEventBus.post(new RestResumedEvent(millisecondsLeft.get()));
+                break;
+
+            case PAUSE_REST_MSG:
+                stopTimer();
+                restEventBus.post(new RestPausedEvent());
                 break;
 
             case STOP_REST_MSG:
@@ -117,8 +121,20 @@ public final class RestController extends Handler {
         Timber.d("startTimer: %d", milliseconds);
 
         millisecondsLeft.set(milliseconds);
+        timer = createTimer(milliseconds);
+        timer.start();
+    }
 
-        timer = new CountDownTimer(milliseconds, 1000) {
+    private void restartTimer(long milliseconds) {
+        Timber.d("restartTimer: %d", milliseconds);
+
+        stopTimer();
+        startTimer(milliseconds);
+    }
+
+    @WorkerThread
+    private CountDownTimer createTimer(long milliseconds) {
+        return new CountDownTimer(milliseconds, TimeUnit.SECONDS.toMillis(1)) {
             @Override
             public void onTick(long millisUntilFinished) {
                 millisecondsLeft.set(millisUntilFinished);
@@ -131,8 +147,6 @@ public final class RestController extends Handler {
                 restEventBus.post(new RestFinishedEvent());
             }
         };
-
-        timer.start();
     }
 
     @WorkerThread
@@ -216,5 +230,10 @@ public final class RestController extends Handler {
 
     public boolean isRestInPause() {
         return getState() instanceof RestInPause;
+    }
+
+    @Retention(RetentionPolicy.RUNTIME)
+    @Target(ElementType.TYPE)
+    public @interface OutcomeEvent {
     }
 }
