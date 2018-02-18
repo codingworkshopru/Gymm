@@ -2,7 +2,6 @@ package ru.codingworkshop.gymm.ui.program.exercise;
 
 import android.app.Instrumentation;
 import android.arch.core.executor.testing.InstantTaskExecutorRule;
-import android.arch.lifecycle.LiveData;
 import android.arch.lifecycle.ViewModelProvider;
 import android.content.Intent;
 import android.content.res.Resources;
@@ -15,28 +14,18 @@ import android.support.test.espresso.action.CoordinatesProvider;
 import android.support.test.espresso.action.GeneralSwipeAction;
 import android.support.test.espresso.action.Press;
 import android.support.test.espresso.action.Swipe;
-import android.support.test.espresso.contrib.RecyclerViewActions;
-import android.support.test.espresso.intent.Intents;
-import android.support.test.espresso.intent.ResettingStubber;
 import android.support.test.espresso.intent.rule.IntentsTestRule;
 import android.view.View;
 import android.widget.ImageButton;
 
 import org.hamcrest.Matcher;
-import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
-import org.mockito.invocation.InvocationOnMock;
 import org.mockito.junit.MockitoJUnitRunner;
-import org.mockito.stubbing.Answer;
-
-import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.TimeUnit;
 
 import ru.codingworkshop.gymm.R;
 import ru.codingworkshop.gymm.data.entity.Exercise;
@@ -58,13 +47,9 @@ import static android.support.test.espresso.action.ViewActions.click;
 import static android.support.test.espresso.action.ViewActions.longClick;
 import static android.support.test.espresso.action.ViewActions.swipeLeft;
 import static android.support.test.espresso.action.ViewActions.swipeRight;
-import static android.support.test.espresso.action.ViewActions.swipeUp;
 import static android.support.test.espresso.assertion.ViewAssertions.matches;
-import static android.support.test.espresso.intent.Intents.init;
 import static android.support.test.espresso.intent.Intents.intending;
-import static android.support.test.espresso.intent.matcher.IntentMatchers.anyIntent;
 import static android.support.test.espresso.intent.matcher.IntentMatchers.hasComponent;
-import static android.support.test.espresso.matcher.ViewMatchers.assertThat;
 import static android.support.test.espresso.matcher.ViewMatchers.isAssignableFrom;
 import static android.support.test.espresso.matcher.ViewMatchers.isDisplayed;
 import static android.support.test.espresso.matcher.ViewMatchers.withId;
@@ -73,14 +58,9 @@ import static android.support.test.espresso.matcher.ViewMatchers.withText;
 import static android.support.v7.widget.helper.ItemTouchHelper.LEFT;
 import static android.support.v7.widget.helper.ItemTouchHelper.RIGHT;
 import static junit.framework.Assert.assertEquals;
-import static junit.framework.Assert.assertNotNull;
-import static junit.framework.Assert.fail;
 import static org.hamcrest.Matchers.both;
-import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.doAnswer;
-import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static ru.codingworkshop.gymm.ui.program.exercise.ProgramExerciseFragment.EXERCISE_ID_KEY;
@@ -122,13 +102,13 @@ public class ProgramExerciseFragmentTest {
     }
 
     @Test
-    public void initializationTest() throws Exception {
+    public void initializationTest() {
         onView(withId(R.id.programExerciseName)).check(matches(withText("exercise100")));
         onView(withId(R.id.actionSaveExercise)).check(matches(isDisplayed()));
     }
 
     @Test
-    public void setsListTest() throws Exception {
+    public void setsListTest() {
         checkListItem(0, 3, 145);
         checkListItem(1, 4, 0);
     }
@@ -150,7 +130,7 @@ public class ProgramExerciseFragmentTest {
     }
 
     @Test
-    public void removeSet() throws Exception {
+    public void removeSet() {
         enterActionMode();
         removeAt(2, RIGHT);
         assertEquals(2, node.getChildren().size());
@@ -160,7 +140,7 @@ public class ProgramExerciseFragmentTest {
     }
 
     @Test
-    public void restoreRemovedExercise() throws Exception {
+    public void restoreRemovedExercise() {
         enterActionMode();
         removeAt(2, LEFT);
         onView(withText(R.string.program_exercise_activity_set_deleted_message)).check(matches(isDisplayed()));
@@ -171,7 +151,7 @@ public class ProgramExerciseFragmentTest {
     }
 
     @Test
-    public void moveSet() throws Exception {
+    public void moveSet() {
         ProgramSet first = node.getChildren().get(0);
         ProgramSet second = node.getChildren().get(1);
         final CoordinatesProvider cp = view -> {
@@ -192,7 +172,7 @@ public class ProgramExerciseFragmentTest {
     }
 
     @Test
-    public void backgroundImageTest() throws Exception {
+    public void backgroundImageTest() {
         onView(withId(R.id.programExerciseBackground)).check(matches(not(isDisplayed())));
         enterActionMode();
         removeAll();
@@ -202,7 +182,7 @@ public class ProgramExerciseFragmentTest {
     }
 
     @Test
-    public void actionModeTest() throws Exception {
+    public void actionModeTest() {
         checkActionModeOff();
         enterActionMode();
         checkActionModeOn();
@@ -211,13 +191,13 @@ public class ProgramExerciseFragmentTest {
     }
 
     @Test
-    public void saveTest() throws Exception {
+    public void saveTest() {
         onView(withId(R.id.actionSaveExercise)).perform(click());
         verify(vm).saveProgramExercise();
     }
 
     @Test
-    public void pickExerciseTest() throws Exception {
+    public void pickExerciseTest() {
         intending(hasComponent(ExercisePickerActivity.class.getName())).respondWith(activityResult);
         onView(withId(R.id.programExerciseName)).perform(click());
         onView(withId(R.id.programExerciseName)).check(matches(withText("exercise101")));
@@ -225,7 +205,7 @@ public class ProgramExerciseFragmentTest {
     }
 
     @Test
-    public void pickExerciseWithoutResultTest() throws Exception {
+    public void pickExerciseWithoutResultTest() {
         Instrumentation.ActivityResult result = new Instrumentation.ActivityResult(0, null);
         intending(hasComponent(ExercisePickerActivity.class.getName())).respondWith(result);
 
@@ -233,7 +213,7 @@ public class ProgramExerciseFragmentTest {
     }
 
     @Test
-    public void exerciseChangedAssuranceMessageTest() throws Exception {
+    public void exerciseChangedAssuranceMessageTest() {
         when(vm.isProgramExerciseChanged()).thenReturn(true);
         onView(both(isAssignableFrom(ImageButton.class)).and(withParent(withId(R.id.programExerciseToolbar)))).perform(click());
         onView(withText(R.string.cancel_changes_question)).check(matches(isDisplayed()));
@@ -246,6 +226,7 @@ public class ProgramExerciseFragmentTest {
             onView(setAt(R.id.programSetReorderImage, i)).check(matches(isDisplayed()));
         }
         onView(withId(R.id.programExerciseName)).check(matches(not(isDisplayed())));
+        onView(withId(R.id.programExerciseAddSetButton)).check(matches(not(isDisplayed())));
     }
 
     private void checkActionModeOff() {
@@ -253,6 +234,7 @@ public class ProgramExerciseFragmentTest {
             onView(setAt(R.id.programSetReorderImage, i)).check(matches(not(isDisplayed())));
         }
         onView(withId(R.id.programExerciseName)).check(matches(isDisplayed()));
+        onView(withId(R.id.programExerciseAddSetButton)).check(matches(isDisplayed()));
     }
 
     private void enterActionMode() {

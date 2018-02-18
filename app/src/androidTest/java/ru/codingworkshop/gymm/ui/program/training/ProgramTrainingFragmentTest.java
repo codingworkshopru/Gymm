@@ -28,9 +28,9 @@ import ru.codingworkshop.gymm.data.tree.node.ProgramExerciseNode;
 import ru.codingworkshop.gymm.data.tree.node.ProgramTrainingTree;
 import ru.codingworkshop.gymm.data.util.LiveDataUtil;
 import ru.codingworkshop.gymm.testing.SimpleFragmentActivity;
+import ru.codingworkshop.gymm.ui.program.ProgramTrainingViewModel;
 import ru.codingworkshop.gymm.util.RecyclerViewItemMatcher;
 import ru.codingworkshop.gymm.util.TreeBuilders;
-import ru.codingworkshop.gymm.ui.program.ProgramTrainingViewModel;
 
 import static android.support.test.espresso.Espresso.onView;
 import static android.support.test.espresso.action.GeneralLocation.CENTER;
@@ -50,8 +50,6 @@ import static android.support.test.espresso.matcher.ViewMatchers.withText;
 import static android.support.v7.widget.helper.ItemTouchHelper.LEFT;
 import static android.support.v7.widget.helper.ItemTouchHelper.RIGHT;
 import static junit.framework.Assert.assertEquals;
-import static junit.framework.Assert.assertFalse;
-import static junit.framework.Assert.assertTrue;
 import static org.hamcrest.Matchers.both;
 import static org.hamcrest.Matchers.not;
 import static org.mockito.ArgumentMatchers.any;
@@ -90,20 +88,20 @@ public class ProgramTrainingFragmentTest {
     }
 
     @Test
-    public void initializationTest() throws Exception {
+    public void initializationTest() {
         onView(withId(R.id.programTrainingName)).check(matches(withText("foo")));
         onView(withId(R.id.actionSaveTraining)).check(matches(isDisplayed()));
     }
 
     @Test
-    public void exercisesListTest() throws Exception {
+    public void exercisesListTest() {
         onView(exerciseAt(R.id.programExerciseName, 0)).check(matches(withText("exercise100")));
         String setsCount = InstrumentationRegistry.getTargetContext().getResources().getQuantityString(R.plurals.number_of_sets, 2, 2);
         onView(exerciseAt(R.id.programExerciseSetsCount, 0)).check(matches(withText(setsCount)));
     }
 
     @Test
-    public void removeExercise() throws Exception {
+    public void removeExercise() {
         enterActionMode();
         removeAt(2, RIGHT);
         assertEquals(2, tree.getChildren().size());
@@ -113,7 +111,7 @@ public class ProgramTrainingFragmentTest {
     }
 
     @Test
-    public void restoreRemovedExercise() throws Exception {
+    public void restoreRemovedExercise() {
         enterActionMode();
         removeAt(2, LEFT);
         onView(withText(R.string.program_training_activity_exercise_deleted_message)).check(matches(isDisplayed()));
@@ -124,7 +122,7 @@ public class ProgramTrainingFragmentTest {
     }
 
     @Test
-    public void moveExercise() throws Exception {
+    public void moveExercise() {
         ProgramExerciseNode first = tree.getChildren().get(0);
         ProgramExerciseNode second = tree.getChildren().get(1);
         final CoordinatesProvider cp = view -> {
@@ -145,7 +143,7 @@ public class ProgramTrainingFragmentTest {
     }
 
     @Test
-    public void backgroundImageTest() throws Exception {
+    public void backgroundImageTest() {
         onView(withId(R.id.programTrainingBackground)).check(matches(not(isDisplayed())));
         enterActionMode();
         removeAll();
@@ -155,7 +153,7 @@ public class ProgramTrainingFragmentTest {
     }
 
     @Test
-    public void actionModeTest() throws Exception {
+    public void actionModeTest() {
         checkActionModeOff();
         enterActionMode();
         checkActionModeOn();
@@ -164,7 +162,7 @@ public class ProgramTrainingFragmentTest {
     }
 
     @Test
-    public void saveWithEmptyNameTest() throws Exception {
+    public void saveWithEmptyNameTest() {
         onView(withId(R.id.programTrainingName)).perform(clearText());
         onView(withId(R.id.actionSaveTraining)).perform(click());
         onView(withId(R.id.programTrainingNameLayout)).check(matches(hasErrorText(R.string.program_training_activity_name_empty_error)));
@@ -172,7 +170,7 @@ public class ProgramTrainingFragmentTest {
     }
 
     @Test
-    public void typeTextWithErrorShownTest() throws Exception {
+    public void typeTextWithErrorShownTest() {
         saveWithEmptyNameTest();
 
         onView(withId(R.id.programTrainingName)).perform(typeText("foo"));
@@ -180,7 +178,7 @@ public class ProgramTrainingFragmentTest {
     }
 
     @Test
-    public void saveDuplicateTest() throws Exception {
+    public void saveDuplicateTest() {
         when(vm.validateProgramTraining()).thenReturn(LiveDataUtil.getLive(false));
         onView(withId(R.id.actionSaveTraining)).perform(click());
         onView(withId(R.id.programTrainingNameLayout)).check(matches(hasErrorText(R.string.program_training_activity_name_duplicate_error)));
@@ -199,14 +197,14 @@ public class ProgramTrainingFragmentTest {
     }
 
     @Test
-    public void saveTest() throws Exception {
+    public void saveTest() {
         when(vm.validateProgramTraining()).thenReturn(LiveDataUtil.getLive(true));
         onView(withId(R.id.actionSaveTraining)).perform(click());
         verify(vm).saveTree();
     }
 
     @Test
-    public void programTrainingChangedAssuranceMessageTest() throws Exception {
+    public void programTrainingChangedAssuranceMessageTest() {
         when(vm.isProgramTrainingChanged()).thenReturn(LiveDataUtil.getLive(true));
 
         onView(both(isAssignableFrom(ImageButton.class)).and(withParent(withId(R.id.programTrainingToolbar)))).perform(click());
@@ -222,6 +220,7 @@ public class ProgramTrainingFragmentTest {
             onView(exerciseAt(R.id.programExerciseReorderImage, i)).check(matches(isDisplayed()));
         }
         onView(withId(R.id.programTrainingNameLayout)).check(matches(not(isDisplayed())));
+        onView(withId(R.id.programTrainingAddExerciseButton)).check(matches(not(isDisplayed())));
     }
 
     private void checkActionModeOff() {
@@ -229,6 +228,7 @@ public class ProgramTrainingFragmentTest {
             onView(exerciseAt(R.id.programExerciseReorderImage, i)).check(matches(not(isDisplayed())));
         }
         onView(withId(R.id.programTrainingNameLayout)).check(matches(isDisplayed()));
+        onView(withId(R.id.programTrainingAddExerciseButton)).check(matches(isDisplayed()));
     }
 
     private void enterActionMode() {
