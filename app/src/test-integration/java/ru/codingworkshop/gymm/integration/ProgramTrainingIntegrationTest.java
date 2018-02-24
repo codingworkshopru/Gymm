@@ -282,4 +282,22 @@ public class ProgramTrainingIntegrationTest {
 
         checkProgramExercise(0, "Отжимания от пола", 1);
     }
+
+    @LargeTest
+    @Test
+    public void deleteAllAndAdd() {
+        addOneProgramTraining("training", "Отжимания от пола");
+
+        editProgramTrainingClick("training");
+        enterActionMode(R.id.programExerciseList);
+        deleteProgramExerciseAt(0);
+        exitActionMode();
+
+        addProgramExerciseClick();
+        pickExercise(db, "Приседания со штангой");
+        addProgramSetClick();
+        typeSetAndSaveIt(10, 1, 30);
+        saveProgramExerciseClick();
+        saveProgramTrainingClick();
+    }
 }

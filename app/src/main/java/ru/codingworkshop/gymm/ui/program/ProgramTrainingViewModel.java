@@ -14,7 +14,9 @@ import com.google.common.base.Strings;
 
 import javax.inject.Inject;
 
+import io.reactivex.Completable;
 import io.reactivex.Flowable;
+import io.reactivex.schedulers.Schedulers;
 import ru.codingworkshop.gymm.data.entity.ProgramExercise;
 import ru.codingworkshop.gymm.data.entity.ProgramSet;
 import ru.codingworkshop.gymm.data.entity.ProgramTraining;
@@ -68,7 +70,10 @@ public class ProgramTrainingViewModel extends ViewModel {
     }
 
     public void saveTree() {
-        saver.save(tree);
+        Completable save = saver.save(tree);
+        if (save != null) {
+            save.subscribeOn(Schedulers.io()).subscribe();
+        }
     }
 
     public @NonNull ProgramTrainingTree getProgramTrainingTree() {

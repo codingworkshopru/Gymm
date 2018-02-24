@@ -24,15 +24,14 @@ public class ProgramTrainingTreeLoader implements Loader<ProgramTrainingTree> {
 
     @Override
     public Flowable<ProgramTrainingTree> loadById(ProgramTrainingTree tree, long id) {
-        ProgramTrainingTreeBuilder programTrainingTreeBuilder = new ProgramTrainingTreeBuilder(tree);
 
         return Flowable.zip(
-                Flowable.just(programTrainingTreeBuilder),
                 dataSource.getParent(id),
                 dataSource.getChildren(id),
                 dataSource.getGrandchildren(id),
                 dataSource.getExercises(id),
-                (builder, programTraining, programExercises, programSets, exercises) -> {
+                (programTraining, programExercises, programSets, exercises) -> {
+                    ProgramTrainingTreeBuilder builder = new ProgramTrainingTreeBuilder(tree);
                     builder.setParent(programTraining);
                     builder.setChildren(programExercises);
                     builder.setGrandchildren(programSets);

@@ -8,6 +8,8 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -25,7 +27,6 @@ import ru.codingworkshop.gymm.util.Models;
 
 import static junit.framework.Assert.assertEquals;
 import static org.mockito.ArgumentMatchers.anyCollection;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -39,29 +40,29 @@ public class ProgramTrainingRepositoryTest {
     @Rule
     public InstantTaskExecutorRule instantTaskExecutorRule = new InstantTaskExecutorRule();
 
-    private ProgramTrainingDao dao;
+    @Mock private ProgramTrainingDao dao;
     private ProgramTrainingRepository repository;
 
     @Before
-    public void init() {
-        dao = mock(ProgramTrainingDao.class);
+    public void setUp() throws Exception {
+        MockitoAnnotations.initMocks(this);
         repository = new ProgramTrainingRepository(dao, new InsertDelegate());
     }
 
     @Test
-    public void queryProgramTrainings() {
+    public void getProgramTrainings() {
         repository.getProgramTrainings();
         verify(dao).getProgramTrainings();
     }
 
     @Test
-    public void queryProgramTrainingById() {
+    public void getProgramTrainingById() {
         repository.getProgramTrainingById(1);
         verify(dao).getProgramTrainingById(1);
     }
 
     @Test
-    public void queryProgramTrainingByName() throws Exception {
+    public void getProgramTrainingByName() {
         repository.getProgramTrainingByName("foo");
         verify(dao).getProgramTrainingByName("foo");
     }
@@ -116,20 +117,13 @@ public class ProgramTrainingRepositoryTest {
     }
 
     @Test
-    public void queryProgramExercisesForTraining() {
-        ProgramTraining programTraining = Models.createProgramTraining(1L, "foo");
-        repository.getProgramExercisesForTraining(programTraining);
-        verify(dao).getProgramExercisesForTraining(1L);
-    }
-
-    @Test
-    public void queryProgramExercisesForTrainingId() {
+    public void getProgramExercisesForTraining() {
         repository.getProgramExercisesForTraining(1L);
         verify(dao).getProgramExercisesForTraining(1L);
     }
 
     @Test(expected = IllegalArgumentException.class)
-    public void insertProgramExercisesWithoutParentId() throws Exception {
+    public void insertProgramExercisesWithoutParentId() {
         ProgramExercise exercise = Models.createProgramExercise(0L, 0L, 100L);
         ArrayList<ProgramExercise> programExercises = Lists.newArrayList(exercise);
         repository.insertProgramExercises(programExercises);
@@ -137,7 +131,7 @@ public class ProgramTrainingRepositoryTest {
     }
 
     @Test(expected = IllegalArgumentException.class)
-    public void insertExercisesWithoutExerciseId() throws Exception {
+    public void insertExercisesWithoutExerciseId() {
         ProgramExercise exercise = Models.createProgramExercise(0L, 2L, 0L);
         ArrayList<ProgramExercise> programExercises = Lists.newArrayList(exercise);
         repository.insertProgramExercises(programExercises);
@@ -145,7 +139,7 @@ public class ProgramTrainingRepositoryTest {
     }
 
     @Test
-    public void insertExercises() throws Exception {
+    public void insertExercises() {
         ArrayList<Long> ids = Lists.newArrayList(2L);
         when(dao.insertProgramExercises(anyCollection())).thenReturn(ids);
         List<ProgramExercise> programExercises = Models.createProgramExercises(1);
@@ -197,7 +191,7 @@ public class ProgramTrainingRepositoryTest {
     }
 
     @Test
-    public void queryProgramSetsForTrainingId() {
+    public void getProgramSetsForTraining() {
         List<Long> ids = Lists.newArrayList(23L, 24L, 25L, 26L, 27L, 38L, 39L);
         List<ProgramSet> sets = ids.stream().map(id -> Models.createLiveProgramSet(id, id / 10, id.intValue()).getValue()).collect(Collectors.toList());
 
@@ -258,4 +252,27 @@ public class ProgramTrainingRepositoryTest {
         verify(dao).deleteProgramSets(sets);
     }
 
+    @Test
+    public void getProgramTrainingByIdSync() {
+        ProgramTraining foo = Models.createProgramTraining(1L, "foo");
+        when(dao.getProgramTrainingByIdSync(1L)).thenReturn(foo);
+        assertEquals(foo, repository.getProgramTrainingByIdSync(1L));
+        verify(dao).getProgramTrainingByIdSync(1L);
+    }
+
+    @Test
+    public void getProgramExercisesForTrainingSync() {
+        List<ProgramExercise> exercises = Models.createProgramExercises(1);
+        when(dao.getProgramExercisesForTrainingSync(1L)).thenReturn(exercises);
+        assertEquals(exercises, repository.getProgramExercisesForTrainingSync(1L));
+        verify(dao).getProgramExercisesForTrainingSync(1L);
+    }
+
+    @Test
+    public void getProgramSetsForTrainingSync() {
+        List<ProgramSet> programSets = Models.createProgramSets(2L, 1);
+        when(dao.getProgramSetsForTrainingSync(1L)).thenReturn(programSets);
+        assertEquals(programSets, repository.getProgramSetsForTrainingSync(1L));
+        verify(dao).getProgramSetsForTrainingSync(1L);
+    }
 }

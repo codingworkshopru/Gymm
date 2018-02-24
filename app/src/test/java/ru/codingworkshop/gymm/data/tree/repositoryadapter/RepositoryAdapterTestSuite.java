@@ -11,7 +11,20 @@ import org.junit.runners.Suite;
 @Suite.SuiteClasses({
         ActualTrainingAdapterTest.class,
         ExerciseAdapterTest.class,
-        ProgramTrainingAdapterTest.class
+        ProgramTrainingAdapterTest.class,
+
+        ExerciseQueryAdapterTest.class,
+        PrimaryMuscleGroupQueryAdapterTest.class,
+        ProgramExercisesAlterAdapterTest.class,
+        ProgramExercisesQueryAdapterTest.class,
+        ProgramExercisesSyncQueryAdapterTest.class,
+        ProgramSetsAlterAdapterTest.class,
+        ProgramSetsQueryAdapterTest.class,
+        ProgramSetsSyncQueryAdapterTest.class,
+        ProgramTrainingAlterAdapterTest.class,
+        ProgramTrainingQueryAdapterTest.class,
+        ProgramTrainingSyncQueryAdapterTest.class,
+        SecondaryMuscleGroupsQueryAdapterTest.class
 })
 public class RepositoryAdapterTestSuite {
 }

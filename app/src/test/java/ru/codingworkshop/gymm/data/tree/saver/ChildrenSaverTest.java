@@ -11,14 +11,14 @@ import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
-import io.reactivex.Flowable;
-import ru.codingworkshop.gymm.data.tree.repositoryadapter.ChildrenAdapter;
+import ru.codingworkshop.gymm.data.tree.repositoryadapter.ModelQueryAdapter;
+import ru.codingworkshop.gymm.data.tree.repositoryadapter.ModelsAlterAdapter;
 import ru.codingworkshop.gymm.util.Models;
 import ru.codingworkshop.gymm.util.SimpleModel;
 
-import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.Mockito.verify;
@@ -32,34 +32,35 @@ import static org.mockito.Mockito.when;
 public class ChildrenSaverTest {
     @Rule public InstantTaskExecutorRule instantTaskExecutorRule = new InstantTaskExecutorRule();
 
-    @Mock private ChildrenAdapter<SimpleModel> adapter;
+    @Mock private ModelQueryAdapter<List<SimpleModel>> queryAdapter;
+    @Mock private ModelsAlterAdapter<SimpleModel> alterAdapter;
 
     @Test
-    public void save() throws Exception {
+    public void save() {
         List<SimpleModel> oldChildren = Models.createSimpleModels("foo", "bar", "baz");
         List<SimpleModel> newChildren = Models.createSimpleModels("foo", "baz", "bak");
         oldChildren.get(2).setId(10L);
 
-        when(adapter.getChildren(1L)).thenReturn(Flowable.just(oldChildren));
+        when(queryAdapter.query(1L)).thenReturn(oldChildren);
 
-        ChildrenSaver<SimpleModel> saver = new ChildrenSaver<>(adapter, 1L);
+        ChildrenSaver<SimpleModel> saver = new ChildrenSaver<>(queryAdapter, alterAdapter, 1L);
         saver.save(newChildren);
 
-        verify(adapter).insertChildren(argThat(actual -> Iterables.elementsEqual(actual, newChildren.subList(2, 3))));
-        verify(adapter).updateChildren(argThat(actual -> Iterables.elementsEqual(actual, newChildren.subList(1, 2))));
-        verify(adapter).deleteChildren(argThat(actual -> Iterables.elementsEqual(actual, oldChildren.subList(2, 3))));
+        verify(alterAdapter).insert(argThat(actual -> Iterables.elementsEqual(actual, newChildren.subList(2, 3))));
+        verify(alterAdapter).update(argThat(actual -> Iterables.elementsEqual(actual, newChildren.subList(1, 2))));
+        verify(alterAdapter).delete(argThat(actual -> Iterables.elementsEqual(actual, oldChildren.subList(2, 3))));
     }
 
-    @Test(expected = IllegalStateException.class)
-    public void saveWithInvalidParentId() throws Exception {
+    @Test(expected = IllegalArgumentException.class)
+    public void saveWithInvalidParentId() {
         List<SimpleModel> newChildren = Models.createSimpleModels("foo");
 
-        ChildrenSaver<SimpleModel> saver = new ChildrenSaver<>(adapter, 0L);
+        ChildrenSaver<SimpleModel> saver = new ChildrenSaver<>(queryAdapter, alterAdapter, 0L);
         saver.save(newChildren);
     }
 
     @Test
-    public void containersDiffTest() throws Exception {
+    public void containersDiffTest() {
         List<SimpleModel> models1 = Models.createSimpleModels("foo", "bar",             "baz"); // the last one has id = 10
         models1.get(2).setId(10L);
 
@@ -69,14 +70,14 @@ public class ChildrenSaverTest {
 
         // new only
         ChildrenSaver.ContainersDiffResult<SimpleModel> result = ChildrenSaver.containersDiff(new ArrayList<>(), models2);
-        assertNull(result.getToDelete());
-        assertNull(result.getToUpdate());
+        assertEquals(Collections.emptyList(), result.getToDelete());
+        assertEquals(Collections.emptyList(), result.getToUpdate());
         assertEquals(models2, result.getToInsert());
 
         // old only
         result = ChildrenSaver.containersDiff(models1, new ArrayList<>());
-        assertNull(result.getToInsert());
-        assertNull(result.getToUpdate());
+        assertEquals(Collections.emptyList(), result.getToInsert());
+        assertEquals(Collections.emptyList(), result.getToUpdate());
         assertEquals(models1, result.getToDelete());
 
         // new, old and updated

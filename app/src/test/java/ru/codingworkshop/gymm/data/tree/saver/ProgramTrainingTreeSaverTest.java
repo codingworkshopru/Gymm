@@ -2,26 +2,24 @@ package ru.codingworkshop.gymm.data.tree.saver;
 
 import android.arch.core.executor.testing.InstantTaskExecutorRule;
 
-import com.google.common.collect.Lists;
-
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.stubbing.Answer;
 
 import java.util.Collections;
-import java.util.concurrent.CountDownLatch;
+import java.util.List;
 
-import io.reactivex.Flowable;
 import ru.codingworkshop.gymm.data.entity.ProgramExercise;
 import ru.codingworkshop.gymm.data.entity.ProgramSet;
 import ru.codingworkshop.gymm.data.entity.ProgramTraining;
 import ru.codingworkshop.gymm.data.tree.node.ImmutableProgramExerciseNode;
 import ru.codingworkshop.gymm.data.tree.node.ImmutableProgramTrainingTree;
 import ru.codingworkshop.gymm.data.tree.node.ProgramTrainingTree;
-import ru.codingworkshop.gymm.data.tree.repositoryadapter.ProgramTrainingAdapter;
+import ru.codingworkshop.gymm.repository.ProgramTrainingRepository;
 import ru.codingworkshop.gymm.util.Models;
 import ru.codingworkshop.gymm.util.TreeBuilders;
 
@@ -40,35 +38,37 @@ import static org.mockito.Mockito.when;
 public class ProgramTrainingTreeSaverTest {
     @Rule public InstantTaskExecutorRule instantTaskExecutorRule = new InstantTaskExecutorRule();
 
-    @Mock private ProgramTrainingAdapter adapter;
+    @Mock private ProgramTrainingRepository repository;
     @InjectMocks private ProgramTrainingTreeSaver saver;
 
     @Test
-    public void saveNewTree() throws Exception {
-        when(adapter.insertParent(any())).thenReturn(1L);
-        when(adapter.insertChildren(anyCollection())).thenReturn(Collections.singletonList(2L));
+    public void saveNewTree() {
+        doAnswer((Answer<Long>) invocation -> {
+            ProgramTraining training = invocation.getArgument(0);
+            training.setId(1L);
+            return 1L;
+        }).when(repository).insertProgramTraining(any(ProgramTraining.class));
+
+        doAnswer((Answer<List<Long>>) invocation -> {
+            List<ProgramExercise> programExercises = invocation.getArgument(0);
+            programExercises.get(0).setId(2L);
+            return Collections.singletonList(2L);
+        }).when(repository).insertProgramExercises(anyCollection());
 
         ProgramTrainingTree tree = TreeBuilders.buildProgramTrainingTree(1);
         tree.getParent().setId(0L);
         tree.getChildren().get(0).getParent().setId(0L);
         tree.getChildren().get(0).getChildren().get(0).setId(0L);
 
-        saver.save(tree);
+        saver.save(tree).test().assertComplete();
 
-        final CountDownLatch latch = new CountDownLatch(1);
-        doAnswer(invocation -> {
-            latch.countDown();
-            return null;
-        }).when(adapter).insertGrandchildren(anyCollection());
-        latch.await();
+        verify(repository).insertProgramTraining(tree.getParent());
 
-        verify(adapter).insertParent(tree.getParent());
-
-        verify(adapter).insertChildren(argThat(ex -> {
+        verify(repository).insertProgramExercises(argThat(ex -> {
             ProgramExercise exercise = ex.iterator().next();
             return exercise.getProgramTrainingId() == 1L;
         }));
-        verify(adapter).insertGrandchildren(argThat(sets -> {
+        verify(repository).insertProgramSets(argThat(sets -> {
             ProgramSet set = sets.iterator().next();
             return set.getProgramExerciseId() == 2L;
         }));
@@ -76,10 +76,14 @@ public class ProgramTrainingTreeSaverTest {
 
     @Test
     public void save() {
-        when(adapter.getChildren(1L)).thenReturn(Flowable.just(Collections.emptyList()));
-        when(adapter.getGrandchildren(1L)).thenReturn(Flowable.just(Collections.emptyList()));
+        when(repository.getProgramExercisesForTrainingSync(1L)).thenReturn(Collections.emptyList());
+        when(repository.getProgramSetsForTrainingSync(1L)).thenReturn(Collections.emptyList());
 
-        when(adapter.insertChildren(anyCollection())).thenReturn(Lists.newArrayList(2L));
+        doAnswer((Answer<List<Long>>) invocation -> {
+            List<ProgramExercise> programExercises = invocation.getArgument(0);
+            programExercises.get(0).setId(2L);
+            return Collections.singletonList(2L);
+        }).when(repository).insertProgramExercises(anyCollection());
 
         ProgramTrainingTree tree = new ImmutableProgramTrainingTree();
         tree.setParent(Models.createProgramTraining(1L, "foo"));
@@ -91,10 +95,10 @@ public class ProgramTrainingTreeSaverTest {
         programExerciseNode.setChildren(Collections.singletonList(set));
         tree.setChildren(Collections.singletonList(programExerciseNode));
 
-        saver.save(tree);
+        saver.save(tree).test().assertComplete();
 
-        verify(adapter).updateParent(any(ProgramTraining.class));
-        verify(adapter).insertChildren(anyCollection());
-        verify(adapter).insertGrandchildren(argThat(programSet -> programSet.iterator().next().getProgramExerciseId() == 2L));
+        verify(repository).updateProgramTraining(any(ProgramTraining.class));
+        verify(repository).insertProgramExercises(anyCollection());
+        verify(repository).insertProgramSets(argThat(programSet -> programSet.iterator().next().getProgramExerciseId() == 2L));
     }
 }

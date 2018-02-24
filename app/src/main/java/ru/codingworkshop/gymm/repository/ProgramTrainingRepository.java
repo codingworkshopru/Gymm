@@ -31,7 +31,7 @@ public class ProgramTrainingRepository {
     private final InsertDelegate insertDelegate;
 
     @Inject
-    public ProgramTrainingRepository(ProgramTrainingDao dao, InsertDelegate insertDelegate) {
+    public ProgramTrainingRepository(@NonNull ProgramTrainingDao dao, @NonNull InsertDelegate insertDelegate) {
         this.dao = dao;
         this.insertDelegate = insertDelegate;
     }
@@ -40,8 +40,12 @@ public class ProgramTrainingRepository {
         return dao.getProgramTrainings();
     }
 
-    public Flowable<ProgramTraining> getProgramTrainingById(long id) {
-        return dao.getProgramTrainingById(id);
+    public Flowable<ProgramTraining> getProgramTrainingById(long trainingId) {
+        return dao.getProgramTrainingById(trainingId);
+    }
+
+    public ProgramTraining getProgramTrainingByIdSync(long id) {
+        return dao.getProgramTrainingByIdSync(id);
     }
 
     public LiveData<ProgramTraining> getProgramTrainingByName(String name) {
@@ -50,24 +54,24 @@ public class ProgramTrainingRepository {
 
     public long insertProgramTraining(@NonNull ProgramTraining programTraining) {
         checkName(programTraining);
-        return dao.insertProgramTraining(programTraining);
+        return insertDelegate.insert(programTraining, dao::insertProgramTraining);
     }
 
-    public void deleteProgramTraining(@NonNull ProgramTraining programTraining) {
-        dao.deleteProgramTraining(programTraining);
+    public int deleteProgramTraining(@NonNull ProgramTraining programTraining) {
+        return dao.deleteProgramTraining(programTraining);
     }
 
-    public void updateProgramTraining(@NonNull ProgramTraining programTraining) {
+    public int updateProgramTraining(@NonNull ProgramTraining programTraining) {
         checkName(programTraining);
-        dao.updateProgramTraining(programTraining);
-    }
-
-    public Flowable<List<ProgramExercise>> getProgramExercisesForTraining(@NonNull ProgramTraining programTraining) {
-        return getProgramExercisesForTraining(programTraining.getId());
+        return dao.updateProgramTraining(programTraining);
     }
 
     public Flowable<List<ProgramExercise>> getProgramExercisesForTraining(long trainingId) {
         return dao.getProgramExercisesForTraining(trainingId);
+    }
+
+    public List<ProgramExercise> getProgramExercisesForTrainingSync(long trainingId) {
+        return dao.getProgramExercisesForTrainingSync(trainingId);
     }
 
     public List<Long> insertProgramExercises(@NonNull Collection<ProgramExercise> programExercises) {
@@ -77,11 +81,11 @@ public class ProgramTrainingRepository {
         return insertDelegate.insert(programExercises, dao::insertProgramExercises);
     }
 
-    public void updateProgramExercises(Collection<ProgramExercise> exerciseEntities) {
+    public int updateProgramExercises(Collection<ProgramExercise> exerciseEntities) {
         for (ProgramExercise ex : exerciseEntities) {
             checkProgramExercise(ex);
         }
-        dao.updateProgramExercises(exerciseEntities);
+        return dao.updateProgramExercises(exerciseEntities);
     }
 
     private static void checkProgramExercise(ProgramExercise programExercise) {
@@ -90,26 +94,30 @@ public class ProgramTrainingRepository {
         Preconditions.checkArgument(isValidId(exerciseId));
     }
 
-    public void deleteProgramExercises(Collection<ProgramExercise> exerciseEntities) {
-        dao.deleteProgramExercises(exerciseEntities);
+    public int deleteProgramExercises(Collection<ProgramExercise> exerciseEntities) {
+        return dao.deleteProgramExercises(exerciseEntities);
     }
 
     public Flowable<List<ProgramSet>> getProgramSetsForTraining(long trainingId) {
         return dao.getProgramSetsForTraining(trainingId);
     }
 
+    public List<ProgramSet> getProgramSetsForTrainingSync(long trainingId) {
+        return dao.getProgramSetsForTrainingSync(trainingId);
+    }
+
     public List<Long> insertProgramSets(@NonNull Collection<ProgramSet> sets) {
         for (ProgramSet set : sets) {
             checkProgramSet(set);
         }
-        return dao.insertProgramSets(sets);
+        return insertDelegate.insert(sets, dao::insertProgramSets);
     }
 
-    public void updateProgramSets(@NonNull Collection<ProgramSet> sets) {
+    public int updateProgramSets(@NonNull Collection<ProgramSet> sets) {
         for (ProgramSet set : sets) {
             checkProgramSet(set);
         }
-        dao.updateProgramSets(sets);
+        return dao.updateProgramSets(sets);
     }
 
     private static void checkProgramSet(@NonNull ProgramSet set) {
@@ -117,8 +125,8 @@ public class ProgramTrainingRepository {
         Preconditions.checkArgument(isValidId(set.getProgramExerciseId()));
     }
 
-    public void deleteProgramSets(@NonNull Collection<ProgramSet> sets) {
-        dao.deleteProgramSets(sets);
+    public int deleteProgramSets(@NonNull Collection<ProgramSet> sets) {
+        return dao.deleteProgramSets(sets);
     }
 
     private static void checkName(@NonNull Named named) {

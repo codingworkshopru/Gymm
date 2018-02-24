@@ -9,46 +9,41 @@ import com.google.common.collect.Maps;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
-import io.reactivex.disposables.Disposable;
+import io.reactivex.Completable;
 import ru.codingworkshop.gymm.data.entity.common.Model;
-import ru.codingworkshop.gymm.data.tree.repositoryadapter.ChildrenAdapter;
+import ru.codingworkshop.gymm.data.tree.repositoryadapter.ModelQueryAdapter;
+import ru.codingworkshop.gymm.data.tree.repositoryadapter.ModelsAlterAdapter;
 import ru.codingworkshop.gymm.db.GymmDatabase;
 
 /**
  * Created by Radik on 29.11.2017.
  */
 
-public class ChildrenSaver<T extends Model> implements Saver<Collection<T>> {
-    private ChildrenAdapter<T> adapter;
+class ChildrenSaver<T extends Model> implements Saver<Collection<T>> {
+    private ModelQueryAdapter<List<T>> querySource;
+    private ModelsAlterAdapter<T> alterSource;
     private long parentId;
-    private Disposable subscription;
 
-    public ChildrenSaver(@NonNull ChildrenAdapter<T> adapter, long parentId) {
-        this.adapter = adapter;
+    ChildrenSaver(@NonNull ModelQueryAdapter<List<T>> querySource, @NonNull ModelsAlterAdapter<T> alterSource, long parentId) {
+        Preconditions.checkArgument(GymmDatabase.isValidId(parentId));
+        this.querySource = querySource;
+        this.alterSource = alterSource;
         this.parentId = parentId;
     }
 
     @Override
-    public void save(@NonNull Collection<T> collection) {
-        Preconditions.checkState(GymmDatabase.isValidId(parentId), "parent id is not valid");
-        subscription = adapter.getChildren(parentId)
-                .take(1)
-                .subscribe(ts -> saveInternal(ts, collection));
-    }
+    public Completable save(@NonNull Collection<T> objectToSave) {
+        ContainersDiffResult<T> result = containersDiff(querySource.query(parentId), objectToSave);
+        alterSource.insert(result.getToInsert());
+        alterSource.update(result.getToUpdate());
+        alterSource.delete(result.getToDelete());
 
-    private void saveInternal(Collection<T> oldChildren, Collection<T> newChildren) {
-        if (subscription != null && !subscription.isDisposed()) {
-            subscription.dispose();
-        }
-        ContainersDiffResult<T> result = containersDiff(oldChildren, newChildren);
-        adapter.insertChildren(result.getToInsert());
-        adapter.updateChildren(result.getToUpdate());
-        adapter.deleteChildren(result.getToDelete());
+        return null;
     }
-
 
     public static <T extends Model> ContainersDiffResult<T> containersDiff(Collection<T> oldContainer, Collection<T> newContainer)
     {
@@ -89,9 +84,9 @@ public class ChildrenSaver<T extends Model> implements Saver<Collection<T>> {
     }
 
     public static class ContainersDiffResult<T> {
-        private Collection<T> toInsert;
-        private Collection<T> toDelete;
-        private Collection<T> toUpdate;
+        private Collection<T> toInsert = Collections.emptyList();
+        private Collection<T> toDelete = Collections.emptyList();
+        private Collection<T> toUpdate = Collections.emptyList();
 
         public ContainersDiffResult() {
         }

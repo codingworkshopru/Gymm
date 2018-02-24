@@ -3,120 +3,86 @@ package ru.codingworkshop.gymm.data.tree.saver;
 import android.support.annotation.NonNull;
 
 import com.google.common.base.Preconditions;
-import com.google.common.collect.Collections2;
-
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.List;
 
 import javax.inject.Inject;
 
 import io.reactivex.Completable;
-import io.reactivex.Flowable;
-import io.reactivex.schedulers.Schedulers;
-import ru.codingworkshop.gymm.data.entity.IProgramExercise;
 import ru.codingworkshop.gymm.data.entity.ProgramExercise;
 import ru.codingworkshop.gymm.data.entity.ProgramSet;
 import ru.codingworkshop.gymm.data.entity.ProgramTraining;
 import ru.codingworkshop.gymm.data.tree.node.ProgramExerciseNode;
 import ru.codingworkshop.gymm.data.tree.node.ProgramTrainingTree;
-import ru.codingworkshop.gymm.data.tree.repositoryadapter.ChildrenAdapter;
-import ru.codingworkshop.gymm.data.tree.repositoryadapter.ProgramTrainingAdapter;
+import ru.codingworkshop.gymm.data.tree.repositoryadapter.ProgramExercisesAlterAdapter;
+import ru.codingworkshop.gymm.data.tree.repositoryadapter.ProgramExercisesSyncQueryAdapter;
+import ru.codingworkshop.gymm.data.tree.repositoryadapter.ProgramSetsAlterAdapter;
+import ru.codingworkshop.gymm.data.tree.repositoryadapter.ProgramSetsSyncQueryAdapter;
+import ru.codingworkshop.gymm.data.tree.repositoryadapter.ProgramTrainingAlterAdapter;
 import ru.codingworkshop.gymm.db.GymmDatabase;
+import ru.codingworkshop.gymm.repository.ProgramTrainingRepository;
 
 /**
  * Created by Radik on 29.11.2017.
  */
 
 public class ProgramTrainingTreeSaver implements Saver<ProgramTrainingTree> {
-    private ProgramTrainingAdapter adapter;
+    private ProgramTrainingRepository programTrainingRepository;
 
     @Inject
-    ProgramTrainingTreeSaver(ProgramTrainingAdapter adapter) {
-        this.adapter = adapter;
+    ProgramTrainingTreeSaver(ProgramTrainingRepository programTrainingRepository) {
+        this.programTrainingRepository = programTrainingRepository;
     }
 
     @Override
-    public void save(@NonNull ProgramTrainingTree tree) {
-        ProgramTraining parent = tree.getParent();
-
-        List<ProgramExerciseNode> programExerciseNodes = tree.getChildren();
-
-        if (!GymmDatabase.isValidId(parent)) {
-            Completable
-                    .fromRunnable(() -> {
-                        long parentId = adapter.insertParent(parent);
-
-                        setParentIdToEveryExercise(programExerciseNodes, parentId);
-                        List<Long> ids = adapter.insertChildren(tree.getProgramExercises());
-
-                        setParentIdToEverySet(programExerciseNodes, ids);
-                        adapter.insertGrandchildren(tree.getAllProgramSets());
-                    })
-                    .subscribeOn(Schedulers.single())
-                    .subscribe();
-        } else {
-            long parentId = parent.getId();
-            adapter.getChildren(parentId)
-                    .take(1)
-                    .subscribe(oldChildren -> {
-                        adapter.updateParent(tree.getParent());
-
-                        ChildrenSaver.ContainersDiffResult<ProgramExercise> diffResult =
-                                ChildrenSaver.containersDiff(oldChildren, tree.getProgramExercises());
-
-                        adapter.deleteChildren(diffResult.getToDelete());
-                        adapter.updateChildren(diffResult.getToUpdate());
-
-                        Collection<ProgramExercise> toInsert = diffResult.getToInsert();
-                        List<Long> ids = adapter.insertChildren(toInsert);
-                        setParentIdToEverySet(Collections2.filter(tree.getChildren(), ch -> toInsert.contains(ch.getParent())), ids);
-
-                        new ChildrenSaver<>(new ChildrenAdapter<ProgramSet>() {
-                            @Override
-                            public Flowable<List<ProgramSet>> getChildren(long id) {
-                                return adapter.getGrandchildren(id);
-                            }
-
-                            @Override
-                            public List<Long> insertChildren(Collection<ProgramSet> children) {
-                                adapter.insertGrandchildren(children);
-                                return null;
-                            }
-
-                            @Override
-                            public void updateChildren(Collection<ProgramSet> children) {
-                                adapter.updateGrandchildren(children);
-                            }
-
-                            @Override
-                            public void deleteChildren(Collection<ProgramSet> children) {
-                                adapter.deleteGrandchildren(children);
-                            }
-                        }, parentId).save(tree.getAllProgramSets());
-                    });
-        }
+    public Completable save(@NonNull ProgramTrainingTree tree) {
+        return Completable.fromRunnable(() -> saveTree(tree));
     }
 
-    private void setParentIdToEverySet(Collection<ProgramExerciseNode> programExerciseNodes, Collection<Long> childrenIds) {
-        Preconditions.checkArgument(programExerciseNodes.size() == childrenIds.size(), "collection exercises and their ids must have the same size");
+    private void saveTree(ProgramTrainingTree tree) {
+        ProgramTrainingAlterAdapter programTrainingAlterAdapter = new ProgramTrainingAlterAdapter(programTrainingRepository);
+        ModelSaver<ProgramTraining> programTrainingModelSaver = new ModelSaver<>(programTrainingAlterAdapter);
+        ProgramTraining parent = tree.getParent();
+        programTrainingModelSaver.save(parent);
 
-        Iterator<ProgramExerciseNode> nodeIt = programExerciseNodes.iterator();
-        Iterator<Long> idIt = childrenIds.iterator();
+        setParentIdsToExercises(tree);
+        ChildrenSaver<ProgramExercise> programExerciseChildrenSaver = new ChildrenSaver<>(
+                new ProgramExercisesSyncQueryAdapter(programTrainingRepository),
+                new ProgramExercisesAlterAdapter(programTrainingRepository),
+                parent.getId());
+        programExerciseChildrenSaver.save(tree.getProgramExercises());
 
-        while (nodeIt.hasNext() && idIt.hasNext()) {
-            ProgramExerciseNode n = nodeIt.next();
-            long id = idIt.next();
+        setParentIdsToSets(tree);
+        ChildrenSaver<ProgramSet> programSetChildrenSaver = new ChildrenSaver<>(
+                new ProgramSetsSyncQueryAdapter(programTrainingRepository),
+                new ProgramSetsAlterAdapter(programTrainingRepository),
+                parent.getId());
+        programSetChildrenSaver.save(tree.getAllProgramSets());
+    }
 
-            for (ProgramSet s : n.getChildren()) {
-                s.setProgramExerciseId(id);
+    /**
+     * call after parent save
+     */
+    private void setParentIdsToExercises(@NonNull ProgramTrainingTree tree) {
+        ProgramTraining parent = tree.getParent();
+        Preconditions.checkArgument(GymmDatabase.isValidId(parent), "parent id is not valid");
+
+        for (ProgramExerciseNode node : tree.getChildren()) {
+            if (!GymmDatabase.isValidId(node.getProgramTrainingId())) {
+                node.setProgramTrainingId(parent.getId());
             }
         }
     }
 
-    private void setParentIdToEveryExercise(List<? extends IProgramExercise> programExercises, long parentId) {
-        for (IProgramExercise n : programExercises) {
-            n.setProgramTrainingId(parentId);
+    /**
+     * call after exercises save
+     */
+    private void setParentIdsToSets(@NonNull ProgramTrainingTree tree) {
+        for (ProgramExerciseNode node : tree.getChildren()) {
+            Preconditions.checkArgument(GymmDatabase.isValidId(node));
+            for (ProgramSet set : node.getChildren()) {
+                if (!GymmDatabase.isValidId(set.getProgramExerciseId())) {
+                    set.setProgramExerciseId(node.getId());
+                }
+            }
         }
     }
 }

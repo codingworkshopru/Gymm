@@ -1,28 +1,34 @@
 package ru.codingworkshop.gymm.data.tree.saver;
 
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 
+import io.reactivex.Completable;
 import ru.codingworkshop.gymm.data.entity.common.Model;
-import ru.codingworkshop.gymm.data.tree.repositoryadapter.ParentAdapter;
-import ru.codingworkshop.gymm.db.GymmDatabase;
+import ru.codingworkshop.gymm.data.tree.repositoryadapter.SingleModelAlterAdapter;
+
+import static ru.codingworkshop.gymm.db.GymmDatabase.isValidId;
 
 /**
  * Created by Radik on 28.11.2017.
  */
 
 public class ModelSaver<T extends Model> implements Saver<T> {
-    private ParentAdapter<T> parentAdapter;
+    private SingleModelAlterAdapter<T> alterAdapter;
 
-    public ModelSaver(ParentAdapter<T> parentAdapter) {
-        this.parentAdapter = parentAdapter;
+    public ModelSaver(SingleModelAlterAdapter<T> alterAdapter) {
+        this.alterAdapter = alterAdapter;
     }
 
+    @Nullable
     @Override
-    public void save(@NonNull T objectToSave) {
-        if (GymmDatabase.isValidId(objectToSave)) {
-            parentAdapter.updateParent(objectToSave);
+    public Completable save(@NonNull T objectToSave) {
+        if (isValidId(objectToSave)) {
+            alterAdapter.update(objectToSave);
         } else {
-            parentAdapter.insertParent(objectToSave);
+            alterAdapter.insert(objectToSave);
         }
+
+        return null;
     }
 }
