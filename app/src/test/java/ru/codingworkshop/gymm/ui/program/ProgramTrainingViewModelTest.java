@@ -67,7 +67,7 @@ public class ProgramTrainingViewModelTest {
     }
 
     @Test
-    public void initializationTest() throws Exception {
+    public void initializationTest() {
         ProgramTrainingTree tree = vm.getProgramTrainingTree();
 
         assertNotNull(tree);
@@ -78,20 +78,20 @@ public class ProgramTrainingViewModelTest {
     }
 
     @Test
-    public void loadTree() throws Exception {
+    public void loadTree() {
         LiveData<ProgramTrainingTree> liveTree = vm.loadTree(1L);
         LiveTest.verifyLiveData(liveTree, tree -> tree != null && tree == vm.getProgramTrainingTree());
         verify(loader).loadById(any(), eq(1L));
     }
 
     @Test
-    public void saveTree() throws Exception {
+    public void saveTree() {
         vm.saveTree();
         verify(saver).save(any());
     }
 
     @Test
-    public void validateProgramTraining() throws Exception {
+    public void validateProgramTraining() {
         when(adapter.getProgramTrainingByName("foo"))
                 .thenReturn(Models.createLiveProgramTraining(1L, "foo"))
                 .thenReturn(LiveDataUtil.getAbsent());
@@ -117,6 +117,7 @@ public class ProgramTrainingViewModelTest {
 
         assertNotNull(LiveTest.getValue(vm.loadTree(1L)));
 
+        when(adapter.getParent(1L)).thenReturn(Flowable.just(Models.createProgramTraining(1L, "foo")));
         when(adapter.getChildren(1L)).thenReturn(Flowable.just(Models.createProgramExercises(1)));
 
         tree.getParent().setName("bar");
@@ -127,7 +128,7 @@ public class ProgramTrainingViewModelTest {
     }
 
     @Test
-    public void createProgramExercise() throws Exception {
+    public void createProgramExercise() {
         ProgramTrainingTree tree = vm.getProgramTrainingTree();
         tree.getParent().setId(1L);
 
@@ -138,7 +139,7 @@ public class ProgramTrainingViewModelTest {
     }
 
     @Test
-    public void saveProgramExercise() throws Exception {
+    public void saveProgramExercise() {
         vm.createProgramExercise();
         vm.saveProgramExercise();
 
@@ -153,7 +154,7 @@ public class ProgramTrainingViewModelTest {
     }
 
     @Test
-    public void deleteProgramExercise() throws Exception {
+    public void deleteProgramExercise() {
         for (int i = 0; i < 3; i++) {
             vm.createProgramExercise();
             vm.saveProgramExercise();
@@ -173,7 +174,7 @@ public class ProgramTrainingViewModelTest {
     }
 
     @Test
-    public void restoreLastDeletedProgramExercise() throws Exception {
+    public void restoreLastDeletedProgramExercise() {
         vm.createProgramExercise();
         vm.saveProgramExercise();
         vm.deleteProgramExercise(0);
@@ -182,7 +183,7 @@ public class ProgramTrainingViewModelTest {
     }
 
     @Test
-    public void moveProgramExercise() throws Exception {
+    public void moveProgramExercise() {
         vm.createProgramExercise();
         vm.saveProgramExercise();
         vm.createProgramExercise();
@@ -196,7 +197,7 @@ public class ProgramTrainingViewModelTest {
     }
 
     @Test
-    public void setProgramExercise() throws Exception {
+    public void setProgramExercise() {
         ProgramExerciseNode node = new MutableProgramExerciseNode();
         vm.setProgramExercise(node);
         ProgramExerciseNode setNode = vm.getProgramExercise().getValue();
@@ -231,7 +232,7 @@ public class ProgramTrainingViewModelTest {
     }
 
     @Test
-    public void createProgramSet() throws Exception {
+    public void createProgramSet() {
         vm.createProgramExercise();
         vm.getProgramExercise().getValue().setId(2L);
         vm.createProgramSet();
@@ -242,7 +243,7 @@ public class ProgramTrainingViewModelTest {
     }
 
     @Test
-    public void saveProgramSet() throws Exception {
+    public void saveProgramSet() {
         vm.createProgramExercise();
         vm.createProgramSet();
         vm.saveProgramSet();
@@ -259,7 +260,7 @@ public class ProgramTrainingViewModelTest {
     }
 
     @Test
-    public void deleteProgramSet() throws Exception {
+    public void deleteProgramSet() {
         vm.createProgramExercise();
 
         vm.createProgramSet();
@@ -274,7 +275,7 @@ public class ProgramTrainingViewModelTest {
     }
 
     @Test
-    public void restoreLastDeletedProgramSet() throws Exception {
+    public void restoreLastDeletedProgramSet() {
         vm.createProgramExercise();
         vm.createProgramSet();
         vm.saveProgramSet();
@@ -284,7 +285,7 @@ public class ProgramTrainingViewModelTest {
     }
 
     @Test
-    public void moveProgramSet() throws Exception {
+    public void moveProgramSet() {
         vm.createProgramExercise();
         vm.createProgramSet();
         vm.saveProgramSet();
@@ -301,7 +302,7 @@ public class ProgramTrainingViewModelTest {
     }
 
     @Test
-    public void setProgramSet() throws Exception {
+    public void setProgramSet() {
         ProgramSet programSet = new ProgramSet();
         vm.setProgramSet(programSet);
         ProgramSet set = vm.getProgramSet().getValue();

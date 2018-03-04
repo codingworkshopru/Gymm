@@ -1,5 +1,6 @@
 package ru.codingworkshop.gymm.ui.info.statistics.journal;
 
+import android.arch.lifecycle.LiveData;
 import android.arch.lifecycle.ViewModelProvider;
 import android.arch.lifecycle.ViewModelProviders;
 import android.content.Context;
@@ -19,7 +20,7 @@ import javax.inject.Inject;
 import dagger.android.support.AndroidSupportInjection;
 import ru.codingworkshop.gymm.R;
 import ru.codingworkshop.gymm.data.entity.ActualTraining;
-import ru.codingworkshop.gymm.data.util.LiveDataUtil;
+import ru.codingworkshop.gymm.data.tree.node.ImmutableActualTrainingTree;
 import ru.codingworkshop.gymm.databinding.FragmentStatisticsTrainingsJournalListItemBinding;
 import ru.codingworkshop.gymm.ui.common.ClickableBindingListAdapter;
 import ru.codingworkshop.gymm.ui.common.ListItemListeners;
@@ -32,6 +33,7 @@ public class StatisticsJournalTrainingsFragment extends Fragment {
     static final String TAG = StatisticsJournalTrainingsFragment.class.getName();
     private StatisticsJournalViewModel viewModel;
     private ClickableBindingListAdapter<ActualTraining, FragmentStatisticsTrainingsJournalListItemBinding> adapter;
+    private LiveData<ImmutableActualTrainingTree> immutableActualTrainingTreeLiveData;
 
     @Override
     public void onAttach(Context context) {
@@ -40,10 +42,10 @@ public class StatisticsJournalTrainingsFragment extends Fragment {
     }
 
     @Override
-    public void onCreate(@Nullable Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-
+    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
         viewModel = ViewModelProviders.of(getActivity(), viewModelFactory).get(StatisticsJournalViewModel.class);
+        viewModel.getActualTrainings().observe(this, adapter::setItems);
     }
 
     @Nullable
@@ -60,17 +62,18 @@ public class StatisticsJournalTrainingsFragment extends Fragment {
             }
         };
         trainingsView.setAdapter(adapter);
-        viewModel.getActualTrainings().observe(this, adapter::setItems);
         return view;
     }
 
     private void onListItemClick(View view) {
         FragmentStatisticsTrainingsJournalListItemBinding binding = DataBindingUtil.getBinding(view);
         ActualTraining actualTraining = binding.getActualTraining();
-        LiveDataUtil.getOnce(viewModel.loadTree(actualTraining.getId()), unused -> startDetailsFragment());
+        immutableActualTrainingTreeLiveData = viewModel.loadTree(actualTraining.getId());
+        immutableActualTrainingTreeLiveData.observe(this, unused -> startDetailsFragment());
     }
 
     private void startDetailsFragment() {
+        immutableActualTrainingTreeLiveData.removeObservers(this);
         FragmentManager fragmentManager = getActivity().getSupportFragmentManager();
         if (fragmentManager.findFragmentByTag(StatisticsJournalTrainingDetailsFragment.TAG) == null) {
             fragmentManager.beginTransaction()

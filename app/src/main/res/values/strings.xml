@@ -74,6 +74,11 @@
     <string name="statistics_activity_journal_comment_label">Комментарий</string>
     <string name="statistics_activity_journal_volume">Объём (повторение * вес)</string>
 
+    <!-- exercise info activity -->
+    <string name="exercise_info_difficulty">Сложность</string>
+    <string name="exercise_info_video_not_exists">Нет видео для данного упражнения</string>
+    <string name="exericse_info_video_loading_error">Ошибка загрузки видео</string>
+
     <!-- notification -->
     <string name="notification_time_till_rest_finish">Время до конца отдыха: </string>
     <string name="notification_rest_finished">Пора продолжить тренировку!</string>

@@ -9,7 +9,6 @@ import android.databinding.DataBindingUtil;
 import android.databinding.ViewDataBinding;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
@@ -26,14 +25,14 @@ import ru.codingworkshop.gymm.data.entity.ProgramSet;
 import ru.codingworkshop.gymm.data.tree.node.ProgramExerciseNode;
 import ru.codingworkshop.gymm.databinding.FragmentProgramExerciseBinding;
 import ru.codingworkshop.gymm.databinding.FragmentProgramExerciseListItemBinding;
+import ru.codingworkshop.gymm.ui.common.ListItemListeners;
 import ru.codingworkshop.gymm.ui.program.ProgramTrainingActivity;
 import ru.codingworkshop.gymm.ui.program.ProgramTrainingViewModel;
-import ru.codingworkshop.gymm.ui.program.common.FragmentAlert;
-import ru.codingworkshop.gymm.ui.common.ListItemListeners;
 import ru.codingworkshop.gymm.ui.program.common.ActionModeCallback;
 import ru.codingworkshop.gymm.ui.program.common.BaseFragment;
-import ru.codingworkshop.gymm.ui.program.common.MyAdapterDataObserver;
+import ru.codingworkshop.gymm.ui.program.common.FragmentAlert;
 import ru.codingworkshop.gymm.ui.program.common.ItemTouchHelperCallback;
+import ru.codingworkshop.gymm.ui.program.common.MyAdapterDataObserver;
 import ru.codingworkshop.gymm.ui.program.common.ProgramRecyclerView;
 import ru.codingworkshop.gymm.ui.program.exercise.picker.ExercisePickerActivity;
 import ru.codingworkshop.gymm.ui.util.AlertDialogFragment;
@@ -73,6 +72,12 @@ public class ProgramExerciseFragment extends BaseFragment implements
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         Timber.d("onCreate");
+    }
+
+    @Override
+    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+
         viewModel = ViewModelProviders.of(getActivity(), viewModelFactory).get(ProgramTrainingViewModel.class);
         viewModel.getProgramExercise().observe(this, this::initData);
     }

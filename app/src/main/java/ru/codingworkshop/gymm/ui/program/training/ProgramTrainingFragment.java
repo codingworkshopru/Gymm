@@ -65,10 +65,14 @@ public class ProgramTrainingFragment extends BaseFragment implements
     }
 
     @Override
-    public void onCreate(@Nullable Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        Timber.d("onCreate");
+    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
         viewModel = ViewModelProviders.of(getActivity(), viewModelFactory).get(ProgramTrainingViewModel.class);
+
+        tree = Preconditions.checkNotNull(viewModel.getProgramTrainingTree(), "tree is null");
+        binding.setProgramTraining(tree.getParent());
+
+        initExerciseList();
     }
 
     @Override
@@ -100,11 +104,6 @@ public class ProgramTrainingFragment extends BaseFragment implements
 
         alert = new FragmentAlert(getChildFragmentManager());
         Timber.d("alert created");
-
-        tree = Preconditions.checkNotNull(viewModel.getProgramTrainingTree(), "tree is null");
-        binding.setProgramTraining(tree.getParent());
-
-        initExerciseList();
 
         return binding;
     }

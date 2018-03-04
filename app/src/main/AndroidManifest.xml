@@ -58,8 +58,7 @@
 
         <activity
             android:name=".ui.info.exercise.ExerciseInfoActivity"
-            android:configChanges="orientation|keyboardHidden|screenSize"
-            android:theme="@style/AppTheme.NoActionBar.TranslucentStatusOn" /> <!-- configChanges for YouTube video smooth playback -->
+            android:theme="@style/AppTheme.NoActionBar.TranslucentStatusOn" />
 
         <activity
             android:name=".ui.info.statistics.plot.StatisticsPlotActivity"

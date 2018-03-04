@@ -39,7 +39,7 @@ public class StatisticsJournalViewModel extends ViewModel {
 
     public LiveData<ImmutableActualTrainingTree> loadTree(long actualTrainingId) {
         actualTrainingTree = new ImmutableActualTrainingTree();
-        return LiveDataReactiveStreams.fromPublisher(this.loader.loadById(actualTrainingTree, actualTrainingId));
+        return LiveDataReactiveStreams.fromPublisher(loader.loadById(actualTrainingTree, actualTrainingId));
     }
 
     public ImmutableActualTrainingTree getActualTrainingTree() {

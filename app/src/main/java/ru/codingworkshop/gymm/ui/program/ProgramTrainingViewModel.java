@@ -22,7 +22,6 @@ import ru.codingworkshop.gymm.data.entity.ProgramSet;
 import ru.codingworkshop.gymm.data.entity.ProgramTraining;
 import ru.codingworkshop.gymm.data.tree.ChildRestoreAdapter;
 import ru.codingworkshop.gymm.data.tree.loader.ProgramTrainingTreeLoader;
-import ru.codingworkshop.gymm.data.tree.loader.common.Loader;
 import ru.codingworkshop.gymm.data.tree.node.MutableProgramExerciseNode;
 import ru.codingworkshop.gymm.data.tree.node.MutableProgramTrainingTree;
 import ru.codingworkshop.gymm.data.tree.node.ProgramExerciseNode;
@@ -31,6 +30,7 @@ import ru.codingworkshop.gymm.data.tree.repositoryadapter.ProgramTrainingAdapter
 import ru.codingworkshop.gymm.data.tree.saver.ProgramTrainingTreeSaver;
 import ru.codingworkshop.gymm.data.tree.saver.Saver;
 import ru.codingworkshop.gymm.data.util.LiveDataUtil;
+import ru.codingworkshop.gymm.data.util.LoaderAdapter;
 import ru.codingworkshop.gymm.db.GymmDatabase;
 
 /**
@@ -38,7 +38,7 @@ import ru.codingworkshop.gymm.db.GymmDatabase;
  */
 
 public class ProgramTrainingViewModel extends ViewModel {
-    private final Loader<ProgramTrainingTree> loader;
+    private final LoaderAdapter<ProgramTrainingTree> loaderAdapter;
     private final Saver<ProgramTrainingTree> saver;
     private final ProgramTrainingAdapter repositoryAdapter;
 
@@ -46,11 +46,8 @@ public class ProgramTrainingViewModel extends ViewModel {
     private final MutableLiveData<ProgramExerciseNode> currentProgramExercise;
     private final MutableLiveData<ProgramSet> currentProgramSet;
 
-    private String programTrainingOldName;
-
     @Inject
     public ProgramTrainingViewModel(ProgramTrainingTreeLoader loader, ProgramTrainingTreeSaver saver, ProgramTrainingAdapter repositoryAdapter) {
-        this.loader = loader;
         this.saver = saver;
         this.repositoryAdapter = repositoryAdapter;
 
@@ -58,15 +55,13 @@ public class ProgramTrainingViewModel extends ViewModel {
         ProgramTraining training = new ProgramTraining();
         tree.setParent(training);
 
+        loaderAdapter = new LoaderAdapter<>(loader, tree);
         currentProgramExercise = new MutableLiveData<>();
         currentProgramSet = new MutableLiveData<>();
     }
 
-    public @NonNull LiveData<ProgramTrainingTree> loadTree(long programTrainingId) {
-        Flowable<ProgramTrainingTree> tree = loader.loadById(this.tree, programTrainingId);
-        return LiveDataReactiveStreams.fromPublisher(tree.doOnNext(programTrainingTree -> {
-            programTrainingOldName = programTrainingTree.getParent().getName();
-        }));
+    @NonNull public LiveData<ProgramTrainingTree> loadTree(long programTrainingId) {
+        return loaderAdapter.load(programTrainingId);
     }
 
     public void saveTree() {
@@ -76,11 +71,11 @@ public class ProgramTrainingViewModel extends ViewModel {
         }
     }
 
-    public @NonNull ProgramTrainingTree getProgramTrainingTree() {
+    @NonNull public ProgramTrainingTree getProgramTrainingTree() {
         return tree;
     }
 
-    public @NonNull LiveData<Boolean> validateProgramTraining() {
+    @NonNull public LiveData<Boolean> validateProgramTraining() {
         return Transformations.map(
                 repositoryAdapter.getProgramTrainingByName(tree.getParent().getName()),
                 programTraining -> programTraining == null || programTraining.getId() == tree.getParent().getId());
@@ -92,13 +87,18 @@ public class ProgramTrainingViewModel extends ViewModel {
             boolean nameChanged = !Strings.isNullOrEmpty(parent.getName());
             boolean childrenChanged = tree.hasChildren();
             return LiveDataUtil.getLive(nameChanged || childrenChanged);
-        } else if (!Objects.equal(programTrainingOldName, parent.getName())) {
-            return LiveDataUtil.getLive(true);
         }
 
         return LiveDataReactiveStreams.fromPublisher(
-                repositoryAdapter.getChildren(parent.getId())
-                .map(oldChildren -> !Objects.equal(oldChildren, tree.getProgramExercises())));
+                repositoryAdapter.getParent(parent.getId()).switchMap(programTraining -> {
+                    boolean haveSameNames = programTraining.getName().equals(parent.getName());
+                    if (!haveSameNames) {
+                        return Flowable.just(true);
+                    } else {
+                        return repositoryAdapter.getChildren(programTraining.getId())
+                                .map(oldChildren -> !Objects.equal(oldChildren, tree.getProgramExercises()));
+                    }
+                }));
     }
 
     /**
@@ -223,5 +223,10 @@ public class ProgramTrainingViewModel extends ViewModel {
 
     @NonNull public LiveData<ProgramSet> getProgramSet() {
         return currentProgramSet;
+    }
+
+    @Override
+    protected void onCleared() {
+        loaderAdapter.clear();
     }
 }

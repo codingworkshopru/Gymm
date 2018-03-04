@@ -1,8 +1,10 @@
 package ru.codingworkshop.gymm.ui.program;
 
+import android.arch.lifecycle.LiveData;
 import android.arch.lifecycle.ViewModelProvider;
 import android.arch.lifecycle.ViewModelProviders;
 import android.os.Bundle;
+import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AppCompatActivity;
@@ -15,8 +17,7 @@ import dagger.android.AndroidInjector;
 import dagger.android.DispatchingAndroidInjector;
 import dagger.android.support.HasSupportFragmentInjector;
 import ru.codingworkshop.gymm.R;
-import ru.codingworkshop.gymm.data.util.LiveDataUtil;
-import ru.codingworkshop.gymm.db.GymmDatabase;
+import ru.codingworkshop.gymm.data.tree.node.ProgramTrainingTree;
 import ru.codingworkshop.gymm.ui.program.training.ProgramTrainingFragment;
 import timber.log.Timber;
 
@@ -29,6 +30,7 @@ public class ProgramTrainingActivity extends AppCompatActivity implements HasSup
 
     @Inject DispatchingAndroidInjector<Fragment> fragmentInjector;
     @Inject ViewModelProvider.Factory viewModelFactory;
+    @Nullable private LiveData<ProgramTrainingTree> programTrainingTreeLiveData;
 
     public interface OnSystemBackPressedListener {
         void onFragmentClose();
@@ -45,14 +47,18 @@ public class ProgramTrainingActivity extends AppCompatActivity implements HasSup
         ProgramTrainingViewModel vm = ViewModelProviders.of(this, viewModelFactory).get(ProgramTrainingViewModel.class);
 
         long programTrainingId = getIntent().getLongExtra(PROGRAM_TRAINING_ID_KEY, 0L);
-        if (GymmDatabase.isValidId(vm.getProgramTrainingTree().getParent()) || programTrainingId == 0L) {
+        if (programTrainingId == 0L) {
             addProgramTrainingFragment();
         } else {
-            LiveDataUtil.getOnce(vm.loadTree(programTrainingId), unused -> addProgramTrainingFragment());
+            programTrainingTreeLiveData = vm.loadTree(programTrainingId);
+            programTrainingTreeLiveData.observe(this, (unused) -> addProgramTrainingFragment());
         }
     }
 
     private void addProgramTrainingFragment() {
+        if (programTrainingTreeLiveData != null) {
+            programTrainingTreeLiveData.removeObservers(this);
+        }
         FragmentManager fragmentManager = getSupportFragmentManager();
         if (fragmentManager.findFragmentByTag(ProgramTrainingFragment.TAG) == null) {
             ProgramTrainingFragment programTrainingFragment = new ProgramTrainingFragment();

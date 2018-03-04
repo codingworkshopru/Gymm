@@ -5,13 +5,13 @@ import android.arch.lifecycle.MutableLiveData;
 import android.arch.lifecycle.Observer;
 import android.support.annotation.Nullable;
 
-import java.util.function.*;
-
 /**
  * Created by Радик on 31.05.2017.
  */
 
 public final class LiveDataUtil {
+    private LiveDataUtil() {}
+
     public static <T> LiveData<T> getLive(T value) {
         MutableLiveData<T> result = new MutableLiveData<>();
         result.setValue(value);
@@ -33,4 +33,5 @@ public final class LiveDataUtil {
 
         return liveData;
     }
+
 }

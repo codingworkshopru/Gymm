@@ -39,10 +39,11 @@ android {
 
 
 ext {
-    support = "27.0.2"
+    support = "27.1.0"
     constraint = "1.0.2"
-    arch = "1.0.0"
-    multidex = "1.0.2"
+    arch = "1.1.0"
+    room = "1.0.0"
+    multidex = "1.0.3"
 
     gson = "2.8.2"
     guava = "24.0"
@@ -75,8 +76,8 @@ dependencies {
     implementation "android.arch.lifecycle:extensions:$arch"
     implementation "android.arch.lifecycle:common-java8:$arch"
     implementation "android.arch.lifecycle:reactivestreams:$arch"
-    implementation "android.arch.persistence.room:rxjava2:$arch"
-    implementation "android.arch.persistence.room:runtime:$arch"
+    implementation "android.arch.persistence.room:rxjava2:$room"
+    implementation "android.arch.persistence.room:runtime:$room"
 
     implementation "com.google.guava:guava:$guava-android"
     implementation "com.google.code.gson:gson:$gson"
@@ -92,7 +93,7 @@ dependencies {
     debugImplementation "com.squareup.leakcanary:leakcanary-android:$leakcanary"
     releaseImplementation "com.squareup.leakcanary:leakcanary-android-no-op:$leakcanary"
 
-    annotationProcessor "android.arch.persistence.room:compiler:$arch"
+    annotationProcessor "android.arch.persistence.room:compiler:$room"
     annotationProcessor "com.google.dagger:dagger-android-processor:$dagger"
     annotationProcessor "com.google.dagger:dagger-compiler:$dagger"
 

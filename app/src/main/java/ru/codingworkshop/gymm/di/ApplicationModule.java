@@ -1,8 +1,5 @@
 package ru.codingworkshop.gymm.di;
 
-import java.util.concurrent.Executor;
-import java.util.concurrent.Executors;
-
 import javax.inject.Singleton;
 
 import dagger.Module;
@@ -29,11 +26,5 @@ class ApplicationModule {
     @Singleton
     GymmDatabase provideDatabase(DatabaseInitializer databaseInitializer) {
         return databaseInitializer.getDatabase();
-    }
-
-    @Provides
-    @Singleton
-    Executor provideExecutor() {
-        return Executors.newSingleThreadExecutor();
     }
 }

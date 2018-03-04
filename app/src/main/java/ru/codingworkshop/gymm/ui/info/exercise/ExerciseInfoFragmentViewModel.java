@@ -1,39 +1,34 @@
 package ru.codingworkshop.gymm.ui.info.exercise;
 
 import android.arch.lifecycle.LiveData;
-import android.arch.lifecycle.LiveDataReactiveStreams;
 import android.arch.lifecycle.ViewModel;
 
 import javax.inject.Inject;
 
-import io.reactivex.Flowable;
 import ru.codingworkshop.gymm.data.tree.loader.ExerciseLoader;
 import ru.codingworkshop.gymm.data.tree.node.ExerciseNode;
+import ru.codingworkshop.gymm.data.util.LoaderAdapter;
 
 /**
  * Created by Radik on 20.11.2017.
  */
 
 public class ExerciseInfoFragmentViewModel extends ViewModel {
-    private ExerciseLoader loader;
-    private LiveData<ExerciseNode> liveNode;
+    private LoaderAdapter<ExerciseNode> adapter;
 
     @Inject
     ExerciseInfoFragmentViewModel(ExerciseLoader loader) {
-        this.loader = loader;
-    }
-
-    public LiveData<ExerciseNode> getLiveNode() {
-        return liveNode;
+        adapter = new LoaderAdapter<>(loader, new ExerciseNode());
     }
 
     public LiveData<ExerciseNode> load(long exerciseId) {
-        if (liveNode == null) {
-            ExerciseNode node = new ExerciseNode();
-            Flowable<ExerciseNode> flowable = loader.loadById(node, exerciseId);
-            liveNode = LiveDataReactiveStreams.fromPublisher(flowable);
-        }
+        return adapter.load(exerciseId);
+    }
 
-        return liveNode;
+    @Override
+    protected void onCleared() {
+        if (adapter != null) {
+            adapter.clear();
+        }
     }
 }

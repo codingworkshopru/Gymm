@@ -1,53 +1,80 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.design.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<layout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:fitsSystemWindows="true"
-    tools:context=".ui.info.exercise.ExerciseInfoActivity">
+    xmlns:tools="http://schemas.android.com/tools">
 
-    <android.support.design.widget.AppBarLayout
-        android:id="@+id/app_bar"
+    <data>
+        <variable
+            name="videoLoaded"
+            type="boolean"/>
+
+        <import type="android.view.View" />
+    </data>
+
+    <android.support.design.widget.CoordinatorLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:fitsSystemWindows="true"
-        android:theme="@style/AppTheme.NoActionBar.AppBarOverlay">
+        android:layout_height="match_parent"
+        tools:context=".ui.info.exercise.ExerciseInfoActivity">
 
-        <android.support.design.widget.CollapsingToolbarLayout
-            android:id="@+id/toolbar_layout"
+        <android.support.design.widget.AppBarLayout
+            android:id="@+id/app_bar"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:fitsSystemWindows="true"
-            app:titleEnabled="false"
-            app:contentScrim="?attr/colorPrimary"
-            app:layout_scrollFlags="scroll|enterAlways|enterAlwaysCollapsed">
+            android:theme="@style/AppTheme.NoActionBar.AppBarOverlay">
 
-            <FrameLayout
-                android:id="@+id/exerciseInfoYouTubePlayerContainer"
+            <android.support.design.widget.CollapsingToolbarLayout
+                android:id="@+id/toolbar_layout"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content">
+                android:layout_height="wrap_content"
+                app:titleEnabled="false"
+                app:layout_scrollFlags="scroll|enterAlways|enterAlwaysCollapsed">
 
-                <ImageView
-                    android:id="@+id/exerciseInfoStubImage"
+                <com.google.android.youtube.player.YouTubeThumbnailView
+                    android:id="@+id/exerciseInfoVideoThumbnail"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:adjustViewBounds="true"
                     android:scaleType="centerCrop"
+                    tools:src="@drawable/sporty_woman"/>
+
+                <ImageButton
+                    android:id="@+id/exerciseInfoPlayVideoButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:onClick="onPlayVideoButtonClick"
+                    android:visibility="@{videoLoaded ? View.VISIBLE : View.GONE}"
+                    app:srcCompat="@drawable/ic_play_arrow_white_24dp" />
+
+                <ProgressBar
+                    android:id="@+id/exerciseInfoPlayVideoProgress"
+                    style="?android:attr/progressBarStyle"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:indeterminate="true"
+                    android:visibility="@{!videoLoaded ? View.VISIBLE : View.GONE}"/>
+
+                <TextView
+                    android:id="@+id/exerciseInfoVideoError"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:background="?attr/colorPrimary"
                     android:visibility="gone"
                     tools:visibility="visible"
-                    app:srcCompat="@drawable/sporty_woman" />
+                    tools:text="@string/exercise_info_video_not_exists"/>
 
-            </FrameLayout>
+            </android.support.design.widget.CollapsingToolbarLayout>
+        </android.support.design.widget.AppBarLayout>
 
-        </android.support.design.widget.CollapsingToolbarLayout>
-    </android.support.design.widget.AppBarLayout>
+        <android.support.v4.widget.NestedScrollView
+            android:id="@+id/exerciseInfoActivityInfoContainer"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:scrollbars="vertical"
+            app:layout_behavior="@string/appbar_scrolling_view_behavior"/>
 
-    <android.support.v4.widget.NestedScrollView
-        android:id="@+id/exerciseInfoActivityInfoContainer"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:scrollbars="vertical"
-        app:layout_behavior="@string/appbar_scrolling_view_behavior"/>
-
-</android.support.design.widget.CoordinatorLayout>
+    </android.support.design.widget.CoordinatorLayout>
+</layout>
