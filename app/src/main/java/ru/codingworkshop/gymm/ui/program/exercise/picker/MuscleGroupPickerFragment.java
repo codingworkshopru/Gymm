@@ -7,8 +7,8 @@ import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.support.annotation.ColorInt;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.annotation.VisibleForTesting;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
@@ -34,46 +34,31 @@ import ru.codingworkshop.gymm.data.entity.MuscleGroup;
 public class MuscleGroupPickerFragment extends Fragment {
     private static final String ANTERIOR_KEY = "anteriorKey";
 
-    public interface OnMuscleGroupPickListener {
-        void onMuscleGroupPick(MuscleGroup muscleGroup);
-    }
-
     @Inject
     ViewModelProvider.Factory viewModelFactory;
-    @VisibleForTesting
-    OnMuscleGroupPickListener listener;
-    private MuscleGroupPickerViewModel viewModel;
+    private ExercisePickerViewModel viewModel;
     private ImageView mapImage;
 
     @Override
     public void onAttach(Context context) {
         AndroidSupportInjection.inject(this);
         super.onAttach(context);
-
-        if (listener == null) {
-            if (context instanceof OnMuscleGroupPickListener) {
-                listener = (OnMuscleGroupPickListener) context;
-            } else if (getParentFragment() instanceof OnMuscleGroupPickListener) {
-                listener = (OnMuscleGroupPickListener) getParentFragment();
-            } else {
-                throw new IllegalStateException("parent must implement " + OnMuscleGroupPickListener.class + " interface");
-            }
-        }
     }
 
     @Override
-    public void onCreate(@Nullable Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
+    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
 
-        viewModel = ViewModelProviders.of(this, viewModelFactory).get(MuscleGroupPickerViewModel.class);
+        viewModel = ViewModelProviders.of(getActivity(), viewModelFactory)
+                .get(ExercisePickerViewModel.class);
 
-        viewModel.load(getArguments().getBoolean(ANTERIOR_KEY))
+        viewModel.getMuscleGroups(getArguments().getBoolean(ANTERIOR_KEY))
                 .observe(this, this::onMuscleGroupsLoaded);
     }
 
     @Nullable
     @Override
-    public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         boolean isAnterior = getArguments().getBoolean(ANTERIOR_KEY);
 
         View root = inflater.inflate(R.layout.fragment_muscle_group_picker, container, false);
@@ -104,18 +89,19 @@ public class MuscleGroupPickerFragment extends Fragment {
                         return color == muscleGroupColor;
                     });
                     if (found.isPresent()) {
-                        listener.onMuscleGroupPick(found.get());
+                        viewModel.setMuscleGroup(found.get());
                     }
                     v.performClick();
                 case MotionEvent.ACTION_DOWN:
                     return true;
+                default:
+                    return false;
             }
-
-            return false;
         });
     }
 
-    private @ColorInt int findColorOnMap(MotionEvent event) {
+    @ColorInt
+    private int findColorOnMap(MotionEvent event) {
         int x = (int) event.getX();
         int y = (int) event.getY();
 
@@ -123,10 +109,11 @@ public class MuscleGroupPickerFragment extends Fragment {
             return Color.BLACK;
 
         mapImage.setDrawingCacheEnabled(true);
-        Bitmap b = Bitmap.createBitmap(mapImage.getDrawingCache());
+        Bitmap b = Bitmap.createBitmap(mapImage.getDrawingCache(false));
         mapImage.setDrawingCacheEnabled(false);
-
-        return b.getPixel(x, y);
+        int pixel = b.getPixel(x, y);
+        b.recycle();
+        return pixel;
     }
 
     public static MuscleGroupPickerFragment newInstance(boolean anterior) {

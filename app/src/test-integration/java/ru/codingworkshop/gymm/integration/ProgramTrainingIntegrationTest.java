@@ -12,9 +12,14 @@ import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.Test;
 
+import java.util.List;
+
 import ru.codingworkshop.gymm.R;
+import ru.codingworkshop.gymm.data.entity.Exercise;
+import ru.codingworkshop.gymm.data.entity.ProgramExercise;
 import ru.codingworkshop.gymm.db.GymmDatabase;
 import ru.codingworkshop.gymm.ui.MainActivity;
+import ru.codingworkshop.gymm.util.Models;
 
 import static android.support.test.espresso.Espresso.onView;
 import static android.support.test.espresso.action.ViewActions.click;
@@ -47,8 +52,10 @@ import static ru.codingworkshop.gymm.integration.Operation.typeSetAndSaveIt;
 @LargeTest
 public class ProgramTrainingIntegrationTest {
     @Rule public ActivityTestRule<MainActivity> activityTestRule =
-            new ActivityTestRule<>(MainActivity.class);
+            new ActivityTestRule<>(MainActivity.class, false, false);
     private static GymmDatabase db;
+    private String trainingName;
+    private String exerciseName;
 
     @BeforeClass
     public static void initDb() {
@@ -64,15 +71,26 @@ public class ProgramTrainingIntegrationTest {
     @Before
     public void setUp() throws Exception {
         db.compileStatement("delete from ProgramTraining").executeUpdateDelete();
+
+        trainingName = "zoo";
+        exerciseName = db.getExerciseDao()
+                .getExerciseById(1L)
+                .map(Exercise::getName)
+                .blockingFirst();
+
+        db.getProgramTrainingDao().insertProgramTraining(Models.createProgramTraining(1L, trainingName));
+        List<ProgramExercise> programExercises = Models.createProgramExercises(1);
+        programExercises.get(0).setExerciseId(1);
+        db.getProgramTrainingDao().insertProgramExercises(programExercises);
+        db.getProgramTrainingDao().insertProgramSets(Models.createProgramSets(programExercises.get(0).getId(), 1));
+
+        activityTestRule.launchActivity(null);
     }
 
     @LargeTest
     @Test
     public void addProgramTraining() {
-        addOneProgramTraining("monday workout", "Приседания в гакк-тренажере");
-    }
-
-    private void addOneProgramTraining(String trainingName, String exerciseName) {
+        trainingName = "foo";
         addProgramTrainingClick();
         typeProgramTrainingName(trainingName);
         addProgramExerciseClick();
@@ -89,10 +107,8 @@ public class ProgramTrainingIntegrationTest {
     @LargeTest
     @Test
     public void addAndEditProgramSet() {
-        addOneProgramTraining("monday workout", "Приседания в гакк-тренажере");
-
-        editProgramTrainingClick("monday workout");
-        editProgramExerciseClick("Приседания в гакк-тренажере");
+        editProgramTrainingClick(trainingName);
+        editProgramExerciseClick(exerciseName);
         // add
         addProgramSetClick();
         typeSetAndSaveIt(7, 6, 5);
@@ -103,8 +119,8 @@ public class ProgramTrainingIntegrationTest {
         saveProgramExerciseClick();
         saveProgramTrainingClick();
 
-        editProgramTrainingClick("monday workout");
-        editProgramExerciseClick("Приседания в гакк-тренажере");
+        editProgramTrainingClick(trainingName);
+        editProgramExerciseClick(exerciseName);
         checkSet(0, 8, 9, 10);
         checkSet(1, 7, 6, 5);
     }
@@ -112,12 +128,12 @@ public class ProgramTrainingIntegrationTest {
     @LargeTest
     @Test
     public void addAndEditProgramExercise() {
-        addOneProgramTraining("monday workout", "Приседания в гакк-тренажере");
+//        addOneProgramTraining("monday workout", "Приседания в гакк-тренажере");
 
-        editProgramTrainingClick("monday workout");
+        editProgramTrainingClick(trainingName);
 
         // edit
-        editProgramExerciseClick("Приседания в гакк-тренажере");
+        editProgramExerciseClick(exerciseName);
         pickExercise(db, "Отжимания от пола");
         addProgramSetClick();
         typeSetAndSaveIt(1, 2, 5);
@@ -131,7 +147,7 @@ public class ProgramTrainingIntegrationTest {
         saveProgramExerciseClick();
 
         saveProgramTrainingClick();
-        editProgramTrainingClick("monday workout");
+        editProgramTrainingClick(trainingName);
         checkProgramExercise(0, "Отжимания от пола", 2);
         checkProgramExercise(1, "Жим штанги лёжа", 1);
     }
@@ -139,12 +155,10 @@ public class ProgramTrainingIntegrationTest {
     @LargeTest
     @Test
     public void editProgramTraining() {
-        addOneProgramTraining("monday workout", "Приседания в гакк-тренажере");
-
-        editProgramTrainingClick("monday workout");
+        editProgramTrainingClick(trainingName);
         clearProgramTrainingName();
         typeProgramTrainingName("tuesday workout");
-        editProgramExerciseClick("Приседания в гакк-тренажере");
+        editProgramExerciseClick(exerciseName);
         editProgramSetClick(0);
         typeSetAndSaveIt(5, 5, 0);
         checkSet(0, 5, 5, 0);
@@ -154,7 +168,7 @@ public class ProgramTrainingIntegrationTest {
         addProgramSetClick();
         typeSetAndSaveIt(1, 0, 0);
         saveProgramExerciseClick();
-        checkProgramExercise(0, "Приседания в гакк-тренажере", 2);
+        checkProgramExercise(0, exerciseName, 2);
         saveProgramTrainingClick();
         checkProgramTraining("tuesday workout");
     }
@@ -247,9 +261,7 @@ public class ProgramTrainingIntegrationTest {
     @LargeTest
     @Test
     public void undoChangesAfterExerciseAddition() {
-        addOneProgramTraining("workout is ruined", "Отжимания от пола");
-
-        editProgramTrainingClick("workout is ruined");
+        editProgramTrainingClick(trainingName);
 
         addProgramExerciseClick();
         pickExercise(db, "Приседания со штангой");
@@ -260,7 +272,7 @@ public class ProgramTrainingIntegrationTest {
         Espresso.pressBack();
         onView(withText(android.R.string.ok)).perform(click());
 
-        editProgramTrainingClick("workout is ruined");
+        editProgramTrainingClick(trainingName);
         checkExerciseNotPresented("Приседания со штангой");
     }
 
@@ -286,9 +298,7 @@ public class ProgramTrainingIntegrationTest {
     @LargeTest
     @Test
     public void deleteAllAndAdd() {
-        addOneProgramTraining("training", "Отжимания от пола");
-
-        editProgramTrainingClick("training");
+        editProgramTrainingClick(trainingName);
         enterActionMode(R.id.programExerciseList);
         deleteProgramExerciseAt(0);
         exitActionMode();

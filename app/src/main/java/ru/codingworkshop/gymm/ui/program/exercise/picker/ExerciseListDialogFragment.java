@@ -4,12 +4,12 @@ import android.app.Dialog;
 import android.arch.lifecycle.ViewModelProvider;
 import android.arch.lifecycle.ViewModelProviders;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.databinding.DataBindingUtil;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.annotation.VisibleForTesting;
 import android.support.design.widget.BottomSheetDialog;
 import android.support.design.widget.BottomSheetDialogFragment;
 import android.support.v7.widget.RecyclerView;
@@ -36,38 +36,28 @@ public class ExerciseListDialogFragment extends BottomSheetDialogFragment {
     private static final String MUSCLE_GROUP_ID_KEY = "muscleGroupIdKey";
     private static final String MUSCLE_GROUP_NAME_KEY = "muscleGroupNameKey";
 
-    public interface OnExerciseClickListener {
-        void onExerciseClick(Exercise exercise);
-    }
-
     @Inject
     ViewModelProvider.Factory viewModelFactory;
-    @VisibleForTesting
-    OnExerciseClickListener exerciseClickListener;
+    private ExercisePickerViewModel viewModel;
     private RecyclerView recyclerView;
 
     @Override
     public void onAttach(Context context) {
         AndroidSupportInjection.inject(this);
         super.onAttach(context);
-
-        if (exerciseClickListener == null) {
-            if (context instanceof OnExerciseClickListener) {
-                exerciseClickListener = (OnExerciseClickListener) context;
-            } else if (getParentFragment() instanceof OnExerciseClickListener) {
-                exerciseClickListener = (OnExerciseClickListener) getParentFragment();
-            } else {
-                throw new IllegalStateException("Parent must implement " + OnExerciseClickListener.class + " interface");
-            }
-        }
     }
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        ExerciseListDialogViewModel viewModel = ViewModelProviders.of(this, viewModelFactory).get(ExerciseListDialogViewModel.class);
-        viewModel.load(getArguments().getLong(MUSCLE_GROUP_ID_KEY)).observe(this, this::onExercisesLoaded);
+        viewModel = ViewModelProviders.of(getActivity(), viewModelFactory).get(ExercisePickerViewModel.class);
+        viewModel.getExercisesForMuscleGroup().observe(this, this::onExercisesLoaded);
+    }
+
+    @Override
+    public void onCancel(DialogInterface dialog) {
+        viewModel.clearMuscleGroup();
     }
 
     @NonNull
@@ -110,7 +100,7 @@ public class ExerciseListDialogFragment extends BottomSheetDialogFragment {
 
     private void onExerciseClick(View v) {
         Exercise exercise = ((FragmentExercisePickerListItemBinding) DataBindingUtil.getBinding(v)).getExercise();
-        exerciseClickListener.onExerciseClick(exercise);
+        viewModel.setExercise(exercise);
     }
 
     public static ExerciseListDialogFragment newInstance(long muscleGroupId, String title) {

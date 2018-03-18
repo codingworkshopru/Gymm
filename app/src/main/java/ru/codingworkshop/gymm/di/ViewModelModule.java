@@ -12,8 +12,7 @@ import ru.codingworkshop.gymm.ui.info.exercise.ExerciseInfoFragmentViewModel;
 import ru.codingworkshop.gymm.ui.info.statistics.journal.StatisticsJournalViewModel;
 import ru.codingworkshop.gymm.ui.info.statistics.plot.StatisticsPlotViewModel;
 import ru.codingworkshop.gymm.ui.program.ProgramTrainingViewModel;
-import ru.codingworkshop.gymm.ui.program.exercise.picker.ExerciseListDialogViewModel;
-import ru.codingworkshop.gymm.ui.program.exercise.picker.MuscleGroupPickerViewModel;
+import ru.codingworkshop.gymm.ui.program.exercise.picker.ExercisePickerViewModel;
 import ru.codingworkshop.gymm.viewmodel.ViewModelFactory;
 
 /**
@@ -39,13 +38,8 @@ abstract class ViewModelModule {
 
     @Binds
     @IntoMap
-    @ViewModelKey(MuscleGroupPickerViewModel.class)
-    abstract ViewModel bindMuscleGroupPickerViewModel(MuscleGroupPickerViewModel muscleGroupPickerViewModel);
-
-    @Binds
-    @IntoMap
-    @ViewModelKey(ExerciseListDialogViewModel.class)
-    abstract ViewModel bindExerciseListDialogViewModel(ExerciseListDialogViewModel exerciseListDialogViewModel);
+    @ViewModelKey(ExercisePickerViewModel.class)
+    abstract ViewModel bindExercisePickerViewModel(ExercisePickerViewModel exercisePickerViewModel);
 
     @Binds
     @IntoMap

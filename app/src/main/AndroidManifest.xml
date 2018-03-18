@@ -13,7 +13,6 @@
         android:label="@string/app_name"
         android:supportsRtl="true"
         android:theme="@style/AppTheme.NoActionBar">
-
         <service
             android:name=".service.TrainingForegroundService"
             android:description="@string/time_service_description"
@@ -29,7 +28,6 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-
         <activity
             android:name=".ui.actual.ActualTrainingActivity"
             android:parentActivityName=".ui.MainActivity">
@@ -37,7 +35,6 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="ru.codingworkshop.gymm.ui.MainActivity" />
         </activity>
-
         <activity
             android:name=".ui.program.ProgramTrainingActivity"
             android:launchMode="singleTop"
@@ -46,7 +43,6 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="ru.codingworkshop.gymm.ui.MainActivity" />
         </activity>
-
         <activity
             android:name=".ui.program.exercise.picker.ExercisePickerActivity"
             android:launchMode="singleTop"
@@ -55,11 +51,9 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".ui.program.ProgramTrainingActivity" />
         </activity>
-
         <activity
             android:name=".ui.info.exercise.ExerciseInfoActivity"
             android:theme="@style/AppTheme.NoActionBar.TranslucentStatusOn" />
-
         <activity
             android:name=".ui.info.statistics.plot.StatisticsPlotActivity"
             android:label="@string/statistics_activity_title"
@@ -68,7 +62,6 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="ru.codingworkshop.gymm.ui.MainActivity" />
         </activity>
-
         <activity
             android:name=".ui.info.statistics.journal.StatisticsJournalActivity"
             android:launchMode="singleTop"

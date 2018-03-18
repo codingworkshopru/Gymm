@@ -1,7 +1,10 @@
 package ru.codingworkshop.gymm.ui.program.exercise.picker;
 
+import android.arch.lifecycle.ViewModelProvider;
+import android.arch.lifecycle.ViewModelProviders;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.annotation.Nullable;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -24,12 +27,11 @@ import ru.codingworkshop.gymm.data.entity.MuscleGroup;
 import ru.codingworkshop.gymm.ui.program.exercise.ProgramExerciseFragment;
 
 public class ExercisePickerActivity extends AppCompatActivity implements
-        HasSupportFragmentInjector,
-        MuscleGroupPickerFragment.OnMuscleGroupPickListener,
-        ExerciseListDialogFragment.OnExerciseClickListener
+        HasSupportFragmentInjector
 {
 
     @Inject DispatchingAndroidInjector<Fragment> fragmentInjector;
+    @Inject ViewModelProvider.Factory viewModelFactory;
 
     private static final String EXERCISE_LIST_DIALOG_TAG = "exerciseListDialogTag";
 
@@ -37,6 +39,12 @@ public class ExercisePickerActivity extends AppCompatActivity implements
     protected void onCreate(Bundle savedInstanceState) {
         AndroidInjection.inject(this);
         super.onCreate(savedInstanceState);
+
+        ExercisePickerViewModel viewModel = ViewModelProviders.of(this, viewModelFactory)
+                .get(ExercisePickerViewModel.class);
+        viewModel.getMuscleGroup().observe(this, this::onMuscleGroupPicked);
+        viewModel.getExercise().observe(this, this::onExercisePicked);
+
         setContentView(R.layout.activity_muscles);
 
         setSupportActionBar(findViewById(R.id.exercisePickerToolbar));
@@ -45,23 +53,32 @@ public class ExercisePickerActivity extends AppCompatActivity implements
             supportActionBar.setDisplayHomeAsUpEnabled(true);
         }
 
+
         ViewPager viewPager = findViewById(R.id.exercisePickerHumanBodyContainer);
-        viewPager.setAdapter(new FragmentPagerAdapter(getSupportFragmentManager()) {
-            @Override
-            public Fragment getItem(int position) {
-                return MuscleGroupPickerFragment.newInstance(position == 0);
-            }
+        if (viewPager != null) {
+            viewPager.setAdapter(new FragmentPagerAdapter(getSupportFragmentManager()) {
+                @Override
+                public Fragment getItem(int position) {
+                    return MuscleGroupPickerFragment.newInstance(position == 0);
+                }
 
-            @Override
-            public int getCount() {
-                return 2;
-            }
-        });
+                @Override
+                public int getCount() {
+                    return 2;
+                }
+            });
 
-        TabLayout tabLayout = findViewById(R.id.exercisePickerHumanBodyTabs);
+            TabLayout tabLayout = findViewById(R.id.exercisePickerHumanBodyTabs);
 
-        viewPager.addOnPageChangeListener(new TabLayout.TabLayoutOnPageChangeListener(tabLayout));
-        tabLayout.addOnTabSelectedListener(new TabLayout.ViewPagerOnTabSelectedListener(viewPager));
+            viewPager.addOnPageChangeListener(new TabLayout.TabLayoutOnPageChangeListener(tabLayout));
+            tabLayout.addOnTabSelectedListener(new TabLayout.ViewPagerOnTabSelectedListener(viewPager));
+        } else {
+            FragmentManager fragmentManager = getSupportFragmentManager();
+            fragmentManager.beginTransaction()
+                    .replace(R.id.exercisePickerHumanBodyAnterior, MuscleGroupPickerFragment.newInstance(true))
+                    .replace(R.id.exercisePickerHumanBodyPosterior, MuscleGroupPickerFragment.newInstance(false))
+                    .commitAllowingStateLoss();
+        }
     }
 
     @Override
@@ -73,19 +90,19 @@ public class ExercisePickerActivity extends AppCompatActivity implements
         return super.onOptionsItemSelected(item);
     }
 
-    @Override
-    public void onMuscleGroupPick(MuscleGroup muscleGroup) {
+    public void onMuscleGroupPicked(@Nullable MuscleGroup muscleGroup) {
         FragmentManager fragmentManager = getSupportFragmentManager();
         ExerciseListDialogFragment fragment = (ExerciseListDialogFragment) fragmentManager.findFragmentByTag(EXERCISE_LIST_DIALOG_TAG);
         if (fragment != null) {
             fragment.dismiss();
         }
-        fragment = ExerciseListDialogFragment.newInstance(muscleGroup.getId(), muscleGroup.getName());
-        fragment.show(fragmentManager, EXERCISE_LIST_DIALOG_TAG);
+        if (muscleGroup != null) {
+            fragment = ExerciseListDialogFragment.newInstance(muscleGroup.getId(), muscleGroup.getName());
+            fragment.show(fragmentManager, EXERCISE_LIST_DIALOG_TAG);
+        }
     }
 
-    @Override
-    public void onExerciseClick(Exercise exercise) {
+    public void onExercisePicked(Exercise exercise) {
         Intent resultIntent = new Intent();
         resultIntent.putExtra(ProgramExerciseFragment.EXERCISE_ID_KEY, exercise.getId());
         resultIntent.putExtra(ProgramExerciseFragment.EXERCISE_NAME_KEY, exercise.getName());

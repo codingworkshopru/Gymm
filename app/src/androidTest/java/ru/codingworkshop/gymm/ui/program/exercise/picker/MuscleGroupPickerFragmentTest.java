@@ -34,7 +34,6 @@ import ru.codingworkshop.gymm.ui.Matchers;
 import ru.codingworkshop.gymm.util.Models;
 
 import static android.support.test.espresso.Espresso.onView;
-import static android.support.test.espresso.action.ViewActions.click;
 import static android.support.test.espresso.assertion.ViewAssertions.matches;
 import static android.support.test.espresso.matcher.ViewMatchers.withId;
 import static org.mockito.ArgumentMatchers.any;
@@ -53,8 +52,7 @@ public class MuscleGroupPickerFragmentTest {
     @Rule public InstantTaskExecutorRule instantTaskExecutorRule = new InstantTaskExecutorRule();
 
     @Mock private ViewModelProvider.Factory viewModelFactory;
-    @Mock private MuscleGroupPickerViewModel vm;
-    @Mock private MuscleGroupPickerFragment.OnMuscleGroupPickListener listener;
+    @Mock private ExercisePickerViewModel vm;
 
     @Before
     public void setUp() throws Exception {
@@ -63,23 +61,23 @@ public class MuscleGroupPickerFragmentTest {
         when(viewModelFactory.create(any())).thenReturn(vm);
         LiveData<List<MuscleGroup>> liveMuscleGroups = Models.createLiveMuscleGroups(200L);
         liveMuscleGroups.getValue().get(0).setMapColorRgb("#0066CC");
-        when(vm.load(false)).thenReturn(liveMuscleGroups);
+        when(vm.getMuscleGroups(false)).thenReturn(liveMuscleGroups);
 
         MuscleGroupPickerFragment fragment = MuscleGroupPickerFragment.newInstance(false);
         fragment.viewModelFactory = viewModelFactory;
-        fragment.listener = listener;
         activityTestRule.getActivity().setFragment(fragment);
     }
 
     @Test
-    public void humanMusclesImageVisibilityTest() throws Exception {
-        onView(withId(R.id.muscleGroupPickerHumanMuscles)).check(matches(Matchers.hasImage(R.drawable.human_muscles_posterior)));
+    public void humanMusclesImageVisibilityTest() {
+        onView(withId(R.id.muscleGroupPickerHumanMuscles))
+                .check(matches(Matchers.hasImage(R.drawable.human_muscles_posterior)));
     }
 
     @Test
-    public void tapOnMuscleGroupTest() throws Exception {
+    public void tapOnMuscleGroupTest() {
         onView(withId(R.id.muscleGroupPickerHumanMuscles)).perform(clickOnMuscleGroupWithColor("#0066CC"));
-        verify(listener).onMuscleGroupPick(argThat(mg -> mg.getId() == 200L));
+        verify(vm).setMuscleGroup(argThat(mg -> mg.getId() == 200L));
     }
 
     public static GeneralClickAction clickOnMuscleGroupWithColor(String color) {
