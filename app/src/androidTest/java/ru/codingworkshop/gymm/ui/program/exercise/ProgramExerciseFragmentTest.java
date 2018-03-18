@@ -217,7 +217,7 @@ public class ProgramExerciseFragmentTest {
         when(vm.isProgramExerciseChanged()).thenReturn(true);
         onView(both(isAssignableFrom(ImageButton.class)).and(withParent(withId(R.id.programExerciseToolbar)))).perform(click());
         onView(withText(R.string.cancel_changes_question)).check(matches(isDisplayed()));
-        onView(withText(android.R.string.ok)).perform(click());
+        onView(withText(R.string.yes_button_text)).perform(click());
         verify(vm).isProgramExerciseChanged();
     }
 

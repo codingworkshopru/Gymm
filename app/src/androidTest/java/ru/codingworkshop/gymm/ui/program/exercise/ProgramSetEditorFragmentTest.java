@@ -20,12 +20,10 @@ import org.junit.runner.RunWith;
 import org.mockito.InOrder;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
 import org.mockito.junit.MockitoJUnitRunner;
 
 import ru.codingworkshop.gymm.R;
 import ru.codingworkshop.gymm.data.entity.ProgramSet;
-import ru.codingworkshop.gymm.data.util.LiveDataUtil;
 import ru.codingworkshop.gymm.testing.SimpleFragmentActivity;
 import ru.codingworkshop.gymm.ui.program.ProgramTrainingViewModel;
 import ru.codingworkshop.gymm.util.Models;
@@ -41,7 +39,6 @@ import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThat;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -72,14 +69,14 @@ public class ProgramSetEditorFragmentTest {
     }
 
     @Test
-    public void repsPickerTest() throws Exception {
+    public void repsPickerTest() {
         checkPicker(R.id.programSetRepsPicker, "1");
         onView(withId(android.R.id.button1)).perform(click());
         assertNotEquals(1, set.getReps());
     }
 
     @Test
-    public void minutesPickerTest() throws Exception {
+    public void minutesPickerTest() {
         checkPicker(R.id.programSetRestMinutesPicker, "0");
         onView(withId(android.R.id.button1)).perform(click());
         assertNotNull(set.getSecondsForRest());
@@ -87,7 +84,7 @@ public class ProgramSetEditorFragmentTest {
     }
 
     @Test
-    public void secondsPickerTest() throws Exception {
+    public void secondsPickerTest() {
         checkPicker(R.id.programSetRestSecondsPicker, "0");
         onView(withId(android.R.id.button1)).perform(click());
         assertNotNull(set.getSecondsForRest());
@@ -95,7 +92,7 @@ public class ProgramSetEditorFragmentTest {
     }
 
     @Test
-    public void saveSetTest() throws Exception {
+    public void saveSetTest() {
         onView(withId(android.R.id.button1)).perform(click());
 
         InOrder ord = inOrder(listener, vm);
@@ -105,7 +102,7 @@ public class ProgramSetEditorFragmentTest {
     }
 
     @Test
-    public void editProgramSet() throws Exception {
+    public void editProgramSet() {
         ProgramSet set = new ProgramSet();
         set.setReps(10);
         set.setMinutes(1);
@@ -120,13 +117,13 @@ public class ProgramSetEditorFragmentTest {
     }
 
     @Test
-    public void onCancelTest() throws Exception {
+    public void onCancelTest() {
         onView(withId(android.R.id.button2)).perform(click());
         verify(vm).setProgramSet(null);
     }
 
     @Test
-    public void onBackPressTest() throws Exception {
+    public void onBackPressTest() {
         Espresso.pressBack();
         verify(vm).setProgramSet(null);
     }

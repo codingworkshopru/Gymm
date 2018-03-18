@@ -209,7 +209,7 @@ public class ProgramTrainingFragmentTest {
 
         onView(both(isAssignableFrom(ImageButton.class)).and(withParent(withId(R.id.programTrainingToolbar)))).perform(click());
         onView(withText(R.string.cancel_changes_question)).check(matches(isDisplayed()));
-        onView(withText(android.R.string.ok)).perform(click());
+        onView(withText(R.string.yes_button_text)).perform(click());
 
         verify(vm).isProgramTrainingChanged();
         verify(vm, never()).saveTree();

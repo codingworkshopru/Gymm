@@ -4,11 +4,14 @@ import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.StringRes;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.FragmentManager;
+
+import ru.codingworkshop.gymm.R;
 
 /**
  * Created by Радик on 10.05.2017.
@@ -110,7 +113,11 @@ public final class AlertDialogFragment extends DialogFragment {
         @StringRes int positiveButton = args.getInt(POSITIVE_BUTTON_RESOURCE_KEY);
         @StringRes int negativeButton = args.getInt(NEGATIVE_BUTTON_RESOURCE_KEY);
 
-        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+        AlertDialog.Builder builder = new AlertDialog.Builder(
+                getContext(),
+                Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP
+                        ? R.style.ThemeOverlay_AppCompat_Dialog_Alert : 0);
+
         if (title != 0) {
             builder.setTitle(title);
         }

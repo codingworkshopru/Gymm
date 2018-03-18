@@ -137,7 +137,7 @@ public final class Matchers {
             return false;
         }
 
-        Bitmap actualBitmap = Bitmap.createBitmap(actual.getBounds().width(), actual.getBounds().height(), Bitmap.Config.ARGB_8888);
+        Bitmap actualBitmap = Bitmap.createBitmap(actual.getIntrinsicWidth(), actual.getIntrinsicHeight(), Bitmap.Config.ARGB_8888);
         Canvas canvas = new Canvas(actualBitmap);
         actual.draw(canvas);
 

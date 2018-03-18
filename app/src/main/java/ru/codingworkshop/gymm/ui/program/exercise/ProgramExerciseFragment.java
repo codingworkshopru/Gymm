@@ -237,7 +237,12 @@ public class ProgramExerciseFragment extends BaseFragment implements
     @Override
     public void onFragmentClose() {
         if (viewModel.isProgramExerciseChanged()) {
-            alert.showTwoButtonsAlert(CANCEL_ALERT_ID, R.string.cancel_changes_question);
+            Bundle args = new AlertDialogFragment.ArgumentsBuilder()
+                    .setMessage(R.string.cancel_changes_question)
+                    .setPositiveButtonText(R.string.yes_button_text)
+                    .setNegativeButtonText(R.string.no_button_text)
+                    .build();
+            alert.showAlert(CANCEL_ALERT_ID, args);
         } else {
             close();
         }
