@@ -1,6 +1,7 @@
 package ru.codingworkshop.gymm.ui.actual;
 
 import android.os.Bundle;
+import android.support.annotation.VisibleForTesting;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.app.AppCompatDelegate;
@@ -17,8 +18,7 @@ import ru.codingworkshop.gymm.ui.actual.rest.ActualTrainingRestFragment;
 
 public class ActualTrainingActivity extends AppCompatActivity implements
         ActualExercisesFragment.ActualExercisesCallback,
-        ActualTrainingRestFragment.ActualTrainingRestCallback,
-        HasSupportFragmentInjector
+        ActualTrainingRestFragment.ActualTrainingRestCallback, HasSupportFragmentInjector
 {
 
     public static final String ACTUAL_EXERCISES_FRAGMENT_TAG = "actualExercisesFragmentTag";
@@ -29,7 +29,8 @@ public class ActualTrainingActivity extends AppCompatActivity implements
 
     @Inject
     DispatchingAndroidInjector<Fragment> fragmentInjector;
-    private Fragment actualExercisesFragment;
+    @VisibleForTesting
+    Fragment actualExercisesFragment;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

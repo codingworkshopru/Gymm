@@ -7,6 +7,7 @@ import android.support.annotation.Nullable;
 import android.support.annotation.VisibleForTesting;
 
 import io.reactivex.disposables.Disposable;
+import io.reactivex.schedulers.Schedulers;
 import ru.codingworkshop.gymm.data.tree.loader.common.Loader;
 
 import static android.support.annotation.VisibleForTesting.PACKAGE_PRIVATE;
@@ -27,10 +28,12 @@ public class LoaderAdapter<T> {
     public LiveData<T> load(long id) {
         if (liveData == null) {
             liveData = new MutableLiveData<>();
-            disposable = loader.loadById(value, id).subscribe(t -> {
-                liveData.postValue(t);
-                clear();
-            });
+            disposable = loader.loadById(value, id)
+                    .subscribeOn(Schedulers.io())
+                    .subscribe(t -> {
+                        liveData.postValue(t);
+                        clear();
+                    });
         }
 
         return liveData;

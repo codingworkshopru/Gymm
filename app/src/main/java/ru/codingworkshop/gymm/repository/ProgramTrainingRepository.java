@@ -40,12 +40,8 @@ public class ProgramTrainingRepository {
         return dao.getProgramTrainings();
     }
 
-    public Flowable<ProgramTraining> getProgramTrainingById(long trainingId) {
+    public ProgramTraining getProgramTrainingById(long trainingId) {
         return dao.getProgramTrainingById(trainingId);
-    }
-
-    public ProgramTraining getProgramTrainingByIdSync(long id) {
-        return dao.getProgramTrainingByIdSync(id);
     }
 
     public LiveData<ProgramTraining> getProgramTrainingByName(String name) {
@@ -66,12 +62,8 @@ public class ProgramTrainingRepository {
         return dao.updateProgramTraining(programTraining);
     }
 
-    public Flowable<List<ProgramExercise>> getProgramExercisesForTraining(long trainingId) {
+    public List<ProgramExercise> getProgramExercisesForTraining(long trainingId) {
         return dao.getProgramExercisesForTraining(trainingId);
-    }
-
-    public List<ProgramExercise> getProgramExercisesForTrainingSync(long trainingId) {
-        return dao.getProgramExercisesForTrainingSync(trainingId);
     }
 
     public List<Long> insertProgramExercises(@NonNull Collection<ProgramExercise> programExercises) {
@@ -98,12 +90,8 @@ public class ProgramTrainingRepository {
         return dao.deleteProgramExercises(exerciseEntities);
     }
 
-    public Flowable<List<ProgramSet>> getProgramSetsForTraining(long trainingId) {
+    public List<ProgramSet> getProgramSetsForTraining(long trainingId) {
         return dao.getProgramSetsForTraining(trainingId);
-    }
-
-    public List<ProgramSet> getProgramSetsForTrainingSync(long trainingId) {
-        return dao.getProgramSetsForTrainingSync(trainingId);
     }
 
     public List<Long> insertProgramSets(@NonNull Collection<ProgramSet> sets) {

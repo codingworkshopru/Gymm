@@ -3,14 +3,12 @@ package ru.codingworkshop.gymm.data.tree.repositoryadapter;
 import java.util.Collection;
 import java.util.List;
 
-import io.reactivex.Flowable;
-
 /**
  * Created by Radik on 13.11.2017.
  */
 
 public interface GrandchildrenAdapter<GC> {
-    Flowable<List<GC>> getGrandchildren(long id);
+    List<GC> getGrandchildren(long id);
 
     void insertGrandchildren(Collection<GC> grandchildren);
     void updateGrandchildren(Collection<GC> grandchildren);

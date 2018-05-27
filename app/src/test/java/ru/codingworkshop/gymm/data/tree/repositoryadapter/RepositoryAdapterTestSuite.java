@@ -17,13 +17,10 @@ import org.junit.runners.Suite;
         PrimaryMuscleGroupQueryAdapterTest.class,
         ProgramExercisesAlterAdapterTest.class,
         ProgramExercisesQueryAdapterTest.class,
-        ProgramExercisesSyncQueryAdapterTest.class,
         ProgramSetsAlterAdapterTest.class,
         ProgramSetsQueryAdapterTest.class,
-        ProgramSetsSyncQueryAdapterTest.class,
         ProgramTrainingAlterAdapterTest.class,
         ProgramTrainingQueryAdapterTest.class,
-        ProgramTrainingSyncQueryAdapterTest.class,
         SecondaryMuscleGroupsQueryAdapterTest.class
 })
 public class RepositoryAdapterTestSuite {

@@ -9,11 +9,12 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 
-import io.reactivex.Flowable;
 import ru.codingworkshop.gymm.repository.ExercisesRepository;
 import ru.codingworkshop.gymm.repository.MuscleGroupsRepository;
 import ru.codingworkshop.gymm.util.Models;
 
+import static junit.framework.Assert.assertFalse;
+import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.when;
 
 /**
@@ -29,25 +30,25 @@ public class ExerciseAdapterTest {
     @Rule public InstantTaskExecutorRule instantTaskExecutorRule = new InstantTaskExecutorRule();
 
     @Test
-    public void getPrimaryMuscleGroup() throws Exception {
+    public void getPrimaryMuscleGroup() {
         when(muscleGroupsRepository.getPrimaryMuscleGroupForExercise(100L))
-                .thenReturn(Flowable.just(Models.createMuscleGroup(200L, "bar")));
+                .thenReturn(Models.createMuscleGroup(200L, "bar"));
 
-        adapter.getPrimaryMuscleGroup(100L).test().assertValue(mg -> mg.getId() == 200L);
+        assertEquals(200L, adapter.getPrimaryMuscleGroup(100L).getId());
     }
 
     @Test
-    public void getParent() throws Exception {
-        when(exercisesRepository.getExerciseById(100L)).thenReturn(Flowable.just(Models.createExercise(100L, "foo")));
+    public void getParent() {
+        when(exercisesRepository.getExerciseById(100L)).thenReturn(Models.createExercise(100L, "foo"));
 
-        adapter.getParent(100L).test().assertValue(mg -> mg.getId() == 100L);
+        assertEquals(100L, adapter.getParent(100L).getId());
     }
 
     @Test
-    public void getChildren() throws Exception {
-        when(muscleGroupsRepository.getSecondaryMuscleGroupsForExercise(100L)).thenReturn(Flowable.just(Models.createMuscleGroups(201L)));
+    public void getChildren() {
+        when(muscleGroupsRepository.getSecondaryMuscleGroupsForExercise(100L)).thenReturn(Models.createMuscleGroups(201L));
 
-        adapter.getChildren(100L).test().assertValue(mgs -> !mgs.isEmpty());
+        assertFalse(adapter.getChildren(100L).isEmpty());
     }
 
 }

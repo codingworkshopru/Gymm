@@ -50,11 +50,11 @@ public class ActualTrainingTreeLoaderTest {
     }
 
     @Test
-    public void load() throws Exception {
+    public void load() {
         ActualTrainingAdapter adapter = mock(ActualTrainingAdapter.class);
-        when(adapter.getParent(11L)).thenReturn(Flowable.just(Models.createActualTraining(11L, 1L)));
-        when(adapter.getChildren(11L)).thenReturn(Flowable.just(Models.createActualExercises(12L)));
-        when(adapter.getGrandchildren(11L)).thenReturn(Flowable.just(Models.createActualSets(12L, 13L)));
+        when(adapter.getParent(11L)).thenReturn(Models.createActualTraining(11L, 1L));
+        when(adapter.getChildren(11L)).thenReturn(Models.createActualExercises(12L));
+        when(adapter.getGrandchildren(11L)).thenReturn(Models.createActualSets(12L, 13L));
 
         ProgramTrainingTreeLoader programTrainingLoader = mock(ProgramTrainingTreeLoader.class);
         when(programTrainingLoader.loadById(any(ProgramTrainingTree.class), eq(1L))).thenReturn(Flowable.just(programTree));

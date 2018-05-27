@@ -21,15 +21,11 @@ public class ExerciseLoader implements Loader<ExerciseNode> {
 
     @Override
     public Flowable<ExerciseNode> loadById(ExerciseNode node, long id) {
-        return Flowable.zip(
-                Flowable.just(node),
-                exerciseAdapter.getParent(id),
-                exerciseAdapter.getChildren(id),
-                exerciseAdapter.getPrimaryMuscleGroup(id),
-                (exerciseNode, exercise, children, muscleGroup) -> {
-                    exerciseNode.setParent(exercise);
-                    exerciseNode.setChildren(children);
-                    exerciseNode.setPrimaryMuscleGroup(muscleGroup);
+        return Flowable.just(node)
+                .map(exerciseNode -> {
+                    exerciseNode.setParent(exerciseAdapter.getParent(id));
+                    exerciseNode.setChildren(exerciseAdapter.getChildren(id));
+                    exerciseNode.setPrimaryMuscleGroup(exerciseAdapter.getPrimaryMuscleGroup(id));
                     return exerciseNode;
                 });
     }

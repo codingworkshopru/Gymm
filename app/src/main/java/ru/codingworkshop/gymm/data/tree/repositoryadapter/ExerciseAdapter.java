@@ -5,7 +5,6 @@ import java.util.List;
 
 import javax.inject.Inject;
 
-import io.reactivex.Flowable;
 import ru.codingworkshop.gymm.data.entity.Exercise;
 import ru.codingworkshop.gymm.data.entity.MuscleGroup;
 import ru.codingworkshop.gymm.repository.ExercisesRepository;
@@ -25,12 +24,12 @@ public class ExerciseAdapter implements ParentAdapter<Exercise>, ChildrenAdapter
         this.muscleGroupsRepository = muscleGroupsRepository;
     }
 
-    public Flowable<MuscleGroup> getPrimaryMuscleGroup(long exerciseId) {
+    public MuscleGroup getPrimaryMuscleGroup(long exerciseId) {
         return muscleGroupsRepository.getPrimaryMuscleGroupForExercise(exerciseId);
     }
 
     @Override
-    public Flowable<Exercise> getParent(long parentId) {
+    public Exercise getParent(long parentId) {
         return exercisesRepository.getExerciseById(parentId);
     }
 
@@ -50,7 +49,7 @@ public class ExerciseAdapter implements ParentAdapter<Exercise>, ChildrenAdapter
     }
 
     @Override
-    public Flowable<List<MuscleGroup>> getChildren(long parentId) {
+    public List<MuscleGroup> getChildren(long parentId) {
         return muscleGroupsRepository.getSecondaryMuscleGroupsForExercise(parentId);
     }
 

@@ -18,17 +18,11 @@ public class ImmutableActualTrainingTreeLoader implements Loader<ImmutableActual
 
     @Override
     public Flowable<ImmutableActualTrainingTree> loadById(ImmutableActualTrainingTree tree, long id) {
-        ImmutableActualTrainingTreeBuilder actualTrainingTreeBuilder = new ImmutableActualTrainingTreeBuilder(tree);
-        return Flowable.zip(
-                Flowable.just(actualTrainingTreeBuilder),
-                adapter.getParent(id),
-                adapter.getChildren(id),
-                adapter.getGrandchildren(id),
-                (builder, actualTraining, actualExercises, actualSets) -> {
-                    builder.setParent(actualTraining);
-                    builder.setChildren(actualExercises);
-                    builder.setGrandchildren(actualSets);
-
+        return Flowable.just(new ImmutableActualTrainingTreeBuilder(tree))
+                .map(builder -> {
+                    builder.setParent(adapter.getParent(id));
+                    builder.setChildren(adapter.getChildren(id));
+                    builder.setGrandchildren(adapter.getGrandchildren(id));
                     return (ImmutableActualTrainingTree) builder.build();
                 });
     }

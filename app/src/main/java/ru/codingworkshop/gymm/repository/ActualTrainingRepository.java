@@ -40,7 +40,7 @@ public class ActualTrainingRepository {
         this.insertDelegate = insertDelegate;
     }
 
-    public Flowable<ActualTraining> getActualTrainingById(long actualTrainingId) {
+    public ActualTraining getActualTrainingById(long actualTrainingId) {
         return dao.getActualTrainingById(actualTrainingId);
     }
 
@@ -66,7 +66,7 @@ public class ActualTrainingRepository {
         );
     }
 
-    public Flowable<List<ActualExercise>> getActualExercisesForActualTraining(long actualTrainingId) {
+    public List<ActualExercise> getActualExercisesForActualTraining(long actualTrainingId) {
         return dao.getActualExercisesForActualTraining(actualTrainingId);
     }
 
@@ -91,7 +91,7 @@ public class ActualTrainingRepository {
         Preconditions.checkArgument(isValidId(actualExercise.getActualTrainingId()));
     }
 
-    public Flowable<List<ActualSet>> getActualSetsForActualTraining(long actualTrainingId) {
+    public List<ActualSet> getActualSetsForActualTraining(long actualTrainingId) {
         return dao.getActualSetsForActualTraining(actualTrainingId);
     }
 
@@ -131,7 +131,7 @@ public class ActualTrainingRepository {
         return dao.getActualExerciseNames();
     }
 
-    public Flowable<List<ExercisePlotTuple>> getStatisticsForExercise(@NonNull String exerciseName, @Nullable Date startDate) {
+    public List<ExercisePlotTuple> getStatisticsForExercise(@NonNull String exerciseName, @Nullable Date startDate) {
         return dao.getStatisticsForExercise(exerciseName, startDate);
     }
 

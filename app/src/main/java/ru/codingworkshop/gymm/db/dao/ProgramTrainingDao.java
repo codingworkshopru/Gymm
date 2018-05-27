@@ -10,7 +10,6 @@ import android.arch.persistence.room.Update;
 import java.util.Collection;
 import java.util.List;
 
-import io.reactivex.Flowable;
 import ru.codingworkshop.gymm.data.entity.ProgramExercise;
 import ru.codingworkshop.gymm.data.entity.ProgramSet;
 import ru.codingworkshop.gymm.data.entity.ProgramTraining;
@@ -27,10 +26,7 @@ public interface ProgramTrainingDao {
     LiveData<List<ProgramTraining>> getProgramTrainings();
 
     @Query("select * from ProgramTraining where id = :id")
-    Flowable<ProgramTraining> getProgramTrainingById(long id);
-
-    @Query("select * from ProgramTraining where id = :id")
-    ProgramTraining getProgramTrainingByIdSync(long id);
+    ProgramTraining getProgramTrainingById(long id);
 
     @Query("select * from ProgramTraining where name = :name")
     LiveData<ProgramTraining> getProgramTrainingByName(String name);
@@ -48,13 +44,7 @@ public interface ProgramTrainingDao {
             "from ProgramExercise " +
             "where programTrainingId = :programTrainingId " +
             "order by sortOrder")
-    Flowable<List<ProgramExercise>> getProgramExercisesForTraining(long programTrainingId);
-
-    @Query("select * " +
-            "from ProgramExercise " +
-            "where programTrainingId = :programTrainingId " +
-            "order by sortOrder")
-    List<ProgramExercise> getProgramExercisesForTrainingSync(long programTrainingId);
+    List<ProgramExercise> getProgramExercisesForTraining(long programTrainingId);
 
     @Insert
     List<Long> insertProgramExercises(Collection<ProgramExercise> programExercises);
@@ -70,14 +60,7 @@ public interface ProgramTrainingDao {
             "join ProgramExercise pe on pe.id = ps.programExerciseId " +
             "where pe.programTrainingId = :programTrainingId " +
             "order by pe.sortOrder, ps.sortOrder")
-    Flowable<List<ProgramSet>> getProgramSetsForTraining(long programTrainingId);
-
-    @Query("select ps.* " +
-            "from ProgramSet ps " +
-            "join ProgramExercise pe on pe.id = ps.programExerciseId " +
-            "where pe.programTrainingId = :programTrainingId " +
-            "order by pe.sortOrder, ps.sortOrder")
-    List<ProgramSet> getProgramSetsForTrainingSync(long programTrainingId);
+    List<ProgramSet> getProgramSetsForTraining(long programTrainingId);
 
     @Insert
     List<Long> insertProgramSets(Collection<ProgramSet> programSets);

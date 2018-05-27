@@ -24,7 +24,7 @@ public class ActualTrainingAdapter implements ParentAdapter<ActualTraining>, Chi
     }
 
     @Override
-    public Flowable<ActualTraining> getParent(long id) {
+    public ActualTraining getParent(long id) {
         return repository.getActualTrainingById(id);
     }
 
@@ -44,7 +44,7 @@ public class ActualTrainingAdapter implements ParentAdapter<ActualTraining>, Chi
     }
 
     @Override
-    public Flowable<List<ActualExercise>> getChildren(long id) {
+    public List<ActualExercise> getChildren(long id) {
         return repository.getActualExercisesForActualTraining(id);
     }
 
@@ -63,7 +63,7 @@ public class ActualTrainingAdapter implements ParentAdapter<ActualTraining>, Chi
     }
 
     @Override
-    public Flowable<List<ActualSet>> getGrandchildren(long id) {
+    public List<ActualSet> getGrandchildren(long id) {
         return repository.getActualSetsForActualTraining(id);
     }
 

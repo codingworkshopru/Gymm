@@ -14,7 +14,6 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 
-import io.reactivex.Flowable;
 import ru.codingworkshop.gymm.data.entity.ActualExercise;
 import ru.codingworkshop.gymm.data.entity.ActualSet;
 import ru.codingworkshop.gymm.data.entity.ActualTraining;
@@ -31,7 +30,7 @@ public interface ActualTrainingDao {
     LiveData<List<ActualTraining>> getActualTrainings();
 
     @Query("select * from ActualTraining where id = :actualTrainingId")
-    Flowable<ActualTraining> getActualTrainingById(long actualTrainingId);
+    ActualTraining getActualTrainingById(long actualTrainingId);
 
     @Insert
     long insertActualTraining(ActualTraining actualTraining);
@@ -66,14 +65,14 @@ public interface ActualTrainingDao {
     @Query("select * " +
             "from ActualExercise " +
             "where actualTrainingId = :actualTrainingId")
-    Flowable<List<ActualExercise>> getActualExercisesForActualTraining(long actualTrainingId);
+    List<ActualExercise> getActualExercisesForActualTraining(long actualTrainingId);
 
     @Query("select aset.* " +
             "from ActualSet aset " +
             "join ActualExercise ae on ae.id = aset.actualExerciseId " +
             "where ae.actualTrainingId = :actualTrainingId " +
             "order by ae.id, aset.id")
-    Flowable<List<ActualSet>> getActualSetsForActualTraining(long actualTrainingId);
+    List<ActualSet> getActualSetsForActualTraining(long actualTrainingId);
 
     @Query("select distinct exerciseName from ActualExercise order by exerciseName")
     LiveData<List<String>> getActualExerciseNames();
@@ -91,5 +90,5 @@ public interface ActualTrainingDao {
             "join ActualSet s on s.actualExerciseId = e.id " +
             "where e.exerciseName = :exerciseName and (startTime > coalesce(:startDate, 0)) " +
             "order by startTime")
-    Flowable<List<ExercisePlotTuple>> getStatisticsForExercise(@NonNull String exerciseName, @Nullable Date startDate);
+    List<ExercisePlotTuple> getStatisticsForExercise(@NonNull String exerciseName, @Nullable Date startDate);
 }

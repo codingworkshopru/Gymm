@@ -18,8 +18,7 @@ import java.util.Locale;
 
 import javax.inject.Inject;
 
-import hu.akarnokd.rxjava2.math.MathObservable;
-import io.reactivex.Observable;
+import io.reactivex.Flowable;
 import io.reactivex.disposables.Disposable;
 import ru.codingworkshop.gymm.data.entity.ExercisePlotTuple;
 import ru.codingworkshop.gymm.repository.ActualTrainingRepository;
@@ -77,16 +76,14 @@ public class StatisticsPlotViewModel extends ViewModel {
 
         onCleared();
 
-        subscribe = repository.getStatisticsForExercise(getExerciseNameById(exercise), getStartDateById(range))
-                .take(1)
-                .toObservable()
-                .flatMap(Observable::fromIterable)
+        subscribe = Flowable.just(repository.getStatisticsForExercise(getExerciseNameById(exercise), getStartDateById(range)))
+                .flatMap(Flowable::fromIterable)
                 .map(tuple -> Pair.create(tuple.getTrainingTime(), getDataFunctionById(data).apply(tuple)))
                 .filter(pair -> pair.second != null)
                 .groupBy(pair -> pair.first, pair -> pair.second.floatValue())
                 .flatMap(dateNumberGroupedFlowable ->
-                        MathObservable
-                                .sumFloat(dateNumberGroupedFlowable)
+                        dateNumberGroupedFlowable.reduce(.0f, (accum, element) -> accum + element)
+                                .toFlowable()
                                 .map(n -> new Entry(dateNumberGroupedFlowable.getKey().getTime(), n)))
                 .toSortedList((o1, o2) -> Float.compare(o1.getX(), o2.getX()))
                 .subscribe(chartEntries::postValue);

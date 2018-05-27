@@ -41,7 +41,7 @@ public class MuscleGroupsRepositoryTest {
     }
 
     @Test
-    public void isEmpty() throws Exception {
+    public void isEmpty() {
         when(dao.getMuscleGroupsCount()).thenReturn(1);
         assertFalse(repository.isEmpty());
 
@@ -52,7 +52,7 @@ public class MuscleGroupsRepositoryTest {
     }
 
     @Test
-    public void getMuscleGroups() throws Exception {
+    public void getMuscleGroups() {
         final LiveData<List<MuscleGroup>> liveMuscleGroups = Models.createLiveMuscleGroups(1L);
         when(dao.getAllMuscleGroups()).thenReturn(liveMuscleGroups);
         assertEquals(liveMuscleGroups, repository.getMuscleGroups());
@@ -60,7 +60,7 @@ public class MuscleGroupsRepositoryTest {
     }
 
     @Test
-    public void getMuscleGroupsBySide() throws Exception {
+    public void getMuscleGroupsBySide() {
         LiveData<List<MuscleGroup>> muscleGroups = Models.createLiveMuscleGroups(1L);
         when(dao.getMuscleGroups(true)).thenReturn(muscleGroups);
         assertEquals(muscleGroups, repository.getMuscleGroups(true));
@@ -68,14 +68,14 @@ public class MuscleGroupsRepositoryTest {
     }
 
     @Test
-    public void insertMuscleGroups() throws Exception {
+    public void insertMuscleGroups() {
         final List<MuscleGroup> muscleGroups = Models.createMuscleGroups(1L);
         repository.insertMuscleGroups(muscleGroups);
         verify(dao).insertMuscleGroups(muscleGroups);
     }
 
     @Test
-    public void getMuscleGroupById() throws Exception {
+    public void getMuscleGroupById() {
         final LiveData<MuscleGroup> muscleGroup = Models.createLiveMuscleGroup(1L, "foo");
         when(dao.getMuscleGroupById(1L)).thenReturn(muscleGroup);
         assertEquals(muscleGroup, repository.getMuscleGroupById(1L));
@@ -83,14 +83,14 @@ public class MuscleGroupsRepositoryTest {
     }
 
     @Test
-    public void getPrimaryMuscleGroupForExercise() throws Exception {
+    public void getPrimaryMuscleGroupForExercise() {
         repository.getPrimaryMuscleGroupForExercise(100L);
         verify(dao).getPrimaryMuscleGroupForExercise(100L);
     }
 
     @Test
-    public void getSecondaryMuscleGroupsForExercise() throws Exception {
-        final Flowable<List<MuscleGroup>> just = Flowable.just(Models.createMuscleGroups(2L));
+    public void getSecondaryMuscleGroupsForExercise() {
+        List<MuscleGroup> just = Models.createMuscleGroups(2L);
         when(dao.getSecondaryMuscleGroupsForExercise(1L)).thenReturn(just);
         assertEquals(just, repository.getSecondaryMuscleGroupsForExercise(1L));
         verify(dao).getSecondaryMuscleGroupsForExercise(1L);

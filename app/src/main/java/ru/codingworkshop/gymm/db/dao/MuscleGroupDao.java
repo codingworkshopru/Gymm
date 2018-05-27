@@ -8,7 +8,6 @@ import android.arch.persistence.room.Query;
 import java.util.Collection;
 import java.util.List;
 
-import io.reactivex.Flowable;
 import ru.codingworkshop.gymm.data.entity.MuscleGroup;
 
 import static android.arch.persistence.room.OnConflictStrategy.FAIL;
@@ -44,10 +43,10 @@ public interface MuscleGroupDao {
             "join SecondaryMuscleGroupLink as l on l.muscleGroupId = mg.id " +
             "where l.exerciseId = :exerciseId " +
             "order by name")
-    Flowable<List<MuscleGroup>> getSecondaryMuscleGroupsForExercise(long exerciseId);
+    List<MuscleGroup> getSecondaryMuscleGroupsForExercise(long exerciseId);
 
     @Query("select mg.* from MuscleGroup as mg " +
             "join Exercise e on e.primaryMuscleGroupId = mg.id " +
             "where e.id = :exerciseId")
-    Flowable<MuscleGroup> getPrimaryMuscleGroupForExercise(long exerciseId);
+    MuscleGroup getPrimaryMuscleGroupForExercise(long exerciseId);
 }

@@ -8,7 +8,6 @@ import java.util.List;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
-import io.reactivex.Flowable;
 import ru.codingworkshop.gymm.data.entity.Exercise;
 import ru.codingworkshop.gymm.db.dao.ExerciseDao;
 import ru.codingworkshop.gymm.db.dao.MuscleGroupDao;
@@ -42,11 +41,11 @@ public class ExercisesRepository {
         return exerciseDao.getExercisesForPrimaryMuscleGroup(muscleGroupId);
     }
 
-    public Flowable<Exercise> getExerciseById(long id) {
+    public Exercise getExerciseById(long id) {
         return exerciseDao.getExerciseById(id);
     }
 
-    public Flowable<List<Exercise>> getExercisesForProgramTraining(long programTrainingId) {
+    public List<Exercise> getExercisesForProgramTraining(long programTrainingId) {
         return exerciseDao.getExercisesForProgramTraining(programTrainingId);
     }
 }

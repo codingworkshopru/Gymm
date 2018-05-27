@@ -58,7 +58,7 @@ public class StatisticsPlotViewModelTest {
         tuple.setTrainingTime(new Date());
         tuple.setReps(1);
         tuple.setWeight(1.0);
-        when(repository.getStatisticsForExercise("foo", null)).thenReturn(Flowable.just(Collections.singletonList(tuple)));
+        when(repository.getStatisticsForExercise("foo", null)).thenReturn(Collections.singletonList(tuple));
         vm.getChartEntries().observeForever(l -> {});
         vm.getExerciseId().setValue(0L);
         vm.getDataTypeId().setValue(0L);

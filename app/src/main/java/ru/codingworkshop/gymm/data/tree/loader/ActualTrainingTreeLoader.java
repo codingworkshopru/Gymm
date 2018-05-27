@@ -22,31 +22,25 @@ public class ActualTrainingTreeLoader implements Loader<ActualTrainingTree> {
     private ProgramTrainingTreeLoader programTrainingTreeLoader;
 
     @Inject
-    public ActualTrainingTreeLoader(@NonNull ActualTrainingAdapter dataSource, @NonNull ProgramTrainingTreeLoader programTrainingTreeLoader) {
+    ActualTrainingTreeLoader(@NonNull ActualTrainingAdapter dataSource, @NonNull ProgramTrainingTreeLoader programTrainingTreeLoader) {
         this.dataSource = dataSource;
         this.programTrainingTreeLoader = programTrainingTreeLoader;
     }
 
     @Override
     public Flowable<ActualTrainingTree> loadById(ActualTrainingTree tree, long id) {
-        ActualTrainingTreeBuilder actualTrainingTreeBuilder = new ActualTrainingTreeBuilder(tree);
-        Flowable<ActualTraining> parentFlowable = dataSource.getParent(id);
-        return Flowable.zip(
-                Flowable.just(actualTrainingTreeBuilder),
-                parentFlowable,
-                dataSource.getChildren(id),
-                dataSource.getGrandchildren(id),
-                parentFlowable.switchMap(actualTraining -> {
-                    ProgramTrainingTree programTrainingTree = new ImmutableProgramTrainingTree();
-                    return programTrainingTreeLoader.loadById(programTrainingTree, actualTraining.getProgramTrainingId());
-                }),
-                (builder, actualTraining, actualExercises, actualSets, programTrainingTree) -> {
-                    builder.setParent(actualTraining);
-                    builder.setChildren(actualExercises);
-                    builder.setGrandchildren(actualSets);
-                    builder.setProgramTrainingTree(programTrainingTree);
+        return Flowable.just(new ActualTrainingTreeBuilder(tree))
+                .map(builder -> {
+                    ActualTraining parent = dataSource.getParent(id);
+                    builder.setParent(parent);
+                    builder.setChildren(dataSource.getChildren(id));
+                    builder.setGrandchildren(dataSource.getGrandchildren(id));
+                    ProgramTrainingTree programTrainingTree1 = programTrainingTreeLoader.loadById(
+                            new ImmutableProgramTrainingTree(),
+                            parent.getProgramTrainingId()
+                    ).blockingFirst();
+                    builder.setProgramTrainingTree(programTrainingTree1);
                     return (ActualTrainingTree) builder.build();
-                }
-        );
+                });
     }
 }

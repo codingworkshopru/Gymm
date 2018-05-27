@@ -76,8 +76,8 @@ public class ProgramTrainingTreeSaverTest {
 
     @Test
     public void save() {
-        when(repository.getProgramExercisesForTrainingSync(1L)).thenReturn(Collections.emptyList());
-        when(repository.getProgramSetsForTrainingSync(1L)).thenReturn(Collections.emptyList());
+        when(repository.getProgramExercisesForTraining(1L)).thenReturn(Collections.emptyList());
+        when(repository.getProgramSetsForTraining(1L)).thenReturn(Collections.emptyList());
 
         doAnswer((Answer<List<Long>>) invocation -> {
             List<ProgramExercise> programExercises = invocation.getArgument(0);

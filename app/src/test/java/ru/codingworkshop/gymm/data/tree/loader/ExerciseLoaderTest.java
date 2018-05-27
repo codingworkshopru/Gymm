@@ -36,15 +36,15 @@ public class ExerciseLoaderTest {
 
     @Before
     public void setUp() throws Exception {
-        when(exerciseAdapter.getParent(100L)).thenReturn(Flowable.just(Models.createExercise(100L, "foo")));
-        when(exerciseAdapter.getPrimaryMuscleGroup(100L)).thenReturn(Flowable.just(Models.createMuscleGroup(200L, "bar")));
+        when(exerciseAdapter.getParent(100L)).thenReturn(Models.createExercise(100L, "foo"));
+        when(exerciseAdapter.getPrimaryMuscleGroup(100L)).thenReturn(Models.createMuscleGroup(200L, "bar"));
 
         node = new ExerciseNode();
     }
 
     @Test
-    public void loadById() throws Exception {
-        when(exerciseAdapter.getChildren(100L)).thenReturn(Flowable.just(Models.createMuscleGroups(1L)));
+    public void loadById() {
+        when(exerciseAdapter.getChildren(100L)).thenReturn(Models.createMuscleGroups(1L));
         loader.loadById(node, 100L)
                 .test()
                 .assertValue(testNode -> 100L == testNode.getParent().getId() && 200L == node.getPrimaryMuscleGroup().getId());
@@ -56,8 +56,8 @@ public class ExerciseLoaderTest {
     }
 
     @Test
-    public void loadByIdWithoutSecondaryMuscleGroups() throws Exception {
-        when(exerciseAdapter.getChildren(100L)).thenReturn(Flowable.just(new ArrayList<>()));
+    public void loadByIdWithoutSecondaryMuscleGroups() {
+        when(exerciseAdapter.getChildren(100L)).thenReturn(new ArrayList<>());
 
         loader.loadById(node, 100L)
                 .test()

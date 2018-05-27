@@ -13,9 +13,9 @@ import ru.codingworkshop.gymm.data.entity.ProgramTraining;
 import ru.codingworkshop.gymm.data.tree.node.ProgramExerciseNode;
 import ru.codingworkshop.gymm.data.tree.node.ProgramTrainingTree;
 import ru.codingworkshop.gymm.data.tree.repositoryadapter.ProgramExercisesAlterAdapter;
-import ru.codingworkshop.gymm.data.tree.repositoryadapter.ProgramExercisesSyncQueryAdapter;
+import ru.codingworkshop.gymm.data.tree.repositoryadapter.ProgramExercisesQueryAdapter;
 import ru.codingworkshop.gymm.data.tree.repositoryadapter.ProgramSetsAlterAdapter;
-import ru.codingworkshop.gymm.data.tree.repositoryadapter.ProgramSetsSyncQueryAdapter;
+import ru.codingworkshop.gymm.data.tree.repositoryadapter.ProgramSetsQueryAdapter;
 import ru.codingworkshop.gymm.data.tree.repositoryadapter.ProgramTrainingAlterAdapter;
 import ru.codingworkshop.gymm.db.GymmDatabase;
 import ru.codingworkshop.gymm.repository.ProgramTrainingRepository;
@@ -45,14 +45,14 @@ public class ProgramTrainingTreeSaver implements Saver<ProgramTrainingTree> {
 
         setParentIdsToExercises(tree);
         ChildrenSaver<ProgramExercise> programExerciseChildrenSaver = new ChildrenSaver<>(
-                new ProgramExercisesSyncQueryAdapter(programTrainingRepository),
+                new ProgramExercisesQueryAdapter(programTrainingRepository),
                 new ProgramExercisesAlterAdapter(programTrainingRepository),
                 parent.getId());
         programExerciseChildrenSaver.save(tree.getProgramExercises());
 
         setParentIdsToSets(tree);
         ChildrenSaver<ProgramSet> programSetChildrenSaver = new ChildrenSaver<>(
-                new ProgramSetsSyncQueryAdapter(programTrainingRepository),
+                new ProgramSetsQueryAdapter(programTrainingRepository),
                 new ProgramSetsAlterAdapter(programTrainingRepository),
                 parent.getId());
         programSetChildrenSaver.save(tree.getAllProgramSets());

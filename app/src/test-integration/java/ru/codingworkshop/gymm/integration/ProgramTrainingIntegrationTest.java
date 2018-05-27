@@ -15,7 +15,6 @@ import org.junit.Test;
 import java.util.List;
 
 import ru.codingworkshop.gymm.R;
-import ru.codingworkshop.gymm.data.entity.Exercise;
 import ru.codingworkshop.gymm.data.entity.ProgramExercise;
 import ru.codingworkshop.gymm.db.GymmDatabase;
 import ru.codingworkshop.gymm.ui.MainActivity;
@@ -73,10 +72,7 @@ public class ProgramTrainingIntegrationTest {
         db.compileStatement("delete from ProgramTraining").executeUpdateDelete();
 
         trainingName = "zoo";
-        exerciseName = db.getExerciseDao()
-                .getExerciseById(1L)
-                .map(Exercise::getName)
-                .blockingFirst();
+        exerciseName = db.getExerciseDao().getExerciseById(1L).getName();
 
         db.getProgramTrainingDao().insertProgramTraining(Models.createProgramTraining(1L, trainingName));
         List<ProgramExercise> programExercises = Models.createProgramExercises(1);
@@ -270,7 +266,7 @@ public class ProgramTrainingIntegrationTest {
         saveProgramExerciseClick();
 
         Espresso.pressBack();
-        onView(withText(android.R.string.ok)).perform(click());
+        onView(withText(R.string.yes_button_text)).perform(click());
 
         editProgramTrainingClick(trainingName);
         checkExerciseNotPresented("Приседания со штангой");
@@ -290,7 +286,7 @@ public class ProgramTrainingIntegrationTest {
         addProgramSetClick();
         typeSetAndSaveIt(1, 0, 0);
         Espresso.pressBack();
-        onView(withText(android.R.string.ok)).perform(click());
+        onView(withText(R.string.yes_button_text)).perform(click());
 
         checkProgramExercise(0, "Отжимания от пола", 1);
     }

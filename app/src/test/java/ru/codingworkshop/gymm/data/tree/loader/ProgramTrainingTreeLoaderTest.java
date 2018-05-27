@@ -8,7 +8,6 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 
-import io.reactivex.Flowable;
 import ru.codingworkshop.gymm.data.tree.node.ImmutableProgramTrainingTree;
 import ru.codingworkshop.gymm.data.tree.node.ProgramTrainingTree;
 import ru.codingworkshop.gymm.data.tree.repositoryadapter.ProgramTrainingAdapter;
@@ -30,10 +29,10 @@ public class ProgramTrainingTreeLoaderTest {
 
     @Test
     public void load() {
-        when(adapter.getParent(1L)).thenReturn(Flowable.just(Models.createProgramTraining(1L, "foo")));
-        when(adapter.getChildren(1L)).thenReturn(Flowable.just(Models.createProgramExercises(1)));
-        when(adapter.getGrandchildren(1L)).thenReturn(Flowable.just(Models.createProgramSets(2L, 3)));
-        when(adapter.getExercises(1L)).thenReturn(Flowable.just(Models.createExercises("bar", "baz")));
+        when(adapter.getParent(1L)).thenReturn(Models.createProgramTraining(1L, "foo"));
+        when(adapter.getChildren(1L)).thenReturn(Models.createProgramExercises(1));
+        when(adapter.getGrandchildren(1L)).thenReturn(Models.createProgramSets(2L, 3));
+        when(adapter.getExercises(1L)).thenReturn(Models.createExercises("bar", "baz"));
 
         ProgramTrainingTree tree = new ImmutableProgramTrainingTree();
         ProgramTrainingTreeLoader loader = new ProgramTrainingTreeLoader(adapter);

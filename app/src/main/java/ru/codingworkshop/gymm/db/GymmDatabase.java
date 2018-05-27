@@ -54,7 +54,7 @@ public abstract class GymmDatabase extends RoomDatabase {
     }
 
     @Override
-    public void init(DatabaseConfiguration configuration) {
+    public void init(@NonNull DatabaseConfiguration configuration) {
         super.init(configuration);
     }
 

@@ -5,7 +5,6 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 
-import io.reactivex.Flowable;
 import ru.codingworkshop.gymm.data.tree.node.ImmutableActualTrainingTree;
 import ru.codingworkshop.gymm.data.tree.repositoryadapter.ActualTrainingAdapter;
 import ru.codingworkshop.gymm.util.Models;
@@ -20,9 +19,9 @@ public class ImmutableActualTrainingTreeLoaderTest {
 
     @Test
     public void loadById() {
-        when(adapter.getParent(11L)).thenReturn(Flowable.just(Models.createActualTraining(11L, 1L)));
-        when(adapter.getChildren(11L)).thenReturn(Flowable.just(Models.createActualExercises(12L)));
-        when(adapter.getGrandchildren(11L)).thenReturn(Flowable.just(Models.createActualSets(12L, 13L)));
+        when(adapter.getParent(11L)).thenReturn(Models.createActualTraining(11L, 1L));
+        when(adapter.getChildren(11L)).thenReturn(Models.createActualExercises(12L));
+        when(adapter.getGrandchildren(11L)).thenReturn(Models.createActualSets(12L, 13L));
 
         ImmutableActualTrainingTreeLoader loader = new ImmutableActualTrainingTreeLoader(adapter);
         loader.loadById(new ImmutableActualTrainingTree(), 11L)

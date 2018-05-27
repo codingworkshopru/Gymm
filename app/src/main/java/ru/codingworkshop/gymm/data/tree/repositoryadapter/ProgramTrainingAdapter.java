@@ -31,7 +31,7 @@ public class ProgramTrainingAdapter implements ParentAdapter<ProgramTraining>,
         this.exercisesRepository = exercisesRepository;
     }
 
-    public Flowable<List<Exercise>> getExercises(long programTrainingId) {
+    public List<Exercise> getExercises(long programTrainingId) {
         return exercisesRepository.getExercisesForProgramTraining(programTrainingId);
     }
 
@@ -40,7 +40,7 @@ public class ProgramTrainingAdapter implements ParentAdapter<ProgramTraining>,
     }
 
     @Override
-    public Flowable<ProgramTraining> getParent(long id) {
+    public ProgramTraining getParent(long id) {
         return programTrainingRepository.getProgramTrainingById(id);
     }
 
@@ -60,7 +60,7 @@ public class ProgramTrainingAdapter implements ParentAdapter<ProgramTraining>,
     }
 
     @Override
-    public Flowable<List<ProgramExercise>> getChildren(long id) {
+    public List<ProgramExercise> getChildren(long id) {
         return programTrainingRepository.getProgramExercisesForTraining(id);
     }
 
@@ -80,7 +80,7 @@ public class ProgramTrainingAdapter implements ParentAdapter<ProgramTraining>,
     }
 
     @Override
-    public Flowable<List<ProgramSet>> getGrandchildren(long id) {
+    public List<ProgramSet> getGrandchildren(long id) {
         return programTrainingRepository.getProgramSetsForTraining(id);
     }
 

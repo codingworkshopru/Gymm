@@ -117,8 +117,8 @@ public class ProgramTrainingViewModelTest {
 
         assertNotNull(LiveTest.getValue(vm.loadTree(1L)));
 
-        when(adapter.getParent(1L)).thenReturn(Flowable.just(Models.createProgramTraining(1L, "foo")));
-        when(adapter.getChildren(1L)).thenReturn(Flowable.just(Models.createProgramExercises(1)));
+        when(adapter.getParent(1L)).thenReturn(Models.createProgramTraining(1L, "foo"));
+        when(adapter.getChildren(1L)).thenReturn(Models.createProgramExercises(1));
 
         tree.getParent().setName("bar");
         assertTrue(LiveTest.getValue(vm.isProgramTrainingChanged()));
@@ -206,7 +206,7 @@ public class ProgramTrainingViewModelTest {
     }
 
     @Test
-    public void isProgramExerciseChanged() throws Exception {
+    public void isProgramExerciseChanged() {
         createProgramExercise();
         assertFalse(vm.isProgramExerciseChanged());
 

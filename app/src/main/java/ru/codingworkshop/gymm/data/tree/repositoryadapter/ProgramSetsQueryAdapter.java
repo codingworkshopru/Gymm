@@ -4,11 +4,10 @@ import android.support.annotation.NonNull;
 
 import java.util.List;
 
-import io.reactivex.Flowable;
 import ru.codingworkshop.gymm.data.entity.ProgramSet;
 import ru.codingworkshop.gymm.repository.ProgramTrainingRepository;
 
-public class ProgramSetsQueryAdapter implements ModelQueryAdapter<Flowable<List<ProgramSet>>> {
+public class ProgramSetsQueryAdapter implements ModelQueryAdapter<List<ProgramSet>> {
     private ProgramTrainingRepository programTrainingRepository;
 
     public ProgramSetsQueryAdapter(@NonNull ProgramTrainingRepository programTrainingRepository) {
@@ -17,7 +16,7 @@ public class ProgramSetsQueryAdapter implements ModelQueryAdapter<Flowable<List<
 
     @NonNull
     @Override
-    public Flowable<List<ProgramSet>> query(long programTrainingId) {
+    public List<ProgramSet> query(long programTrainingId) {
         return programTrainingRepository.getProgramSetsForTraining(programTrainingId);
     }
 }

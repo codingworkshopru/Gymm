@@ -7,7 +7,6 @@ import android.arch.persistence.room.Query;
 
 import java.util.List;
 
-import io.reactivex.Flowable;
 import ru.codingworkshop.gymm.data.entity.Exercise;
 import ru.codingworkshop.gymm.data.entity.SecondaryMuscleGroupLink;
 
@@ -26,7 +25,7 @@ public interface ExerciseDao {
     LiveData<List<Exercise>> getExercisesForPrimaryMuscleGroup(long id);
 
     @Query("select * from exercise where id = :id")
-    Flowable<Exercise> getExerciseById(long id);
+    Exercise getExerciseById(long id);
 
     @Query("select count(*) from exercise")
     int getExercisesCount();
@@ -45,7 +44,7 @@ public interface ExerciseDao {
                     "where pe.programTrainingId = :programTrainingId " +
                     "order by pe.sortOrder"
     )
-    Flowable<List<Exercise>> getExercisesForProgramTraining(long programTrainingId);
+    List<Exercise> getExercisesForProgramTraining(long programTrainingId);
 
     @Insert(onConflict = FAIL)
     List<Long> insertExercises(List<Exercise> entities);

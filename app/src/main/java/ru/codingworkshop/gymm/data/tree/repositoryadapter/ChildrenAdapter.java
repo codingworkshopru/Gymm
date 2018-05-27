@@ -3,14 +3,12 @@ package ru.codingworkshop.gymm.data.tree.repositoryadapter;
 import java.util.Collection;
 import java.util.List;
 
-import io.reactivex.Flowable;
-
 /**
  * Created by Radik on 09.11.2017.
  */
 
 public interface ChildrenAdapter<C> {
-    Flowable<List<C>> getChildren(long id);
+    List<C> getChildren(long id);
 
     List<Long> insertChildren(Collection<C> children);
 

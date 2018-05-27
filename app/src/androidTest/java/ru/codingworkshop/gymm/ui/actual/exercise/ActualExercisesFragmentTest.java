@@ -6,6 +6,8 @@ import android.support.annotation.PluralsRes;
 import android.support.test.InstrumentationRegistry;
 import android.support.test.espresso.Espresso;
 import android.support.test.espresso.ViewAction;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
 import android.view.View;
 
 import org.hamcrest.Matcher;
@@ -217,29 +219,25 @@ public class ActualExercisesFragmentTest extends Base {
     }
 
     @Test
-    public void saveStateBeforeDetach() {
+    public void saveStateBeforeDetach() throws Throwable {
         selectStepAtPosition(1);
         onView(stepItem(R.id.stepperItemActualSetsContainer, 1)).perform(swipeLeft());
 
-        activityTestRule
-                .getActivity()
-                .getSupportFragmentManager()
-                .beginTransaction()
+        FragmentManager supportFragmentManager = activityTestRule.getActivity()
+                .getSupportFragmentManager();
+
+        supportFragmentManager.beginTransaction()
                 .remove(fragment)
                 .commit();
 
-        onView(withId(R.id.container)); // waiting for commit finishes
-
+        activityTestRule.runOnUiThread(supportFragmentManager::executePendingTransactions);
         fragment.callback = callback; // onAttach
 
-        activityTestRule
-                .getActivity()
-                .getSupportFragmentManager()
-                .beginTransaction()
+        supportFragmentManager.beginTransaction()
                 .add(R.id.container, fragment)
                 .commit();
 
-        onView(withId(android.R.id.tabcontent)); // waiting for commit finishes
+        activityTestRule.runOnUiThread(supportFragmentManager::executePendingTransactions);
 
         assertItemAtPositionIsActive(1);
         assertCurrentPageIndex(2);

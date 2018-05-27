@@ -60,7 +60,8 @@ public class ProgramTrainingViewModel extends ViewModel {
         currentProgramSet = new MutableLiveData<>();
     }
 
-    @NonNull public LiveData<ProgramTrainingTree> loadTree(long programTrainingId) {
+    @NonNull
+    public LiveData<ProgramTrainingTree> loadTree(long programTrainingId) {
         return loaderAdapter.load(programTrainingId);
     }
 
@@ -82,23 +83,25 @@ public class ProgramTrainingViewModel extends ViewModel {
     }
 
     public LiveData<Boolean> isProgramTrainingChanged() {
-        ProgramTraining parent = tree.getParent();
-        if (!GymmDatabase.isValidId(parent)) {
-            boolean nameChanged = !Strings.isNullOrEmpty(parent.getName());
-            boolean childrenChanged = tree.hasChildren();
-            return LiveDataUtil.getLive(nameChanged || childrenChanged);
-        }
-
         return LiveDataReactiveStreams.fromPublisher(
-                repositoryAdapter.getParent(parent.getId()).switchMap(programTraining -> {
-                    boolean haveSameNames = programTraining.getName().equals(parent.getName());
-                    if (!haveSameNames) {
-                        return Flowable.just(true);
-                    } else {
-                        return repositoryAdapter.getChildren(programTraining.getId())
-                                .map(oldChildren -> !Objects.equal(oldChildren, tree.getProgramExercises()));
-                    }
-                }));
+                Flowable.just(tree.getParent())
+                        .map(newParent -> {
+                            if (!GymmDatabase.isValidId(newParent)) {
+                                boolean nameChanged = !Strings.isNullOrEmpty(newParent.getName());
+                                boolean childrenChanged = tree.hasChildren();
+                                return nameChanged || childrenChanged;
+                            } else {
+                                ProgramTraining persistedParent = repositoryAdapter.getParent(newParent.getId());
+                                boolean hasSameNames = persistedParent.getName().equals(newParent.getName());
+                                if (!hasSameNames) {
+                                    return true;
+                                } else {
+                                    return !Objects.equal(repositoryAdapter.getChildren(persistedParent.getId()), tree.getProgramExercises());
+                                }
+                            }
+                        })
+                        .subscribeOn(Schedulers.io())
+        );
     }
 
     /**
